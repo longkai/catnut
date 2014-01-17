@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<resources>
+
+	<style name="AppTheme" parent="android:Theme.Holo">
+
+	</style>
+
+	<style name="AppTheme.Light" parent="android:Theme.Holo.Light">
+
+	</style>
+
+	<style name="AppTheme.Dark" parent="android:Theme.Holo">
+
+	</style>
+</resources>
