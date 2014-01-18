@@ -1,0 +1,27 @@
+{
+	"name": "tingting",
+	"title": "婷婷",
+	"decription": "新浪微博Android客户端",
+	"author": {
+		"name": "longkai",
+		"url": "https://github.com/longkai",
+		"mail": "im.longai@gmail.com"
+	},
+	"repo": {
+		"type": "git",
+		"url": "https://github.com/longkai/tingting.git"
+	},
+	"keywords": [
+		"weibo",
+		"Android"
+	],
+	"dependencies": [
+		"support-v4",
+		"support-v13",
+		"android-volley"
+	],
+	"license": {
+		"type": "MIT",
+		"url": "http://opensource.org/licenses/mit-license.php"
+	}
+}
