@@ -22,7 +22,9 @@ import com.android.volley.VolleyError;
 import tingting.chen.R;
 import tingting.chen.TingtingApp;
 import tingting.chen.beans.AccessToken;
+import tingting.chen.beans.WeiboAPIError;
 import tingting.chen.util.GsonRequest;
+import tingting.chen.util.HttpUtils;
 import tingting.chen.util.Manifest;
 
 /**
@@ -81,9 +83,10 @@ public class OAuthFragment extends Fragment {
 						new Response.ErrorListener() {
 							@Override
 							public void onErrorResponse(VolleyError error) {
-								Toast.makeText(getActivity(), "auth fail!", Toast.LENGTH_LONG).show();
-								Log.e(TAG, String.valueOf(error.networkResponse.statusCode));
-								Log.e(TAG, new String(error.networkResponse.data));
+								Log.wtf(TAG, "auth fail!", error);
+								WeiboAPIError e = HttpUtils.fromVolleyError(error);
+								ErrorDialogFragment fragment = ErrorDialogFragment.newInstance(null, e.error);
+								fragment.show(getFragmentManager(), null);
 							}
 						}
 					));

@@ -8,4 +8,5 @@
 	<string name="app_name">婷婷</string>
 	<string name="oauth">授权</string>
 	<string name="refresh">刷新</string>
+	<string name="alert_error">出错啦！</string>
 </resources>
