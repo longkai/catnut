@@ -22,9 +22,8 @@ repositories {
 apply plugin: 'android'
 
 ext {
-	SUPPORT_LIB_VERSION = '19.0.1'
-	// 1.9+ is not supported for now!
-	GRADLE_VERSION = '1.8'
+	gsonVersion = '2.2.4'
+	supportLibVersion = '19.0.1'
 }
 
 android {
@@ -61,10 +60,13 @@ dependencies {
 	// you need to use gradle' s multi-project build facility.
 	// if you don' t know how it works, please refer Gradle' s docs or google.
 	compile files("libs/*.jar")
-	compile "com.android.support:support-v4:$SUPPORT_LIB_VERSION"
-	compile "com.android.support:support-v13:$SUPPORT_LIB_VERSION"
+	compile "com.google.code.gson:gson:$gsonVersion"
+	compile "com.android.support:support-v4:$supportLibVersion"
+	compile "com.android.support:support-v13:$supportLibVersion"
+	// please download google android-volley and compile it to a jar or multi-project build!
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = GRADLE_VERSION
+	// 1.9+ is not supported for now!
+	gradleVersion = 1.8
 }
