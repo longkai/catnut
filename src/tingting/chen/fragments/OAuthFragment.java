@@ -132,7 +132,7 @@ public class OAuthFragment extends Fragment {
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
 		mWebView.clearCache(true);
+		super.onDestroy();
 	}
 }
