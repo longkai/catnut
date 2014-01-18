@@ -30,6 +30,7 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 	private static RequestQueue sRequestQueue;
 
 	private SharedPreferences mPreferences;
+	private AccessToken mAccessToken;
 
 	@Override
 	public void onCreate() {
@@ -39,16 +40,16 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 		sRequestQueue = Volley.newRequestQueue(this);
 
 		// 检查用户是否已经成功授权，并且授权是否过期
-		AccessToken accessToken = getUserInfo();
-		if (accessToken.access_token != null) {
+		getAccessToken();
+		if (mAccessToken != null) {
 			long now = System.currentTimeMillis();
-			if (now > accessToken.expires_in) {
-				Log.d(TAG, "用户授权已过期，清除access token...");
-				mPreferences.edit()
-					.remove(ACCESS_TOKEN)
-					.commit();
+			if (now > mAccessToken.expires_in) {
+				// 保存用户的uid信息意义不大，因为只是清掉了uid，他所保存的其它信息依然存在
+				Log.d(TAG, "用户授权已过期，清除授权信息...");
+				invalidateAuth();
+				mAccessToken = null;
 			} else {
-				Log.d(TAG, "授权即将在" + DateUtils.getRelativeTimeSpanString(accessToken.expires_in) + "过期！");
+				Log.d(TAG, "授权将在" + DateUtils.getRelativeTimeSpanString(mAccessToken.expires_in) + "过期！");
 			}
 		}
 	}
@@ -67,20 +68,19 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 	 *
 	 * @param accessToken
 	 */
-	public void saveUserInfo(AccessToken accessToken) {
+	public void saveAccessToken(AccessToken accessToken) {
 		Log.d(TAG, "save user info...");
 		mPreferences.edit()
 			.putLong(UID, accessToken.uid)
 			.putString(ACCESS_TOKEN, accessToken.access_token)
 			.putLong(EXPIRES_IN, accessToken.expires_in * 1000 + System.currentTimeMillis())
 			.commit();
-		// 还有一个将被废弃就不加进鸟=.=
 	}
 
 	/**
 	 * 注销用户
 	 */
-	public void removeUserInfo() {
+	public void invalidateAuth() {
 		Log.d(TAG, "remove user info...");
 		mPreferences.edit()
 			.remove(UID)
@@ -94,12 +94,20 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 	 *
 	 * @return AccessToken
 	 */
-	public AccessToken getUserInfo() {
-		AccessToken accessToken = new AccessToken();
-		accessToken.uid = mPreferences.getLong(UID, 0L);
-		accessToken.access_token = mPreferences.getString(ACCESS_TOKEN, null);
-		accessToken.expires_in = mPreferences.getLong(EXPIRES_IN, 0L);
-		return accessToken;
+	public AccessToken getAccessToken() {
+		if (mAccessToken == null) {
+			long uid = mPreferences.getLong(UID, 0L);
+			long expiresIn = mPreferences.getLong(EXPIRES_IN, 0L);
+			String accessToken = mPreferences.getString(ACCESS_TOKEN, null);
+			// 当且仅当三项都完备的时候我们才会初始化授权信息对象！
+			if (uid != 0L && expiresIn != 0L && accessToken != null) {
+				mAccessToken = new AccessToken();
+				mAccessToken.uid = uid;
+				mAccessToken.access_token = accessToken;
+				mAccessToken.expires_in = expiresIn;
+			}
+		}
+		return mAccessToken;
 	}
 
 	/**

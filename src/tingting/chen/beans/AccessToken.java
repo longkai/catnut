@@ -17,7 +17,7 @@ import android.os.Parcelable;
 public class AccessToken implements Parcelable {
 
 	public long uid;
-	public long remind_in; // 从新浪那里拿回来是秒，但是如果保存用户信息后便会还原为毫秒值！！！
+	// 从新浪那里拿回来是秒，但是如果保存用户信息后便会还原为毫秒值！！！
 	public long expires_in;
 	public String access_token;
 
@@ -29,7 +29,6 @@ public class AccessToken implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeLong(uid);
-		dest.writeLong(remind_in);
 		dest.writeLong(expires_in);
 		dest.writeString(access_token);
 	}
@@ -40,7 +39,6 @@ public class AccessToken implements Parcelable {
 		public AccessToken createFromParcel(Parcel source) {
 			AccessToken accessToken = new AccessToken();
 			accessToken.uid = source.readLong();
-			accessToken.remind_in = source.readLong();
 			accessToken.expires_in = source.readLong();
 			accessToken.access_token = source.readString();
 			return accessToken;

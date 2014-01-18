@@ -29,6 +29,8 @@ public class MainActivity extends Activity {
 
 	private TingtingApp mApp;
 
+	private AccessToken mAccessToken;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -37,9 +39,9 @@ public class MainActivity extends Activity {
 
 		if (savedInstanceState == null) {
 			Fragment fragment;
-			AccessToken accessToken = mApp.getUserInfo();
+			mAccessToken = mApp.getAccessToken();
 			// 判断以下是否已经认证，跳转不同的界面
-			if (accessToken.access_token != null) {
+			if (mAccessToken != null) {
 				fragment = new Fragment() {
 					@Override
 					public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

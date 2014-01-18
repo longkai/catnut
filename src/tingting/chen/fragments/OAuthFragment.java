@@ -67,7 +67,7 @@ public class OAuthFragment extends Fragment {
 							@Override
 							public void onResponse(AccessToken accessToken) {
 								Log.i(TAG, "auth success with uid: " + accessToken.uid);
-								TingtingApp.getTingtingApp().saveUserInfo(accessToken);
+								TingtingApp.getTingtingApp().saveAccessToken(accessToken);
 								// todo 优雅地处理授权成功后的跳转
 								getFragmentManager().beginTransaction()
 									.replace(R.id.fragment_container, new Fragment() {
