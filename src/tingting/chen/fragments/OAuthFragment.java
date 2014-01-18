@@ -20,8 +20,8 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.Volley;
 import tingting.chen.R;
+import tingting.chen.TingtingApp;
 import tingting.chen.beans.AccessToken;
 import tingting.chen.util.GsonRequest;
 import tingting.chen.util.Manifest;
@@ -58,7 +58,7 @@ public class OAuthFragment extends Fragment {
 				String code = Uri.parse(url).getQueryParameter("code");
 				Log.d(TAG, "the auth code is " + code);
 				String accessTokenUri = Manifest.getAccessTokenUri(code);
-				Volley.newRequestQueue(getActivity())
+				TingtingApp.getRequestQueue()
 					.add(new GsonRequest<AccessToken>(
 						Request.Method.POST,
 						accessTokenUri,

@@ -18,7 +18,8 @@
 	<application
 		android:label="@string/app_name"
 		android:icon="@drawable/ic_launcher"
-		android:theme="@style/AppTheme.Light">
+		android:theme="@style/AppTheme.Light"
+		android:name=".TingtingApp">
 		<activity android:name=".ui.MainActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
