@@ -17,7 +17,7 @@ import android.os.Parcelable;
 public class AccessToken implements Parcelable {
 
 	public long uid;
-	public long remind_in; // seconds!
+	public long remind_in; // 从新浪那里拿回来是秒，但是如果保存用户信息后便会还原为毫秒值！！！
 	public long expires_in;
 	public String access_token;
 

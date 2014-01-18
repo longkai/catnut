@@ -8,6 +8,7 @@ package tingting.chen;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.text.format.DateUtils;
 import android.util.Log;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
@@ -41,9 +42,13 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 		AccessToken accessToken = getUserInfo();
 		if (accessToken.access_token != null) {
 			long now = System.currentTimeMillis();
-			if (now > accessToken.expires_in * 1000) {
-				Log.d(TAG, "用户授权已过期，清除信息...");
-				removeUserInfo();
+			if (now > accessToken.expires_in) {
+				Log.d(TAG, "用户授权已过期，清除access token...");
+				mPreferences.edit()
+					.remove(ACCESS_TOKEN)
+					.commit();
+			} else {
+				Log.d(TAG, "授权即将在" + DateUtils.getRelativeTimeSpanString(accessToken.expires_in) + "过期！");
 			}
 		}
 	}
@@ -67,11 +72,14 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 		mPreferences.edit()
 			.putLong(UID, accessToken.uid)
 			.putString(ACCESS_TOKEN, accessToken.access_token)
-			.putLong(EXPIRES_IN, accessToken.expires_in)
+			.putLong(EXPIRES_IN, accessToken.expires_in * 1000 + System.currentTimeMillis())
 			.commit();
 		// 还有一个将被废弃就不加进鸟=.=
 	}
 
+	/**
+	 * 注销用户
+	 */
 	public void removeUserInfo() {
 		Log.d(TAG, "remove user info...");
 		mPreferences.edit()
