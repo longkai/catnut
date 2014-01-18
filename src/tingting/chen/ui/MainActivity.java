@@ -6,18 +6,15 @@
 package tingting.chen.ui;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.MenuItem;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.Volley;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import tingting.chen.R;
+import tingting.chen.TingtingApp;
 import tingting.chen.beans.AccessToken;
 import tingting.chen.fragments.OAuthFragment;
-import tingting.chen.util.GsonRequest;
 
 /**
  * 应用程序主界面。
@@ -30,13 +27,30 @@ public class MainActivity extends Activity {
 
 	public static final String TAG = "MainActivity";
 
+	private TingtingApp mApp;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.fragment_container);
+		mApp = TingtingApp.getTingtingApp();
+
 		if (savedInstanceState == null) {
+			Fragment fragment;
+			AccessToken accessToken = mApp.getUserInfo();
+			// 判断以下是否已经认证，跳转不同的界面
+			if (accessToken.access_token != null) {
+				fragment = new Fragment() {
+					@Override
+					public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+						return inflater.inflate(R.layout.main, container, false);
+					}
+				};
+			} else {
+				fragment = new OAuthFragment();
+			}
 			getFragmentManager().beginTransaction()
-				.replace(R.id.fragment_container, new OAuthFragment())
+				.replace(R.id.fragment_container, fragment)
 				.commit();
 		}
 	}

@@ -11,6 +11,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import tingting.chen.beans.AccessToken;
+
+import static tingting.chen.util.Constants.*;
 
 /**
  * 应用程序对象
@@ -33,6 +36,16 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 		sApp = this;
 		mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		sRequestQueue = Volley.newRequestQueue(this);
+
+		// 检查用户是否已经成功授权，并且授权是否过期
+		AccessToken accessToken = getUserInfo();
+		if (accessToken.access_token != null) {
+			long now = System.currentTimeMillis();
+			if (now > accessToken.expires_in * 1000) {
+				Log.d(TAG, "用户授权已过期，清除信息...");
+				removeUserInfo();
+			}
+		}
 	}
 
 	@Override
@@ -42,6 +55,43 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 
 	public SharedPreferences getPreferences() {
 		return mPreferences;
+	}
+
+	/**
+	 * 保存授权用户的授权信息
+	 *
+	 * @param accessToken
+	 */
+	public void saveUserInfo(AccessToken accessToken) {
+		Log.d(TAG, "save user info...");
+		mPreferences.edit()
+			.putLong(UID, accessToken.uid)
+			.putString(ACCESS_TOKEN, accessToken.access_token)
+			.putLong(EXPIRES_IN, accessToken.expires_in)
+			.commit();
+		// 还有一个将被废弃就不加进鸟=.=
+	}
+
+	public void removeUserInfo() {
+		Log.d(TAG, "remove user info...");
+		mPreferences.edit()
+			.remove(UID)
+			.remove(EXPIRES_IN)
+			.remove(ACCESS_TOKEN)
+			.commit();
+	}
+
+	/**
+	 * 获取已经成功授权用户的信息
+	 *
+	 * @return AccessToken
+	 */
+	public AccessToken getUserInfo() {
+		AccessToken accessToken = new AccessToken();
+		accessToken.uid = mPreferences.getLong(UID, 0L);
+		accessToken.access_token = mPreferences.getString(ACCESS_TOKEN, null);
+		accessToken.expires_in = mPreferences.getLong(EXPIRES_IN, 0L);
+		return accessToken;
 	}
 
 	/**

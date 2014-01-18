@@ -6,7 +6,6 @@
 package tingting.chen.fragments;
 
 import android.app.ActionBar;
-import android.app.AlertDialog;
 import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
@@ -66,12 +65,17 @@ public class OAuthFragment extends Fragment {
 						null,
 						new Response.Listener<AccessToken>() {
 							@Override
-							public void onResponse(AccessToken response) {
-								new AlertDialog.Builder(getActivity())
-									.setMessage(response.access_token)
-									.setTitle(String.valueOf(response.uid))
-									.setNeutralButton(android.R.string.ok, null)
-									.show();
+							public void onResponse(AccessToken accessToken) {
+								Log.i(TAG, "auth success with uid: " + accessToken.uid);
+								TingtingApp.getTingtingApp().saveUserInfo(accessToken);
+								// todo 优雅地处理授权成功后的跳转
+								getFragmentManager().beginTransaction()
+									.replace(R.id.fragment_container, new Fragment() {
+										@Override
+										public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+											return inflater.inflate(R.layout.main, container, false);
+										}
+									}).commit();
 							}
 						},
 						new Response.ErrorListener() {
