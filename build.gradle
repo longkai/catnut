@@ -1,0 +1,70 @@
+/*
+ * The MIT License (MIT)
+ * Copyright (c) 2014 longkai
+ * The software shall be used for good, not evil.
+ */
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'com.android.tools.build:gradle:0.6.+'
+	}
+}
+
+// for our non-android-support libs, such as gson, etc.
+repositories {
+	// prefer and fall back
+	jcenter()
+	mavenCentral()
+}
+
+apply plugin: 'android'
+
+ext {
+	SUPPORT_LIB_VERSION = '19.0.1'
+	// 1.9+ is not supported for now!
+	GRADLE_VERSION = '1.8'
+}
+
+android {
+	compileSdkVersion 19
+	buildToolsVersion = '19.0.1'
+
+	sourceSets {
+		defaultConfig {
+			testPackageName 'tingting.chen.tests'
+		}
+
+		main {
+			assets.srcDirs = ['assets']
+			res.srcDirs = ['res']
+			aidl.srcDirs = ['src']
+			resources.srcDirs = ['src']
+			renderscript.srcDirs = ['src']
+			java.srcDirs = ['src']
+			manifest.srcFile 'AndroidManifest.xml'
+		}
+
+		instrumentTest {
+			assets.srcDirs = ["tests/assets"]
+			res.srcDirs = ["tests/res"]
+			resources.srcDirs = ["tests/src"]
+			java.srcDirs = ["tests/src"]
+		}
+	}
+}
+
+dependencies {
+	// if you use Android Studio with a lib has its own res/ directory,
+	// and that lib is not available in remote maven repo,
+	// you need to use gradle' s multi-project build facility.
+	// if you don' t know how it works, please refer Gradle' s docs or google.
+	compile files("libs/*.jar")
+	compile "com.android.support:support-v4:$SUPPORT_LIB_VERSION"
+	compile "com.android.support:support-v13:$SUPPORT_LIB_VERSION"
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = GRADLE_VERSION
+}
