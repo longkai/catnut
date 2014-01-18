@@ -5,7 +5,5 @@
   ~ The software shall be used for good, not evil.
   -->
 <resources>
-	<string name="app_name">婷婷</string>
-	<string name="oauth">授权</string>
-	<string name="refresh">刷新</string>
+	<item type="id" name="refresh" />
 </resources>
