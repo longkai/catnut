@@ -46,8 +46,7 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 			if (now > mAccessToken.expires_in) {
 				// 保存用户的uid信息意义不大，因为只是清掉了uid，他所保存的其它信息依然存在
 				Log.d(TAG, "用户授权已过期，清除授权信息...");
-				invalidateAuth();
-				mAccessToken = null;
+				invalidateAccessToken();
 			} else {
 				Log.d(TAG, "授权将在" + DateUtils.getRelativeTimeSpanString(mAccessToken.expires_in) + "过期！");
 			}
@@ -69,7 +68,7 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 	 * @param accessToken
 	 */
 	public void saveAccessToken(AccessToken accessToken) {
-		Log.d(TAG, "save user info...");
+		Log.d(TAG, "save access token...");
 		mPreferences.edit()
 			.putLong(UID, accessToken.uid)
 			.putString(ACCESS_TOKEN, accessToken.access_token)
@@ -80,13 +79,14 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 	/**
 	 * 注销用户
 	 */
-	public void invalidateAuth() {
-		Log.d(TAG, "remove user info...");
+	public void invalidateAccessToken() {
+		Log.d(TAG, "invalidate access token...");
 		mPreferences.edit()
 			.remove(UID)
 			.remove(EXPIRES_IN)
 			.remove(ACCESS_TOKEN)
 			.commit();
+		mAccessToken = null;
 	}
 
 	/**
