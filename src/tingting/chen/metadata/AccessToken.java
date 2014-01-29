@@ -3,7 +3,7 @@
  * Copyright (c) 2014 longkai
  * The software shall be used for good, not evil.
  */
-package tingting.chen.beans;
+package tingting.chen.metadata;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -16,10 +16,20 @@ import android.os.Parcelable;
  */
 public class AccessToken implements Parcelable {
 
-	public long uid;
+	public static final String UID = "uid";
+	public static final String EXPIRES_IN = "expires_in";
+	public static final String ACCESS_TOKEN = "access_token";
+
+	public final long uid;
 	// 从新浪那里拿回来是秒，但是如果保存用户信息后便会还原为毫秒值！！！
-	public long expires_in;
-	public String access_token;
+	public final long expires_in;
+	public final String access_token;
+
+	public AccessToken(long uid, long expires_in, String access_token) {
+		this.uid = uid;
+		this.expires_in = expires_in;
+		this.access_token = access_token;
+	}
 
 	@Override
 	public int describeContents() {
@@ -37,11 +47,9 @@ public class AccessToken implements Parcelable {
 
 		@Override
 		public AccessToken createFromParcel(Parcel source) {
-			AccessToken accessToken = new AccessToken();
-			accessToken.uid = source.readLong();
-			accessToken.expires_in = source.readLong();
-			accessToken.access_token = source.readString();
-			return accessToken;
+			return new AccessToken(source.readLong(),
+				source.readLong(),
+				source.readString());
 		}
 
 		@Override

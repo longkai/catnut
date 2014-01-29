@@ -20,7 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import tingting.chen.R;
 import tingting.chen.TingtingApp;
-import tingting.chen.beans.AccessToken;
+import tingting.chen.metadata.AccessToken;
 import tingting.chen.beans.WeiboAPIError;
 import tingting.chen.util.GsonRequest;
 import tingting.chen.util.HttpUtils;

@@ -12,7 +12,7 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import tingting.chen.beans.AccessToken;
+import tingting.chen.metadata.AccessToken;
 
 import static tingting.chen.util.Constants.*;
 

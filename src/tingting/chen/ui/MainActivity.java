@@ -20,7 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import tingting.chen.R;
 import tingting.chen.TingtingApp;
-import tingting.chen.beans.AccessToken;
+import tingting.chen.metadata.AccessToken;
 import tingting.chen.fragment.OAuthFragment;
 import tingting.chen.fragment.StatusesFragment;
 import tingting.chen.fragment.UsersFragment;
