@@ -22,10 +22,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONObject;
 import tingting.chen.R;
 import tingting.chen.TingtingApp;
-import tingting.chen.metadata.AccessToken;
-import tingting.chen.beans.WeiboAPIError;
-import tingting.chen.util.GsonRequest;
-import tingting.chen.util.HttpUtils;
+import tingting.chen.metadata.WeiboAPIError;
 import tingting.chen.util.Manifest;
 
 /**
@@ -85,7 +82,7 @@ public class OAuthFragment extends Fragment {
 							@Override
 							public void onErrorResponse(VolleyError error) {
 								Log.wtf(TAG, "auth fail!", error);
-								WeiboAPIError e = HttpUtils.fromVolleyError(error);
+								WeiboAPIError e = WeiboAPIError.fromVolleyError(error);
 								ErrorDialogFragment fragment = ErrorDialogFragment.newInstance(null, e.error);
 								fragment.show(getFragmentManager(), null);
 							}

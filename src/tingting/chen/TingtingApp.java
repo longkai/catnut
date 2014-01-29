@@ -17,8 +17,6 @@ import tingting.chen.metadata.AccessToken;
 
 import static tingting.chen.metadata.AccessToken.*;
 
-//import static tingting.chen.util.Constants.*;
-
 /**
  * 应用程序对象
  *
