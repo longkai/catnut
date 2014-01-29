@@ -13,6 +13,8 @@ package tingting.chen.util;
  */
 public class Constants {
 
+	public static final String ID = "id";
+
 	public static final String UID = "uid";
 	public static final String EXPIRES_IN = "expires_in";
 	public static final String ACCESS_TOKEN = "access_token";

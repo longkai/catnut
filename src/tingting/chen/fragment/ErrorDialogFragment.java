@@ -3,7 +3,7 @@
  * Copyright (c) 2014 longkai
  * The software shall be used for good, not evil.
  */
-package tingting.chen.fragments;
+package tingting.chen.fragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

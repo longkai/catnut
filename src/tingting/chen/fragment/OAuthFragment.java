@@ -3,7 +3,7 @@
  * Copyright (c) 2014 longkai
  * The software shall be used for good, not evil.
  */
-package tingting.chen.fragments;
+package tingting.chen.fragment;
 
 import android.app.ActionBar;
 import android.app.Fragment;
@@ -15,7 +15,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
