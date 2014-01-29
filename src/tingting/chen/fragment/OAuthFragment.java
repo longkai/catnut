@@ -18,6 +18,8 @@ import android.widget.RelativeLayout;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import org.json.JSONObject;
 import tingting.chen.R;
 import tingting.chen.TingtingApp;
 import tingting.chen.metadata.AccessToken;
@@ -58,17 +60,17 @@ public class OAuthFragment extends Fragment {
 				String code = Uri.parse(url).getQueryParameter("code");
 				Log.d(TAG, "the auth code is " + code);
 				String accessTokenUri = Manifest.getAccessTokenUri(code);
-				TingtingApp.getRequestQueue()
-					.add(new GsonRequest<AccessToken>(
+				final TingtingApp app = TingtingApp.getTingtingApp();
+				app.getRequestQueue()
+					.add(new JsonObjectRequest(
 						Request.Method.POST,
 						accessTokenUri,
-						AccessToken.class,
 						null,
-						new Response.Listener<AccessToken>() {
+						new Response.Listener<JSONObject>() {
 							@Override
-							public void onResponse(AccessToken accessToken) {
-								Log.i(TAG, "auth success with uid: " + accessToken.uid);
-								TingtingApp.getTingtingApp().saveAccessToken(accessToken);
+							public void onResponse(JSONObject response) {
+								Log.i(TAG, "auth success with result: " + response.toString());
+								app.saveAccessToken(response);
 								// todo 优雅地处理授权成功后的跳转
 								getFragmentManager().beginTransaction()
 									.replace(R.id.fragment_container, new Fragment() {

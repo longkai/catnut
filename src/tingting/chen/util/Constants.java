@@ -15,10 +15,6 @@ public class Constants {
 
 	public static final String ID = "id";
 
-	public static final String UID = "uid";
-	public static final String EXPIRES_IN = "expires_in";
-	public static final String ACCESS_TOKEN = "access_token";
-
 	// for error dialog box
 	public static final String TITLE = "title";
 	public static final String MESSAGE = "message";

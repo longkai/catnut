@@ -12,9 +12,12 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import org.json.JSONObject;
 import tingting.chen.metadata.AccessToken;
 
-import static tingting.chen.util.Constants.*;
+import static tingting.chen.metadata.AccessToken.*;
+
+//import static tingting.chen.util.Constants.*;
 
 /**
  * 应用程序对象
@@ -26,9 +29,10 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 
 	public static final String TAG = "TingtingApp";
 
+	/** singleton */
 	private static TingtingApp sApp;
-	private static RequestQueue sRequestQueue;
 
+	private RequestQueue mRequestQueue;
 	private SharedPreferences mPreferences;
 	private AccessToken mAccessToken;
 
@@ -37,10 +41,17 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 		super.onCreate();
 		sApp = this;
 		mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-		sRequestQueue = Volley.newRequestQueue(this);
+		mRequestQueue = Volley.newRequestQueue(this);
 
-		// 检查用户是否已经成功授权，并且授权是否过期
-		getAccessToken();
+		checkAccessToken();
+	}
+
+	/** 检查用户是否已经成功授权，并且授权是否过期 */
+	private void checkAccessToken() {
+		if (mAccessToken == null) {
+			mAccessToken = getAccessToken();
+		}
+
 		if (mAccessToken != null) {
 			long now = System.currentTimeMillis();
 			if (now > mAccessToken.expires_in) {
@@ -65,14 +76,14 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 	/**
 	 * 保存授权用户的授权信息
 	 *
-	 * @param accessToken
+	 * @param json 包含access token的json对象
 	 */
-	public void saveAccessToken(AccessToken accessToken) {
+	public void saveAccessToken(JSONObject json) {
 		Log.d(TAG, "save access token...");
 		mPreferences.edit()
-			.putLong(UID, accessToken.uid)
-			.putString(ACCESS_TOKEN, accessToken.access_token)
-			.putLong(EXPIRES_IN, accessToken.expires_in * 1000 + System.currentTimeMillis())
+			.putLong(UID, json.optLong(UID))
+			.putString(ACCESS_TOKEN, json.optString(ACCESS_TOKEN))
+			.putLong(EXPIRES_IN, json.optLong(EXPIRES_IN) * 1000 + System.currentTimeMillis())
 			.commit();
 	}
 
@@ -101,13 +112,19 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 			String accessToken = mPreferences.getString(ACCESS_TOKEN, null);
 			// 当且仅当三项都完备的时候我们才会初始化授权信息对象！
 			if (uid != 0L && expiresIn != 0L && accessToken != null) {
-				mAccessToken = new AccessToken();
-				mAccessToken.uid = uid;
-				mAccessToken.access_token = accessToken;
-				mAccessToken.expires_in = expiresIn;
+				mAccessToken = new AccessToken(uid, expiresIn, accessToken);
 			}
 		}
 		return mAccessToken;
+	}
+
+	/**
+	 * 获取异步http请求队列对象
+	 *
+	 * @return RequestQueue
+	 */
+	public RequestQueue getRequestQueue() {
+		return mRequestQueue;
 	}
 
 	/**
@@ -117,14 +134,5 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 	 */
 	public static TingtingApp getTingtingApp() {
 		return sApp;
-	}
-
-	/**
-	 * 获取异步http请求队列对象
-	 *
-	 * @return RequestQueue
-	 */
-	public static RequestQueue getRequestQueue() {
-		return sRequestQueue;
 	}
 }

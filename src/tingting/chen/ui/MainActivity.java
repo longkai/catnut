@@ -16,6 +16,7 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import tingting.chen.R;
@@ -41,20 +42,19 @@ public class MainActivity extends Activity {
 	public static final String TAG = "MainActivity";
 
 	private TingtingApp mApp;
-
-	private static AccessToken sAccessToken;
+	private RequestQueue mRequestQueue;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.fragment_container);
 		mApp = TingtingApp.getTingtingApp();
+		mRequestQueue = mApp.getRequestQueue();
 
 		if (savedInstanceState == null) {
 			Fragment fragment;
-			sAccessToken = mApp.getAccessToken();
 			// 判断以下是否已经认证，跳转不同的界面
-			if (sAccessToken != null) {
+			if (mApp.getAccessToken() != null) {
 //				fragment = new Fragment() {
 //					@Override
 //					public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,24 +66,26 @@ public class MainActivity extends Activity {
 				fragment = new OAuthFragment();
 			}
 			getFragmentManager().beginTransaction()
-					.replace(R.id.fragment_container, fragment)
-					.commit();
+				.replace(R.id.fragment_container, fragment)
+				.commit();
 		}
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	private String uri() {
+		AccessToken accessToken = mApp.getAccessToken();
 		StringBuilder uri = new StringBuilder("https://api.weibo.com/2/friendships/friends.json");
-		uri.append("?access_token=").append(sAccessToken.access_token)
-				.append("&uid=").append(sAccessToken.uid);
+		uri.append("?access_token=").append(accessToken.access_token)
+			.append("&uid=").append(accessToken.uid);
 		return uri.toString();
 	}
 
-	private static String uri2() {
+	private String uri2() {
+		AccessToken accessToken = mApp.getAccessToken();
 		StringBuilder uri = new StringBuilder("https://api.weibo.com/2/statuses/user_timeline.json");
-		uri.append("?access_token=").append(sAccessToken.access_token)
-				.append("&uid=").append(sAccessToken.uid)
-				.append("&count=100");
+		uri.append("?access_token=").append(accessToken.access_token)
+			.append("&uid=").append(accessToken.uid)
+			.append("&count=100");
 		return uri.toString();
 	}
 
@@ -104,52 +106,57 @@ public class MainActivity extends Activity {
 			case android.R.id.home:
 				String uri = uri();
 				Log.i(TAG, uri);
-				TingtingApp.getRequestQueue().add(
-						new TingtingRequest(
-								this,
-								Request.Method.GET,
-								uri,
-								null,
-								new UserProcessor.MyFriendsProcessor(),
-								null,
-								new Response.ErrorListener() {
-									@Override
-									public void onErrorResponse(VolleyError error) {
-										Toast.makeText(MainActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-									}
-								}
-						)
+				mRequestQueue.add(
+					new TingtingRequest(
+						this,
+						Request.Method.GET,
+						uri,
+						null,
+						new UserProcessor.MyFriendsProcessor(),
+						null,
+						new Response.ErrorListener() {
+							@Override
+							public void onErrorResponse(VolleyError error) {
+								Toast.makeText(MainActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+							}
+						}
+					)
 				);
 				break;
 			case android.R.id.button1:
 				String url = uri2();
 				Log.d(TAG, url);
-				TingtingApp.getRequestQueue()
-						.add(new TingtingRequest(
-								this,
-								Request.Method.GET,
-								uri2(),
-								null,
-								new StatusProcessor.MyTweetsProcessor(),
-								null,
-								new Response.ErrorListener() {
-									@Override
-									public void onErrorResponse(VolleyError error) {
-										Toast.makeText(MainActivity.this, "error", Toast.LENGTH_LONG).show();
-									}
-								}
-						));
+				mRequestQueue.add(new TingtingRequest(
+					this,
+					Request.Method.GET,
+					uri2(),
+					null,
+					new StatusProcessor.MyTweetsProcessor(),
+					null,
+					new Response.ErrorListener() {
+						@Override
+						public void onErrorResponse(VolleyError error) {
+							Toast.makeText(MainActivity.this, "error", Toast.LENGTH_LONG).show();
+						}
+					}
+				));
 				break;
 			case android.R.id.button2:
 				getFragmentManager().beginTransaction()
-						.replace(R.id.fragment_container, new StatusesFragment())
-						.addToBackStack(null)
-						.commit();
+					.replace(R.id.fragment_container, new StatusesFragment())
+					.addToBackStack(null)
+					.commit();
 				break;
 			default:
 				break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		mRequestQueue.cancelAll(this);
 	}
 
 	public static class StatusAdapter extends CursorAdapter {
