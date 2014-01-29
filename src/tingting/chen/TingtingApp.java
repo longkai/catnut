@@ -15,6 +15,10 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONObject;
 import tingting.chen.metadata.AccessToken;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import static tingting.chen.metadata.AccessToken.*;
 
 /**
@@ -29,6 +33,8 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 
 	/** singleton */
 	private static TingtingApp sApp;
+	/**  */
+	private static Map<String, String> sAuthHeaders;
 
 	private RequestQueue mRequestQueue;
 	private SharedPreferences mPreferences;
@@ -132,5 +138,26 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 	 */
 	public static TingtingApp getTingtingApp() {
 		return sApp;
+	}
+
+	/**
+	 * 获得在请求头部设置access token的map，避免每次都在uri中append上access token
+	 * <p/>
+	 * 没有授权则返回空的map
+	 *
+	 * @return headers with access token
+	 */
+	public static Map<String, String> getAuthHeaders() {
+		// 如果没有授权，返回null
+		AccessToken accessToken = sApp.getAccessToken();
+		if (accessToken == null) {
+			return Collections.emptyMap();
+		}
+
+		if (sAuthHeaders == null) {
+			sAuthHeaders = new HashMap<String, String>(1);
+			sAuthHeaders.put("Authorization", "OAuth2 " + accessToken.access_token);
+		}
+		return sAuthHeaders;
 	}
 }

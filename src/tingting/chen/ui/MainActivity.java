@@ -15,10 +15,8 @@ import android.view.*;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
+import com.android.volley.*;
+import org.json.JSONObject;
 import tingting.chen.R;
 import tingting.chen.TingtingApp;
 import tingting.chen.metadata.AccessToken;
@@ -29,6 +27,8 @@ import tingting.chen.metadata.Status;
 import tingting.chen.processor.StatusProcessor;
 import tingting.chen.processor.UserProcessor;
 import tingting.chen.tingting.TingtingRequest;
+
+import java.util.Map;
 
 /**
  * 应用程序主界面。
@@ -75,16 +75,17 @@ public class MainActivity extends Activity {
 	private String uri() {
 		AccessToken accessToken = mApp.getAccessToken();
 		StringBuilder uri = new StringBuilder("https://api.weibo.com/2/friendships/friends.json");
-		uri.append("?access_token=").append(accessToken.access_token)
-			.append("&uid=").append(accessToken.uid);
+//		uri.append("?access_token=").append(accessToken.access_token)
+//			.append("&uid=").append(accessToken.uid);
+		uri.append("?uid=").append(accessToken.uid);
 		return uri.toString();
 	}
 
 	private String uri2() {
 		AccessToken accessToken = mApp.getAccessToken();
 		StringBuilder uri = new StringBuilder("https://api.weibo.com/2/statuses/user_timeline.json");
-		uri.append("?access_token=").append(accessToken.access_token)
-			.append("&uid=").append(accessToken.uid)
+//		uri.append("?access_token=").append(accessToken.access_token)
+			uri.append("?uid=").append(accessToken.uid)
 			.append("&count=100");
 		return uri.toString();
 	}
@@ -113,14 +114,24 @@ public class MainActivity extends Activity {
 						uri,
 						null,
 						new UserProcessor.MyFriendsProcessor(),
-						null,
+						new Response.Listener<JSONObject>() {
+							@Override
+							public void onResponse(JSONObject response) {
+								Log.d(TAG, response.toString());
+							}
+						},
 						new Response.ErrorListener() {
 							@Override
 							public void onErrorResponse(VolleyError error) {
 								Toast.makeText(MainActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
 							}
 						}
-					)
+					) {
+						@Override
+						public Map<String, String> getHeaders() throws AuthFailureError {
+							return TingtingApp.getAuthHeaders();
+						}
+					}
 				);
 				break;
 			case android.R.id.button1:
@@ -139,7 +150,12 @@ public class MainActivity extends Activity {
 							Toast.makeText(MainActivity.this, "error", Toast.LENGTH_LONG).show();
 						}
 					}
-				));
+				) {
+					@Override
+					public Map<String, String> getHeaders() throws AuthFailureError {
+						return TingtingApp.getAuthHeaders();
+					}
+				});
 				break;
 			case android.R.id.button2:
 				getFragmentManager().beginTransaction()
