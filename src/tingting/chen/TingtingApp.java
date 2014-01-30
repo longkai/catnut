@@ -25,7 +25,6 @@ import static tingting.chen.metadata.AccessToken.*;
  * 应用程序对象
  *
  * @author longkai
- * @date 2014-01-18
  */
 public class TingtingApp extends Application implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -33,7 +32,7 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 
 	/** singleton */
 	private static TingtingApp sApp;
-	/**  */
+	/** http request header for weibo' s access token */
 	private static Map<String, String> sAuthHeaders;
 
 	private RequestQueue mRequestQueue;
@@ -102,6 +101,8 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 			.remove(ACCESS_TOKEN)
 			.commit();
 		mAccessToken = null;
+		sAuthHeaders.clear();
+		sAuthHeaders = null;
 	}
 
 	/**
