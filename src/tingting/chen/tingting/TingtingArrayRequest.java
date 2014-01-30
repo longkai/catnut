@@ -7,6 +7,7 @@ package tingting.chen.tingting;
 
 import android.content.Context;
 import android.util.Log;
+import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Response;
@@ -14,8 +15,10 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
+import tingting.chen.TingtingApp;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 /**
  * http json array请求抽象，子类需要持久化json array，并且进行潜在的错误处理。
@@ -27,18 +30,18 @@ public class TingtingArrayRequest extends JsonRequest<JSONArray> {
 	public static final String TAG = "TingtingArrayRequest";
 
 	protected Context mContext;
+	protected TingtingAPI mApi;
 	protected Response.Listener<JSONArray> mListener;
 	protected TingtingProcessor<JSONArray> mProcessor;
 
 	public TingtingArrayRequest(Context context,
-								int method,
-								String url,
-								String requestBody,
+								TingtingAPI api,
 								TingtingProcessor<JSONArray> processor,
 								Response.Listener<JSONArray> listener,
 								Response.ErrorListener errorListener) {
-		super(method, url, requestBody, listener, errorListener);
+		super(api.method, api.uri, null, listener, errorListener);
 		mContext = context;
+		mApi = api;
 		mProcessor = processor;
 		mListener = listener;
 	}
@@ -69,5 +72,15 @@ public class TingtingArrayRequest extends JsonRequest<JSONArray> {
 		} else {
 			mListener.onResponse(response);
 		}
+	}
+
+	@Override
+	public Map<String, String> getHeaders() throws AuthFailureError {
+		return mApi.authRequired ? TingtingApp.getAuthHeaders() : super.getHeaders();
+	}
+
+	@Override
+	protected Map<String, String> getParams() throws AuthFailureError {
+		return mApi.params == null ? super.getParams() : mApi.params;
 	}
 }

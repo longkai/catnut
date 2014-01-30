@@ -19,6 +19,8 @@ import com.android.volley.*;
 import org.json.JSONObject;
 import tingting.chen.R;
 import tingting.chen.TingtingApp;
+import tingting.chen.api.RelationshipAPI;
+import tingting.chen.api.TweetAPI;
 import tingting.chen.metadata.AccessToken;
 import tingting.chen.fragment.OAuthFragment;
 import tingting.chen.fragment.StatusesFragment;
@@ -26,6 +28,7 @@ import tingting.chen.fragment.UsersFragment;
 import tingting.chen.metadata.Status;
 import tingting.chen.processor.StatusProcessor;
 import tingting.chen.processor.UserProcessor;
+import tingting.chen.tingting.TingtingAPI;
 import tingting.chen.tingting.TingtingRequest;
 
 import java.util.Map;
@@ -72,24 +75,6 @@ public class MainActivity extends Activity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
-	private String uri() {
-		AccessToken accessToken = mApp.getAccessToken();
-		StringBuilder uri = new StringBuilder("https://api.weibo.com/2/friendships/friends.json");
-//		uri.append("?access_token=").append(accessToken.access_token)
-//			.append("&uid=").append(accessToken.uid);
-		uri.append("?uid=").append(accessToken.uid);
-		return uri.toString();
-	}
-
-	private String uri2() {
-		AccessToken accessToken = mApp.getAccessToken();
-		StringBuilder uri = new StringBuilder("https://api.weibo.com/2/statuses/user_timeline.json");
-//		uri.append("?access_token=").append(accessToken.access_token)
-			uri.append("?uid=").append(accessToken.uid)
-			.append("&count=100");
-		return uri.toString();
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuItem b1 = menu.add(Menu.NONE, android.R.id.button1, Menu.NONE, "b1");
@@ -105,14 +90,11 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
-				String uri = uri();
-				Log.i(TAG, uri);
+				TingtingAPI api = RelationshipAPI.following(mApp.getAccessToken().uid, 0, 0, 0);
 				mRequestQueue.add(
 					new TingtingRequest(
 						this,
-						Request.Method.GET,
-						uri,
-						null,
+						api,
 						new UserProcessor.MyFriendsProcessor(),
 						new Response.Listener<JSONObject>() {
 							@Override
@@ -126,22 +108,13 @@ public class MainActivity extends Activity {
 								Toast.makeText(MainActivity.this, error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
 							}
 						}
-					) {
-						@Override
-						public Map<String, String> getHeaders() throws AuthFailureError {
-							return TingtingApp.getAuthHeaders();
-						}
-					}
+					)
 				);
 				break;
 			case android.R.id.button1:
-				String url = uri2();
-				Log.d(TAG, url);
 				mRequestQueue.add(new TingtingRequest(
 					this,
-					Request.Method.GET,
-					uri2(),
-					null,
+					TweetAPI.myTimeline(mApp.getAccessToken().uid, 0, 0, 0, 0, 0, 0, 0),
 					new StatusProcessor.MyTweetsProcessor(),
 					null,
 					new Response.ErrorListener() {
@@ -150,12 +123,7 @@ public class MainActivity extends Activity {
 							Toast.makeText(MainActivity.this, "error", Toast.LENGTH_LONG).show();
 						}
 					}
-				) {
-					@Override
-					public Map<String, String> getHeaders() throws AuthFailureError {
-						return TingtingApp.getAuthHeaders();
-					}
-				});
+				));
 				break;
 			case android.R.id.button2:
 				getFragmentManager().beginTransaction()
