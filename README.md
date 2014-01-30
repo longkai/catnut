@@ -13,7 +13,7 @@
  2. Eclipse（包含ADT插件，建议直接下载打包好的[ADT Bundle][]）
  3. Android Studio（好是挺好，就是龟速，现阶段不太推荐）
 4. 以下为**可选**
- 1. Gradle == 1.8 （本项目自带了Gradle Wrapper，所以本地没有也没有关系，不用Android Stuido的话更不需要这个）
+ 1. Gradle == 1.8 （本项目自带了Gradle Wrapper，所以本地没有也没有关系，不用Android Studio的话更不需要这个）
 
 ## 依赖（在``build.gradle``里``dependencies {}``申明）
 1. support-v4，注意版本号，为什么我们的项目要求那么高的API却还需要兼容库呢？因为兼容库不仅仅提供兼容类，还有其它的功能。并且没有用到的类可以在编译期间被删除掉[?][ProGuard]

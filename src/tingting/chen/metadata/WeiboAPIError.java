@@ -55,7 +55,7 @@ public class WeiboAPIError implements Parcelable {
 			return new WeiboAPIError(
 				volleyError.networkResponse.statusCode,
 				null,
-				TextUtils.isEmpty(msg) ? "Known error!" : msg);
+				TextUtils.isEmpty(msg) ? "Unknown error! Please try again later:-(" : msg);
 		}
 
 		try {
