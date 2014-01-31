@@ -7,10 +7,7 @@ package tingting.chen.tingting;
 
 import android.content.Context;
 import android.util.Log;
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkResponse;
-import com.android.volley.ParseError;
-import com.android.volley.Response;
+import com.android.volley.*;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import org.json.JSONArray;
@@ -50,9 +47,9 @@ public class TingtingArrayRequest extends JsonRequest<JSONArray> {
 	protected Response<JSONArray> parseNetworkResponse(NetworkResponse response) {
 		try {
 			String jsonString =
-					new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+				new String(response.data, HttpHeaderParser.parseCharset(response.headers));
 			Response<JSONArray> success = Response.success(new JSONArray(jsonString),
-					HttpHeaderParser.parseCacheHeaders(response));
+				HttpHeaderParser.parseCacheHeaders(response));
 			if (mProcessor != null) {
 				// do in background...
 				mProcessor.asyncProcess(mContext, success.result);
@@ -62,6 +59,8 @@ public class TingtingArrayRequest extends JsonRequest<JSONArray> {
 			return Response.error(new ParseError(e));
 		} catch (JSONException je) {
 			return Response.error(new ParseError(je));
+		} catch (Exception ex) {
+			return Response.error(new ParseError(ex));
 		}
 	}
 

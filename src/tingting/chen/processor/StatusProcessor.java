@@ -32,7 +32,7 @@ public class StatusProcessor {
 	public static class MyTweetsProcessor implements TingtingProcessor<JSONObject> {
 
 		@Override
-		public void asyncProcess(Context context, JSONObject jsonObject) {
+		public void asyncProcess(Context context, JSONObject jsonObject) throws Exception {
 			JSONArray jsonArray = jsonObject.optJSONArray(Status.MULTIPLE);
 			List<ContentValues> statues = new ArrayList<ContentValues>(jsonArray.length());
 			List<ContentValues> users = new ArrayList<ContentValues>(jsonArray.length());

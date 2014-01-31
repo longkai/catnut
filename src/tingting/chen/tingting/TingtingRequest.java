@@ -52,9 +52,9 @@ public class TingtingRequest extends JsonRequest<JSONObject> {
 	protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
 		try {
 			String jsonString =
-					new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+				new String(response.data, HttpHeaderParser.parseCharset(response.headers));
 			Response<JSONObject> success = Response.success(new JSONObject(jsonString),
-					HttpHeaderParser.parseCacheHeaders(response));
+				HttpHeaderParser.parseCacheHeaders(response));
 			if (mProcessor != null) {
 				// do in background...
 				mProcessor.asyncProcess(mContext, success.result);
@@ -64,6 +64,8 @@ public class TingtingRequest extends JsonRequest<JSONObject> {
 			return Response.error(new ParseError(e));
 		} catch (JSONException je) {
 			return Response.error(new ParseError(je));
+		} catch (Exception ex) {
+			return Response.error(new ParseError(ex));
 		}
 	}
 

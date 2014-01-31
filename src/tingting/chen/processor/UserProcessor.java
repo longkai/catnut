@@ -31,7 +31,7 @@ public class UserProcessor {
 	public static class MyFriendsProcessor implements TingtingProcessor<JSONObject> {
 
 		@Override
-		public void asyncProcess(Context context, JSONObject data) {
+		public void asyncProcess(Context context, JSONObject data) throws Exception {
 			JSONArray jsonArray = data.optJSONArray(User.MULTIPLE);
 			ContentValues[] users = new ContentValues[jsonArray.length()];
 			// 可能会包含有这条用户最新的微博存在
