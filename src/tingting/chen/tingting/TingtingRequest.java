@@ -36,11 +36,12 @@ public class TingtingRequest extends JsonRequest<JSONObject> {
 	protected TingtingProcessor<JSONObject> mProcessor;
 	protected Response.Listener<JSONObject> mListener;
 
-	public TingtingRequest(Context context,
-						   TingtingAPI api,
-						   TingtingProcessor<JSONObject> processor,
-						   Response.Listener<JSONObject> listener,
-						   Response.ErrorListener errorListener) {
+	public TingtingRequest(
+			Context context,
+			TingtingAPI api,
+			TingtingProcessor<JSONObject> processor,
+			Response.Listener<JSONObject> listener,
+			Response.ErrorListener errorListener) {
 		super(api.method, api.uri, null, listener, errorListener);
 		mContext = context;
 		mApi = api;
@@ -52,9 +53,9 @@ public class TingtingRequest extends JsonRequest<JSONObject> {
 	protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
 		try {
 			String jsonString =
-				new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+					new String(response.data, HttpHeaderParser.parseCharset(response.headers));
 			Response<JSONObject> success = Response.success(new JSONObject(jsonString),
-				HttpHeaderParser.parseCacheHeaders(response));
+					HttpHeaderParser.parseCacheHeaders(response));
 			if (mProcessor != null) {
 				// do in background...
 				mProcessor.asyncProcess(mContext, success.result);

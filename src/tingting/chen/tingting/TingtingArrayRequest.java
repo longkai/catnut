@@ -31,11 +31,12 @@ public class TingtingArrayRequest extends JsonRequest<JSONArray> {
 	protected Response.Listener<JSONArray> mListener;
 	protected TingtingProcessor<JSONArray> mProcessor;
 
-	public TingtingArrayRequest(Context context,
-								TingtingAPI api,
-								TingtingProcessor<JSONArray> processor,
-								Response.Listener<JSONArray> listener,
-								Response.ErrorListener errorListener) {
+	public TingtingArrayRequest(
+			Context context,
+			TingtingAPI api,
+			TingtingProcessor<JSONArray> processor,
+			Response.Listener<JSONArray> listener,
+			Response.ErrorListener errorListener) {
 		super(api.method, api.uri, null, listener, errorListener);
 		mContext = context;
 		mApi = api;
@@ -47,9 +48,9 @@ public class TingtingArrayRequest extends JsonRequest<JSONArray> {
 	protected Response<JSONArray> parseNetworkResponse(NetworkResponse response) {
 		try {
 			String jsonString =
-				new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+					new String(response.data, HttpHeaderParser.parseCharset(response.headers));
 			Response<JSONArray> success = Response.success(new JSONArray(jsonString),
-				HttpHeaderParser.parseCacheHeaders(response));
+					HttpHeaderParser.parseCacheHeaders(response));
 			if (mProcessor != null) {
 				// do in background...
 				mProcessor.asyncProcess(mContext, success.result);

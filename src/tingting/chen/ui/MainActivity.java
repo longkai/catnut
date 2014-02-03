@@ -15,13 +15,14 @@ import android.view.*;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.android.volley.*;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import org.json.JSONObject;
 import tingting.chen.R;
 import tingting.chen.TingtingApp;
 import tingting.chen.api.RelationshipAPI;
 import tingting.chen.api.TweetAPI;
-import tingting.chen.metadata.AccessToken;
 import tingting.chen.fragment.OAuthFragment;
 import tingting.chen.fragment.StatusesFragment;
 import tingting.chen.fragment.UsersFragment;
@@ -30,8 +31,6 @@ import tingting.chen.processor.StatusProcessor;
 import tingting.chen.processor.UserProcessor;
 import tingting.chen.tingting.TingtingAPI;
 import tingting.chen.tingting.TingtingRequest;
-
-import java.util.Map;
 
 /**
  * 应用程序主界面。
