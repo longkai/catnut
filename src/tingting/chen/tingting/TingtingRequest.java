@@ -15,7 +15,6 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
-import tingting.chen.TingtingApp;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;

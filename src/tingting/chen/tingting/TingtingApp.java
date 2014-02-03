@@ -3,7 +3,7 @@
  * Copyright (c) 2014 longkai
  * The software shall be used for good, not evil.
  */
-package tingting.chen;
+package tingting.chen.tingting;
 
 import android.app.Application;
 import android.content.SharedPreferences;

@@ -5,5 +5,5 @@
   ~ The software shall be used for good, not evil.
   -->
 <resources>
-	<item type="id" name="refresh" />
+	<item name="refresh" type="id" />
 </resources>
