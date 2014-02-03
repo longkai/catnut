@@ -11,9 +11,11 @@ import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import org.json.JSONObject;
 import tingting.chen.metadata.AccessToken;
+import tingting.chen.util.BitmapLruCache;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +38,7 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 	private static Map<String, String> sAuthHeaders;
 
 	private RequestQueue mRequestQueue;
+	private ImageLoader mImageLoader;
 	private SharedPreferences mPreferences;
 	private AccessToken mAccessToken;
 
@@ -45,7 +48,7 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 		sApp = this;
 		mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		mRequestQueue = Volley.newRequestQueue(this);
-
+		mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache(1000)); // 1000个缓存条目
 		checkAccessToken();
 	}
 
@@ -130,6 +133,15 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 	 */
 	public RequestQueue getRequestQueue() {
 		return mRequestQueue;
+	}
+
+	/**
+	 * 获取异步图片loader
+	 *
+	 * @return {@link com.android.volley.toolbox.ImageLoader}
+	 */
+	public ImageLoader getImageLoader() {
+		return mImageLoader;
 	}
 
 	/**
