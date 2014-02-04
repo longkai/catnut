@@ -38,6 +38,7 @@ public class HelloActivity extends Activity {
 				.replace(android.R.id.content, new OAuthFragment())
 				.commit();
 		} else {
+			getActionBar().hide();
 			ImageView imageView = new ImageView(this);
 			ImageLoader imageLoader = app.getImageLoader();
 			// todo 测试图片，过后换个好看的:-)

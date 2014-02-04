@@ -6,4 +6,5 @@
   -->
 <resources>
 	<item name="refresh" type="id" />
+	<item name="pager" type="id" />
 </resources>

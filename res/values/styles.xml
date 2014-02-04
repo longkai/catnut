@@ -11,9 +11,12 @@
 	</style>
 
 	<style name="AppTheme.Light" parent="android:Theme.Holo.Light">
+		<item name="android:windowBackground">@android:color/white</item>
 		<item name="android:actionBarStyle">@style/ActionBar_Light</item>
 		<item name="android:actionOverflowButtonStyle">@style/OverflowButtonStyle_Light</item>
 		<item name="android:selectableItemBackground">@drawable/item_background_holo_light</item>
+		<item name="android:actionBarTabStyle">@style/ActionBar_Light_TabStyle</item>
+		<item name="android:actionBarTabBarStyle">@style/ActionBar_Light_TabBarStyle</item>
 	</style>
 
 	<style name="AppTheme.Dark" parent="android:Theme.Holo">
@@ -36,6 +39,16 @@
 
 	<style name="ActionBar_Light_TextStyle" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
 		<item name="android:textColor">@android:color/white</item>
+	</style>
+
+	<style name="ActionBar_Light_TabStyle" parent="android:Widget.Holo.Light.ActionBar.TabView">
+		<item name="android:background">@drawable/bg_actionbar</item>
+		<item name="android:paddingLeft">0dp</item>
+		<item name="android:paddingRight">0dp</item>
+	</style>
+
+	<style name="ActionBar_Light_TabBarStyle" parent="android:Widget.Holo.Light.ActionBar.TabBar">
+		<item name="android:background">@drawable/bg_actionbar</item>
 	</style>
 
 	<!--
