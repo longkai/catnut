@@ -22,6 +22,7 @@
 		android:name=".tingting.TingtingApp">
 		<activity
 			android:name=".ui.HelloActivity"
+			android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen"
 			android:noHistory="true">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />

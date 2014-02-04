@@ -120,7 +120,7 @@ public class OAuthFragment extends Fragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		MenuItem refresh = menu.add(Menu.NONE, R.id.refresh, Menu.NONE, getString(R.string.refresh));
-		refresh.setIcon(R.drawable.navigation_refresh_light);
+		refresh.setIcon(R.drawable.ic_navigation_refresh_light);
 		refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 	}
 

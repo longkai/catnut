@@ -10,4 +10,6 @@
 	<string name="refresh">刷新</string>
 	<string name="alert_error">出错啦！</string>
 	<string name="auth_success">授权成功！</string>
+	<string name="logout">退出</string>
+	<string name="logout_confirm">确定结束应用了嘛?</string>
 </resources>

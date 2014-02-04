@@ -42,7 +42,7 @@ public class ErrorDialogFragment extends DialogFragment {
 		Bundle args = getArguments();
 		// todo: what about the different themes?
 		return new AlertDialog.Builder(getActivity())
-			.setIcon(R.drawable.alerts_and_states_error_light)
+			.setIcon(R.drawable.ic_alerts_and_states_error_light)
 			.setTitle(args.getString(Constants.TITLE, getString(R.string.alert_error)))
 			.setMessage(args.getString(Constants.MESSAGE))
 			.setNeutralButton(android.R.string.ok, null)

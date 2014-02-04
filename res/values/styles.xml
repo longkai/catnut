@@ -11,10 +11,37 @@
 	</style>
 
 	<style name="AppTheme.Light" parent="android:Theme.Holo.Light">
-
+		<item name="android:actionBarStyle">@style/ActionBar_Light</item>
+		<item name="android:actionOverflowButtonStyle">@style/OverflowButtonStyle_Light</item>
+		<item name="android:selectableItemBackground">@drawable/item_background_holo_light</item>
 	</style>
 
 	<style name="AppTheme.Dark" parent="android:Theme.Holo">
 
 	</style>
+
+	<!--
+	***********************
+	light theme goes first!
+	***********************
+	-->
+	<style name="OverflowButtonStyle_Light" parent="android:Widget.Holo.Light.ActionButton.Overflow">
+		<item name="android:src">@drawable/ic_title_overflow_default</item>
+	</style>
+
+	<style name="ActionBar_Light" parent="android:Widget.Holo.ActionBar">
+		<item name="android:background">@color/actionbar_background</item>
+		<item name="android:titleTextStyle">@style/ActionBar_Light_TextStyle</item>
+	</style>
+
+	<style name="ActionBar_Light_TextStyle" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
+		<item name="android:textColor">@android:color/white</item>
+	</style>
+
+	<!--
+	***********************
+	below is dark theme!
+	***********************
+	-->
+
 </resources>
