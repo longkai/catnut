@@ -7,6 +7,7 @@ package tingting.chen.tingting;
 
 import android.content.*;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
@@ -97,6 +98,17 @@ public class TingtingProvider extends ContentProvider {
 		return type;
 	}
 
+	private static String projection(String[] projection) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < projection.length; i++) {
+			sb.append(projection[i]);
+			if (i != projection.length - 1) {
+				sb.append(",");
+			}
+		}
+		return sb.toString();
+	}
+
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 		SQLiteDatabase db = mDb.getReadableDatabase();
@@ -112,7 +124,8 @@ public class TingtingProvider extends ContentProvider {
 				cursor = db.query(Status.TABLE, projection, queryWithId(uri), selectionArgs, null, null, null);
 				break;
 			case STATUSES:
-				cursor = db.query(Status.TABLE, projection, selection, selectionArgs, null, null, null);
+				cursor = db.rawQuery("select " + projection(projection) + " FROM " + Status.TABLE + " as s join " + User.TABLE + " as u on s.uid = u._id order by s._id desc", null);
+//				cursor = db.query("", projection, selection, selectionArgs, null, null, null)
 				break;
 			default:
 				Log.wtf(TAG, "unknown uri: " + uri);

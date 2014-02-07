@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.volley.RequestQueue;
 import tingting.chen.R;
+import tingting.chen.fragment.HomeTimelineFragment;
 import tingting.chen.tingting.TingtingApp;
 
 /**
@@ -107,6 +108,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 	@Override
 	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
 		mViewPager.setCurrentItem(tab.getPosition());
+		mActionBar.show();
 	}
 
 	@Override
@@ -125,7 +127,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
 		@Override
 		public Fragment getItem(int position) {
-			return new DummyFragment();
+			return new HomeTimelineFragment();
 		}
 
 		@Override

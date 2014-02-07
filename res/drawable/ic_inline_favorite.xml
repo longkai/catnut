@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:state_pressed="true" android:drawable="@drawable/ic_tweet_action_inline_favorite_on" />
+	<item android:state_focused="true" android:drawable="@drawable/ic_tweet_action_inline_favorite_on" />
+	<item android:state_selected="true" android:drawable="@drawable/ic_tweet_action_inline_favorite_on" />
+	<item android:drawable="@drawable/ic_tweet_action_inline_favorite_off" />
+</selector>

@@ -5,7 +5,8 @@
   ~ The software shall be used for good, not evil.
   -->
 <resources>
-	<item name="refresh" type="id" />
-	<item name="pager" type="id" />
-	<item name="view_stub" type="id" />
+	<dimen name="small">4dp</dimen>
+	<dimen name="medium">8dp</dimen>
+	<dimen name="large">16dp</dimen>
+	<dimen name="xlarge">32dp</dimen>
 </resources>
