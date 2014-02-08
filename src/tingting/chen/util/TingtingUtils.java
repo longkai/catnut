@@ -5,8 +5,12 @@
  */
 package tingting.chen.util;
 
+import android.content.Context;
+import android.content.CursorLoader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.text.TextUtils;
+import tingting.chen.tingting.TingtingProvider;
 
 /**
  * 工具类
@@ -90,6 +94,25 @@ public class TingtingUtils {
 	 */
 	public static boolean optValue(boolean real, boolean defaultValue) {
 		return !real ? defaultValue : real;
+	}
+
+	/**
+	 * 自定义raw sql以获取cursor，包含所有的除了having，group外的所有字段
+	 * @param context
+	 * @param uri
+	 * @param projection
+	 * @param selection
+	 * @param selectionArgs
+	 * @param from
+	 * @param join
+	 * @param on
+	 * @param sort
+	 * @param limit
+	 * @return {@link android.content.CursorLoader}
+	 */
+	public static CursorLoader getCursorLoader(Context context, Uri uri, String[] projection, String selection, String[] selectionArgs, String from, String join, String on, String sort, String limit) {
+		String sql = buildQuery(projection, selection, from, join, on, sort, limit);
+		return new CursorLoader(context, uri, null, sql, selectionArgs, null);
 	}
 
 	/**

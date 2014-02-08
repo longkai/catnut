@@ -114,15 +114,8 @@ public class TingtingProvider extends ContentProvider {
 				cursor = db.query(Status.TABLE, projection, queryWithId(uri), selectionArgs, null, null, null);
 				break;
 			case STATUSES:
-				cursor = db.rawQuery(TingtingUtils.buildQuery(
-						projection,
-						selection,
-						Status.TABLE + " as s",
-						User.TABLE + " as u",
-						"s.uid=u._id",
-						sortOrder,
-						null),
-					selectionArgs);
+				// 这里，比较特殊，直接在selection中写sql，可以包含占位符
+				cursor = db.rawQuery(selection, selectionArgs);
 				break;
 			default:
 				Log.wtf(TAG, "unknown uri: " + uri);

@@ -5,20 +5,15 @@
  */
 package tingting.chen.fragment;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
-import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.AbsListView;
-import android.widget.ListView;
 import android.widget.Toast;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -32,6 +27,7 @@ import tingting.chen.processor.StatusProcessor;
 import tingting.chen.tingting.TingtingApp;
 import tingting.chen.tingting.TingtingProvider;
 import tingting.chen.tingting.TingtingRequest;
+import tingting.chen.util.TingtingUtils;
 
 /**
  * 当前登录用户及其所关注用户的最新微博时间线
@@ -41,6 +37,8 @@ import tingting.chen.tingting.TingtingRequest;
 public class HomeTimelineFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
 	private static final String TAG = "HomeTimelineFragment";
+
+	private static final int TWEETS_SIZE = 20;
 
 	private RequestQueue mRequestQueue;
 	private Activity mActivity;
@@ -99,7 +97,9 @@ public class HomeTimelineFragment extends ListFragment implements LoaderManager.
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		return new CursorLoader(mActivity, TingtingProvider.parse(Status.MULTIPLE),
+		return TingtingUtils.getCursorLoader(
+			mActivity,
+			TingtingProvider.parse(Status.MULTIPLE),
 			new String[] {
 				"s._id",
 				Status.columnText,
@@ -112,7 +112,12 @@ public class HomeTimelineFragment extends ListFragment implements LoaderManager.
 			},
 			null,
 			null,
-			"s._id desc");
+			Status.TABLE + " as s",
+			User.TABLE + " as u",
+			"s.uid=u._id",
+			"s._id desc",
+			String.valueOf(TWEETS_SIZE)
+		);
 	}
 
 	@Override
