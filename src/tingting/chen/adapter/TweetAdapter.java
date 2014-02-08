@@ -7,10 +7,8 @@ package tingting.chen.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.media.Image;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,6 +52,10 @@ public class TweetAdapter extends CursorAdapter {
 		int nickIndex;
 		TextView text;
 		int textIndex;
+		TextView replyCount;
+		int replyCountIndex;
+		TextView reteetCount;
+		int reteetCountIndex;
 
 		ImageView thumbs;
 		int thumbsIndex;
@@ -74,6 +76,10 @@ public class TweetAdapter extends CursorAdapter {
 		holder.thumbsIndex = cursor.getColumnIndex(Status.thumbnail_pic);
 		holder.avatar = (ImageView) view.findViewById(R.id.avatar);
 		holder.avatarIndex = cursor.getColumnIndex(User.profile_image_url);
+		holder.replyCount = (TextView) view.findViewById(R.id.reply_count);
+		holder.replyCountIndex = cursor.getColumnIndex(Status.comments_count);
+		holder.reteetCount = (TextView) view.findViewById(R.id.reteet_count);
+		holder.reteetCountIndex = cursor.getColumnIndex(Status.reposts_count);
 
 		ViewStub stub = (ViewStub) view.findViewById(R.id.view_stub);
 		if (!TextUtils.isEmpty(cursor.getString(holder.thumbsIndex))) {
@@ -95,6 +101,12 @@ public class TweetAdapter extends CursorAdapter {
 			holder.create_at.setText(DateUtils.getRelativeTimeSpanString(parse.getTime()));
 		} catch (ParseException e) {
 		}
+
+		int replyCount = cursor.getInt(holder.replyCountIndex);
+		holder.replyCount.setText(replyCount == 0 ? null : String.valueOf(replyCount));
+		int retweetCount = cursor.getInt(holder.reteetCountIndex);
+		holder.reteetCount.setText(replyCount == 0 ? null : String.valueOf(retweetCount));
+
 		String thumbsUri = cursor.getString(holder.thumbsIndex);
 		if (holder.thumbs != null && !TextUtils.isEmpty(thumbsUri)) {
 			mImageLoader.get(thumbsUri,

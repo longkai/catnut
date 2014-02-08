@@ -102,7 +102,16 @@ public class HomeTimelineFragment extends ListFragment implements LoaderManager.
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		return new CursorLoader(mActivity, TingtingProvider.parse(Status.MULTIPLE),
-			new String[]{"s._id", Status.columnText, Status.thumbnail_pic, "s."+Status.created_at, User.screen_name, User.profile_image_url},
+			new String[] {
+				"s._id",
+				Status.columnText,
+				Status.thumbnail_pic,
+				Status.comments_count,
+				Status.reposts_count,
+				"s." + Status.created_at,
+				User.screen_name,
+				User.profile_image_url
+			},
 			null,
 			null,
 			"s._id desc");

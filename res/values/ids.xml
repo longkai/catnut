@@ -8,4 +8,7 @@
 	<item name="refresh" type="id" />
 	<item name="pager" type="id" />
 	<item name="view_stub" type="id" />
+	<item name="action_reteet" type="id" />
+	<item name="action_reply" type="id" />
+	<item name="action_favorite" type="id" />
 </resources>

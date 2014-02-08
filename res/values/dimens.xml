@@ -9,4 +9,6 @@
 	<dimen name="medium">8dp</dimen>
 	<dimen name="large">16dp</dimen>
 	<dimen name="xlarge">32dp</dimen>
+
+	<dimen name="counter_width">48dp</dimen>
 </resources>
