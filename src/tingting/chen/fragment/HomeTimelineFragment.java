@@ -44,14 +44,12 @@ public class HomeTimelineFragment extends ListFragment implements LoaderManager.
 
 	private RequestQueue mRequestQueue;
 	private Activity mActivity;
-	private ActionBar mActionBar;
 	private TweetAdapter mAdapter;
 
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		mActivity = activity;
-		mActionBar = mActivity.getActionBar();
 		mRequestQueue = TingtingApp.getTingtingApp().getRequestQueue();
 	}
 
@@ -64,7 +62,7 @@ public class HomeTimelineFragment extends ListFragment implements LoaderManager.
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		menu.add(Menu.NONE, R.id.refresh, 100, R.string.refresh)
+		menu.add(Menu.NONE, R.id.refresh, Menu.NONE, R.string.refresh)
 			.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 	}
 
