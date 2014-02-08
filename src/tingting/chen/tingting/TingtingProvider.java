@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.util.Log;
 import tingting.chen.metadata.Status;
 import tingting.chen.metadata.User;
+import tingting.chen.util.TingtingUtils;
 
 /**
  * 应用程序数据源。
@@ -98,17 +99,6 @@ public class TingtingProvider extends ContentProvider {
 		return type;
 	}
 
-	private static String projection(String[] projection) {
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < projection.length; i++) {
-			sb.append(projection[i]);
-			if (i != projection.length - 1) {
-				sb.append(",");
-			}
-		}
-		return sb.toString();
-	}
-
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 		SQLiteDatabase db = mDb.getReadableDatabase();
@@ -124,8 +114,15 @@ public class TingtingProvider extends ContentProvider {
 				cursor = db.query(Status.TABLE, projection, queryWithId(uri), selectionArgs, null, null, null);
 				break;
 			case STATUSES:
-				cursor = db.rawQuery("select " + projection(projection) + " FROM " + Status.TABLE + " as s join " + User.TABLE + " as u on s.uid = u._id order by s._id desc", null);
-//				cursor = db.query("", projection, selection, selectionArgs, null, null, null)
+				cursor = db.rawQuery(TingtingUtils.buildQuery(
+						projection,
+						selection,
+						Status.TABLE + " as s",
+						User.TABLE + " as u",
+						"s.uid=u._id",
+						sortOrder,
+						null),
+					selectionArgs);
 				break;
 			default:
 				Log.wtf(TAG, "unknown uri: " + uri);

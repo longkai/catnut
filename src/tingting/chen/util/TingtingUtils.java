@@ -91,4 +91,63 @@ public class TingtingUtils {
 	public static boolean optValue(boolean real, boolean defaultValue) {
 		return !real ? defaultValue : real;
 	}
+
+	/**
+	 * 模仿android的凑sql的方法，不同在于支持join和on，用在raw-query
+	 * @param projection
+	 * @param selection
+	 * @param from
+	 * @param join
+	 * @param on
+	 * @param sort
+	 * @param limit
+	 * @return query sql
+	 */
+	public static String buildQuery(String[] projection, String selection, String from, String join, String on, String sort, String limit) {
+		StringBuilder query = new StringBuilder("SELECT");
+		if (projection == null) {
+			query.append(" * ");
+		} else {
+			query.append(" ").append(projection(projection));
+		}
+
+		query.append(" FROM ").append(from);
+
+		if (join != null) {
+			query.append(" JOIN ").append(join);
+			if (on != null) {
+				query.append(" ON ").append(on);
+			}
+		}
+
+		if (selection != null) {
+			query.append(" WHERE ").append(selection);
+		}
+
+		if (sort != null) {
+			query.append(" ORDER BY ").append(sort);
+		}
+
+		if (limit != null) {
+			query.append(" LIMIT ").append(limit);
+		}
+
+		return query.toString();
+	}
+
+	/**
+	 * 拼接投影sql
+	 * @param projection
+	 * @return turn a string[] into xx,xxx,xxx,...,xx
+	 */
+	private static String projection(String[] projection) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < projection.length; i++) {
+			sb.append(projection[i]);
+			if (i != projection.length - 1) {
+				sb.append(",");
+			}
+		}
+		return sb.toString();
+	}
 }
