@@ -13,6 +13,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.*;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -99,6 +100,8 @@ public class HomeTimelineFragment extends ListFragment implements LoaderManager.
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		ProgressBar progressBar = new ProgressBar(mActivity);
+		getListView().addFooterView(progressBar);
 		setEmptyText(mActivity.getString(R.string.no_tweets));
 		setListAdapter(mAdapter);
 		getLoaderManager().initLoader(0, null, this);
@@ -128,8 +131,7 @@ public class HomeTimelineFragment extends ListFragment implements LoaderManager.
 			null,
 			null,
 			Status.TABLE + " as s",
-			User.TABLE + " as u",
-			"s.uid=u._id",
+			"inner join " + User.TABLE + " as u on s.uid=u._id",
 			"s._id desc",
 			String.valueOf(TWEETS_SIZE)
 		);

@@ -104,14 +104,13 @@ public class TingtingUtils {
 	 * @param selection
 	 * @param selectionArgs
 	 * @param from
-	 * @param join
-	 * @param on
+	 * @param joinOn
 	 * @param sort
 	 * @param limit
 	 * @return {@link android.content.CursorLoader}
 	 */
-	public static CursorLoader getCursorLoader(Context context, Uri uri, String[] projection, String selection, String[] selectionArgs, String from, String join, String on, String sort, String limit) {
-		String sql = buildQuery(projection, selection, from, join, on, sort, limit);
+	public static CursorLoader getCursorLoader(Context context, Uri uri, String[] projection, String selection, String[] selectionArgs, String from, String joinOn, String sort, String limit) {
+		String sql = buildQuery(projection, selection, from, joinOn, sort, limit);
 		return new CursorLoader(context, uri, null, sql, selectionArgs, null);
 	}
 
@@ -120,13 +119,12 @@ public class TingtingUtils {
 	 * @param projection
 	 * @param selection
 	 * @param from
-	 * @param join
-	 * @param on
+	 * @param joinOn 自己写上什么类型的join和on关键字(right, full not support)
 	 * @param sort
 	 * @param limit
 	 * @return query sql
 	 */
-	public static String buildQuery(String[] projection, String selection, String from, String join, String on, String sort, String limit) {
+	public static String buildQuery(String[] projection, String selection, String from, String joinOn, String sort, String limit) {
 		StringBuilder query = new StringBuilder("SELECT");
 		if (projection == null) {
 			query.append(" * ");
@@ -136,11 +134,9 @@ public class TingtingUtils {
 
 		query.append(" FROM ").append(from);
 
-		if (join != null) {
-			query.append(" JOIN ").append(join);
-			if (on != null) {
-				query.append(" ON ").append(on);
-			}
+		if (joinOn != null) {
+			// 至于是什么类型的join，多少个join和on，这里得自己写上
+			query.append(" ").append(joinOn);
 		}
 
 		if (selection != null) {
