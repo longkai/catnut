@@ -9,8 +9,11 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
 import android.net.Uri;
+import android.text.Spannable;
 import android.text.TextUtils;
-import tingting.chen.tingting.TingtingProvider;
+import android.text.style.URLSpan;
+import android.widget.TextView;
+import tingting.chen.support.TweetURLSpan;
 
 /**
  * 工具类
@@ -98,6 +101,7 @@ public class TingtingUtils {
 
 	/**
 	 * 自定义raw sql以获取cursor，包含所有的除了having，group外的所有字段
+	 *
 	 * @param context
 	 * @param uri
 	 * @param projection
@@ -116,10 +120,11 @@ public class TingtingUtils {
 
 	/**
 	 * 模仿android的凑sql的方法，不同在于支持join和on，用在raw-query
+	 *
 	 * @param projection
 	 * @param selection
 	 * @param from
-	 * @param joinOn 自己写上什么类型的join和on关键字(right, full not support)
+	 * @param joinOn     自己写上什么类型的join和on关键字(right, full not support)
 	 * @param sort
 	 * @param limit
 	 * @return query sql
@@ -156,6 +161,7 @@ public class TingtingUtils {
 
 	/**
 	 * 拼接投影sql
+	 *
 	 * @param projection
 	 * @return turn a string[] into xx,xxx,xxx,...,xx
 	 */
@@ -168,5 +174,23 @@ public class TingtingUtils {
 			}
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * 清除textview链接的下划线
+	 *
+	 * @param textView
+	 */
+	public static void removeLinkUnderline(TextView textView) {
+		Spannable s = Spannable.Factory.getInstance().newSpannable(textView.getText());
+		URLSpan[] spans = s.getSpans(0, s.length(), URLSpan.class);
+		for (URLSpan span : spans) {
+			int start = s.getSpanStart(span);
+			int end = s.getSpanEnd(span);
+			s.removeSpan(span);
+			span = new TweetURLSpan(span.getURL());
+			s.setSpan(span, start, end, 0);
+		}
+		textView.setText(s);
 	}
 }

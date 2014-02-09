@@ -50,6 +50,7 @@
 		<TextView
 			android:id="@+id/text"
 			android:textColor="@android:color/secondary_text_light"
+			android:textColorLink="@android:color/holo_blue_dark"
 			android:layout_marginTop="@dimen/small"
 			android:textAppearance="@android:style/TextAppearance.DeviceDefault"
 			android:layout_below="@id/nick"

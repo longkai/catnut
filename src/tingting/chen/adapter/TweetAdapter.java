@@ -9,6 +9,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,11 +22,15 @@ import tingting.chen.R;
 import tingting.chen.metadata.Status;
 import tingting.chen.metadata.User;
 import tingting.chen.tingting.TingtingApp;
+import tingting.chen.util.Constants;
+import tingting.chen.util.TingtingUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 微博列表适配器
@@ -34,9 +39,14 @@ import java.util.Locale;
  */
 public class TweetAdapter extends CursorAdapter {
 
-	private ImageLoader mImageLoader;
+	/** 微博中 @xx 正则 */
+	public static final Pattern MENTION_PATTERN = Pattern.compile("@[\\u4e00-\\u9fa5a-zA-Z0-9_-]+");
+	/** 微博中 #xx# 正则 */
+	public static final Pattern TOPIC_PATTERN = Pattern.compile("#[^#]+#");
+	/** 微博链接，不包含中文 */
+	public static final Pattern WEB_URL = Pattern.compile("(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
 
-	private boolean isInflate;
+	private ImageLoader mImageLoader;
 
 	public TweetAdapter(Context context) {
 		super(context, null, 0);
@@ -113,5 +123,19 @@ public class TweetAdapter extends CursorAdapter {
 				ImageLoader.getImageListener(holder.thumbs, R.drawable.error, R.drawable.error),
 				holder.thumbs.getMaxWidth(), holder.thumbs.getMaxHeight());
 		}
+
+		// 分别对微博的链接，@，##话题过滤
+		// todo：对@，## 进行处理
+		Linkify.addLinks(holder.text, MENTION_PATTERN, Constants.SINA_WEIBO_URL, null, filter);
+		Linkify.addLinks(holder.text, TOPIC_PATTERN, Constants.SINA_WEIBO_URL, null, filter);
+		Linkify.addLinks(holder.text, WEB_URL, null, null, filter);
+		TingtingUtils.removeLinkUnderline(holder.text);
 	}
+
+	private Linkify.TransformFilter filter = new Linkify.TransformFilter() {
+		@Override
+		public String transformUrl(Matcher match, String url) {
+			return match.group();
+		}
+	};
 }
