@@ -46,6 +46,9 @@ public class TweetAdapter extends CursorAdapter {
 	/** 微博链接，不包含中文 */
 	public static final Pattern WEB_URL = Pattern.compile("(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
 
+	public static final String TOPIC_SCHEME = "http://huati.weibo.com/k/";
+	public static final String MENTION_SCHEME = "http://weibo.com/n/";
+
 	private ImageLoader mImageLoader;
 
 	public TweetAdapter(Context context) {
@@ -126,16 +129,30 @@ public class TweetAdapter extends CursorAdapter {
 
 		// 分别对微博的链接，@，##话题过滤
 		// todo：对@，## 进行处理
-		Linkify.addLinks(holder.text, MENTION_PATTERN, Constants.SINA_WEIBO_URL, null, filter);
-		Linkify.addLinks(holder.text, TOPIC_PATTERN, Constants.SINA_WEIBO_URL, null, filter);
-		Linkify.addLinks(holder.text, WEB_URL, null, null, filter);
+		Linkify.addLinks(holder.text, MENTION_PATTERN, MENTION_SCHEME, null, mentionFilter);
+		Linkify.addLinks(holder.text, TOPIC_PATTERN, TOPIC_SCHEME, null, topicFilter);
+		Linkify.addLinks(holder.text, WEB_URL, null, null, urlFileter);
 		TingtingUtils.removeLinkUnderline(holder.text);
 	}
 
-	private Linkify.TransformFilter filter = new Linkify.TransformFilter() {
+	private Linkify.TransformFilter mentionFilter = new Linkify.TransformFilter() {
 		@Override
 		public String transformUrl(Matcher match, String url) {
-			return match.group();
+			return url.substring(1);
+		}
+	};
+
+	private Linkify.TransformFilter topicFilter = new Linkify.TransformFilter() {
+		@Override
+		public String transformUrl(Matcher match, String url) {
+			return url.substring(1, url.length() - 1);
+		}
+	};
+
+	private Linkify.TransformFilter urlFileter = new Linkify.TransformFilter() {
+		@Override
+		public String transformUrl(Matcher match, String url) {
+			return url;
 		}
 	};
 }

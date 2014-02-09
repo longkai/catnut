@@ -13,8 +13,6 @@ package tingting.chen.util;
  */
 public class Constants {
 
-	public static final String SINA_WEIBO_URL = "http://weibo.com/";
-
 	public static final String ID = "id";
 
 	// for error dialog box
