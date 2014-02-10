@@ -110,12 +110,14 @@
 				android:id="@+id/favorite_count"
 				android:textSize="@dimen/text_size_small"
 				android:textColor="@android:color/darker_gray"
-				android:layout_width="@dimen/large"
+				android:layout_width="24dp"
 				android:layout_height="wrap_content" />
 
 			<TextView
 				android:id="@+id/source"
 				android:textSize="@dimen/text_size_small"
+				android:singleLine="true"
+				android:ellipsize="end"
 				android:textColor="@android:color/darker_gray"
 				android:gravity="right"
 				android:layout_width="match_parent"
