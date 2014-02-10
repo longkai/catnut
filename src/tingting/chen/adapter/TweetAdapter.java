@@ -75,6 +75,8 @@ public class TweetAdapter extends CursorAdapter {
 		int reteetCountIndex;
 		TextView source;
 		int sourceIndex;
+		TextView favoriteCount;
+		int favoriteCountIndex;
 
 		ImageView thumbs;
 		int thumbsIndex;
@@ -99,6 +101,8 @@ public class TweetAdapter extends CursorAdapter {
 		holder.replyCountIndex = cursor.getColumnIndex(Status.comments_count);
 		holder.reteetCount = (TextView) view.findViewById(R.id.reteet_count);
 		holder.reteetCountIndex = cursor.getColumnIndex(Status.reposts_count);
+		holder.favoriteCount = (TextView) view.findViewById(R.id.favorite_count);
+		holder.favoriteCountIndex = cursor.getColumnIndex(Status.attitudes_count);
 		holder.source = (TextView) view.findViewById(R.id.source);
 		holder.sourceIndex = cursor.getColumnIndex(Status.source);
 
@@ -127,6 +131,8 @@ public class TweetAdapter extends CursorAdapter {
 		holder.replyCount.setText(replyCount == 0 ? null : String.valueOf(replyCount));
 		int retweetCount = cursor.getInt(holder.reteetCountIndex);
 		holder.reteetCount.setText(replyCount == 0 ? null : String.valueOf(retweetCount));
+		int favoriteCount = cursor.getInt(holder.favoriteCountIndex);
+		holder.favoriteCount.setText(favoriteCount == 0 ? null : String.valueOf(favoriteCount));
 		String source = cursor.getString(holder.sourceIndex);
 		// remove html tags, maybe we should do this after we load the data from cloud...
 		holder.source.setText(Html.fromHtml(source).toString());
