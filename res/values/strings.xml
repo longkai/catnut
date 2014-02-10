@@ -14,4 +14,5 @@
 	<string name="logout_confirm">确定结束应用了嘛?</string>
 	<string name="no_tweets">没有微博啦Orz，要不试试刷新一下？</string>
 	<string name="new_tweet_hint">有什么新鲜事？</string>
+	<string name="search_hint">嗯哼？</string>
 </resources>

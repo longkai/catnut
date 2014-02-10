@@ -5,9 +5,9 @@
   ~ The software shall be used for good, not evil.
   -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-		  package="tingting.chen"
-		  android:versionCode="0"
-		  android:versionName="0.1">
+	package="tingting.chen"
+	android:versionCode="0"
+	android:versionName="0.1">
 
 	<uses-sdk
 		android:minSdkVersion="16"

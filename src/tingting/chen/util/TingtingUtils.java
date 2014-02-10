@@ -177,6 +177,15 @@ public class TingtingUtils {
 	}
 
 	/**
+	 * simple wrap the keywords with '%xx%'
+	 * @param keywords
+	 * @return '%keywords%'
+	 */
+	public static String like(String keywords) {
+		return "'%" + keywords + "%'";
+	}
+
+	/**
 	 * 清除textview链接的下划线
 	 *
 	 * @param textView

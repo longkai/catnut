@@ -8,14 +8,18 @@ package tingting.chen.fragment;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.media.Image;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.*;
-import android.widget.AbsListView;
-import android.widget.ProgressBar;
-import android.widget.Toast;
+import android.widget.*;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -40,12 +44,26 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  * @author longkai
  */
 public class HomeTimelineFragment extends ListFragment
-	implements LoaderManager.LoaderCallbacks<Cursor>, OnRefreshListener, AbsListView.OnScrollListener {
+	implements LoaderManager.LoaderCallbacks<Cursor>, OnRefreshListener, AbsListView.OnScrollListener, SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
 	private static final String TAG = "HomeTimelineFragment";
 
 	/** 默认每页微博数量 */
 	private static final int TWEETS_SIZE = 20;
+
+	/** 待检索的列 */
+	private static final String[] COLUMNS = new String[]{
+		"s._id",
+		Status.columnText,
+		Status.thumbnail_pic,
+		Status.comments_count,
+		Status.reposts_count,
+		Status.attitudes_count,
+		Status.source,
+		"s." + Status.created_at,
+		User.screen_name,
+		User.profile_image_url
+	};
 
 	private RequestQueue mRequestQueue;
 	private Activity mActivity;
@@ -58,6 +76,13 @@ public class HomeTimelineFragment extends ListFragment
 	private int mCurPage;
 	/** 当前是否在进行加载更多 */
 	private boolean mLoading;
+	/** 标志位，当前是否是显示搜索列表 */
+	private boolean isSearching;
+
+	/** 搜索视图 */
+	private SearchView mSearchView;
+	/** 当前搜索关键字 */
+	private String mCurFilter;
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -90,7 +115,43 @@ public class HomeTimelineFragment extends ListFragment
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		menu.add(Menu.NONE, R.id.refresh, Menu.NONE, R.string.refresh)
 			.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+		// 搜索相关
+		MenuItem search = menu.add(android.R.string.search_go);
+		search.setIcon(R.drawable.ic_title_search_default);
+		search.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS
+			| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+		mSearchView = new SearchView(mActivity);
+		mSearchView.setOnQueryTextListener(this);
+		mSearchView.setOnCloseListener(this);
+		mSearchView.setIconifiedByDefault(false);
+		mSearchView.setQueryHint(getString(R.string.search_hint));
+		mSearchView.setIconified(false);
+		int searchPlateId = mSearchView.getContext().getResources().getIdentifier("android:id/search_plate", null, null);
+		View searchPlate = mSearchView.findViewById(searchPlateId);
+		if (searchPlate != null) {
+			// 修改搜索文字的颜色
+			int searchTextId = searchPlate.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+			TextView searchText = (TextView) searchPlate.findViewById(searchTextId);
+			if (searchText != null) {
+				searchText.setTextColor(Color.WHITE);
+				searchText.setHintTextColor(Color.WHITE);
+			}
+		}
+		// 修改搜索hint图标，这里有bug，所以不得已搜索的空间又小了
+		int searchButtonId = mSearchView.getContext().getResources().getIdentifier("android:id/search_mag_icon", null, null);
+		ImageView searchButton = (ImageView) mSearchView.findViewById(searchButtonId);
+		if (searchButton != null) {
+			searchButton.setImageResource(R.drawable.ic_search_hint);
+		}
+		// 修改清除图标
+		int clearId = mSearchView.getContext().getResources().getIdentifier("android:id/search_close_btn", null, null);
+		ImageView closeButton = (ImageView) mSearchView.findViewById(clearId);
+		if (closeButton != null) {
+			closeButton.setImageResource(R.drawable.ic_clear);
+		}
+		search.setActionView(mSearchView);
 	}
+
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -121,29 +182,35 @@ public class HomeTimelineFragment extends ListFragment
 		super.onStop();
 	}
 
+
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		String where = null;
+		String limit = String.valueOf(TWEETS_SIZE * (mCurPage + 1));
+		// 搜索只能是本地搜索
+		if (!TextUtils.isEmpty(mCurFilter) && mCurFilter.trim().length() != 0) {
+			where = Status.columnText + " like " + TingtingUtils.like(mCurFilter) +
+				" or " +
+				User.screen_name + " like " + TingtingUtils.like(mCurFilter);
+			limit = null;
+			getListView().removeFooterView(mLoadMore);
+			isSearching = true;
+		} else {
+			if (isSearching) {
+				isSearching = false;
+				getListView().addFooterView(mLoadMore);
+			}
+		}
 		CursorLoader cursorLoader = TingtingUtils.getCursorLoader(
 			mActivity,
 			TingtingProvider.parse(Status.MULTIPLE),
-			new String[]{
-				"s._id",
-				Status.columnText,
-				Status.thumbnail_pic,
-				Status.comments_count,
-				Status.reposts_count,
-				Status.attitudes_count,
-				Status.source,
-				"s." + Status.created_at,
-				User.screen_name,
-				User.profile_image_url
-			},
-			null,
+			COLUMNS,
+			where,
 			null,
 			Status.TABLE + " as s",
 			"inner join " + User.TABLE + " as u on s.uid=u._id",
 			"s._id desc",
-			String.valueOf(TWEETS_SIZE * (mCurPage + 1))
+			limit
 		);
 		// 清除加载更多标志位
 		if (mCurPage != 0) {
@@ -202,7 +269,7 @@ public class HomeTimelineFragment extends ListFragment
 
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
-		if (mLoadMore.isShown() && !mLoading) {
+		if (mLoadMore.isShown() && !mLoading && !isSearching) {
 			mLoading = true;
 			mCurPage++;
 			// 开启worker线程去web抓取数据，
@@ -214,5 +281,36 @@ public class HomeTimelineFragment extends ListFragment
 
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+	}
+
+	@Override
+	public boolean onQueryTextSubmit(String query) {
+		return true;
+	}
+
+	@Override
+	public boolean onQueryTextChange(String newText) {
+		// the search filter, and restart the loader to do a new query
+		// with this filter.
+		String newFilter = !TextUtils.isEmpty(newText) ? newText : null;
+		// Don't do anything if the filter hasn't actually changed.
+		// Prevents restarting the loader when restoring state.
+		if (TextUtils.isEmpty(mCurFilter) && TextUtils.isEmpty(newFilter)) {
+			return true;
+		}
+		if (!TextUtils.isEmpty(mCurFilter) && mCurFilter.equals(newFilter)) {
+			return true;
+		}
+		mCurFilter = newFilter;
+		getLoaderManager().restartLoader(0, null, this);
+		return true;
+	}
+
+	@Override
+	public boolean onClose() {
+		if (!TextUtils.isEmpty(mSearchView.getQuery())) {
+			mSearchView.setQuery(null, true);
+		}
+		return true;
 	}
 }

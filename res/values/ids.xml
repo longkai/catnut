@@ -11,4 +11,5 @@
 	<item name="action_reteet" type="id" />
 	<item name="action_reply" type="id" />
 	<item name="action_favorite" type="id" />
+	<item name="action_search" type="id" />
 </resources>
