@@ -21,8 +21,8 @@ import com.android.volley.toolbox.ImageLoader;
 import tingting.chen.R;
 import tingting.chen.metadata.Status;
 import tingting.chen.metadata.User;
+import tingting.chen.support.TweetImageSpan;
 import tingting.chen.tingting.TingtingApp;
-import tingting.chen.util.Constants;
 import tingting.chen.util.TingtingUtils;
 
 import java.text.ParseException;
@@ -49,11 +49,14 @@ public class TweetAdapter extends CursorAdapter {
 	public static final String TOPIC_SCHEME = "http://huati.weibo.com/k/";
 	public static final String MENTION_SCHEME = "http://weibo.com/n/";
 
+	private Context mContext;
 	private ImageLoader mImageLoader;
 
 	public TweetAdapter(Context context) {
 		super(context, null, 0);
+		mContext = context;
 		mImageLoader = TingtingApp.getTingtingApp().getImageLoader();
+		mImageSpan = new TweetImageSpan(mContext);
 	}
 
 	private static class ViewHolder {
@@ -127,6 +130,8 @@ public class TweetAdapter extends CursorAdapter {
 				holder.thumbs.getMaxWidth(), holder.thumbs.getMaxHeight());
 		}
 
+		// 表情处理
+		holder.text.setText(mImageSpan.getImageSpan(holder.text.getText()));
 		// 分别对微博的链接，@，##话题过滤
 		// todo：对@，## 进行处理
 		Linkify.addLinks(holder.text, MENTION_PATTERN, MENTION_SCHEME, null, mentionFilter);
@@ -134,6 +139,8 @@ public class TweetAdapter extends CursorAdapter {
 		Linkify.addLinks(holder.text, WEB_URL, null, null, urlFileter);
 		TingtingUtils.removeLinkUnderline(holder.text);
 	}
+
+	private TweetImageSpan mImageSpan;
 
 	private Linkify.TransformFilter mentionFilter = new Linkify.TransformFilter() {
 		@Override

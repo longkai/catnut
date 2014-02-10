@@ -15,7 +15,6 @@ import android.os.Bundle;
 import android.view.*;
 import android.widget.AbsListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
