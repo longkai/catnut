@@ -132,6 +132,7 @@ public class HomeTimelineFragment extends ListFragment
 				Status.thumbnail_pic,
 				Status.comments_count,
 				Status.reposts_count,
+				Status.source,
 				"s." + Status.created_at,
 				User.screen_name,
 				User.profile_image_url
