@@ -7,6 +7,7 @@ package tingting.chen.processor;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import tingting.chen.metadata.Status;
@@ -56,4 +57,16 @@ public class UserProcessor {
 		}
 	}
 
+	/**
+	 * 持久化单个用户的信息
+	 */
+	public static class UserProfileProcessor implements TingtingProcessor<JSONObject> {
+
+		@Override
+		public void asyncProcess(Context context, JSONObject data) throws Exception {
+			Log.d("xx", data.toString());
+			ContentValues user = User.METADATA.convert(data);
+			context.getContentResolver().insert(TingtingProvider.parse(User.MULTIPLE), user);
+		}
+	}
 }

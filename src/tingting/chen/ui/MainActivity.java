@@ -5,16 +5,25 @@
  */
 package tingting.chen.ui;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.AsyncQueryHandler;
 import android.content.DialogInterface;
+import android.database.Cursor;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Process;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
 import tingting.chen.R;
 import tingting.chen.fragment.HomeTimelineFragment;
+import tingting.chen.metadata.User;
 import tingting.chen.tingting.TingtingApp;
+import tingting.chen.tingting.TingtingProvider;
 
 /**
  * 应用程序主界面。
@@ -27,16 +36,60 @@ public class MainActivity extends Activity {
 	private static final String TAG = "MainActivity";
 
 	private TingtingApp mApp;
+	private ActionBar mActionBar;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (savedInstanceState == null) {
 			mApp = TingtingApp.getTingtingApp();
+			mActionBar = getActionBar();
+			setHeader();
 			getFragmentManager().beginTransaction()
 				.replace(android.R.id.content, new HomeTimelineFragment())
 				.commit();
 		}
+	}
+
+	/**
+	 * 设置顶部，关联用户的头像和昵称
+	 */
+	private void setHeader() {
+		new AsyncQueryHandler(getContentResolver()) {
+			@Override
+			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+				if (cursor != null && cursor.moveToNext()) {
+					mActionBar.setDisplayUseLogoEnabled(true);
+					mActionBar.setTitle(cursor.getString(0));
+					String avatarUrl = cursor.getString(1);
+					mApp.getImageLoader()
+						.get(avatarUrl, new ImageLoader.ImageListener() {
+							@Override
+							public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+								BitmapDrawable bd = new BitmapDrawable(getResources(), response.getBitmap());
+								Log.d(TAG, bd.toString());
+								mActionBar.setIcon(bd);
+							}
+
+							@Override
+							public void onErrorResponse(VolleyError error) {
+							}
+						});
+					cursor.close();
+				}
+			}
+		}.startQuery(
+			0,
+			null,
+			TingtingProvider.parse(User.MULTIPLE, String.valueOf(mApp.getAccessToken().uid)),
+			new String[]{
+				User.screen_name,
+				User.profile_image_url
+			},
+			null,
+			null,
+			null
+		);
 	}
 
 	@Override

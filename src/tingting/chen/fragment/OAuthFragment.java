@@ -25,8 +25,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONObject;
 import tingting.chen.R;
+import tingting.chen.api.UserAPI;
+import tingting.chen.processor.UserProcessor;
 import tingting.chen.tingting.TingtingApp;
 import tingting.chen.metadata.WeiboAPIError;
+import tingting.chen.tingting.TingtingRequest;
 import tingting.chen.ui.MainActivity;
 import tingting.chen.util.Manifest;
 
@@ -80,6 +83,14 @@ public class OAuthFragment extends Fragment {
 							Log.i(TAG, "auth success with result: " + response.toString());
 							mApp.saveAccessToken(response);
 							Toast.makeText(getActivity(), getString(R.string.auth_success), Toast.LENGTH_SHORT).show();
+							// fetch user' s profile
+							mRequestQueue.add(new TingtingRequest(
+								getActivity(),
+								UserAPI.profile(mApp.getAccessToken().uid),
+								new UserProcessor.UserProfileProcessor(),
+								null,
+								null
+							));
 							startActivity(new Intent(getActivity(), MainActivity.class));
 						}
 					},
@@ -120,7 +131,7 @@ public class OAuthFragment extends Fragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		MenuItem refresh = menu.add(Menu.NONE, R.id.refresh, Menu.NONE, getString(R.string.refresh));
-		refresh.setIcon(R.drawable.ic_navigation_refresh_light);
+		refresh.setIcon(R.drawable.ic_action_retry);
 		refresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 	}
 
