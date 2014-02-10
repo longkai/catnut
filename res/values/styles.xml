@@ -17,6 +17,8 @@
 		<item name="android:selectableItemBackground">@drawable/item_background_holo_light</item>
 		<item name="android:actionBarTabStyle">@style/ActionBar_Light_TabStyle</item>
 		<item name="android:actionBarTabBarStyle">@style/ActionBar_Light_TabBarStyle</item>
+		<item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
+		<item name="android:buttonStyle">@style/RobotoButtonStyle</item>
 	</style>
 
 	<style name="AppTheme.Dark" parent="android:Theme.Holo">
@@ -49,6 +51,15 @@
 
 	<style name="ActionBar_Light_TabBarStyle" parent="android:Widget.Holo.Light.ActionBar.TabBar">
 		<item name="android:background">@drawable/bg_actionbar</item>
+	</style>
+
+	<!-- Roboto font -->
+	<style name="RobotoTextViewStyle" parent="android:Widget.TextView">
+		<item name="android:fontFamily">sans-serif-light</item>
+	</style>
+
+	<style name="RobotoButtonStyle" parent="android:Widget.Holo.Button">
+		<item name="android:fontFamily">sans-serif-light</item>
 	</style>
 
 	<!--
