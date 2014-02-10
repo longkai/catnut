@@ -5,15 +5,13 @@
  */
 package tingting.chen.ui;
 
-import android.app.*;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Process;
-import android.support.v13.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.view.*;
-import android.widget.TextView;
-import com.android.volley.RequestQueue;
+import android.view.Menu;
+import android.view.MenuItem;
 import tingting.chen.R;
 import tingting.chen.fragment.HomeTimelineFragment;
 import tingting.chen.tingting.TingtingApp;
@@ -24,55 +22,21 @@ import tingting.chen.tingting.TingtingApp;
  *
  * @author longkai
  */
-public class MainActivity extends Activity implements ActionBar.TabListener {
+public class MainActivity extends Activity {
 
 	private static final String TAG = "MainActivity";
 
 	private TingtingApp mApp;
-	private RequestQueue mRequestQueue;
-
-	private ActionBar mActionBar;
-	private ViewPager mViewPager;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.pager);
-
-		mApp = TingtingApp.getTingtingApp();
-		mRequestQueue = mApp.getRequestQueue();
-
-		mActionBar = getActionBar();
-		mViewPager = (ViewPager) findViewById(R.id.pager);
-		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		buildPagerTabs();
-
-		mViewPager.setAdapter(new MainPagerFragmentAdapter());
-		mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-			@Override
-			public void onPageSelected(int position) {
-				mActionBar.setSelectedNavigationItem(position);
-			}
-		});
-	}
-
-	private void buildPagerTabs() {
-		int[] icons = new int[]{
-			R.drawable.ic_tab_home,
-			R.drawable.ic_tab_home,
-		};
-		for (int icon : icons) {
-			ActionBar.Tab tab = mActionBar.newTab()
-				.setIcon(icon)
-				.setTabListener(this);
-			mActionBar.addTab(tab);
+		if (savedInstanceState == null) {
+			mApp = TingtingApp.getTingtingApp();
+			getFragmentManager().beginTransaction()
+				.replace(android.R.id.content, new HomeTimelineFragment())
+				.commit();
 		}
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-		mRequestQueue.cancelAll(TAG);
 	}
 
 	@Override
@@ -101,48 +65,5 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 				break;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
-	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-		mViewPager.setCurrentItem(tab.getPosition());
-		mActionBar.show();
-	}
-
-	@Override
-	public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-	}
-
-	@Override
-	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-	}
-
-	private class MainPagerFragmentAdapter extends FragmentPagerAdapter {
-
-		public MainPagerFragmentAdapter() {
-			super(getFragmentManager());
-		}
-
-		@Override
-		public Fragment getItem(int position) {
-			return new HomeTimelineFragment();
-		}
-
-		@Override
-		public int getCount() {
-			return mActionBar.getTabCount();
-		}
-	}
-
-	/**
-	 * just for test!
-	 */
-	public static class DummyFragment extends Fragment {
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			TextView tv = new TextView(getActivity());
-			tv.setText(R.string.app_name);
-			return tv;
-		}
 	}
 }
