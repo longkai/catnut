@@ -19,6 +19,7 @@
 1. support-v4，注意版本号，为什么我们的项目要求那么高的API却还需要兼容库呢？因为兼容库不仅仅提供兼容类，还有其它的功能。并且没有用到的类可以在编译期间被删除掉[?][ProGuard]
 2. support-v13，for native fragment api
 3. android-volley，异步http请求框架，需要自行[下载][volley]并引入
+4. ActionBar-PullToRefresh，刷新控件，需自行[下载][pull2refresh]或者通过Android Studio引入
 
 ## 如何构建
 1. 通过IDE
@@ -50,5 +51,6 @@ The software shall be used for good, not evil.
 [ADT Bundle]: http://developer.android.com/sdk/index.html "ADT Bundle"
 [ProGuard]: http://proguard.sourceforge.net/index.html "ProGuard"
 [volley]: https://android.googlesource.com/platform/frameworks/volley "android-volley"
+[pull2refresh]: https://github.com/chrisbanes/ActionBar-PullToRefresh "ActionBar-PullToRefresh"
 [@龙凯Orz]: http://weibo.com/coding4fun "sina weibo"
 [@longkai_1991]: https://twitter.com/longkai_1991 "twitter"
