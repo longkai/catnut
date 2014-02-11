@@ -52,6 +52,7 @@ public class TweetAdapter extends CursorAdapter {
 
 	private Context mContext;
 	private ImageLoader mImageLoader;
+	private TweetImageSpan mImageSpan;
 
 	public TweetAdapter(Context context) {
 		super(context, null, 0);
@@ -128,11 +129,11 @@ public class TweetAdapter extends CursorAdapter {
 		}
 
 		int replyCount = cursor.getInt(holder.replyCountIndex);
-		holder.replyCount.setText(replyCount == 0 ? null : String.valueOf(replyCount));
+		holder.replyCount.setText(TingtingUtils.approximate(replyCount));
 		int retweetCount = cursor.getInt(holder.reteetCountIndex);
-		holder.reteetCount.setText(replyCount == 0 ? null : String.valueOf(retweetCount));
+		holder.reteetCount.setText(TingtingUtils.approximate(retweetCount));
 		int favoriteCount = cursor.getInt(holder.favoriteCountIndex);
-		holder.favoriteCount.setText(favoriteCount == 0 ? null : String.valueOf(favoriteCount));
+		holder.favoriteCount.setText(TingtingUtils.approximate(favoriteCount));
 		String source = cursor.getString(holder.sourceIndex);
 		// remove html tags, maybe we should do this after we load the data from cloud...
 		holder.source.setText(Html.fromHtml(source).toString());
@@ -154,7 +155,6 @@ public class TweetAdapter extends CursorAdapter {
 		TingtingUtils.removeLinkUnderline(holder.text);
 	}
 
-	private TweetImageSpan mImageSpan;
 
 	private Linkify.TransformFilter mentionFilter = new Linkify.TransformFilter() {
 		@Override

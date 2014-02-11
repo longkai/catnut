@@ -100,6 +100,29 @@ public class TingtingUtils {
 	}
 
 	/**
+	 * 将数字转换为相对数字，节省版面，比如1234->1.2k，34567->3.5w
+	 * <p/>
+	 * 注意，0返回null，最大的权值为w
+	 *
+	 * @param number
+	 * @return 数字相对大小字符串
+	 */
+	public static String approximate(int number) {
+		if (number == 0) {
+			return null;
+		}
+		if (number < 1000) {
+			return String.valueOf(number);
+		} else if (number < 10000) {
+			float f = number * 1f / 1000;
+			return String.valueOf(Math.round(f * 10) / 10.0) + "k";
+		} else {
+			float f = number * 1f / 10000;
+			return String.valueOf(Math.round(f * 10) / 10.0) + "w";
+		}
+	}
+
+	/**
 	 * 自定义raw sql以获取cursor，包含所有的除了having，group外的所有字段
 	 *
 	 * @param context
@@ -178,6 +201,7 @@ public class TingtingUtils {
 
 	/**
 	 * simple wrap the keywords with '%xx%'
+	 *
 	 * @param keywords
 	 * @return '%keywords%'
 	 */

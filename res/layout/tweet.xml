@@ -109,8 +109,9 @@
 			<TextView
 				android:id="@+id/favorite_count"
 				android:textSize="@dimen/text_size_small"
+				android:layout_marginRight="@dimen/medium"
 				android:textColor="@android:color/darker_gray"
-				android:layout_width="24dp"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content" />
 
 			<TextView
