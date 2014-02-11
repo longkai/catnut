@@ -1,4 +1,4 @@
-新浪微博Android REST Client客户端
+新浪微博Android REST Client
 =====================
 ## 说明
 程序架构启发自Google IO 2010 - [developing-RESTful-android-apps][]，界面设计启发自[Twitter for Android][]（需翻墙）
