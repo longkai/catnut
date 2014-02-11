@@ -16,4 +16,6 @@
 	<string name="new_tweet_hint">有什么新鲜事？</string>
 	<string name="search_hint">嗯哼？</string>
 	<string name="authing_hint">正在联系新浪微博授权中...</string>
+	<string name="open_drawer">打开抽屉...</string>
+	<string name="close_drawer">关闭抽屉...</string>
 </resources>

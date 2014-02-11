@@ -6,6 +6,9 @@
   -->
 <resources>
 	<item name="refresh" type="id" />
+	<item name="fragment_container" type="id" />
+	<item name="drawer_layout" type="id" />
+	<item name="drawer" type="id" />
 	<item name="pager" type="id" />
 	<item name="view_stub" type="id" />
 	<item name="action_reteet" type="id" />
