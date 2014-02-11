@@ -14,7 +14,6 @@ import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Process;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.android.volley.VolleyError;
@@ -61,14 +60,11 @@ public class MainActivity extends Activity {
 				if (cursor != null && cursor.moveToNext()) {
 					mActionBar.setDisplayUseLogoEnabled(true);
 					mActionBar.setTitle(cursor.getString(0));
-					String avatarUrl = cursor.getString(1);
 					mApp.getImageLoader()
-						.get(avatarUrl, new ImageLoader.ImageListener() {
+						.get(cursor.getString(1), new ImageLoader.ImageListener() {
 							@Override
 							public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-								BitmapDrawable bd = new BitmapDrawable(getResources(), response.getBitmap());
-								Log.d(TAG, bd.toString());
-								mActionBar.setIcon(bd);
+								mActionBar.setIcon(new BitmapDrawable(getResources(), response.getBitmap()));
 							}
 
 							@Override

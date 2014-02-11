@@ -7,17 +7,12 @@ package tingting.chen.processor;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import tingting.chen.metadata.Status;
 import tingting.chen.metadata.User;
 import tingting.chen.tingting.TingtingProcessor;
 import tingting.chen.tingting.TingtingProvider;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * 用户数据处理器，关联该用户最新的一条微博
@@ -64,7 +59,6 @@ public class UserProcessor {
 
 		@Override
 		public void asyncProcess(Context context, JSONObject data) throws Exception {
-			Log.d("xx", data.toString());
 			ContentValues user = User.METADATA.convert(data);
 			context.getContentResolver().insert(TingtingProvider.parse(User.MULTIPLE), user);
 		}

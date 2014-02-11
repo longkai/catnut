@@ -8,6 +8,7 @@ package tingting.chen.fragment;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -47,6 +48,8 @@ public class OAuthFragment extends Fragment {
 	private TingtingApp mApp;
 	private RequestQueue mRequestQueue;
 
+	private ProgressDialog mProgressDialog;
+
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
@@ -70,10 +73,11 @@ public class OAuthFragment extends Fragment {
 		mWebView.setWebViewClient(new WebViewClient() {
 			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-			String code = Uri.parse(url).getQueryParameter("code");
-			Log.d(TAG, "the auth code is " + code);
-			String accessTokenUri = Manifest.getAccessTokenUri(code);
-			mRequestQueue.add(new JsonObjectRequest(
+				String code = Uri.parse(url).getQueryParameter("code");
+				Log.d(TAG, "the auth code is " + code);
+				String accessTokenUri = Manifest.getAccessTokenUri(code);
+				mProgressDialog = ProgressDialog.show(getActivity(), null, getString(R.string.authing_hint), true, false);
+				mRequestQueue.add(new JsonObjectRequest(
 					Request.Method.POST,
 					accessTokenUri,
 					null,
@@ -88,10 +92,15 @@ public class OAuthFragment extends Fragment {
 								getActivity(),
 								UserAPI.profile(mApp.getAccessToken().uid),
 								new UserProcessor.UserProfileProcessor(),
-								null,
-								null
+								new Response.Listener<JSONObject>() {
+									@Override
+									public void onResponse(JSONObject response) {
+										mProgressDialog.dismiss();
+										startActivity(new Intent(getActivity(), MainActivity.class));
+									}
+								},
+								null // should not happen!
 							));
-							startActivity(new Intent(getActivity(), MainActivity.class));
 						}
 					},
 					new Response.ErrorListener() {
@@ -103,8 +112,8 @@ public class OAuthFragment extends Fragment {
 							fragment.show(getFragmentManager(), null);
 						}
 					}
-			)).setTag(TAG);
-			return true;
+				)).setTag(TAG);
+				return true;
 			}
 		});
 	}
