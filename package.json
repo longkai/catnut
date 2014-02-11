@@ -18,7 +18,8 @@
 	"dependencies": [
 		"support-v4",
 		"support-v13",
-		"android-volley"
+		"android-volley",
+		"ActionBar-PullToRefresh"
 	],
 	"license": {
 		"type": "MIT",
