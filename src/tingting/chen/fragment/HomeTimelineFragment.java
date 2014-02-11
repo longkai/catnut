@@ -182,7 +182,6 @@ public class HomeTimelineFragment extends ListFragment
 		super.onStop();
 	}
 
-
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		String where = null;
@@ -193,14 +192,15 @@ public class HomeTimelineFragment extends ListFragment
 				" or " +
 				User.screen_name + " like " + TingtingUtils.like(mCurFilter);
 			limit = null;
-			getListView().removeFooterView(mLoadMore);
-			isSearching = true;
-		} else {
-			if (isSearching) {
-				isSearching = false;
-				getListView().addFooterView(mLoadMore);
+			if (!isSearching) {
+				getListView().removeFooterView(mLoadMore);
 			}
+			isSearching = true;
+		} else if (isSearching) {
+			isSearching = false;
+			getListView().addFooterView(mLoadMore);
 		}
+
 		CursorLoader cursorLoader = TingtingUtils.getCursorLoader(
 			mActivity,
 			TingtingProvider.parse(Status.MULTIPLE),
