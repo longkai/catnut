@@ -1,9 +1,11 @@
-婷婷 - 新浪微博客户端
+新浪微博Android REST Client客户端
 =====================
 ## 说明
-为某人写的一个新浪微博客户端
+程序架构启发自Google IO 2010 - [developing-RESTful-android-apps][]，界面设计启发自[Twitter for Android][]（需翻墙）
 
-> ![icon][]
+个人学习时作品，目前有空或者有新的想法就写写，持续构建中:-)，欢迎感兴趣的朋友交流，fork，clone，bug issue啥的!
+
+> ![show][]
 
 ## 环境需求
 1. Android SDK >= 4.1.x（API Level >= 16），*建议设置ANDROID_HOME环境变量*
@@ -31,11 +33,17 @@
  2. 如果本地没有安装gradle，那么shell或者cmd进入项目根目录，mac或者linux敲``./gradlew clean build``，windows敲``gradlew clean build``，接下来同1
 
 ## License
-```
-The MIT License (MIT)
-Copyright (c) 2014 longkai
-The software shall be used for good, not evil.
-```
+code license
+> ```
+> The MIT License (MIT)
+> Copyright (c) 2014 longkai
+> The software shall be used for good, not evil.
+> ```
+
+document license
+> 本作品采用[知识共享署名-非商业性使用 4.0 国际许可协议][creative commons license]进行许可。
+
+>![][creative commons icon]
 
 ## 联系作者
 1. 邮箱：im.longkai@gmail.com
@@ -46,7 +54,9 @@ The software shall be used for good, not evil.
 ---
 2014-01-18
 
-[icon]: https://raw.github.com/longkai/tingting/master/res/drawable-xhdpi/ic_launcher.png "icon"
+[developing-RESTful-android-apps]: http://www.google.com/events/io/2010/sessions/developing-RESTful-android-apps.html "developing-RESTful-android-apps"
+[Twitter for Android]: https://about.twitter.com/zh-hans/products/android "twitter for android"
+[show]: http://farm4.staticflickr.com/3824/12456581065_a01628cf23_o.png "效果图"
 [Intellij IDEA Community]: http://www.jetbrains.com/idea/ "Intellij IDEA"
 [ADT Bundle]: http://developer.android.com/sdk/index.html "ADT Bundle"
 [ProGuard]: http://proguard.sourceforge.net/index.html "ProGuard"
@@ -54,3 +64,5 @@ The software shall be used for good, not evil.
 [pull2refresh]: https://github.com/chrisbanes/ActionBar-PullToRefresh "ActionBar-PullToRefresh"
 [@龙凯Orz]: http://weibo.com/coding4fun "sina weibo"
 [@longkai_1991]: https://twitter.com/longkai_1991 "twitter"
+[creative commons icon]: http://i.creativecommons.org/l/by-nc/4.0/88x31.png "creative commons icon"
+[creative commons license]: http://creativecommons.org/licenses/by-nc/4.0/deed.zh "creative commons license"
