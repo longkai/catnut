@@ -32,6 +32,7 @@ import tingting.chen.R;
 import tingting.chen.adapter.DrawerNavAdapter;
 import tingting.chen.adapter.TweetAdapter;
 import tingting.chen.fragment.HomeTimelineFragment;
+import tingting.chen.fragment.PrefFragment;
 import tingting.chen.metadata.Status;
 import tingting.chen.metadata.User;
 import tingting.chen.support.TweetImageSpan;
@@ -288,6 +289,15 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					})
 					.setNegativeButton(android.R.string.no, null)
 					.show();
+				break;
+			case R.id.pref:
+				if (getFragmentManager().findFragmentByTag(TAG) == null) {
+					getFragmentManager()
+						.beginTransaction()
+							.replace(R.id.fragment_container, new PrefFragment(), TAG)
+						.addToBackStack(null)
+						.commit();
+				}
 				break;
 			default:
 				break;

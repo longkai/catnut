@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<PreferenceCategory android:title="@string/general_settings">
+
+		<CheckBoxPreference
+			android:key="auto_fetch_on_start"
+			android:defaultValue="false"
+			android:title="@string/auto_fetch_on_start"
+			android:summary="@string/auto_fetch_on_start_summary" />
+
+		<CheckBoxPreference
+			android:key="auto_load_more_from_cloud"
+			android:defaultValue="true"
+			android:title="@string/load_more_from_cloud"
+			android:summary="@string/load_more_from_cloud_summary" />
+
+		<ListPreference
+			android:key="default_fetch_size"
+			android:defaultValue="@integer/default_fetch_size"
+			android:title="@string/tweets_count_per_fetch"
+			android:summary="@string/tweets_count_per_fetch_summary"
+			android:dialogTitle="@string/tweets_count_per_fetch"
+			android:entries="@array/fetch_size_pref_entries"
+			android:entryValues="@array/fetch_size_pref_entries" />
+	</PreferenceCategory>
+
+	<PreferenceCategory android:title="@string/advanced_settings">
+
+		<CheckBoxPreference
+			android:key="show_tweet_thumbs"
+			android:title="@string/show_thumbs"
+			android:defaultValue="true"
+			android:summary="@string/show_thumbs_summary" />
+	</PreferenceCategory>
+
+	<PreferenceCategory android:title="@string/about">
+
+		<Preference
+			android:key="about"
+			android:title="@string/version"
+			android:summary="@string/version_name" />
+
+		<Preference
+			android:key="author"
+			android:title="@string/author"
+			android:summary="龙凯 im.longkai@gmail.com" />
+
+		<Preference
+			android:key="source_code"
+			android:title="@string/source_code"
+			android:summary="@string/source_code_summary" />
+
+		<Preference
+			android:key="open_source_license"
+			android:title="Open Source Licenses" />
+	</PreferenceCategory>
+</PreferenceScreen>

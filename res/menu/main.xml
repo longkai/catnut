@@ -12,7 +12,10 @@
 		android:showAsAction="never" />
 	<item
 		android:id="@+id/logout"
-		android:orderInCategory="1000"
 		android:title="@string/logout"
+		android:showAsAction="never" />
+	<item
+		android:id="@+id/pref"
+		android:title="@string/pref"
 		android:showAsAction="never" />
 </menu>

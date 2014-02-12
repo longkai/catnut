@@ -14,6 +14,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import org.json.JSONObject;
+import tingting.chen.fragment.PrefFragment;
 import tingting.chen.metadata.AccessToken;
 import tingting.chen.util.BitmapLruCache;
 
@@ -47,6 +48,7 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 		super.onCreate();
 		sApp = this;
 		mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		mPreferences.registerOnSharedPreferenceChangeListener(this);
 		mRequestQueue = Volley.newRequestQueue(this);
 		mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache(1000)); // 1000个缓存条目
 		checkAccessToken();
