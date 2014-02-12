@@ -5,9 +5,7 @@
  */
 package tingting.chen.ui;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.*;
 import android.content.AsyncQueryHandler;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,6 +14,7 @@ import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Process;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -42,13 +41,15 @@ import tingting.chen.util.TingtingUtils;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 应用程序主界面。
  *
  * @author longkai
  */
-public class MainActivity extends Activity implements DrawerLayout.DrawerListener, ListView.OnItemClickListener {
+public class MainActivity extends Activity implements DrawerLayout.DrawerListener, ListView.OnItemClickListener,
+	FragmentManager.OnBackStackChangedListener {
 
 	private static final String TAG = "MainActivity";
 
@@ -63,6 +64,9 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		R.id.action_share_app,
 		R.id.action_view_source_code,
 	};
+
+	// for card flip animation
+	private Handler mHandler = new Handler();
 
 	private TingtingApp mApp;
 	private ImageLoader mImageLoader;
@@ -115,8 +119,9 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 
 			getFragmentManager()
 				.beginTransaction()
-					.replace(R.id.fragment_container, new HomeTimelineFragment())
+				.replace(R.id.fragment_container, new HomeTimelineFragment())
 				.commit();
+			getFragmentManager().addOnBackStackChangedListener(this);
 		}
 	}
 
@@ -288,11 +293,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				break;
 			case R.id.pref:
 				if (getFragmentManager().findFragmentByTag(TAG) == null) {
-					getFragmentManager()
-						.beginTransaction()
-							.replace(R.id.fragment_container, new PrefFragment(), TAG)
-						.addToBackStack(null)
-						.commit();
+					flipCard(new PrefFragment(), TAG);
 				}
 				break;
 			default:
@@ -358,5 +359,32 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				break;
 		}
 		mDrawerLayout.closeDrawer(mDrawer);
+	}
+
+	@Override
+	public void onBackStackChanged() {
+		invalidateOptionsMenu();
+	}
+
+	/**
+	 * 切换fragment时卡片翻转的效果
+	 * @param fragment
+	 * @param tag 没有赋null即可
+	 */
+	private void flipCard(Fragment fragment, String tag) {
+		getFragmentManager()
+			.beginTransaction()
+			.setCustomAnimations(
+				R.animator.card_flip_right_in, R.animator.card_flip_right_out,
+				R.animator.card_flip_left_in, R.animator.card_flip_left_out)
+			.replace(R.id.fragment_container, fragment, tag)
+			.addToBackStack(null)
+			.commit();
+		mHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				invalidateOptionsMenu();
+			}
+		});
 	}
 }
