@@ -13,6 +13,7 @@ import tingting.chen.metadata.Status;
 import tingting.chen.metadata.User;
 import tingting.chen.tingting.TingtingProcessor;
 import tingting.chen.tingting.TingtingProvider;
+import tingting.chen.util.Constants;
 
 /**
  * 用户数据处理器，关联该用户最新的一条微博
@@ -60,6 +61,14 @@ public class UserProcessor {
 		@Override
 		public void asyncProcess(Context context, JSONObject data) throws Exception {
 			ContentValues user = User.METADATA.convert(data);
+			// 如果包含了用户最新的一条微博
+			if (data.has(Status.SINGLE)) {
+				JSONObject json = data.getJSONObject(Status.SINGLE);
+				ContentValues tweet = Status.METADATA.convert(json);
+				// 注意，新浪此时返回的内联微博没有uid这项！
+				tweet.put(Status.uid, data.optLong(Constants.ID));
+				context.getContentResolver().insert(TingtingProvider.parse(Status.MULTIPLE), tweet);
+			}
 			context.getContentResolver().insert(TingtingProvider.parse(User.MULTIPLE), user);
 		}
 	}
