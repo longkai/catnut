@@ -104,7 +104,9 @@ public class TingtingApp extends Application implements SharedPreferences.OnShar
 			.remove(ACCESS_TOKEN)
 			.commit();
 		mAccessToken = null;
-		sAuthHeaders.clear();
+		if (sAuthHeaders != null) {
+			sAuthHeaders.clear();
+		}
 		sAuthHeaders = null;
 	}
 

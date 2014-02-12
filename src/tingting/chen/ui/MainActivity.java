@@ -272,6 +272,23 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					.setNegativeButton(android.R.string.no, null)
 					.show();
 				break;
+			// 注销，需要重新授权的
+			case R.id.cancellation:
+				new AlertDialog.Builder(this)
+					.setMessage(getString(R.string.cancellation_confirm))
+					.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							mApp.invalidateAccessToken();
+							Intent intent = new Intent(MainActivity.this, HelloActivity.class);
+							// 清除掉之前的back stack哦
+							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+							startActivity(intent);
+						}
+					})
+					.setNegativeButton(android.R.string.no, null)
+					.show();
+				break;
 			default:
 				break;
 		}
