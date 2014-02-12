@@ -38,7 +38,4 @@
 
 	<item name="action_share_app" type="id" />
 	<item name="action_view_source_code" type="id" />
-	<item name="action_view_version" type="id" />
-	<item name="action_view_author" type="id" />
-	<item name="action_view_licenses" type="id" />
 </resources>

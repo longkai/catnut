@@ -62,10 +62,6 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		0, // 分享
 		R.id.action_share_app,
 		R.id.action_view_source_code,
-		0, // 关于
-		R.id.action_view_version,
-		R.id.action_view_author,
-		R.id.action_view_licenses
 	};
 
 	private TingtingApp mApp;
