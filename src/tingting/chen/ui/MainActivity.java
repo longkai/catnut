@@ -76,8 +76,9 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 	private DrawerLayout mDrawerLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
 
+	private String mNick;
 	private ImageView mProfileCover;
-	private TextView mNick;
+	private TextView mTextNick;
 	private TextView mDescription;
 	private ViewStub mLatestTweet;
 
@@ -107,7 +108,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 
 			// drawer customized view
 			mProfileCover = (ImageView) findViewById(R.id.avatar_profile);
-			mNick = (TextView) findViewById(R.id.nick);
+			mTextNick = (TextView) findViewById(R.id.nick);
 			mDescription = (TextView) findViewById(R.id.description);
 			mLatestTweet = (ViewStub) findViewById(R.id.latest_tweet);
 
@@ -135,9 +136,9 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 				if (cursor != null && cursor.moveToNext()) {
 					mActionBar.setDisplayUseLogoEnabled(true);
-					String nick = cursor.getString(cursor.getColumnIndex(User.screen_name));
-					mActionBar.setTitle(nick);
-					mImageLoader.get(cursor.getString(1), new ImageLoader.ImageListener() {
+					mNick = cursor.getString(cursor.getColumnIndex(User.screen_name));
+					mActionBar.setTitle(mNick);
+					mImageLoader.get(cursor.getString(cursor.getColumnIndex(User.profile_image_url)), new ImageLoader.ImageListener() {
 						@Override
 						public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
 							mActionBar.setIcon(new BitmapDrawable(getResources(), response.getBitmap()));
@@ -147,7 +148,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 						public void onErrorResponse(VolleyError error) {
 						}
 					});
-					mNick.setText(nick);
+					mTextNick.setText(mNick);
 					mImageLoader.get(cursor.getString(cursor.getColumnIndex(User.avatar_large)),
 						ImageLoader.getImageListener(
 							mProfileCover, R.drawable.error, R.drawable.error
@@ -197,7 +198,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				Status.source,
 				Status.created_at,
 			},
-			"_id=(select max(_id) from " + Status.TABLE + " where uid=" + mApp.getAccessToken().uid + ")",
+			"_id=(select max(s._id) from " + Status.TABLE + " as s where s.uid=" + mApp.getAccessToken().uid + ")",
 			Status.TABLE,
 			null,
 			null,
@@ -293,11 +294,13 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 	@Override
 	public void onDrawerOpened(View drawerView) {
 		mDrawerToggle.onDrawerOpened(drawerView);
+		mActionBar.setTitle(getString(R.string.my_profile));
 	}
 
 	@Override
 	public void onDrawerClosed(View drawerView) {
 		mDrawerToggle.onDrawerClosed(drawerView);
+		mActionBar.setTitle(mNick);
 	}
 
 	@Override

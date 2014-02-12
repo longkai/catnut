@@ -25,6 +25,7 @@
 	<string name="share_app">微博app分享</string>
 	<string name="share_text">我正在使用『新浪微博Android Rest Client』，推荐你也用用:-) http://weibo.com</string>
 	<string name="github_link">https://github.com/longkai/tingting</string>
+	<string name="my_profile">我的信息</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>关注</item>
