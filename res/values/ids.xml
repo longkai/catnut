@@ -15,4 +15,15 @@
 	<item name="action_reply" type="id" />
 	<item name="action_favorite" type="id" />
 	<item name="action_search" type="id" />
+
+	<item name="tweet_layout" type="id" />
+	<item name="avatar_profile" type="id" />
+	<item name="nick" type="id" />
+	<item name="dummy" type="id" />
+	<item name="description" type="id" />
+	<item name="statics" type="id" />
+	<item name="following_count" type="id" />
+	<item name="followers_count" type="id" />
+	<item name="tweets_count" type="id" />
+	<item name="nav_text" type="id" />
 </resources>

@@ -16,22 +16,28 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Process;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.text.Html;
+import android.text.TextUtils;
+import android.text.format.DateUtils;
+import android.text.util.Linkify;
+import android.util.Log;
+import android.view.*;
+import android.widget.*;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import tingting.chen.R;
+import tingting.chen.adapter.TweetAdapter;
 import tingting.chen.fragment.HomeTimelineFragment;
+import tingting.chen.metadata.Status;
 import tingting.chen.metadata.User;
+import tingting.chen.support.TweetImageSpan;
 import tingting.chen.tingting.TingtingApp;
 import tingting.chen.tingting.TingtingProvider;
+import tingting.chen.util.TingtingUtils;
+
+import java.text.ParseException;
+import java.util.Date;
 
 /**
  * 应用程序主界面。
@@ -44,11 +50,18 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 	private static final String TAG = "MainActivity";
 
 	private TingtingApp mApp;
+	private ImageLoader mImageLoader;
 	private ActionBar mActionBar;
 
-	private ListView mDrawer;
+	private View mDrawer;
+	private ListView mListView;
 	private DrawerLayout mDrawerLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
+
+	private ImageView mProfileCover;
+	private TextView mNick;
+	private TextView mDescription;
+	private ViewStub mLatestTweet;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -57,20 +70,33 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			setContentView(R.layout.main);
 
 			mApp = TingtingApp.getTingtingApp();
-			mActionBar = getActionBar();
-			prepareActionBar();
+			mImageLoader = mApp.getImageLoader();
 
+			// drawer specific
 			mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-			mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+			mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, Gravity.START);
 			mDrawerLayout.setDrawerListener(this);
 
 			mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 				R.drawable.ic_drawer, R.string.open_drawer, R.string.close_drawer);
 
-			mDrawer = (ListView) findViewById(R.id.drawer);
-			mDrawer.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-				new String[]{"1", "2", "3"}));
-			mDrawer.setOnItemClickListener(this);
+			// the whole left drawer
+			mDrawer = findViewById(R.id.drawer);
+
+			mListView = (ListView) findViewById(android.R.id.list);
+			mListView.setAdapter(new ArrayAdapter<String>(this, R.layout.nav_text_row, R.id.nav_text,
+				getResources().getStringArray(R.array.drawer_list)));
+			mListView.setOnItemClickListener(this);
+
+			// drawer customized view
+			mProfileCover = (ImageView) findViewById(R.id.avatar_profile);
+			mNick = (TextView) findViewById(R.id.nick);
+			mDescription = (TextView) findViewById(R.id.description);
+			mLatestTweet = (ViewStub) findViewById(R.id.latest_tweet);
+
+			mActionBar = getActionBar();
+			prepareActionBar();
+			fetchLatestTweet();
 
 			getFragmentManager()
 				.beginTransaction()
@@ -92,18 +118,35 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 				if (cursor != null && cursor.moveToNext()) {
 					mActionBar.setDisplayUseLogoEnabled(true);
-					mActionBar.setTitle(cursor.getString(0));
-					mApp.getImageLoader()
-						.get(cursor.getString(1), new ImageLoader.ImageListener() {
-							@Override
-							public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-								mActionBar.setIcon(new BitmapDrawable(getResources(), response.getBitmap()));
-							}
+					String nick = cursor.getString(cursor.getColumnIndex(User.screen_name));
+					mActionBar.setTitle(nick);
+					mImageLoader.get(cursor.getString(1), new ImageLoader.ImageListener() {
+						@Override
+						public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+							mActionBar.setIcon(new BitmapDrawable(getResources(), response.getBitmap()));
+						}
 
-							@Override
-							public void onErrorResponse(VolleyError error) {
-							}
-						});
+						@Override
+						public void onErrorResponse(VolleyError error) {
+						}
+					});
+					mNick.setText(nick);
+					mImageLoader.get(cursor.getString(cursor.getColumnIndex(User.avatar_large)),
+						ImageLoader.getImageListener(
+							mProfileCover, R.drawable.error, R.drawable.error
+						));
+					String description = cursor.getString(cursor.getColumnIndex(User.description));
+					mDescription.setText(TextUtils.isEmpty(description) ? getString(R.string.no_description) : description);
+
+					View flowingCount = findViewById(R.id.following_count);
+					TingtingUtils.setText(flowingCount, android.R.id.text1, cursor.getString(cursor.getColumnIndex(User.friends_count)));
+					TingtingUtils.setText(flowingCount, android.R.id.text2, getString(R.string.followings));
+					View flowerCount = findViewById(R.id.followers_count);
+					TingtingUtils.setText(flowerCount, android.R.id.text1, cursor.getString(cursor.getColumnIndex(User.followers_count)));
+					TingtingUtils.setText(flowerCount, android.R.id.text2, getString(R.string.followers));
+					View tweetsCount = findViewById(R.id.tweets_count);
+					TingtingUtils.setText(tweetsCount, android.R.id.text1, cursor.getString(cursor.getColumnIndex(User.statuses_count)));
+					TingtingUtils.setText(tweetsCount, android.R.id.text2, getString(R.string.tweets));
 					cursor.close();
 				}
 			}
@@ -113,9 +156,77 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			TingtingProvider.parse(User.MULTIPLE, String.valueOf(mApp.getAccessToken().uid)),
 			new String[]{
 				User.screen_name,
-				User.profile_image_url
+				User.profile_image_url,
+				User.avatar_large,
+				User.description,
+				User.statuses_count,
+				User.followers_count,
+				User.friends_count
 			},
 			null,
+			null,
+			null
+		);
+	}
+
+	private void fetchLatestTweet() {
+		String query = TingtingUtils.buildQuery(
+			new String[]{
+				Status.columnText,
+				Status.thumbnail_pic,
+				Status.comments_count,
+				Status.reposts_count,
+				Status.attitudes_count,
+				Status.source,
+				Status.created_at,
+			},
+			"_id=(select max(_id) from " + Status.TABLE + " where uid=" + mApp.getAccessToken().uid + ")",
+			Status.TABLE,
+			null,
+			null,
+			null
+		);
+		new AsyncQueryHandler(getContentResolver()) {
+			@Override
+			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+				if (cursor != null && cursor.moveToNext()) {
+					View tweet = mLatestTweet.inflate();
+					String tweetText = cursor.getString(cursor.getColumnIndex(Status.columnText));
+					TextView text = TingtingUtils.setText(tweet, R.id.text, new TweetImageSpan(MainActivity.this).getImageSpan(tweetText));
+					// 不处理链接，直接跳转到自己所有的微博
+					Linkify.addLinks(text, TweetAdapter.MENTION_PATTERN, null, null, null);
+					Linkify.addLinks(text, TweetAdapter.TOPIC_PATTERN, null, null, null);
+					Linkify.addLinks(text, TweetAdapter.WEB_URL, null, null, null);
+					TingtingUtils.removeLinkUnderline(text);
+
+					int replyCount = cursor.getInt(cursor.getColumnIndex(Status.comments_count));
+					TingtingUtils.setText(tweet, R.id.reply_count, TingtingUtils.approximate(replyCount));
+					int retweetCount = cursor.getInt(cursor.getColumnIndex(Status.reposts_count));
+					TingtingUtils.setText(tweet, R.id.reteet_count, TingtingUtils.approximate(retweetCount));
+					int favoriteCount = cursor.getInt(cursor.getColumnIndex(Status.attitudes_count));
+					TingtingUtils.setText(tweet, R.id.favorite_count, TingtingUtils.approximate(favoriteCount));
+					String source = cursor.getString(cursor.getColumnIndex(Status.source));
+					TingtingUtils.setText(tweet, R.id.source, Html.fromHtml(source).toString());
+					try {
+						Date date = TweetAdapter.sdf.parse(cursor.getString(cursor.getColumnIndex(Status.created_at)));
+						TingtingUtils.setText(tweet, R.id.create_at, DateUtils.getRelativeTimeSpanString(date.getTime()));
+					} catch (ParseException e) {
+						Log.d(TAG, "parse time", e);
+					}
+					TingtingUtils.setText(tweet, R.id.nick, "@" + mActionBar.getTitle()).setTextColor(R.color.actionbar_background);
+					cursor.close();
+				} else {
+					mLatestTweet.setLayoutResource(android.R.layout.simple_list_item_1);
+					Log.d(TAG, mLatestTweet.toString());
+//					TingtingUtils.setText(mLatestTweet.inflate(), android.R.id.text1, "no tweet!");
+				}
+			}
+		}.startQuery(
+			0,
+			null,
+			TingtingProvider.parse(Status.MULTIPLE),
+			null,
+			query,
 			null,
 			null
 		);

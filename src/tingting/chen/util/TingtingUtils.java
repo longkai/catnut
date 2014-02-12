@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.text.Spannable;
 import android.text.TextUtils;
 import android.text.style.URLSpan;
+import android.view.View;
 import android.widget.TextView;
 import tingting.chen.support.TweetURLSpan;
 
@@ -120,6 +121,19 @@ public class TingtingUtils {
 			float f = number * 1f / 10000;
 			return String.valueOf(Math.round(f * 10) / 10.0) + "w";
 		}
+	}
+
+	/**
+	 * 设置某个view里面的textview的text
+	 * @param parent 父容器
+	 * @param textViewId textview的id
+	 * @param text
+	 * @return that textview
+	 */
+	public static TextView setText(View parent, int textViewId, CharSequence text) {
+		TextView textView = (TextView) parent.findViewById(textViewId);
+		textView.setText(text);
+		return textView;
 	}
 
 	/**

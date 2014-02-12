@@ -18,4 +18,15 @@
 	<string name="authing_hint">正在联系新浪微博授权中...</string>
 	<string name="open_drawer">打开抽屉...</string>
 	<string name="close_drawer">关闭抽屉...</string>
+	<string name="no_description">这家伙很懒，啥都没写→_→</string>
+	<string name="followings">关注</string>
+	<string name="followers">粉丝</string>
+	<string name="tweets">微博</string>
+	<string-array name="drawer_list">
+		<item>关注</item>
+		<item>粉丝</item>
+		<item>分组</item>
+		<item>收藏</item>
+		<item>草稿</item>
+	</string-array>
 </resources>

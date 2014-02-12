@@ -83,7 +83,7 @@ public class TweetAdapter extends CursorAdapter {
 		int thumbsIndex;
 	}
 
-	private static SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d HH:mm:ss Z yyyy", Locale.ENGLISH);
+	public static SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d HH:mm:ss Z yyyy", Locale.ENGLISH);
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
