@@ -28,4 +28,17 @@
 	<item name="followers_count" type="id" />
 	<item name="tweets_count" type="id" />
 	<item name="nav_text" type="id" />
+
+	<item name="action_my_tweets" type="id" />
+	<item name="action_my_followers" type="id" />
+	<item name="action_my_followings" type="id" />
+	<item name="action_my_list" type="id" />
+	<item name="action_my_favorites" type="id" />
+	<item name="action_my_drafts" type="id" />
+
+	<item name="action_share_app" type="id" />
+	<item name="action_view_source_code" type="id" />
+	<item name="action_view_version" type="id" />
+	<item name="action_view_author" type="id" />
+	<item name="action_view_licenses" type="id" />
 </resources>

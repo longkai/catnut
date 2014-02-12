@@ -10,9 +10,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.AsyncQueryHandler;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Process;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -42,13 +44,28 @@ import java.util.Date;
 
 /**
  * 应用程序主界面。
- * todo 后面需要好好设计界面
  *
  * @author longkai
  */
 public class MainActivity extends Activity implements DrawerLayout.DrawerListener, ListView.OnItemClickListener {
 
 	private static final String TAG = "MainActivity";
+
+	private static final int[] DRAWER_LIST_ITEMS_IDS = {
+		0, // 我的
+		R.id.action_my_followings,
+		R.id.action_my_followers,
+		R.id.action_my_list,
+		R.id.action_my_favorites,
+		R.id.action_my_drafts,
+		0, // 分享
+		R.id.action_share_app,
+		R.id.action_view_source_code,
+		0, // 关于
+		R.id.action_view_version,
+		R.id.action_view_author,
+		R.id.action_view_licenses
+	};
 
 	private TingtingApp mApp;
 	private ImageLoader mImageLoader;
@@ -295,7 +312,25 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		Toast.makeText(MainActivity.this, position + " click!", Toast.LENGTH_SHORT).show();
+		Intent intent;
+		switch (DRAWER_LIST_ITEMS_IDS[position]) {
+			case R.id.action_share_app:
+				intent = new Intent(Intent.ACTION_SEND);
+				intent.setType("image/*");
+				intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_app));
+				intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text));
+				intent.putExtra(Intent.EXTRA_STREAM,
+					Uri.parse("android.resource://tingting.chen/drawable/ic_launcher"));
+				startActivity(intent);
+				break;
+			case R.id.action_view_source_code:
+				intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.github_link)));
+				startActivity(intent);
+				break;
+			default:
+				Toast.makeText(MainActivity.this, position + " click! not yet implement for now:-(", Toast.LENGTH_SHORT).show();
+				break;
+		}
 		mDrawerLayout.closeDrawer(mDrawer);
 	}
 }
