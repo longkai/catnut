@@ -8,16 +8,13 @@ package tingting.chen.fragment;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.media.Image;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import com.android.volley.RequestQueue;
@@ -65,6 +62,7 @@ public class HomeTimelineFragment extends ListFragment
 		User.profile_image_url
 	};
 
+	private SharedPreferences mPref;
 	private RequestQueue mRequestQueue;
 	private Activity mActivity;
 	private TweetAdapter mAdapter;
@@ -88,6 +86,7 @@ public class HomeTimelineFragment extends ListFragment
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		mActivity = activity;
+		mPref = TingtingApp.getTingtingApp().getPreferences();
 		mRequestQueue = TingtingApp.getTingtingApp().getRequestQueue();
 	}
 
@@ -170,8 +169,15 @@ public class HomeTimelineFragment extends ListFragment
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		// 先尝试去新浪抓一把，避免那啥，empty*_*
-		mPullToRefreshLayout.setRefreshing(true);
-		fetchTweets(true, 0);
+		boolean autoFetch = mPref.getBoolean(PrefFragment.AUTO_FETCH_ON_START, true);
+		boolean firstRun = mPref.getBoolean(PrefFragment.IS_FIRST_RUN, true);
+		if (autoFetch || firstRun) {
+			mPullToRefreshLayout.setRefreshing(true);
+			fetchTweets(true, 0);
+			if (firstRun) {
+				mPref.edit().putBoolean(PrefFragment.IS_FIRST_RUN, false).commit();
+			}
+		}
 		// 接下来办正事
 		getListView().setOnScrollListener(this);
 		getListView().addFooterView(mLoadMore);

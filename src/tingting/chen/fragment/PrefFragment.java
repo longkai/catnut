@@ -20,6 +20,8 @@ import tingting.chen.R;
  */
 public class PrefFragment extends PreferenceFragment {
 
+	public static final String IS_FIRST_RUN = "first_run";
+
 	public static final String AUTO_FETCH_ON_START = "auto_fetch_on_start";
 	public static final String DEFAULT_FETCH_SIZE = "default_fetch_size";
 	public static final String AUTO_LOAD_MORE_FROM_CLOUD = "auto_load_more_from_cloud";
