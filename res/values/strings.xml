@@ -23,10 +23,18 @@
 	<string name="followers">粉丝</string>
 	<string name="tweets">微博</string>
 	<string-array name="drawer_list">
+		<item>微博</item>
 		<item>关注</item>
 		<item>粉丝</item>
 		<item>分组</item>
 		<item>收藏</item>
 		<item>草稿</item>
+		<item>分享</item>
+		<item>分享</item>
+		<item>源代码</item>
+		<item>关于</item>
+		<item>版本</item>
+		<item>作者</item>
+		<item>Licenses/Open Source</item>
 	</string-array>
 </resources>

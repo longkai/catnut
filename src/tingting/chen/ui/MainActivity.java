@@ -27,6 +27,7 @@ import android.widget.*;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import tingting.chen.R;
+import tingting.chen.adapter.DrawerNavAdapter;
 import tingting.chen.adapter.TweetAdapter;
 import tingting.chen.fragment.HomeTimelineFragment;
 import tingting.chen.metadata.Status;
@@ -84,8 +85,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			mDrawer = findViewById(R.id.drawer);
 
 			mListView = (ListView) findViewById(android.R.id.list);
-			mListView.setAdapter(new ArrayAdapter<String>(this, R.layout.nav_text_row, R.id.nav_text,
-				getResources().getStringArray(R.array.drawer_list)));
+			mListView.setAdapter(new DrawerNavAdapter(this, R.array.drawer_list, R.array.drawer_list_header_indexes));
 			mListView.setOnItemClickListener(this);
 
 			// drawer customized view
@@ -215,10 +215,6 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					}
 					TingtingUtils.setText(tweet, R.id.nick, "@" + mActionBar.getTitle()).setTextColor(R.color.actionbar_background);
 					cursor.close();
-				} else {
-					mLatestTweet.setLayoutResource(android.R.layout.simple_list_item_1);
-					Log.d(TAG, mLatestTweet.toString());
-//					TingtingUtils.setText(mLatestTweet.inflate(), android.R.id.text1, "no tweet!");
 				}
 			}
 		}.startQuery(

@@ -16,6 +16,8 @@
 	<item name="action_favorite" type="id" />
 	<item name="action_search" type="id" />
 
+	<item name="list_header" type="id" />
+
 	<item name="tweet_layout" type="id" />
 	<item name="avatar_profile" type="id" />
 	<item name="nick" type="id" />

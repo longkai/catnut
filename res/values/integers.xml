@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<resources>
+	<integer-array name="drawer_list_header_indexes">
+		<item>0</item>
+		<item>6</item>
+		<item>9</item>
+	</integer-array>
+</resources>
