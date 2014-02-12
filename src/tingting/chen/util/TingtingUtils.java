@@ -7,6 +7,7 @@ package tingting.chen.util;
 
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.text.Spannable;
@@ -239,5 +240,20 @@ public class TingtingUtils {
 			s.setSpan(span, start, end, 0);
 		}
 		textView.setText(s);
+	}
+
+	/**
+	 * 当使用list pref时只能存储string array，so 这个方法你懂的
+	 * @param pref
+	 * @param key
+	 * @param defaultValue
+	 * @return key exists ? existed value : defaultValue
+	 */
+	public static int resolveListPrefInt(SharedPreferences pref, String key, int defaultValue) {
+		String value = pref.getString(key, null);
+		if (value == null) {
+			return defaultValue;
+		}
+		return Integer.parseInt(value);
 	}
 }

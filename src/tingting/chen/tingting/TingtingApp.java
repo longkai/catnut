@@ -14,7 +14,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import org.json.JSONObject;
-import tingting.chen.fragment.PrefFragment;
 import tingting.chen.metadata.AccessToken;
 import tingting.chen.util.BitmapLruCache;
 

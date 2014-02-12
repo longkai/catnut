@@ -45,9 +45,6 @@ public class HomeTimelineFragment extends ListFragment
 
 	private static final String TAG = "HomeTimelineFragment";
 
-	/** 默认每页微博数量 */
-	private static final int TWEETS_SIZE = 20;
-
 	/** 待检索的列 */
 	private static final String[] COLUMNS = new String[]{
 		"s._id",
@@ -195,7 +192,9 @@ public class HomeTimelineFragment extends ListFragment
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		String where = null;
-		String limit = String.valueOf(TWEETS_SIZE * (mCurPage + 1));
+		int size = TingtingUtils.resolveListPrefInt(mPref,
+			PrefFragment.DEFAULT_FETCH_SIZE, mActivity.getResources().getInteger(R.integer.default_fetch_size));
+		String limit = String.valueOf(size * (mCurPage + 1));
 		// 搜索只能是本地搜索
 		if (!TextUtils.isEmpty(mCurFilter) && mCurFilter.trim().length() != 0) {
 			where = Status.columnText + " like " + TingtingUtils.like(mCurFilter) +
@@ -232,7 +231,7 @@ public class HomeTimelineFragment extends ListFragment
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		// 为何微博如此之少Orz
-		if (data.getCount() < TWEETS_SIZE) {
+		if (data.getCount() < 20) {
 			getListView().removeFooterView(mLoadMore);
 		}
 		mAdapter.swapCursor(data);
@@ -255,8 +254,11 @@ public class HomeTimelineFragment extends ListFragment
 	 * @param offset    从那条开始加载或者刷新？ 不知道就0吧*_*
 	 */
 	private void fetchTweets(boolean isRefresh, long offset) {
-		TingtingAPI api = isRefresh ? TweetAPI.homeTimeline(offset, 0, 0, 0, 0, 0, 0)
-			: TweetAPI.homeTimeline(0, offset, 0, 0, 0, 0, 0);
+		int count = TingtingUtils.resolveListPrefInt(mPref,
+			PrefFragment.DEFAULT_FETCH_SIZE,
+			mActivity.getResources().getInteger(R.integer.default_fetch_size));
+		TingtingAPI api = isRefresh ? TweetAPI.homeTimeline(offset, 0, count, 0, 0, 0, 0)
+			: TweetAPI.homeTimeline(0, offset, count, 0, 0, 0, 0);
 		mRequestQueue.add(new TingtingRequest(
 			mActivity,
 			api,
