@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.volley.toolbox.ImageLoader;
 import tingting.chen.R;
+import tingting.chen.fragment.PrefFragment;
 import tingting.chen.metadata.Status;
 import tingting.chen.metadata.User;
 import tingting.chen.support.TweetImageSpan;
@@ -53,11 +54,14 @@ public class TweetAdapter extends CursorAdapter {
 	private Context mContext;
 	private ImageLoader mImageLoader;
 	private TweetImageSpan mImageSpan;
+	private boolean mThumbsRequried;
 
 	public TweetAdapter(Context context) {
 		super(context, null, 0);
 		mContext = context;
-		mImageLoader = TingtingApp.getTingtingApp().getImageLoader();
+		TingtingApp app = TingtingApp.getTingtingApp();
+		mImageLoader = app.getImageLoader();
+		mThumbsRequried = app.getPreferences().getBoolean(PrefFragment.SHOW_TWEET_THUMBS, true);
 		mImageSpan = new TweetImageSpan(mContext);
 	}
 
@@ -107,9 +111,12 @@ public class TweetAdapter extends CursorAdapter {
 		holder.source = (TextView) view.findViewById(R.id.source);
 		holder.sourceIndex = cursor.getColumnIndex(Status.source);
 
-		ViewStub stub = (ViewStub) view.findViewById(R.id.view_stub);
-		if (!TextUtils.isEmpty(cursor.getString(holder.thumbsIndex))) {
-			holder.thumbs = (ImageView) stub.inflate();
+		// 用户偏好设置，是否显示缩略图
+		if (mThumbsRequried) {
+			ViewStub stub = (ViewStub) view.findViewById(R.id.view_stub);
+			if (!TextUtils.isEmpty(cursor.getString(holder.thumbsIndex))) {
+				holder.thumbs = (ImageView) stub.inflate();
+			}
 		}
 		view.setTag(holder);
 		return view;
