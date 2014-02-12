@@ -169,6 +169,10 @@ public class HomeTimelineFragment extends ListFragment
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		// 先尝试去新浪抓一把，避免那啥，empty*_*
+		mPullToRefreshLayout.setRefreshing(true);
+		fetchTweets(true, 0);
+		// 接下来办正事
 		getListView().setOnScrollListener(this);
 		getListView().addFooterView(mLoadMore);
 		setEmptyText(mActivity.getString(R.string.no_tweets));
@@ -221,6 +225,10 @@ public class HomeTimelineFragment extends ListFragment
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		// 为何微博如此之少Orz
+		if (data.getCount() < TWEETS_SIZE) {
+			getListView().removeFooterView(mLoadMore);
+		}
 		mAdapter.swapCursor(data);
 	}
 
