@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import com.android.volley.RequestQueue;
@@ -288,9 +289,13 @@ public class HomeTimelineFragment extends ListFragment
 		if (mLoadMore.isShown() && !mLoading && !isSearching) {
 			mLoading = true;
 			mCurPage++;
-			// 开启worker线程去web抓取数据，
-			// todo: 这里可以设置偏好，此时网络是否开启（wifi or data）去更新数据还是只看本地缓存的，假如是本地的，没有更多了要告知用户
-			fetchTweets(false, mAdapter.getItemId(mAdapter.getCount() - 2)); // -2 因为从0开始并且有一个footer view
+			if (mPref.getBoolean(PrefFragment.AUTO_LOAD_MORE_FROM_CLOUD, true)) {
+				Log.d(TAG, "loading more from cloud!");
+				// 开启worker线程去web抓取数据，
+				fetchTweets(false, mAdapter.getItemId(mAdapter.getCount() - 2)); // -2 因为从0开始并且有一个footer view
+			} else {
+				Log.d(TAG, "loading more from local!");
+			}
 			getLoaderManager().restartLoader(0, null, this);
 		}
 	}
