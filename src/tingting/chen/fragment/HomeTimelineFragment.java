@@ -122,7 +122,7 @@ public class HomeTimelineFragment extends ListFragment
 		mSearchView.setOnCloseListener(this);
 		mSearchView.setIconifiedByDefault(false);
 		mSearchView.setQueryHint(getString(R.string.search_hint));
-		mSearchView.setIconified(false);
+		mSearchView.setIconified(true);
 		int searchPlateId = mSearchView.getContext().getResources().getIdentifier("android:id/search_plate", null, null);
 		View searchPlate = mSearchView.findViewById(searchPlateId);
 		if (searchPlate != null) {
