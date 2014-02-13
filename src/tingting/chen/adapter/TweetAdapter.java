@@ -6,11 +6,14 @@
 package tingting.chen.adapter;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +30,7 @@ import tingting.chen.support.TweetImageSpan;
 import tingting.chen.tingting.TingtingApp;
 import tingting.chen.util.TingtingUtils;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,6 +44,8 @@ import java.util.regex.Pattern;
  * @author longkai
  */
 public class TweetAdapter extends CursorAdapter {
+
+	private static final String TAG = "TweetAdapter";
 
 	/** 微博中 @xx 正则 */
 	public static final Pattern MENTION_PATTERN = Pattern.compile("@[\\u4e00-\\u9fa5a-zA-Z0-9_-]+");
@@ -57,13 +63,25 @@ public class TweetAdapter extends CursorAdapter {
 	private boolean mThumbsRequired;
 	private String mUserNick;
 
+	/** 自定义字体，用户偏好 */
+	private Typeface mCustomizeFont;
+
 	public TweetAdapter(Context context, String nick) {
 		super(context, null, 0);
 		mContext = context;
 		this.mUserNick = nick;
 		TingtingApp app = TingtingApp.getTingtingApp();
 		mImageLoader = app.getImageLoader();
-		mThumbsRequired = app.getPreferences().getBoolean(PrefFragment.SHOW_TWEET_THUMBS, true);
+		SharedPreferences preferences = app.getPreferences();
+		mThumbsRequired = preferences.getBoolean(PrefFragment.SHOW_TWEET_THUMBS, true);
+		String fontPath = preferences.getString(PrefFragment.CUSTOMIZE_TWEET_FONT, null);
+		if (fontPath != null) {
+			try {
+				mCustomizeFont = Typeface.createFromFile(new File(fontPath));
+			} catch (Exception e) {
+				Log.e(TAG, "load customized font fail!", e);
+			}
+		}
 		mImageSpan = new TweetImageSpan(mContext);
 	}
 
@@ -139,6 +157,10 @@ public class TweetAdapter extends CursorAdapter {
 			holder.nick.setText(mUserNick);
 		}
 		// 微博相关
+		if (mCustomizeFont != null) {
+			// 用户自定义字体
+			holder.text.setTypeface(mCustomizeFont);
+		}
 		holder.text.setText(cursor.getString(holder.textIndex));
 		try {
 			Date parse = sdf.parse(cursor.getString(holder.create_atIndex));

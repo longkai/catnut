@@ -31,7 +31,7 @@
 	<string name="pref">设置</string>
 	<string name="tweets_count_per_fetch">每页微博数</string>
 	<string name="about">关于</string>
-	<string name="advanced_settings">高级设置</string>
+	<string name="advanced_settings">高级设置（重启应用才能看到效果）</string>
 	<string name="commit_link">https://github.com/longkai/tingting/commits/master</string>
 	<string name="version">版本</string>
 	<string name="author">作者</string>
@@ -42,10 +42,16 @@
 	<string name="load_more_from_cloud_summary">若不勾选则加载本地缓存的微博，但是数据可能不是最新的，建议在wifi下开启</string>
 	<string name="auto_fetch_on_start">启动时刷新</string>
 	<string name="auto_fetch_on_start_summary">启动应用时自动去抓取最新的 主页时间线 微博并缓存到本地</string>
-	<string name="general_settings">通用</string>
+	<string name="general_settings">基本设置</string>
 	<string name="source_code">源代码</string>
 	<string name="source_code_summary">本应用开源哦，感兴趣的话戳这里*_*</string>
 	<string name="my_timeline">我的时间线</string>
+	<string name="supported_font_types">只支持[ttf|otf|fon|ttc]格式的字体文件！</string>
+	<string name="customized_font_message">自定义字体需要自己提供字体文件哦！支持[ttf|otf|fon|ttc]格式</string>
+	<string name="keep_current_font">保持现有</string>
+	<string name="use_default_font">使用默认</string>
+	<string name="customize_font">自定义</string>
+	<string name="select_font_title">选择字体文件[ttf|otf|fon|ttc]</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>关注</item>

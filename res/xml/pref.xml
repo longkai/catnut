@@ -33,6 +33,12 @@
 
 	<PreferenceCategory android:title="@string/advanced_settings">
 
+		<Preference
+			android:key="customize_tweet_font"
+			android:defaultValue="@null"
+			android:title="字体"
+			android:summary="默认的字体不和胃口？换一个心情吧*_*" />
+
 		<CheckBoxPreference
 			android:key="show_tweet_thumbs"
 			android:title="@string/show_thumbs"
