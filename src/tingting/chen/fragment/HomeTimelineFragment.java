@@ -7,10 +7,11 @@ package tingting.chen.fragment;
 
 import android.content.CursorLoader;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
+import android.util.Log;
 import tingting.chen.R;
 import tingting.chen.adapter.TweetAdapter;
 import tingting.chen.api.TweetAPI;
@@ -128,5 +129,18 @@ public class HomeTimelineFragment extends TimelineFragment {
 			success,
 			error
 		)).setTag(TAG);
+	}
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+		if (key.equals(PrefFragment.TWEET_FONT_SIZE)
+				|| key.equals(PrefFragment.CUSTOMIZE_TWEET_FONT)
+				|| key.equals(PrefFragment.SHOW_TWEET_THUMBS)) {
+			Log.d(TAG, "pref change, the home timeline fragment needs update!");
+			// 应用新的偏好
+			mAdapter.swapCursor(null);
+			mAdapter = new TweetAdapter(mActivity, null);
+			setListAdapter(mAdapter);
+		}
 	}
 }

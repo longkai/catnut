@@ -36,7 +36,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  */
 public abstract class TimelineFragment extends ListFragment
 	implements LoaderManager.LoaderCallbacks<Cursor>, OnRefreshListener,
-	AbsListView.OnScrollListener, SearchView.OnQueryTextListener, SearchView.OnCloseListener {
+	AbsListView.OnScrollListener, SearchView.OnQueryTextListener, SearchView.OnCloseListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
 	private static final String TAG = "TimelineFragment";
 
@@ -97,6 +97,7 @@ public abstract class TimelineFragment extends ListFragment
 		this.mPref = app.getPreferences();
 		this.mRequestQueue = app.getRequestQueue();
 		this.mLoadMore = new ProgressBar(mActivity);
+		this.mPref.registerOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override

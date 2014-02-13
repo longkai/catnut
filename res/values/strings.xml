@@ -31,12 +31,12 @@
 	<string name="pref">设置</string>
 	<string name="tweets_count_per_fetch">每页微博数</string>
 	<string name="about">关于</string>
-	<string name="advanced_settings">高级设置（重启应用才能看到效果）</string>
+	<string name="advanced_settings">高级设置</string>
 	<string name="commit_link">https://github.com/longkai/tingting/commits/master</string>
 	<string name="version">版本</string>
 	<string name="author">作者</string>
 	<string name="show_thumbs">显示缩略图</string>
-	<string name="show_thumbs_summary">若不勾选，则不显示任何缩略图，考虑美观，建议取消*_*</string>
+	<string name="show_thumbs_summary">若不勾选，则不显示任何缩略图，考虑美观或者省流量，可以取消*_*</string>
 	<string name="tweets_count_per_fetch_summary">每次刷新需要加载多少条微博咧*_*</string>
 	<string name="load_more_from_cloud">联网加载更多微博</string>
 	<string name="load_more_from_cloud_summary">若不勾选则加载本地缓存的微博，但是数据可能不是最新的，建议在wifi下开启</string>
@@ -53,7 +53,7 @@
 	<string name="customize_font">自定义</string>
 	<string name="select_font_title">选择字体文件[ttf|otf|fon|ttc]</string>
 	<string name="font">字体</string>
-	<string name="change_font_summary">默认的字体不和胃口？换一个心情吧*_*</string>
+	<string name="change_font_summary">默认的字体不合适？换一个心情吧*_*</string>
 	<string name="font_size">字体大小</string>
 	<string name="adjust_font_size_summary">调整微博字体的大小</string>
 	<string-array name="drawer_list">
