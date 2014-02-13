@@ -25,7 +25,7 @@ public class UserProcessor {
 	/**
 	 * 将我的好友持久化到本地
 	 */
-	public static class MyFriendsProcessor implements TingtingProcessor<JSONObject> {
+	public static class UsersProcessor implements TingtingProcessor<JSONObject> {
 
 		@Override
 		public void asyncProcess(Context context, JSONObject data) throws Exception {

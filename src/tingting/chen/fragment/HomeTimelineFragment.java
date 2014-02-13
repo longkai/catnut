@@ -120,7 +120,7 @@ public class HomeTimelineFragment extends TimelineFragment {
 		mRequestQueue.add(new TingtingRequest(
 			mActivity,
 			api,
-			new StatusProcessor.MyTweetsProcessor(),
+			new StatusProcessor.TweetsProcessor(),
 			isRefresh ? refreshSuccessListener : loadMoreSuccessListener,
 			isRefresh ? refreshFailListener : loadMoreFailListener
 		)).setTag(TAG);

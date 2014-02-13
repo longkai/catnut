@@ -29,7 +29,7 @@ public class StatusProcessor {
 	 *
 	 * @author longkai
 	 */
-	public static class MyTweetsProcessor implements TingtingProcessor<JSONObject> {
+	public static class TweetsProcessor implements TingtingProcessor<JSONObject> {
 
 		@Override
 		public void asyncProcess(Context context, JSONObject jsonObject) throws Exception {

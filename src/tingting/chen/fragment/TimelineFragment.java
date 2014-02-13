@@ -223,9 +223,6 @@ public abstract class TimelineFragment extends ListFragment
 
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
-//		Log.d(TAG, "is shown: " + mLoadMore.isShown());
-//		Log.d(TAG, "is loading: " + mLoadMore);
-//		Log.d(TAG, "is searching: " + isSearching);
 		if (mLoadMore.isShown() && !mLoadingFromCloud && !isSearching) {
 			mCurPage++;
 			if (mPref.getBoolean(PrefFragment.AUTO_LOAD_MORE_FROM_CLOUD, true)) {
