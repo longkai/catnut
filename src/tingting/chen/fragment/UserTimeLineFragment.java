@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
+import android.text.TextUtils;
 import android.util.Log;
 import tingting.chen.R;
 import tingting.chen.adapter.TweetAdapter;
@@ -91,6 +92,19 @@ public class UserTimeLineFragment extends TimelineFragment {
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		int size = super.getDefaultFetchSize();
+		StringBuilder where = new StringBuilder(Status.uid).append("=").append(uid);
+		String limit = String.valueOf((mCurPage + 1) * size);
+		if (!TextUtils.isEmpty(mCurFilter) && mCurFilter.trim().length() != 0) {
+			where.append(" and ").append(Status.columnText).append(" like ").append(TingtingUtils.like(mCurFilter));
+			limit = null;
+			if (!isSearching) {
+				getListView().removeFooterView(mLoadMore);
+			}
+			isSearching = true;
+		} else if (isSearching) {
+			isSearching = false;
+			getListView().addFooterView(mLoadMore);
+		}
 		CursorLoader loader = TingtingUtils.getCursorLoader(
 			mActivity,
 			TingtingProvider.parse(Status.MULTIPLE),
@@ -104,12 +118,12 @@ public class UserTimeLineFragment extends TimelineFragment {
 				Status.source,
 				Status.created_at,
 			},
-			"uid=" + uid,
+			where.toString(),
 			null,
 			Status.TABLE,
 			null,
 			"_id desc",
-			String.valueOf(size * (mCurPage + 1))
+			limit
 		);
 		return loader;
 	}

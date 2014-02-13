@@ -176,10 +176,11 @@ public abstract class TimelineFragment extends ListFragment
 	 * 获取抓取微博的条目数
 	 */
 	protected int getDefaultFetchSize() {
-		int count = TingtingUtils.resolveListPrefInt(mPref,
+		return TingtingUtils.resolveListPrefInt(
+			mPref,
 			PrefFragment.DEFAULT_FETCH_SIZE,
-			mActivity.getResources().getInteger(R.integer.default_fetch_size));
-		return count;
+			mActivity.getResources().getInteger(R.integer.default_fetch_size)
+		);
 	}
 
 	@Override

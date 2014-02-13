@@ -81,8 +81,7 @@ public class HomeTimelineFragment extends TimelineFragment {
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		String where = null;
-		int size = TingtingUtils.resolveListPrefInt(mPref,
-			PrefFragment.DEFAULT_FETCH_SIZE, mActivity.getResources().getInteger(R.integer.default_fetch_size));
+		int size = super.getDefaultFetchSize();
 		String limit = String.valueOf(size * (mCurPage + 1));
 		// 搜索只能是本地搜索
 		if (!TextUtils.isEmpty(mCurFilter) && mCurFilter.trim().length() != 0) {
