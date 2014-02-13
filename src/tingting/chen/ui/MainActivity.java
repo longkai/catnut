@@ -310,7 +310,8 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					.show();
 				break;
 			case R.id.pref:
-				if (getFragmentManager().findFragmentByTag(TAG) == null) {
+				Fragment pref = getFragmentManager().findFragmentByTag(TAG);
+				if (pref == null || !pref.isVisible()) {
 					flipCard(new PrefFragment(), TAG);
 				}
 				break;
