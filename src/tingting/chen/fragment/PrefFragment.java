@@ -52,6 +52,12 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 	}
 
 	@Override
+	public void onStart() {
+		super.onStart();
+		getActivity().getActionBar().setTitle(getText(R.string.pref));
+	}
+
+	@Override
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
 		if (preference.hasKey()) {
 			String key = preference.getKey();

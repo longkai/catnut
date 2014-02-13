@@ -53,6 +53,12 @@ public class HomeTimelineFragment extends TimelineFragment {
 	}
 
 	@Override
+	public void onStart() {
+		super.onStart();
+		mActivity.getActionBar().setTitle(mActivity.getDefaultUserNick());
+	}
+
+	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		// 先尝试去新浪抓一把，避免那啥，empty*_*

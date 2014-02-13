@@ -48,7 +48,7 @@ public class UserTimeLineFragment extends TimelineFragment {
 			api,
 			new StatusProcessor.TweetsProcessor(),
 			isRefresh ? refreshSuccessListener : loadMoreSuccessListener,
-			isRefresh ?	refreshFailListener : loadMoreFailListener
+			isRefresh ? refreshFailListener : loadMoreFailListener
 		)).setTag(TAG);
 	}
 
@@ -68,7 +68,10 @@ public class UserTimeLineFragment extends TimelineFragment {
 	@Override
 	public void onStart() {
 		super.onStart();
-		mActivity.getActionBar().setTitle(nick == null ? getString(R.string.my_timeline) : nick);
+		mActivity.getActionBar().setTitle(
+			nick == null || nick.equals(mActivity.getDefaultUserNick()) ?
+				getText(R.string.my_timeline) : nick
+		);
 	}
 
 	@Override

@@ -66,6 +66,11 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		R.id.action_view_source_code,
 	};
 
+	/** the last title before drawer open */
+	private transient CharSequence mTitleBeforeDrawerClosed;
+	/** should we go back to the last title before the drawer open? */
+	private boolean mShouldPopupLastTile = true;
+
 	// for card flip animation
 	private Handler mHandler = new Handler();
 
@@ -173,6 +178,8 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 							Bundle args = new Bundle();
 							args.putLong(Constants.ID, mApp.getAccessToken().uid);
 							fragment.setArguments(args);
+							mShouldPopupLastTile = false;
+							mDrawerLayout.closeDrawer(mDrawer);
 							flipCard(fragment, null);
 						}
 					});
@@ -329,13 +336,17 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 	@Override
 	public void onDrawerOpened(View drawerView) {
 		mDrawerToggle.onDrawerOpened(drawerView);
+		mTitleBeforeDrawerClosed = mActionBar.getTitle();
 		mActionBar.setTitle(getString(R.string.my_profile));
 	}
 
 	@Override
 	public void onDrawerClosed(View drawerView) {
 		mDrawerToggle.onDrawerClosed(drawerView);
-		mActionBar.setTitle(mNick);
+		if (mShouldPopupLastTile) {
+			mActionBar.setTitle(mTitleBeforeDrawerClosed);
+		}
+		mShouldPopupLastTile = true;
 	}
 
 	@Override
