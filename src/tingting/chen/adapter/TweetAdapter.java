@@ -64,8 +64,13 @@ public class TweetAdapter extends CursorAdapter {
 	private String mUserNick;
 
 	/** 自定义字体，用户偏好 */
-	private Typeface mCustomizeFont;
+	private Typeface mCustomizedFont;
+	private int mCustomizedFontSize;
 
+	/**
+	 * @param context
+	 * @param nick 如果是不是某个用户的微博时间线，请赋null
+	 */
 	public TweetAdapter(Context context, String nick) {
 		super(context, null, 0);
 		mContext = context;
@@ -74,10 +79,12 @@ public class TweetAdapter extends CursorAdapter {
 		mImageLoader = app.getImageLoader();
 		SharedPreferences preferences = app.getPreferences();
 		mThumbsRequired = preferences.getBoolean(PrefFragment.SHOW_TWEET_THUMBS, true);
+		mCustomizedFontSize = TingtingUtils.resolveListPrefInt(preferences,
+			PrefFragment.TWEET_FONT_SIZE, context.getResources().getInteger(R.integer.default_tweet_font_size));
 		String fontPath = preferences.getString(PrefFragment.CUSTOMIZE_TWEET_FONT, null);
 		if (fontPath != null) {
 			try {
-				mCustomizeFont = Typeface.createFromFile(new File(fontPath));
+				mCustomizedFont = Typeface.createFromFile(new File(fontPath));
 			} catch (Exception e) {
 				Log.e(TAG, "load customized font fail!", e);
 			}
@@ -157,10 +164,11 @@ public class TweetAdapter extends CursorAdapter {
 			holder.nick.setText(mUserNick);
 		}
 		// 微博相关
-		if (mCustomizeFont != null) {
+		if (mCustomizedFont != null) {
 			// 用户自定义字体
-			holder.text.setTypeface(mCustomizeFont);
+			holder.text.setTypeface(mCustomizedFont);
 		}
+		holder.text.setTextSize(mCustomizedFontSize);
 		holder.text.setText(cursor.getString(holder.textIndex));
 		try {
 			Date parse = sdf.parse(cursor.getString(holder.create_atIndex));

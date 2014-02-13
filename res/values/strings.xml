@@ -52,6 +52,10 @@
 	<string name="use_default_font">使用默认</string>
 	<string name="customize_font">自定义</string>
 	<string name="select_font_title">选择字体文件[ttf|otf|fon|ttc]</string>
+	<string name="font">字体</string>
+	<string name="change_font_summary">默认的字体不和胃口？换一个心情吧*_*</string>
+	<string name="font_size">字体大小</string>
+	<string name="adjust_font_size_summary">调整微博字体的大小</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>关注</item>

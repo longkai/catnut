@@ -9,6 +9,15 @@
 
 	<PreferenceCategory android:title="@string/general_settings">
 
+		<ListPreference
+			android:key="default_fetch_size"
+			android:defaultValue="@integer/default_fetch_size"
+			android:title="@string/tweets_count_per_fetch"
+			android:summary="@string/tweets_count_per_fetch_summary"
+			android:dialogTitle="@string/tweets_count_per_fetch"
+			android:entries="@array/fetch_size_pref_entries"
+			android:entryValues="@array/fetch_size_pref_entries" />
+
 		<CheckBoxPreference
 			android:key="auto_fetch_on_start"
 			android:defaultValue="false"
@@ -20,15 +29,6 @@
 			android:defaultValue="true"
 			android:title="@string/load_more_from_cloud"
 			android:summary="@string/load_more_from_cloud_summary" />
-
-		<ListPreference
-			android:key="default_fetch_size"
-			android:defaultValue="@integer/default_fetch_size"
-			android:title="@string/tweets_count_per_fetch"
-			android:summary="@string/tweets_count_per_fetch_summary"
-			android:dialogTitle="@string/tweets_count_per_fetch"
-			android:entries="@array/fetch_size_pref_entries"
-			android:entryValues="@array/fetch_size_pref_entries" />
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/advanced_settings">
@@ -36,8 +36,16 @@
 		<Preference
 			android:key="customize_tweet_font"
 			android:defaultValue="@null"
-			android:title="字体"
-			android:summary="默认的字体不和胃口？换一个心情吧*_*" />
+			android:title="@string/font"
+			android:summary="@string/change_font_summary" />
+
+		<ListPreference
+			android:key="tweet_font_size"
+			android:defaultValue="@integer/default_tweet_font_size"
+			android:title="@string/font_size"
+			android:summary="@string/adjust_font_size_summary"
+			android:entries="@array/tweet_font_size_entries"
+			android:entryValues="@array/tweet_font_size_entryValues" />
 
 		<CheckBoxPreference
 			android:key="show_tweet_thumbs"

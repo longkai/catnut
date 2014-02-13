@@ -8,6 +8,7 @@
 	<string name="version_name">0.1</string>
 
 	<integer name="default_fetch_size">20</integer>
+	<integer name="default_tweet_font_size">16</integer>
 	<!-- cannot use integer array Orz... -->
 	<string-array name="fetch_size_pref_entries">
 		<item>20</item>
@@ -15,5 +16,20 @@
 		<item>60</item>
 		<item>80</item>
 		<item>100</item>
+	</string-array>
+
+	<string-array name="tweet_font_size_entries">
+		<item>极小</item>
+		<item>较小</item>
+		<item>正常</item>
+		<item>较大</item>
+		<item>极大</item>
+	</string-array>
+	<string-array name="tweet_font_size_entryValues">
+		<item>12</item>
+		<item>14</item>
+		<item>16</item>
+		<item>18</item>
+		<item>20</item>
 	</string-array>
 </resources>

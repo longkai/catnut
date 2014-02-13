@@ -34,6 +34,7 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 	public static final String AUTO_FETCH_ON_START = "auto_fetch_on_start";
 	public static final String DEFAULT_FETCH_SIZE = "default_fetch_size";
 	public static final String AUTO_LOAD_MORE_FROM_CLOUD = "auto_load_more_from_cloud";
+	public static final String TWEET_FONT_SIZE = "tweet_font_size";
 	public static final String SHOW_TWEET_THUMBS = "show_tweet_thumbs";
 	public static final String CUSTOMIZE_TWEET_FONT = "customize_tweet_font";
 	public static final String ABOUT = "about";
