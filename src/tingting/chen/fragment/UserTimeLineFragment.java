@@ -40,13 +40,15 @@ public class UserTimeLineFragment extends TimelineFragment {
 	@Override
 	protected void fetchTweetsFromCloud(boolean isRefresh, long offset) {
 		int size = super.getDefaultFetchSize();
-		TingtingAPI api = TweetAPI.userTimeline(uid, offset, 0, size, 0, 0, 0, 0);
+		TingtingAPI api = isRefresh
+			? TweetAPI.userTimeline(uid, 0, 0, size, 0, 0, 0, 0)
+			: TweetAPI.userTimeline(uid, 0, offset, size, 0, 0, 0, 0);
 		mRequestQueue.add(new TingtingRequest(
 			mActivity,
 			api,
 			new StatusProcessor.MyTweetsProcessor(),
-			success,
-			error
+			isRefresh ? refreshSuccessListener : loadMoreSuccessListener,
+			isRefresh ?	refreshFailListener : loadMoreFailListener
 		)).setTag(TAG);
 	}
 

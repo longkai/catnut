@@ -109,10 +109,6 @@ public class HomeTimelineFragment extends TimelineFragment {
 			"s._id desc",
 			limit
 		);
-		// 清除加载更多标志位
-		if (mCurPage != 0) {
-			mLoading = false;
-		}
 		return cursorLoader;
 	}
 
@@ -125,8 +121,8 @@ public class HomeTimelineFragment extends TimelineFragment {
 			mActivity,
 			api,
 			new StatusProcessor.MyTweetsProcessor(),
-			success,
-			error
+			isRefresh ? refreshSuccessListener : loadMoreSuccessListener,
+			isRefresh ? refreshFailListener : loadMoreFailListener
 		)).setTag(TAG);
 	}
 

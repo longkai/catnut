@@ -52,7 +52,7 @@ public class StatusProcessor {
 					json = json.optJSONObject(Status.retweeted_status);
 					statues.add(statusMetadata.convert(json));
 					// 没有uid则标识返回用户的全部字段
-					if (!json.has(Status.uid)) {
+					if (!json.has(Status.uid) && json.has(User.SINGLE)) { // 有些时候，数据也是不可靠的...
 						users.add(userMetadata.convert(json.optJSONObject(User.SINGLE)));
 					}
 				}

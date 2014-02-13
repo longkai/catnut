@@ -9,7 +9,6 @@ import android.content.ContentValues;
 import android.provider.BaseColumns;
 import android.util.Log;
 import org.json.JSONObject;
-import tingting.chen.processor.StatusProcessor;
 import tingting.chen.tingting.TingtingMetadata;
 import tingting.chen.util.Constants;
 

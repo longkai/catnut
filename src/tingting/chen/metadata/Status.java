@@ -8,6 +8,7 @@ package tingting.chen.metadata;
 import android.content.ContentValues;
 import android.provider.BaseColumns;
 import android.util.Log;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import tingting.chen.tingting.TingtingMetadata;
 import tingting.chen.util.Constants;
@@ -24,6 +25,8 @@ public final class Status implements TingtingMetadata<JSONObject, ContentValues>
 	public static final String TABLE = "statuses";
 	public static final String SINGLE = "status";
 	public static final String MULTIPLE = "statuses";
+
+	public static final String total_number = "total_number";
 
 	// singleton
 	public static final Status METADATA = new Status();
@@ -113,8 +116,12 @@ public final class Status implements TingtingMetadata<JSONObject, ContentValues>
 		tweet.put(source, json.optString(source));
 		tweet.put(favorited, json.optBoolean(favorited));
 		tweet.put(truncated, json.optBoolean(truncated));
-		// 直接存储为json字符串
-		tweet.put(pic_urls, json.optJSONArray(pic_urls).toString());
+		// 有些时候，数据来源是不可靠的
+		JSONArray thumbs = json.optJSONArray(pic_urls);
+		if (thumbs != null) {
+			// 直接存储为json字符串
+			tweet.put(pic_urls, thumbs.toString());
+		}
 		tweet.put(thumbnail_pic, json.optString(thumbnail_pic));
 		tweet.put(bmiddle_pic, json.optString(bmiddle_pic));
 		tweet.put(original_pic, json.optString(original_pic));

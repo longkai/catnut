@@ -20,8 +20,10 @@ import android.widget.*;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import org.json.JSONObject;
 import tingting.chen.R;
 import tingting.chen.adapter.TweetAdapter;
+import tingting.chen.metadata.Status;
 import tingting.chen.tingting.TingtingApp;
 import tingting.chen.ui.MainActivity;
 import tingting.chen.util.TingtingUtils;
@@ -50,8 +52,8 @@ public abstract class TimelineFragment extends ListFragment
 	protected ProgressBar mLoadMore;
 	/** 当前的页码，每次加载更多就+1 */
 	protected int mCurPage;
-	/** 当前是否在进行加载更多 */
-	protected boolean mLoading;
+	/** 当前是否在通过web进行加载更多 */
+	protected boolean mLoadingFromCloud;
 	/** 标志位，当前是否是显示搜索列表 */
 	protected boolean isSearching;
 
@@ -68,17 +70,39 @@ public abstract class TimelineFragment extends ListFragment
 	 */
 	protected abstract void fetchTweetsFromCloud(boolean isRefresh, long offset);
 
-	protected Response.Listener success = new Response.Listener() {
+	protected Response.Listener refreshSuccessListener = new Response.Listener() {
 		@Override
 		public void onResponse(Object response) {
 			mPullToRefreshLayout.setRefreshComplete();
 		}
 	};
 
-	protected Response.ErrorListener error = new Response.ErrorListener() {
+	protected Response.ErrorListener refreshFailListener = new Response.ErrorListener() {
 		@Override
 		public void onErrorResponse(VolleyError error) {
+			Log.e(TAG, "refresh tweets from cloud error!", error);
 			mPullToRefreshLayout.setRefreshComplete();
+			Toast.makeText(mActivity, error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+		}
+	};
+
+	protected Response.Listener<JSONObject> loadMoreSuccessListener = new Response.Listener<JSONObject>() {
+		@Override
+		public void onResponse(JSONObject response) {
+			// 看看是不是到底了
+			if (response.optInt(Status.total_number) == mAdapter.getCount()) {
+				getListView().removeFooterView(mLoadMore);
+				Toast.makeText(mActivity, R.string.no_tweets, Toast.LENGTH_SHORT).show();
+			}
+			mLoadingFromCloud = false;
+		}
+	};
+
+	protected Response.ErrorListener loadMoreFailListener = new Response.ErrorListener() {
+		@Override
+		public void onErrorResponse(VolleyError error) {
+			Log.e(TAG, "loading data from cloud error!", error);
+			mLoadingFromCloud = false;
 			Toast.makeText(mActivity, error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
 		}
 	};
@@ -199,12 +223,15 @@ public abstract class TimelineFragment extends ListFragment
 
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
-		if (mLoadMore.isShown() && !mLoading && !isSearching) {
-			mLoading = true;
+//		Log.d(TAG, "is shown: " + mLoadMore.isShown());
+//		Log.d(TAG, "is loading: " + mLoadMore);
+//		Log.d(TAG, "is searching: " + isSearching);
+		if (mLoadMore.isShown() && !mLoadingFromCloud && !isSearching) {
 			mCurPage++;
 			if (mPref.getBoolean(PrefFragment.AUTO_LOAD_MORE_FROM_CLOUD, true)) {
 				Log.d(TAG, "loading more from cloud!");
-				// 开启worker线程去web抓取数据，
+				// 开启worker线程去web抓取数据
+				mLoadingFromCloud = true;
 				this.fetchTweetsFromCloud(false, mAdapter.getItemId(mAdapter.getCount() - 2));
 			} else {
 				Log.d(TAG, "loading more from local!");
