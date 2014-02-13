@@ -32,16 +32,17 @@ import tingting.chen.adapter.DrawerNavAdapter;
 import tingting.chen.adapter.TweetAdapter;
 import tingting.chen.fragment.HomeTimelineFragment;
 import tingting.chen.fragment.PrefFragment;
+import tingting.chen.fragment.UserTimeLineFragment;
 import tingting.chen.metadata.Status;
 import tingting.chen.metadata.User;
 import tingting.chen.support.TweetImageSpan;
 import tingting.chen.tingting.TingtingApp;
 import tingting.chen.tingting.TingtingProvider;
+import tingting.chen.util.Constants;
 import tingting.chen.util.TingtingUtils;
 
 import java.text.ParseException;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * 应用程序主界面。
@@ -165,6 +166,16 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					TingtingUtils.setText(flowerCount, android.R.id.text1, cursor.getString(cursor.getColumnIndex(User.followers_count)));
 					TingtingUtils.setText(flowerCount, android.R.id.text2, getString(R.string.followers));
 					View tweetsCount = findViewById(R.id.tweets_count);
+					tweetsCount.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							UserTimeLineFragment fragment = new UserTimeLineFragment();
+							Bundle args = new Bundle();
+							args.putLong(Constants.ID, mApp.getAccessToken().uid);
+							fragment.setArguments(args);
+							flipCard(fragment, null);
+						}
+					});
 					TingtingUtils.setText(tweetsCount, android.R.id.text1, cursor.getString(cursor.getColumnIndex(User.statuses_count)));
 					TingtingUtils.setText(tweetsCount, android.R.id.text2, getString(R.string.tweets));
 					cursor.close();
@@ -386,5 +397,12 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				invalidateOptionsMenu();
 			}
 		});
+	}
+
+	/**
+	 * 获取当前授权用户的nick
+	 */
+	public String getDefaultUserNick() {
+		return mNick;
 	}
 }

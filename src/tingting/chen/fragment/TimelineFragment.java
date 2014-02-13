@@ -24,6 +24,7 @@ import tingting.chen.R;
 import tingting.chen.adapter.TweetAdapter;
 import tingting.chen.tingting.TingtingApp;
 import tingting.chen.ui.MainActivity;
+import tingting.chen.util.TingtingUtils;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
@@ -96,7 +97,6 @@ public abstract class TimelineFragment extends ListFragment
 		this.mPref = app.getPreferences();
 		this.mRequestQueue = app.getRequestQueue();
 		this.mLoadMore = new ProgressBar(mActivity);
-		this.mAdapter = new TweetAdapter(mActivity);
 	}
 
 	@Override
@@ -171,6 +171,16 @@ public abstract class TimelineFragment extends ListFragment
 		return super.onOptionsItemSelected(item);
 	}
 
+	/**
+	 * 获取抓取微博的条目数
+	 */
+	protected int getDefaultFetchSize() {
+		int count = TingtingUtils.resolveListPrefInt(mPref,
+			PrefFragment.DEFAULT_FETCH_SIZE,
+			mActivity.getResources().getInteger(R.integer.default_fetch_size));
+		return count;
+	}
+
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		// 为何微博如此之少Orz
@@ -203,6 +213,11 @@ public abstract class TimelineFragment extends ListFragment
 
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+	}
+
+	@Override
+	public void onRefreshStarted(View view) {
+		fetchTweetsFromCloud(true, 0);
 	}
 
 	@Override

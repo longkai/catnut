@@ -12,7 +12,7 @@
 	<string name="auth_success">授权成功！</string>
 	<string name="logout">退出</string>
 	<string name="logout_confirm">确定结束应用了嘛?</string>
-	<string name="no_tweets">没有微博啦Orz，要不试试刷新一下？</string>
+	<string name="no_tweets">没有更多微博啦，赶紧学习去吧*_*</string>
 	<string name="new_tweet_hint">有什么新鲜事？</string>
 	<string name="search_hint">嗯哼？</string>
 	<string name="authing_hint">正在联系新浪微博授权中...</string>
@@ -45,6 +45,7 @@
 	<string name="general_settings">通用</string>
 	<string name="source_code">源代码</string>
 	<string name="source_code_summary">本应用开源哦，感兴趣的话戳这里*_*</string>
+	<string name="my_timeline">我的时间线</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>关注</item>

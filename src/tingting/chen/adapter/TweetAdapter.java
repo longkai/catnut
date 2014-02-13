@@ -54,14 +54,16 @@ public class TweetAdapter extends CursorAdapter {
 	private Context mContext;
 	private ImageLoader mImageLoader;
 	private TweetImageSpan mImageSpan;
-	private boolean mThumbsRequried;
+	private boolean mThumbsRequired;
+	private String mUserNick;
 
-	public TweetAdapter(Context context) {
+	public TweetAdapter(Context context, String nick) {
 		super(context, null, 0);
 		mContext = context;
+		this.mUserNick = nick;
 		TingtingApp app = TingtingApp.getTingtingApp();
 		mImageLoader = app.getImageLoader();
-		mThumbsRequried = app.getPreferences().getBoolean(PrefFragment.SHOW_TWEET_THUMBS, true);
+		mThumbsRequired = app.getPreferences().getBoolean(PrefFragment.SHOW_TWEET_THUMBS, true);
 		mImageSpan = new TweetImageSpan(mContext);
 	}
 
@@ -93,15 +95,18 @@ public class TweetAdapter extends CursorAdapter {
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 		ViewHolder holder = new ViewHolder();
 		View view = LayoutInflater.from(context).inflate(R.layout.tweet, null);
+		holder.nick = (TextView) view.findViewById(R.id.nick);
+		// 如果是某个主页时间线
+		if (mUserNick == null) {
+			holder.nickIndex = cursor.getColumnIndex(User.screen_name);
+			holder.avatar = (ImageView) view.findViewById(R.id.avatar);
+			holder.avatarIndex = cursor.getColumnIndex(User.profile_image_url);
+		}
+		// 微博相关
 		holder.text = (TextView) view.findViewById(R.id.text);
 		holder.textIndex = cursor.getColumnIndex(Status.columnText);
-		holder.nick = (TextView) view.findViewById(R.id.nick);
-		holder.nickIndex = cursor.getColumnIndex(User.screen_name);
 		holder.create_at = (TextView) view.findViewById(R.id.create_at);
 		holder.create_atIndex = cursor.getColumnIndex(Status.created_at);
-		holder.thumbsIndex = cursor.getColumnIndex(Status.thumbnail_pic);
-		holder.avatar = (ImageView) view.findViewById(R.id.avatar);
-		holder.avatarIndex = cursor.getColumnIndex(User.profile_image_url);
 		holder.replyCount = (TextView) view.findViewById(R.id.reply_count);
 		holder.replyCountIndex = cursor.getColumnIndex(Status.comments_count);
 		holder.reteetCount = (TextView) view.findViewById(R.id.reteet_count);
@@ -110,9 +115,9 @@ public class TweetAdapter extends CursorAdapter {
 		holder.favoriteCountIndex = cursor.getColumnIndex(Status.attitudes_count);
 		holder.source = (TextView) view.findViewById(R.id.source);
 		holder.sourceIndex = cursor.getColumnIndex(Status.source);
-
 		// 用户偏好设置，是否显示缩略图
-		if (mThumbsRequried) {
+		if (mThumbsRequired) {
+			holder.thumbsIndex = cursor.getColumnIndex(Status.thumbnail_pic);
 			ViewStub stub = (ViewStub) view.findViewById(R.id.view_stub);
 			if (!TextUtils.isEmpty(cursor.getString(holder.thumbsIndex))) {
 				holder.thumbs = (ImageView) stub.inflate();
@@ -125,16 +130,21 @@ public class TweetAdapter extends CursorAdapter {
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 		ViewHolder holder = (ViewHolder) view.getTag();
+		// 用户相关
+		if (mUserNick == null) {
+			mImageLoader.get(cursor.getString(holder.avatarIndex),
+				ImageLoader.getImageListener(holder.avatar, R.drawable.error, R.drawable.error));
+			holder.nick.setText(cursor.getString(holder.nickIndex));
+		} else {
+			holder.nick.setText(mUserNick);
+		}
+		// 微博相关
 		holder.text.setText(cursor.getString(holder.textIndex));
-		mImageLoader.get(cursor.getString(holder.avatarIndex),
-			ImageLoader.getImageListener(holder.avatar, R.drawable.error, R.drawable.error));
-		holder.nick.setText(cursor.getString(holder.nickIndex));
 		try {
 			Date parse = sdf.parse(cursor.getString(holder.create_atIndex));
 			holder.create_at.setText(DateUtils.getRelativeTimeSpanString(parse.getTime()));
 		} catch (ParseException e) {
 		}
-
 		int replyCount = cursor.getInt(holder.replyCountIndex);
 		holder.replyCount.setText(TingtingUtils.approximate(replyCount));
 		int retweetCount = cursor.getInt(holder.reteetCountIndex);
@@ -144,21 +154,22 @@ public class TweetAdapter extends CursorAdapter {
 		String source = cursor.getString(holder.sourceIndex);
 		// remove html tags, maybe we should do this after we load the data from cloud...
 		holder.source.setText(Html.fromHtml(source).toString());
-
-		String thumbsUri = cursor.getString(holder.thumbsIndex);
-		if (holder.thumbs != null && !TextUtils.isEmpty(thumbsUri)) {
-			mImageLoader.get(thumbsUri,
-				ImageLoader.getImageListener(holder.thumbs, R.drawable.error, R.drawable.error),
-				holder.thumbs.getMaxWidth(), holder.thumbs.getMaxHeight());
+		// 是否需要缩略图，用户偏好
+		if (mThumbsRequired) {
+			String thumbsUri = cursor.getString(holder.thumbsIndex);
+			if (holder.thumbs != null && !TextUtils.isEmpty(thumbsUri)) {
+				mImageLoader.get(thumbsUri,
+					ImageLoader.getImageListener(holder.thumbs, R.drawable.error, R.drawable.error),
+					holder.thumbs.getMaxWidth(), holder.thumbs.getMaxHeight());
+			}
 		}
-
 		// 表情处理
 		holder.text.setText(mImageSpan.getImageSpan(holder.text.getText()));
 		// 分别对微博的链接，@，##话题过滤
 		// todo：对@，## 进行处理
 		Linkify.addLinks(holder.text, MENTION_PATTERN, MENTION_SCHEME, null, mentionFilter);
 		Linkify.addLinks(holder.text, TOPIC_PATTERN, TOPIC_SCHEME, null, topicFilter);
-		Linkify.addLinks(holder.text, WEB_URL, null, null, urlFileter);
+		Linkify.addLinks(holder.text, WEB_URL, null, null, urlFilter);
 		TingtingUtils.removeLinkUnderline(holder.text);
 	}
 
@@ -177,7 +188,7 @@ public class TweetAdapter extends CursorAdapter {
 		}
 	};
 
-	private Linkify.TransformFilter urlFileter = new Linkify.TransformFilter() {
+	private Linkify.TransformFilter urlFilter = new Linkify.TransformFilter() {
 		@Override
 		public String transformUrl(Matcher match, String url) {
 			return url;

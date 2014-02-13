@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import tingting.chen.R;
+import tingting.chen.adapter.TweetAdapter;
 import tingting.chen.api.TweetAPI;
 import tingting.chen.metadata.Status;
 import tingting.chen.metadata.User;
@@ -43,6 +44,12 @@ public class HomeTimelineFragment extends TimelineFragment {
 		User.screen_name,
 		User.profile_image_url
 	};
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		mAdapter = new TweetAdapter(mActivity, null);
+	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -110,15 +117,8 @@ public class HomeTimelineFragment extends TimelineFragment {
 	}
 
 	@Override
-	public void onRefreshStarted(View view) {
-		fetchTweetsFromCloud(true, 0);
-	}
-
-	@Override
 	protected void fetchTweetsFromCloud(boolean isRefresh, long offset) {
-		int count = TingtingUtils.resolveListPrefInt(mPref,
-			PrefFragment.DEFAULT_FETCH_SIZE,
-			mActivity.getResources().getInteger(R.integer.default_fetch_size));
+		int count = super.getDefaultFetchSize();
 		TingtingAPI api = isRefresh ? TweetAPI.homeTimeline(offset, 0, count, 0, 0, 0, 0)
 			: TweetAPI.homeTimeline(0, offset, count, 0, 0, 0, 0);
 		mRequestQueue.add(new TingtingRequest(
