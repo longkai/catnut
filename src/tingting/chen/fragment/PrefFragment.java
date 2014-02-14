@@ -15,7 +15,10 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.webkit.WebView;
+import android.widget.TextView;
 import android.widget.Toast;
 import tingting.chen.R;
 import tingting.chen.tingting.TingtingApp;
@@ -32,6 +35,8 @@ import java.util.regex.Pattern;
  */
 public class PrefFragment extends PreferenceFragment implements DialogInterface.OnClickListener {
 
+	private static final String TAG = "PrefFragment";
+
 	public static final int CUSTOMIZE_FONT_REQUEST_CODE = 1;
 
 	public static final String IS_FIRST_RUN = "first_run";
@@ -46,6 +51,7 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 	public static final String AUTHOR = "author";
 	public static final String SOURCE_CODE = "source_code";
 	public static final String OPEN_SOURCE_LICENSE = "open_source_license";
+	public static final String NOTES = "notes";
 
 	private SharedPreferences mPref;
 
@@ -87,16 +93,16 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 						.setNeutralButton(android.R.string.ok, null)
 						.show();
 				} catch (IOException e) {
-					Log.e("preference fragment", "error open license file from assets!", e);
+					Log.e(TAG, "error open license file from assets!", e);
 				} finally {
 					if (inputStream != null) {
 						try {
 							inputStream.close();
 						} catch (IOException e) {
-							Log.wtf("preference fragment", "error closing input stream!", e);
 						}
 					}
 				}
+				return true;
 			} else if (key.equals(CUSTOMIZE_TWEET_FONT)) {
 				new AlertDialog.Builder(getActivity())
 					.setMessage(getString(R.string.customized_font_message))
@@ -104,6 +110,29 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 					.setNeutralButton(getString(R.string.use_default_font), this)
 					.setPositiveButton(getString(R.string.customize_font), this)
 					.show();
+				return true;
+			} else if (key.equals(NOTES)) {
+				InputStream inputStream = null;
+				try {
+					inputStream = getActivity().getAssets().open("notes.txt");
+					View v = LayoutInflater.from(getActivity()).inflate(R.layout.scroll_text, null);
+					TextView tv = (TextView) v.findViewById(android.R.id.text1);
+					tv.setText(new Scanner(inputStream).useDelimiter("\\A").next());
+					new AlertDialog.Builder(getActivity())
+						.setTitle("Notes")
+						.setView(v)
+						.setNeutralButton(android.R.string.ok, null)
+						.show();
+				} catch (IOException e) {
+					Log.e(TAG, "error open notes from assets!", e);
+				} finally {
+					if (inputStream != null) {
+						try {
+							inputStream.close();
+						} catch (IOException e) {
+						}
+					}
+				}
 				return true;
 			}
 			if (intent != null) {

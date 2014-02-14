@@ -62,6 +62,11 @@
 			android:summary="@string/version_name" />
 
 		<Preference
+			android:key="notes"
+			android:title="@string/notes"
+			android:summary="@string/notes_summary" />
+
+		<Preference
 			android:key="author"
 			android:title="@string/author"
 			android:summary="龙凯 im.longkai@gmail.com" />

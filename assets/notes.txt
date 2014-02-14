@@ -1,0 +1,22 @@
+Catnut, 新浪微博 RESTFul Client
+
+---
+程序架构启发自Google IO 2010 - developing-RESTful-android-apps，界面设计启发自Twitter for Android
+
+个人学习时作品，最初是打算帮某童鞋做的课程设计Orz，目前有空或者有新的想法就写写:-)，欢迎对程序设计感兴趣的朋友在本项目的github主页交流，fork，clone，bug issue啥的!
+
+---
+致谢
+
+1. 应用logo来自好朋友lp，我不会告诉你他名字*_*
+
+2. Catnut名字来自独来独往的猫yly，这名字有点怪麽Orz
+
+3. 微博表情来自新浪
+
+4. 部分应用图标来自Twitter for Android
+
+5. 感谢一路上有你，感谢那些帮助我们成长的点点滴滴:-)
+
+---
+2014-02-14
