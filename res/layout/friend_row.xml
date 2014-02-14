@@ -36,7 +36,7 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" />-->
 	<ImageView
-		android:id="@+id/verified"
+		android:id="@id/verified"
 		android:visibility="gone"
 		android:layout_alignTop="@id/nick"
 		android:layout_alignBottom="@id/nick"

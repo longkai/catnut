@@ -26,9 +26,6 @@ import tingting.chen.metadata.User;
 import tingting.chen.tingting.TingtingApp;
 import tingting.chen.ui.MainActivity;
 import tingting.chen.util.TingtingUtils;
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 /**
  * 用户列表
@@ -67,7 +64,7 @@ public abstract class UsersFragment extends ListFragment implements LoaderManage
 			mNextCursor = response.optInt(User.next_cursor);
 			if (response.optJSONArray(User.MULTIPLE).length() < getDefaultFetchSize()) {
 				// no more data
-				Toast.makeText(mActivity, mActivity.getString(R.string.no_more_friends), Toast.LENGTH_SHORT).show();
+				Toast.makeText(mActivity, mActivity.getString(R.string.no_more), Toast.LENGTH_SHORT).show();
 				getListView().removeFooterView(mLoadMore);
 			}
 		}

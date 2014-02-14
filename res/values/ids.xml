@@ -21,6 +21,7 @@
 	<item name="tweet_layout" type="id" />
 	<item name="avatar_profile" type="id" />
 	<item name="nick" type="id" />
+	<item name="verified" type="id" />
 	<item name="dummy" type="id" />
 	<item name="description" type="id" />
 	<item name="statics" type="id" />

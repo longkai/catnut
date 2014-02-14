@@ -3,7 +3,9 @@ Catnut, 新浪微博 RESTFul Client
 ---
 程序架构启发自Google IO 2010 - developing-RESTful-android-apps，界面设计启发自Twitter for Android
 
-个人学习时作品，最初是打算帮某童鞋做的课程设计Orz，目前有空或者有新的想法就写写:-)，欢迎对程序设计感兴趣的朋友在本项目的github主页交流，fork，clone，bug issue啥的!
+个人学习时作品，最初是打算帮某童鞋做的课程设计Orz，目前有空或者有新的想法就写写:-)
+
+欢迎对程序设计感兴趣的朋友在本项目的github主页交流，fork，clone，bug issue啥的!
 
 ---
 致谢

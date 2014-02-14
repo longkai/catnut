@@ -5,7 +5,7 @@
   ~ The software shall be used for good, not evil.
   -->
 <resources>
-	<string name="app_name">爱猫的坚果</string>
+	<string name="app_name">Catnut</string>
 	<string name="oauth">授权</string>
 	<string name="refresh">刷新</string>
 	<string name="alert_error">出错啦！</string>
@@ -56,8 +56,8 @@
 	<string name="change_font_summary">默认的字体不合适？换一个心情吧*_*</string>
 	<string name="font_size">字体大小</string>
 	<string name="adjust_font_size_summary">调整微博字体的大小</string>
-	<string name="my_followings_title">我的关注</string>
-	<string name="no_more_friends">没有更多好友啦！</string>
+	<string name="my_followings_title">我关注的</string>
+	<string name="no_more">没有更多啦！</string>
 	<string name="follow_me_title">关注我的</string>
 	<string name="notes">说明</string>
 	<string name="notes_summary">关于这个应用的一些事儿</string>
