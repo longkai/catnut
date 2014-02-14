@@ -7,6 +7,7 @@ package tingting.chen.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.text.TextUtils;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,14 +77,20 @@ public class UsersAdapter extends CursorAdapter {
 			ImageLoader.getImageListener(holder.avatar, R.drawable.error, R.drawable.error));
 		holder.nick.setText(cursor.getString(holder.nickIndex));
 		holder.location.setText(cursor.getString(holder.locationIndex));
-		holder.description.setText(cursor.getString(holder.descriptionIndex));
 		if (TingtingUtils.getBoolean(cursor, User.verified)) {
 			holder.verified.setVisibility(View.VISIBLE);
 		} else {
 			holder.verified.setVisibility(View.GONE);
 		}
-		Linkify.addLinks(holder.description, TweetAdapter.WEB_URL, null, null, urlFilter);
-		TingtingUtils.removeLinkUnderline(holder.description);
+
+		String desc = cursor.getString(holder.descriptionIndex);
+		if (!TextUtils.isEmpty(desc)) {
+			holder.description.setText(desc);
+			Linkify.addLinks(holder.description, TweetAdapter.WEB_URL, null, null, urlFilter);
+			TingtingUtils.removeLinkUnderline(holder.description);
+		} else {
+			holder.description.setText(context.getText(R.string.no_description));
+		}
 	}
 
 	private Linkify.TransformFilter urlFilter = new Linkify.TransformFilter() {

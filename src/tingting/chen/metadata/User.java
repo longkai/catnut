@@ -25,6 +25,9 @@ public final class User implements TingtingMetadata<JSONObject, ContentValues> {
 	public static final String SINGLE = "user";
 	public static final String MULTIPLE = "users";
 
+	public static final String next_cursor = "next_cursor";
+	public static final String total_number = "total_number";
+
 	// singleton
 	public static final User METADATA = new User();
 
