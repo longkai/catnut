@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Catnut by longkai</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Catnut</h1>
+        <h2>新浪微博Android REST Client</h2>
+        <a href="https://github.com/longkai/catnut" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="%E6%96%B0%E6%B5%AA%E5%BE%AE%E5%8D%9Aandroid-rest-client" class="anchor" href="#%E6%96%B0%E6%B5%AA%E5%BE%AE%E5%8D%9Aandroid-rest-client"><span class="octicon octicon-link"></span></a>新浪微博Android REST Client</h1>
+
+<h2>
+<a name="%E8%AF%B4%E6%98%8E" class="anchor" href="#%E8%AF%B4%E6%98%8E"><span class="octicon octicon-link"></span></a>说明</h2>
+
+<p>程序架构启发自Google IO 2010 - <a href="http://www.google.com/events/io/2010/sessions/developing-RESTful-android-apps.html" title="developing-RESTful-android-apps">developing-RESTful-android-apps</a>，界面设计启发自<a href="https://about.twitter.com/zh-hans/products/android" title="twitter for android">Twitter for Android</a>（需翻墙）</p>
+
+<p>个人学习时作品，目前有空或者有新的想法就写写，持续构建中:-)，欢迎感兴趣的朋友交流，fork，clone，bug issue啥的!</p>
+
+<blockquote>
+<p><img src="http://farm4.staticflickr.com/3824/12456581065_a01628cf23_o.png" alt="show" title="效果图"></p>
+</blockquote>
+
+<h2>
+<a name="%E7%8E%AF%E5%A2%83%E9%9C%80%E6%B1%82" class="anchor" href="#%E7%8E%AF%E5%A2%83%E9%9C%80%E6%B1%82"><span class="octicon octicon-link"></span></a>环境需求</h2>
+
+<ol>
+<li>Android SDK &gt;= 4.1.x（API Level &gt;= 16），<em>建议设置ANDROID_HOME环境变量</em>
+</li>
+<li>JDK &gt;= 1.6（现在只有4.4才支持JDK7的语法），<strong>必须设置好JAVA_HOME环境变量</strong>
+</li>
+<li>IDE（选择一个自己熟悉的就可以了）
+
+<ol>
+<li>Intellij IDEA（推荐使用免费开源的社区版<a href="http://www.jetbrains.com/idea/" title="Intellij IDEA">Intellij IDEA Community</a>）</li>
+<li>Eclipse（包含ADT插件，建议直接下载打包好的<a href="http://developer.android.com/sdk/index.html" title="ADT Bundle">ADT Bundle</a>）</li>
+<li>Android Studio（好是挺好，就是龟速，现阶段不太推荐）</li>
+</ol>
+</li>
+<li>以下为<strong>可选</strong>
+
+<ol>
+<li>Gradle == 1.8 （本项目自带了Gradle Wrapper，所以本地没有也没有关系，不用Android Studio的话更不需要这个）</li>
+</ol>
+</li>
+</ol><h2>
+<a name="%E4%BE%9D%E8%B5%96%E5%9C%A8buildgradle%E9%87%8Cdependencies-%E7%94%B3%E6%98%8E" class="anchor" href="#%E4%BE%9D%E8%B5%96%E5%9C%A8buildgradle%E9%87%8Cdependencies-%E7%94%B3%E6%98%8E"><span class="octicon octicon-link"></span></a>依赖（在<code>build.gradle</code>里<code>dependencies {}</code>申明）</h2>
+
+<ol>
+<li>support-v4，注意版本号，为什么我们的项目要求那么高的API却还需要兼容库呢？因为兼容库不仅仅提供兼容类，还有其它的功能。并且没有用到的类可以在编译期间被删除掉<a href="http://proguard.sourceforge.net/index.html" title="ProGuard">?</a>
+</li>
+<li>support-v13，for native fragment api</li>
+<li>android-volley，异步http请求框架，需要自行<a href="https://android.googlesource.com/platform/frameworks/volley" title="android-volley">下载</a>并引入</li>
+<li>ActionBar-PullToRefresh，刷新控件，需自行<a href="https://github.com/chrisbanes/ActionBar-PullToRefresh" title="ActionBar-PullToRefresh">下载</a>或者通过Android Studio引入</li>
+</ol><h2>
+<a name="%E5%A6%82%E4%BD%95%E6%9E%84%E5%BB%BA" class="anchor" href="#%E5%A6%82%E4%BD%95%E6%9E%84%E5%BB%BA"><span class="octicon octicon-link"></span></a>如何构建</h2>
+
+<ol>
+<li>通过IDE
+
+<ol>
+<li>Intellij IDEA，直接导入（需自行引入<code>build.gradle</code>里<code>dependencies {}</code>的依赖），后面你懂的</li>
+<li>Eclipse，直接导入（需自行引入<code>build.gradle</code>里<code>dependencies {}</code>的依赖），后面你懂的</li>
+<li>Android Studio，直接导入（最好选中build.gradle文件），后面你懂的</li>
+</ol>
+</li>
+<li>通过命令行（gradle构建，<strong>目前版本必须是1.8</strong>，并且要<strong>设置好ANDROID_HOME环境变量</strong>）
+
+<ol>
+<li>如果本地有配置有gradle，那么shell或者cmd进入到项目根目录，敲<code>gradle clean build</code>，一切正常的话在<code>build/apk/</code>下会生成相应的apk文件（<strong>注意安装文件名有debug的那个apk文件</strong>）</li>
+<li>如果本地没有安装gradle，那么shell或者cmd进入项目根目录，mac或者linux敲<code>./gradlew clean build</code>，windows敲<code>gradlew clean build</code>，接下来同1</li>
+</ol>
+</li>
+</ol><h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>code license</p>
+
+<blockquote>
+<pre><code>The MIT License (MIT)
+Copyright (c) 2014 longkai
+The software shall be used for good, not evil.
+</code></pre>
+</blockquote>
+
+<p>document license</p>
+
+<blockquote>
+<p>本作品采用<a href="http://creativecommons.org/licenses/by-nc/4.0/deed.zh" title="creative commons license">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可。</p>
+
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" alt="" title="creative commons icon"></p>
+</blockquote>
+
+<h2>
+<a name="%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85" class="anchor" href="#%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85"><span class="octicon octicon-link"></span></a>联系作者</h2>
+
+<ol>
+<li>邮箱：<a href="mailto:im.longkai@gmail.com">im.longkai@gmail.com</a>
+</li>
+<li>微信：longkai_1991</li>
+<li>Twitter: <a href="https://twitter.com/longkai_1991" title="twitter">@longkai_1991</a>
+</li>
+<li>新浪微博：<a href="http://weibo.com/coding4fun" title="sina weibo">@龙凯Orz</a>
+</li>
+</ol><hr><p>2014-01-18</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/longkai/catnut/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/longkai/catnut/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/longkai/catnut"></a> is maintained by <a href="https://github.com/longkai">longkai</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-48094293-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
