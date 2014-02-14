@@ -28,6 +28,7 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.util.CatnutUtils;
+import org.catnut.util.DateTime;
 
 import java.io.File;
 import java.text.ParseException;
@@ -113,8 +114,6 @@ public class TweetAdapter extends CursorAdapter {
 		int thumbsIndex;
 	}
 
-	public static SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d HH:mm:ss Z yyyy", Locale.ENGLISH);
-
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 		ViewHolder holder = new ViewHolder();
@@ -163,11 +162,8 @@ public class TweetAdapter extends CursorAdapter {
 		}
 		holder.text.setTextSize(mCustomizedFontSize);
 		holder.text.setText(cursor.getString(holder.textIndex));
-		try {
-			Date parse = sdf.parse(cursor.getString(holder.create_atIndex));
-			holder.create_at.setText(DateUtils.getRelativeTimeSpanString(parse.getTime()));
-		} catch (ParseException e) {
-		}
+		String create_at = cursor.getString(holder.create_atIndex);
+		holder.create_at.setText(DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(create_at)));
 		int replyCount = cursor.getInt(holder.replyCountIndex);
 		holder.replyCount.setText(CatnutUtils.approximate(replyCount));
 		int retweetCount = cursor.getInt(holder.reteetCountIndex);

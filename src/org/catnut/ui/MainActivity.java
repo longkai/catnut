@@ -22,7 +22,6 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import com.android.volley.VolleyError;
@@ -32,15 +31,16 @@ import org.catnut.adapter.DrawerNavAdapter;
 import org.catnut.adapter.TweetAdapter;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
-import org.catnut.fragment.*;
+import org.catnut.fragment.FriendsFragment;
+import org.catnut.fragment.HomeTimelineFragment;
+import org.catnut.fragment.PrefFragment;
+import org.catnut.fragment.UserTimeLineFragment;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
-
-import java.text.ParseException;
-import java.util.Date;
+import org.catnut.util.DateTime;
 
 /**
  * 应用程序主界面。
@@ -255,12 +255,8 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					CatnutUtils.setText(tweet, R.id.favorite_count, CatnutUtils.approximate(favoriteCount));
 					String source = cursor.getString(cursor.getColumnIndex(Status.source));
 					CatnutUtils.setText(tweet, R.id.source, Html.fromHtml(source).toString());
-					try {
-						Date date = TweetAdapter.sdf.parse(cursor.getString(cursor.getColumnIndex(Status.created_at)));
-						CatnutUtils.setText(tweet, R.id.create_at, DateUtils.getRelativeTimeSpanString(date.getTime()));
-					} catch (ParseException e) {
-						Log.d(TAG, "parse time", e);
-					}
+					String create_at = cursor.getString(cursor.getColumnIndex(Status.created_at));
+					CatnutUtils.setText(tweet, R.id.create_at, DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(create_at)));
 					CatnutUtils.setText(tweet, R.id.nick, "@" + mActionBar.getTitle()).setTextColor(R.color.actionbar_background);
 					cursor.close();
 				}
