@@ -210,9 +210,9 @@ public abstract class TimelineFragment extends ListFragment
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		// 为何微博如此之少Orz
-		if (data.getCount() < 20) {
-			getListView().removeFooterView(mLoadMore);
-		}
+//		if (data.getCount() < 20) {
+//			getListView().removeFooterView(mLoadMore);
+//		}
 		mAdapter.swapCursor(data);
 	}
 

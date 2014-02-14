@@ -24,7 +24,7 @@
 	<string name="tweets">微博</string>
 	<string name="share_app">微博app分享</string>
 	<string name="share_text">我正在使用『新浪微博Android Rest Client』，推荐你也用用:-) http://weibo.com</string>
-	<string name="github_link">https://github.com/longkai/tingting</string>
+	<string name="github_link">https://github.com/longkai/catnut</string>
 	<string name="my_profile">我的信息</string>
 	<string name="cancellation">注销</string>
 	<string name="cancellation_confirm">注销后需要重新向新浪申请授权的哦Orz</string>
@@ -32,7 +32,7 @@
 	<string name="tweets_count_per_fetch">每页微博数</string>
 	<string name="about">关于</string>
 	<string name="advanced_settings">高级设置</string>
-	<string name="commit_link">https://github.com/longkai/tingting/commits/master</string>
+	<string name="commit_link">https://github.com/longkai/catnut/commits/master</string>
 	<string name="version">版本</string>
 	<string name="author">作者</string>
 	<string name="show_thumbs">显示缩略图</string>
