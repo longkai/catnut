@@ -38,21 +38,7 @@ public class HelloActivity extends Activity {
 				.replace(android.R.id.content, new OAuthFragment())
 				.commit();
 		} else {
-			getActionBar().hide();
-			ImageView imageView = new ImageView(this);
-			ImageLoader imageLoader = app.getImageLoader();
-			// todo 测试图片，过后换个好看的:-)
-			imageLoader.get("https://www.google.com.hk/images/srpr/logo11w.png",
-				ImageLoader.getImageListener(imageView,
-					R.drawable.ic_launcher, R.drawable.ic_launcher));
-			setContentView(imageView);
-
-			new Handler().postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					startActivity(new Intent(HelloActivity.this, MainActivity.class));
-				}
-			}, DEFAULT_SPLASH_TIME_MILLS);
+			startActivity(new Intent(HelloActivity.this, MainActivity.class));
 		}
 	}
 }
