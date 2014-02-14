@@ -31,7 +31,7 @@ android {
 
 	sourceSets {
 		defaultConfig {
-			testPackageName 'tingting.chen.tests'
+			testPackageName 'org.catnut.tests'
 		}
 
 		main {

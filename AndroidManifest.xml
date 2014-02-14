@@ -5,7 +5,7 @@
   ~ The software shall be used for good, not evil.
   -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="tingting.chen"
+	package="org.catnut"
 	android:versionCode="0"
 	android:versionName="@string/version_name">
 
@@ -20,7 +20,7 @@
 		android:label="@string/app_name"
 		android:icon="@drawable/ic_launcher"
 		android:theme="@style/AppTheme.Light"
-		android:name=".tingting.TingtingApp">
+		android:name=".core.CatnutApp">
 		<activity
 			android:name=".ui.HelloActivity"
 			android:noHistory="true">
@@ -32,7 +32,7 @@
 		<activity android:name=".ui.MainActivity" />
 
 		<provider
-			android:authorities="tingting.chen"
-			android:name=".tingting.TingtingProvider" />
+			android:authorities="org.catnut"
+			android:name=".core.CatnutProvider" />
 	</application>
 </manifest>
