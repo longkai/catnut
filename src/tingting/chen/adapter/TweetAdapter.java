@@ -140,14 +140,8 @@ public class TweetAdapter extends CursorAdapter {
 		holder.favoriteCountIndex = cursor.getColumnIndex(Status.attitudes_count);
 		holder.source = (TextView) view.findViewById(R.id.source);
 		holder.sourceIndex = cursor.getColumnIndex(Status.source);
-		// 用户偏好设置，是否显示缩略图
-		if (mThumbsRequired) {
-			holder.thumbsIndex = cursor.getColumnIndex(Status.thumbnail_pic);
-			ViewStub stub = (ViewStub) view.findViewById(R.id.view_stub);
-			if (!TextUtils.isEmpty(cursor.getString(holder.thumbsIndex))) {
-				holder.thumbs = (ImageView) stub.inflate();
-			}
-		}
+		holder.thumbsIndex = cursor.getColumnIndex(Status.thumbnail_pic);
+		holder.thumbs = (ImageView) view.findViewById(R.id.thumbs);
 		view.setTag(holder);
 		return view;
 	}
@@ -185,13 +179,19 @@ public class TweetAdapter extends CursorAdapter {
 		// remove html tags, maybe we should do this after we load the data from cloud...
 		holder.source.setText(Html.fromHtml(source).toString());
 		// 是否需要缩略图，用户偏好
+		boolean show = false;
 		if (mThumbsRequired) {
 			String thumbsUri = cursor.getString(holder.thumbsIndex);
-			if (holder.thumbs != null && !TextUtils.isEmpty(thumbsUri)) {
+			if (!TextUtils.isEmpty(thumbsUri)) {
 				mImageLoader.get(thumbsUri,
 					ImageLoader.getImageListener(holder.thumbs, R.drawable.error, R.drawable.error),
 					holder.thumbs.getMaxWidth(), holder.thumbs.getMaxHeight());
+				holder.thumbs.setVisibility(View.VISIBLE);
+				show = true;
 			}
+		}
+		if (!show) {
+			holder.thumbs.setVisibility(View.GONE);
 		}
 		// 表情处理
 		holder.text.setText(mImageSpan.getImageSpan(holder.text.getText()));
