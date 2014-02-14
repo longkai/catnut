@@ -36,14 +36,19 @@ public class FriendsFragment extends UsersFragment {
 		User.profile_image_url,
 		User.verified,
 		User.location,
-		User.description
+		User.description,
+		User.following,
+		User.follow_me
 	};
 
 	private long mUid;
+	/** 是加载关注好友呢，还是关注me的人咧 */
+	private boolean mIsFollowing;
 
-	public static FriendsFragment getInstance(long uid) {
+	public static FriendsFragment getInstance(long uid, boolean isFollowing) {
 		Bundle args = new Bundle();
 		args.putLong(Constants.ID, uid);
+		args.putBoolean(TAG, isFollowing); // 这里，随便上一个string的key了，懒得定义Orz
 		FriendsFragment fragment = new FriendsFragment();
 		fragment.setArguments(args);
 		return fragment;
@@ -54,7 +59,8 @@ public class FriendsFragment extends UsersFragment {
 		int size = super.getDefaultFetchSize();
 		mRequestQueue.add(new TingtingRequest(
 			mActivity,
-			FriendshipsAPI.friends(mUid, size, cursor, 1),
+			mIsFollowing ? FriendshipsAPI.friends(mUid, size, cursor, 1)
+				: FriendshipsAPI.followers(mUid, size, cursor, 1),
 			new UserProcessor.UsersProcessor(),
 			successListener,
 			errorListener
@@ -64,14 +70,18 @@ public class FriendsFragment extends UsersFragment {
 	@Override
 	public void onStart() {
 		super.onStart();
-		mActivity.getActionBar().setTitle(R.string.my_followings_title);
+		mActivity.getActionBar().setTitle(
+			getString(mIsFollowing ? R.string.my_followings_title : R.string.follow_me_title)
+		);
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mAdapter = new UsersAdapter(mActivity);
-		mUid = getArguments().getLong(Constants.ID, 0L);
+		Bundle args = getArguments();
+		mUid = args.getLong(Constants.ID, 0L);
+		mIsFollowing = args.getBoolean(TAG, false);
 	}
 
 	@Override
@@ -91,7 +101,9 @@ public class FriendsFragment extends UsersFragment {
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		String limit = String.valueOf(getDefaultFetchSize() * (mCurPage + 1));
-		StringBuilder where = new StringBuilder(User.following + "=1");
+		StringBuilder where = new StringBuilder(
+			mIsFollowing ? User.following : User.follow_me
+		).append("=1");
 		if (!TextUtils.isEmpty(mCurFilter) && mCurFilter.trim().length() != 0) {
 			limit = null;
 			where

@@ -49,12 +49,16 @@ public class UsersAdapter extends CursorAdapter {
 		int descriptionIndex;
 		ImageView verified;
 		int verifiedIndex;
+
+		ImageView toggleFollowing;
+		int followingIndex;
+		int follow_meIndex;
 	}
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 		ViewHolder holder = new ViewHolder();
-		View view = LayoutInflater.from(context).inflate(R.layout.following_row, parent, false);
+		View view = LayoutInflater.from(context).inflate(R.layout.friend_row , parent, false);
 		holder.avatar = (ImageView) view.findViewById(R.id.avatar);
 		holder.avatarIndex = cursor.getColumnIndex(User.profile_image_url);
 		holder.nick = (TextView) view.findViewById(R.id.nick);
@@ -65,7 +69,9 @@ public class UsersAdapter extends CursorAdapter {
 		holder.descriptionIndex = cursor.getColumnIndex(User.description);
 		holder.verified = (ImageView) view.findViewById(R.id.verified);
 		holder.verifiedIndex = cursor.getColumnIndex(User.verified);
-
+		holder.toggleFollowing = (ImageView) view.findViewById(R.id.toggle_following);
+		holder.followingIndex = cursor.getColumnIndex(User.following);
+		holder.follow_meIndex = cursor.getColumnIndex(User.follow_me);
 		view.setTag(holder);
 		return view;
 	}
@@ -90,6 +96,12 @@ public class UsersAdapter extends CursorAdapter {
 			TingtingUtils.removeLinkUnderline(holder.description);
 		} else {
 			holder.description.setText(context.getText(R.string.no_description));
+		}
+
+		if (cursor.getInt(holder.followingIndex) == 1) {
+			holder.toggleFollowing.setImageResource(R.drawable.btn_inline_following);
+		} else {
+			holder.toggleFollowing.setImageResource(R.drawable.btn_inline_follow);
 		}
 	}
 

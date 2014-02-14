@@ -40,7 +40,7 @@
 	<string name="tweets_count_per_fetch_summary">每次刷新需要加载多少条微博咧*_*</string>
 	<string name="load_more_from_cloud">联网加载更多微博</string>
 	<string name="load_more_from_cloud_summary">若不勾选则加载本地缓存的微博，但是数据可能不是最新的，建议在wifi下开启</string>
-	<string name="auto_fetch_on_start">启动时刷新</string>
+	<string name="auto_fetch_on_start">保持最新状态</string>
 	<string name="auto_fetch_on_start_summary">启动应用时自动去抓取最新的 主页时间线 微博并缓存到本地</string>
 	<string name="general_settings">基本设置</string>
 	<string name="source_code">源代码</string>
@@ -58,6 +58,7 @@
 	<string name="adjust_font_size_summary">调整微博字体的大小</string>
 	<string name="my_followings_title">我的关注</string>
 	<string name="no_more_friends">没有更多好友啦！</string>
+	<string name="follow_me_title">关注我的</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>关注</item>

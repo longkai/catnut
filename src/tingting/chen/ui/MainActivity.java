@@ -181,10 +181,16 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 							flipCard(fragment, null);
 						}
 					});
+					flowerCount.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							changeMyFollowersFragment();
+						}
+					});
 					flowingCount.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							changeMyFriendsFragment();
+							changeMyFollowingFragment();
 						}
 					});
 					TingtingUtils.setText(tweetsCount, android.R.id.text1, cursor.getString(cursor.getColumnIndex(User.statuses_count)));
@@ -270,12 +276,21 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		);
 	}
 
-	private void changeMyFriendsFragment() {
-		Fragment usersFragment = getFragmentManager().findFragmentByTag(FriendsFragment.TAG);
+	private void changeMyFollowingFragment() {
+		Fragment usersFragment = getFragmentManager().findFragmentByTag("following");
 		if (usersFragment == null || !usersFragment.isVisible()) {
 			mShouldPopupLastTile = false;
 			mDrawerLayout.closeDrawer(mDrawer);
-			flipCard(FriendsFragment.getInstance(mApp.getAccessToken().uid), FriendsFragment.TAG);
+			flipCard(FriendsFragment.getInstance(mApp.getAccessToken().uid, true), "following");
+		}
+	}
+
+	private void changeMyFollowersFragment() {
+		Fragment usersFragment = getFragmentManager().findFragmentByTag("follower");
+		if (usersFragment == null || !usersFragment.isVisible()) {
+			mShouldPopupLastTile = false;
+			mDrawerLayout.closeDrawer(mDrawer);
+			flipCard(FriendsFragment.getInstance(mApp.getAccessToken().uid, false), "follower");
 		}
 	}
 
@@ -391,7 +406,10 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				startActivity(intent);
 				break;
 			case R.id.action_my_followings:
-				changeMyFriendsFragment();
+				changeMyFollowingFragment();
+				break;
+			case R.id.action_my_followers:
+				changeMyFollowersFragment();
 				break;
 			default:
 				Toast.makeText(MainActivity.this, position + " click! not yet implement for now:-(", Toast.LENGTH_SHORT).show();
