@@ -108,7 +108,8 @@ public class TingtingProvider extends ContentProvider {
 				cursor = db.query(User.TABLE, projection, queryWithId(uri), selectionArgs, null, null, null);
 				break;
 			case USERS:
-				cursor = db.query(User.TABLE, projection, selection, selectionArgs, null, null, sortOrder);
+				cursor = db.rawQuery(selection, selectionArgs);
+//				cursor = db.query(User.TABLE, projection, selection, selectionArgs, null, null, sortOrder);
 				break;
 			case STATUS:
 				cursor = db.query(Status.TABLE, projection, queryWithId(uri), selectionArgs, null, null, null);

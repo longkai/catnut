@@ -33,6 +33,7 @@ import tingting.chen.adapter.TweetAdapter;
 import tingting.chen.fragment.HomeTimelineFragment;
 import tingting.chen.fragment.PrefFragment;
 import tingting.chen.fragment.UserTimeLineFragment;
+import tingting.chen.fragment.UsersFragment;
 import tingting.chen.metadata.Status;
 import tingting.chen.metadata.User;
 import tingting.chen.support.TweetImageSpan;
@@ -181,6 +182,17 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 							mShouldPopupLastTile = false;
 							mDrawerLayout.closeDrawer(mDrawer);
 							flipCard(fragment, null);
+						}
+					});
+					flowingCount.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							Fragment usersFragment = getFragmentManager().findFragmentByTag("users");
+							if (usersFragment == null || !usersFragment.isVisible()) {
+								mShouldPopupLastTile = false;
+								mDrawerLayout.closeDrawer(mDrawer);
+								flipCard(new UsersFragment(), "users");
+							}
 						}
 					});
 					TingtingUtils.setText(tweetsCount, android.R.id.text1, cursor.getString(cursor.getColumnIndex(User.statuses_count)));
@@ -376,6 +388,10 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			case R.id.action_view_source_code:
 				intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.github_link)));
 				startActivity(intent);
+				break;
+			case R.id.action_my_followings:
+				mShouldPopupLastTile = false;
+				flipCard(new UsersFragment(), null);
 				break;
 			default:
 				Toast.makeText(MainActivity.this, position + " click! not yet implement for now:-(", Toast.LENGTH_SHORT).show();

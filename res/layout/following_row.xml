@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:padding="@dimen/medium"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<ImageView
+		android:id="@+id/avatar"
+		android:layout_marginRight="@dimen/medium"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+
+	<TextView
+		android:id="@id/nick"
+		android:singleLine="true"
+		android:ellipsize="end"
+		android:layout_toRightOf="@id/avatar"
+		android:layout_marginRight="@dimen/small"
+		android:textStyle="bold"
+		android:text="@string/app_name"
+		android:textColor="@android:color/primary_text_light"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+
+	<!--<ViewStub
+		android:id="@id/view_stub"
+		android:layout_toRightOf="@id/nick"
+		android:layout="@layout/verify_icon"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />-->
+	<ImageView
+		android:id="@+id/verified"
+		android:visibility="gone"
+		android:layout_alignTop="@id/nick"
+		android:layout_alignBottom="@id/nick"
+		android:layout_toRightOf="@id/nick"
+		android:src="@drawable/ic_verified"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+
+	<!-- 地址 -->
+	<TextView
+		android:id="@+id/location"
+		android:layout_below="@id/nick"
+		android:layout_alignLeft="@id/nick"
+		android:textColor="@android:color/darker_gray"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+
+	<ImageView
+		android:layout_alignParentRight="true"
+		android:src="@drawable/btn_inline_following"
+		android:layout_alignTop="@id/nick"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+
+	<!-- description -->
+	<TextView
+		android:id="@id/description"
+		android:textColor="@android:color/secondary_text_light"
+		android:layout_alignLeft="@id/nick"
+		android:layout_below="@id/location"
+		android:textColorLink="@android:color/holo_blue_dark"
+		android:layout_marginTop="@dimen/small"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+</RelativeLayout>

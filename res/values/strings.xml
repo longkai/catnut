@@ -5,7 +5,7 @@
   ~ The software shall be used for good, not evil.
   -->
 <resources>
-	<string name="app_name">婷婷</string>
+	<string name="app_name">爱猫的坚果</string>
 	<string name="oauth">授权</string>
 	<string name="refresh">刷新</string>
 	<string name="alert_error">出错啦！</string>
@@ -56,6 +56,7 @@
 	<string name="change_font_summary">默认的字体不合适？换一个心情吧*_*</string>
 	<string name="font_size">字体大小</string>
 	<string name="adjust_font_size_summary">调整微博字体的大小</string>
+	<string name="my_followings_title">我的关注</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>关注</item>
