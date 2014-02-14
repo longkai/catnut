@@ -20,6 +20,7 @@
 		<item name="android:actionBarTabBarStyle">@style/ActionBar_Light_TabBarStyle</item>
 		<item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
 		<item name="android:buttonStyle">@style/RobotoButtonStyle</item>
+		<item name="android:webTextViewStyle">@style/RobotoWebViewStyle</item>
 	</style>
 
 	<style name="AppTheme.Dark" parent="android:Theme.Holo">
@@ -60,6 +61,10 @@
 	</style>
 
 	<style name="RobotoButtonStyle" parent="android:Widget.Holo.Button">
+		<item name="android:fontFamily">sans-serif-light</item>
+	</style>
+
+	<style name="RobotoWebViewStyle" parent="android:Widget.Holo.Light.WebTextView">
 		<item name="android:fontFamily">sans-serif-light</item>
 	</style>
 

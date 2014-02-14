@@ -14,10 +14,15 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
+import android.util.Log;
+import android.webkit.WebView;
 import android.widget.Toast;
 import tingting.chen.R;
 import tingting.chen.tingting.TingtingApp;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
 /**
@@ -70,8 +75,28 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 			} else if (key.equals(ABOUT)) {
 				intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.commit_link)));
 			} else if (key.equals(OPEN_SOURCE_LICENSE)) {
-				// todo: set open source license!
-				intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://opensource.org/licenses/mit-license.php"));
+				InputStream inputStream = null;
+				try {
+					inputStream = getActivity().getAssets().open("license.html");
+					Scanner in = new Scanner(inputStream).useDelimiter("\\A");
+					WebView html = new WebView(getActivity());
+					html.loadDataWithBaseURL(null, in.next(), "text/html", "utf-8", null);
+					new AlertDialog.Builder(getActivity())
+						.setTitle("Open Source Licenses")
+						.setView(html)
+						.setNeutralButton(android.R.string.ok, null)
+						.show();
+				} catch (IOException e) {
+					Log.e("preference fragment", "error open license file from assets!", e);
+				} finally {
+					if (inputStream != null) {
+						try {
+							inputStream.close();
+						} catch (IOException e) {
+							Log.wtf("preference fragment", "error closing input stream!", e);
+						}
+					}
+				}
 			} else if (key.equals(CUSTOMIZE_TWEET_FONT)) {
 				new AlertDialog.Builder(getActivity())
 					.setMessage(getString(R.string.customized_font_message))
