@@ -97,7 +97,8 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 	private ImageView mProfileCover;
 	private TextView mTextNick;
 	private TextView mDescription;
-	private ViewStub mLatestTweet;
+	private View mTweetLayout;
+//	private ViewStub mLatestTweet;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -127,7 +128,8 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			mProfileCover = (ImageView) findViewById(R.id.avatar_profile);
 			mTextNick = (TextView) findViewById(R.id.nick);
 			mDescription = (TextView) findViewById(R.id.description);
-			mLatestTweet = (ViewStub) findViewById(R.id.latest_tweet);
+			mTweetLayout = findViewById(R.id.tweet_layout);
+//			mLatestTweet = (ViewStub) findViewById(R.id.latest_tweet);
 
 			mActionBar = getActionBar();
 			prepareActionBar();
@@ -184,13 +186,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					tweetsCount.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							UserTimeLineFragment fragment = new UserTimeLineFragment();
-							Bundle args = new Bundle();
-							args.putLong(Constants.ID, mApp.getAccessToken().uid);
-							fragment.setArguments(args);
-							mShouldPopupLastTile = false;
-							mDrawerLayout.closeDrawer(mDrawer);
-							flipCard(fragment, null);
+							viewMyTweets();
 						}
 					});
 					flowerCount.setOnClickListener(new View.OnClickListener() {
@@ -250,7 +246,8 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			@Override
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 				if (cursor != null && cursor.moveToNext()) {
-					View tweet = mLatestTweet.inflate();
+					ViewStub viewStub = (ViewStub) mTweetLayout.findViewById(R.id.latest_tweet);
+					View tweet = viewStub.inflate();
 					String tweetText = cursor.getString(cursor.getColumnIndex(Status.columnText));
 					TweetTextView text = (TweetTextView) CatnutUtils.setText(tweet, R.id.text, new TweetImageSpan(MainActivity.this).getImageSpan(tweetText));
 					// 不处理链接，直接跳转到自己所有的微博
@@ -270,6 +267,12 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					String create_at = cursor.getString(cursor.getColumnIndex(Status.created_at));
 					CatnutUtils.setText(tweet, R.id.create_at, DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(create_at)));
 					CatnutUtils.setText(tweet, R.id.nick, "@" + mActionBar.getTitle()).setTextColor(R.color.actionbar_background);
+					mTweetLayout.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							viewMyTweets();
+						}
+					});
 					cursor.close();
 				}
 			}
@@ -284,21 +287,37 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		);
 	}
 
+	private void viewMyTweets() {
+		String tag = "my_tweets";
+		Fragment f = getFragmentManager().findFragmentByTag(tag);
+		if (f == null || !f.isVisible()) {
+			UserTimeLineFragment fragment = new UserTimeLineFragment();
+			Bundle args = new Bundle();
+			args.putLong(Constants.ID, mApp.getAccessToken().uid);
+			fragment.setArguments(args);
+			mShouldPopupLastTile = false;
+			mDrawerLayout.closeDrawer(mDrawer);
+			flipCard(fragment, tag);
+		}
+	}
+
 	private void changeMyFollowingFragment() {
-		Fragment usersFragment = getFragmentManager().findFragmentByTag("following");
+		String tag = "following";
+		Fragment usersFragment = getFragmentManager().findFragmentByTag(tag);
 		if (usersFragment == null || !usersFragment.isVisible()) {
 			mShouldPopupLastTile = false;
 			mDrawerLayout.closeDrawer(mDrawer);
-			flipCard(FriendsFragment.getInstance(mApp.getAccessToken().uid, true), "following");
+			flipCard(FriendsFragment.getInstance(mApp.getAccessToken().uid, true), tag);
 		}
 	}
 
 	private void changeMyFollowersFragment() {
-		Fragment usersFragment = getFragmentManager().findFragmentByTag("follower");
+		String tag = "follower";
+		Fragment usersFragment = getFragmentManager().findFragmentByTag(tag);
 		if (usersFragment == null || !usersFragment.isVisible()) {
 			mShouldPopupLastTile = false;
 			mDrawerLayout.closeDrawer(mDrawer);
-			flipCard(FriendsFragment.getInstance(mApp.getAccessToken().uid, false), "follower");
+			flipCard(FriendsFragment.getInstance(mApp.getAccessToken().uid, false), tag);
 		}
 	}
 

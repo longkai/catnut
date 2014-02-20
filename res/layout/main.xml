@@ -84,7 +84,10 @@
 
 		<!-- 显示最新的一条微博，防止下面list的布局错乱，故加frame layout -->
 		<FrameLayout
-			android:id="@id/dummy"
+			android:id="@id/tweet_layout"
+			android:clickable="true"
+			android:focusable="true"
+			android:background="?android:attr/selectableItemBackground"
 			android:layout_below="@id/statics"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content">
@@ -92,7 +95,6 @@
 			<ViewStub
 				android:id="@+id/latest_tweet"
 				android:layout="@layout/tweet"
-				android:inflatedId="@id/tweet_layout"
 				android:padding="@null"
 				android:layout_below="@id/statics"
 				android:layout_width="match_parent"
@@ -101,7 +103,7 @@
 
 		<ListView
 			android:id="@android:id/list"
-			android:layout_below="@id/dummy"
+			android:layout_below="@id/tweet_layout"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content" />
 	</RelativeLayout>
