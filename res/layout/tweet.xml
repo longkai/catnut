@@ -71,7 +71,7 @@
 			android:id="@+id/thumbs"
 			android:clickable="true"
 			android:focusable="true"
-			android:background="@drawable/item_background_holo_light"
+			android:background="@drawable/actionbar_item_background_light"
 			android:visibility="gone"
 			android:layout_marginTop="@dimen/small"
 			android:layout_width="wrap_content"
