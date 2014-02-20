@@ -19,9 +19,8 @@ import com.android.volley.toolbox.ImageLoader;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.metadata.User;
+import org.catnut.support.TweetTextView;
 import org.catnut.util.CatnutUtils;
-
-import java.util.regex.Matcher;
 
 /**
  * 用户列表
@@ -92,7 +91,7 @@ public class UsersAdapter extends CursorAdapter {
 		String desc = cursor.getString(holder.descriptionIndex);
 		if (!TextUtils.isEmpty(desc)) {
 			holder.description.setText(desc);
-			Linkify.addLinks(holder.description, TweetAdapter.WEB_URL, null, null, urlFilter);
+			Linkify.addLinks(holder.description, TweetTextView.WEB_URL, null, null, TweetTextView.URL_FILTER);
 			CatnutUtils.removeLinkUnderline(holder.description);
 		} else {
 			holder.description.setText(context.getText(R.string.no_description));
@@ -104,11 +103,4 @@ public class UsersAdapter extends CursorAdapter {
 			holder.toggleFollowing.setImageResource(R.drawable.btn_inline_follow);
 		}
 	}
-
-	private Linkify.TransformFilter urlFilter = new Linkify.TransformFilter() {
-		@Override
-		public String transformUrl(Matcher match, String url) {
-			return url;
-		}
-	};
 }

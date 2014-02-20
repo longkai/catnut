@@ -5,7 +5,11 @@
  */
 package org.catnut.ui;
 
-import android.app.*;
+import android.app.ActionBar;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.AsyncQueryHandler;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,13 +26,20 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.util.Linkify;
-import android.view.*;
-import android.widget.*;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewStub;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import org.catnut.R;
 import org.catnut.adapter.DrawerNavAdapter;
-import org.catnut.adapter.TweetAdapter;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
 import org.catnut.fragment.FriendsFragment;
@@ -243,9 +254,9 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					String tweetText = cursor.getString(cursor.getColumnIndex(Status.columnText));
 					TweetTextView text = (TweetTextView) CatnutUtils.setText(tweet, R.id.text, new TweetImageSpan(MainActivity.this).getImageSpan(tweetText));
 					// 不处理链接，直接跳转到自己所有的微博
-					Linkify.addLinks(text, TweetAdapter.MENTION_PATTERN, null, null, null);
-					Linkify.addLinks(text, TweetAdapter.TOPIC_PATTERN, null, null, null);
-					Linkify.addLinks(text, TweetAdapter.WEB_URL, null, null, null);
+//					Linkify.addLinks(text, TweetTextView.MENTION_PATTERN, null, null, null);
+//					Linkify.addLinks(text, TweetTextView.TOPIC_PATTERN, null, null, null);
+					Linkify.addLinks(text, TweetTextView.WEB_URL, null, null, null);
 					CatnutUtils.removeLinkUnderline(text);
 
 					int replyCount = cursor.getInt(cursor.getColumnIndex(Status.comments_count));

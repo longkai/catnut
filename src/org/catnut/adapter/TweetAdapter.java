@@ -32,8 +32,15 @@ import org.catnut.util.CatnutUtils;
 import org.catnut.util.DateTime;
 
 import java.io.File;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static org.catnut.support.TweetTextView.MENTION_FILTER;
+import static org.catnut.support.TweetTextView.MENTION_PATTERN;
+import static org.catnut.support.TweetTextView.MENTION_SCHEME;
+import static org.catnut.support.TweetTextView.TOPIC_FILTER;
+import static org.catnut.support.TweetTextView.TOPIC_PATTERN;
+import static org.catnut.support.TweetTextView.TOPIC_SCHEME;
+import static org.catnut.support.TweetTextView.URL_FILTER;
+import static org.catnut.support.TweetTextView.WEB_URL;
 
 /**
  * 微博列表适配器
@@ -43,16 +50,6 @@ import java.util.regex.Pattern;
 public class TweetAdapter extends CursorAdapter {
 
 	private static final String TAG = "TweetAdapter";
-
-	/** 微博中 @xx 正则 */
-	public static final Pattern MENTION_PATTERN = Pattern.compile("@[\\u4e00-\\u9fa5a-zA-Z0-9_-]+");
-	/** 微博中 #xx# 正则 */
-	public static final Pattern TOPIC_PATTERN = Pattern.compile("#[^#]+#");
-	/** 微博链接，不包含中文 */
-	public static final Pattern WEB_URL = Pattern.compile("(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
-
-	public static final String TOPIC_SCHEME = "http://huati.weibo.com/k/";
-	public static final String MENTION_SCHEME = "http://weibo.com/n/";
 
 	private Context mContext;
 	private ImageLoader mImageLoader;
@@ -189,31 +186,9 @@ public class TweetAdapter extends CursorAdapter {
 		holder.text.setText(mImageSpan.getImageSpan(holder.text.getText()));
 		// 分别对微博的链接，@，##话题过滤
 		// todo：对@，## 进行处理
-		Linkify.addLinks(holder.text, MENTION_PATTERN, MENTION_SCHEME, null, mentionFilter);
-		Linkify.addLinks(holder.text, TOPIC_PATTERN, TOPIC_SCHEME, null, topicFilter);
-		Linkify.addLinks(holder.text, WEB_URL, null, null, urlFilter);
+		Linkify.addLinks(holder.text, MENTION_PATTERN, MENTION_SCHEME, null, MENTION_FILTER);
+		Linkify.addLinks(holder.text, TOPIC_PATTERN, TOPIC_SCHEME, null, TOPIC_FILTER);
+		Linkify.addLinks(holder.text, WEB_URL, null, null, URL_FILTER);
 		CatnutUtils.removeLinkUnderline(holder.text);
 	}
-
-
-	private Linkify.TransformFilter mentionFilter = new Linkify.TransformFilter() {
-		@Override
-		public String transformUrl(Matcher match, String url) {
-			return url.substring(1);
-		}
-	};
-
-	private Linkify.TransformFilter topicFilter = new Linkify.TransformFilter() {
-		@Override
-		public String transformUrl(Matcher match, String url) {
-			return url.substring(1, url.length() - 1);
-		}
-	};
-
-	private Linkify.TransformFilter urlFilter = new Linkify.TransformFilter() {
-		@Override
-		public String transformUrl(Matcher match, String url) {
-			return url;
-		}
-	};
 }

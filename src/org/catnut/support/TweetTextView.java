@@ -11,9 +11,13 @@ import android.text.Selection;
 import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.ClickableSpan;
+import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.TextView;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 自定义的微博文本view，目的是为了在{@link android.widget.ListView}中点击微博的时候能够传递到整个层级视图
@@ -23,6 +27,37 @@ import android.widget.TextView;
  * @author longkai
  */
 public class TweetTextView extends TextView {
+
+	public static final String TOPIC_SCHEME = "http://huati.weibo.com/k/";
+	public static final String MENTION_SCHEME = "http://weibo.com/n/";
+
+	/** 微博中 @xx 正则 */
+	public static final Pattern MENTION_PATTERN = Pattern.compile("@[\\u4e00-\\u9fa5a-zA-Z0-9_-]+");
+	/** 微博中 #xx# 正则 */
+	public static final Pattern TOPIC_PATTERN = Pattern.compile("#[^#]+#");
+	/** 微博链接，不包含中文 */
+	public static final Pattern WEB_URL = Pattern.compile("(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
+
+	public static final Linkify.TransformFilter MENTION_FILTER = new Linkify.TransformFilter() {
+		@Override
+		public String transformUrl(Matcher match, String url) {
+			return url.substring(1);
+		}
+	};
+
+	public static final Linkify.TransformFilter TOPIC_FILTER = new Linkify.TransformFilter() {
+		@Override
+		public String transformUrl(Matcher match, String url) {
+			return url.substring(1, url.length() - 1);
+		}
+	};
+
+	public static final Linkify.TransformFilter URL_FILTER = new Linkify.TransformFilter() {
+		@Override
+		public String transformUrl(Matcher match, String url) {
+			return url;
+		}
+	};
 
 	public TweetTextView(Context context, AttributeSet attrs) {
 		super(context, attrs);
