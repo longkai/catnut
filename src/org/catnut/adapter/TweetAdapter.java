@@ -27,14 +27,11 @@ import org.catnut.fragment.PrefFragment;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.support.TweetImageSpan;
+import org.catnut.support.TweetTextView;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.DateTime;
 
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -99,7 +96,7 @@ public class TweetAdapter extends CursorAdapter {
 		int create_atIndex;
 		TextView nick;
 		int nickIndex;
-		TextView text;
+		TweetTextView text;
 		int textIndex;
 		TextView replyCount;
 		int replyCountIndex;
@@ -126,7 +123,7 @@ public class TweetAdapter extends CursorAdapter {
 			holder.avatarIndex = cursor.getColumnIndex(User.profile_image_url);
 		}
 		// 微博相关
-		holder.text = (TextView) view.findViewById(R.id.text);
+		holder.text = (TweetTextView) view.findViewById(R.id.text);
 		holder.textIndex = cursor.getColumnIndex(Status.columnText);
 		holder.create_at = (TextView) view.findViewById(R.id.create_at);
 		holder.create_atIndex = cursor.getColumnIndex(Status.created_at);

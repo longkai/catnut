@@ -16,11 +16,11 @@ import org.catnut.R;
 import org.catnut.adapter.TweetAdapter;
 import org.catnut.api.TweetAPI;
 import org.catnut.core.CatnutAPI;
+import org.catnut.core.CatnutProvider;
+import org.catnut.core.CatnutRequest;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.processor.StatusProcessor;
-import org.catnut.core.CatnutProvider;
-import org.catnut.core.CatnutRequest;
 import org.catnut.util.CatnutUtils;
 
 /**

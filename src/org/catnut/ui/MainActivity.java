@@ -38,6 +38,7 @@ import org.catnut.fragment.UserTimeLineFragment;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.support.TweetImageSpan;
+import org.catnut.support.TweetTextView;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
@@ -240,7 +241,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				if (cursor != null && cursor.moveToNext()) {
 					View tweet = mLatestTweet.inflate();
 					String tweetText = cursor.getString(cursor.getColumnIndex(Status.columnText));
-					TextView text = CatnutUtils.setText(tweet, R.id.text, new TweetImageSpan(MainActivity.this).getImageSpan(tweetText));
+					TweetTextView text = (TweetTextView) CatnutUtils.setText(tweet, R.id.text, new TweetImageSpan(MainActivity.this).getImageSpan(tweetText));
 					// 不处理链接，直接跳转到自己所有的微博
 					Linkify.addLinks(text, TweetAdapter.MENTION_PATTERN, null, null, null);
 					Linkify.addLinks(text, TweetAdapter.TOPIC_PATTERN, null, null, null);
