@@ -38,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
+import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
 import org.catnut.adapter.DrawerNavAdapter;
 import org.catnut.core.CatnutApp;
@@ -141,6 +142,18 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				.commit();
 			getFragmentManager().addOnBackStackChangedListener(this);
 		}
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		EasyTracker.getInstance(this).activityStart(this);
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		EasyTracker.getInstance(this).activityStop(this);
 	}
 
 	/**

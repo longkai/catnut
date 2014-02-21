@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+	tools:ignore="TypographyDashes">
+	<!--Replace placeholder ID with your tracking ID-->
+	<string name="ga_trackingId">UA-48299322-1</string>
+
+	<!--Enable automatic activity tracking-->
+	<bool name="ga_autoActivityTracking">true</bool>
+
+	<!--Enable automatic exception tracking-->
+	<bool name="ga_reportUncaughtExceptions">true</bool>
+</resources>
