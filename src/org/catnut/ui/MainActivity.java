@@ -86,6 +86,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 	private Handler mHandler = new Handler();
 
 	private CatnutApp mApp;
+	private EasyTracker mTracker;
 	private ImageLoader mImageLoader;
 	private ActionBar mActionBar;
 
@@ -141,19 +142,27 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				.replace(R.id.fragment_container, new HomeTimelineFragment())
 				.commit();
 			getFragmentManager().addOnBackStackChangedListener(this);
+
+			if (mApp.getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
+				mTracker = EasyTracker.getInstance(this);
+			}
 		}
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		EasyTracker.getInstance(this).activityStart(this);
+		if (mTracker != null) {
+			mTracker.activityStart(this);
+		}
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-		EasyTracker.getInstance(this).activityStop(this);
+		if (mTracker != null) {
+			mTracker.activityStop(this);
+		}
 	}
 
 	/**

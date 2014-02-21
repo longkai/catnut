@@ -7,8 +7,11 @@ package org.catnut.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
 import org.catnut.core.CatnutApp;
 import org.catnut.fragment.OAuthFragment;
 
@@ -25,12 +28,17 @@ public class HelloActivity extends Activity {
 	/** 欢迎界面默认的播放时间 */
 	private static final long DEFAULT_SPLASH_TIME_MILLS = 3000L;
 
+	// only use for auth!
+	private EasyTracker mTracker;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		final CatnutApp app = CatnutApp.getTingtingApp();
 		// 根据是否已经授权，切换不同的界面
 		if (app.getAccessToken() == null) {
+			// 授权时，无所谓pref的设置了Orz
+			mTracker = EasyTracker.getInstance(this);
 			getFragmentManager().beginTransaction()
 				.replace(android.R.id.content, new OAuthFragment())
 				.commit();
@@ -42,12 +50,17 @@ public class HelloActivity extends Activity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		EasyTracker.getInstance(this).activityStart(this);
+		if (mTracker != null) {
+			mTracker.send(MapBuilder.createAppView().set(Fields.SCREEN_NAME, "auth").build());
+			mTracker.activityStart(this);
+		}
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-		EasyTracker.getInstance(this).activityStop(this);
+		if (mTracker != null) {
+			mTracker.activityStop(this);
+		}
 	}
 }

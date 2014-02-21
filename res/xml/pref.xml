@@ -52,6 +52,12 @@
 			android:title="@string/show_thumbs"
 			android:defaultValue="true"
 			android:summary="@string/show_thumbs_summary" />
+
+		<CheckBoxPreference
+			android:key="@string/pref_enable_analytics"
+			android:title="@string/enable_analytics"
+			android:defaultValue="true"
+			android:summary="@string/enable_analytics_summary" />
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/about">

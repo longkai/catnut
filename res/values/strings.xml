@@ -61,6 +61,8 @@
 	<string name="follow_me_title">关注我的</string>
 	<string name="notes">说明</string>
 	<string name="notes_summary">关于这个应用的一些事儿</string>
+	<string name="enable_analytics">匿名统计</string>
+	<string name="enable_analytics_summary">使用「Google Analytics」的匿名统计数据帮助作者改进「Catnut」</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>关注</item>
