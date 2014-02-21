@@ -33,6 +33,7 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
+import org.catnut.ui.ProfileActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
@@ -82,6 +83,14 @@ public class ProfileFragment extends Fragment {
 	private View mFollowersCount;
 	private View mTweetLayout;
 
+	private View.OnClickListener tweetsOnclickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			ProfileActivity activity = (ProfileActivity) getActivity();
+			activity.flipCard(UserTimeLineFragment.getFragment(mUid, mScreenName), null, true);
+		}
+	};
+
 	public static ProfileFragment getFragment(long uid, String screenName) {
 		Bundle args = new Bundle();
 		args.putLong(Constants.ID, uid);
@@ -110,6 +119,7 @@ public class ProfileFragment extends Fragment {
 		mFollowingsCount = view.findViewById(R.id.following_count);
 		mFollowersCount = view.findViewById(R.id.followers_count);
 		mTweetLayout = view.findViewById(R.id.tweet_layout);
+		view.findViewById(R.id.action_tweets).setOnClickListener(tweetsOnclickListener);
 		// 从本地抓取数据*_*
 		String query = CatnutUtils.buildQuery(PROJECTION,
 				User.screen_name + "=" + CatnutUtils.quote(mScreenName), User.TABLE, null, null, null);
@@ -139,6 +149,7 @@ public class ProfileFragment extends Fragment {
 						}
 					});
 					// 我的微博
+					mTweetsCount.setOnClickListener(tweetsOnclickListener);
 					CatnutUtils.setText(mTweetsCount, android.R.id.text1,
 							cursor.getString(cursor.getColumnIndex(User.statuses_count)));
 					CatnutUtils.setText(mTweetsCount, android.R.id.text2, getString(R.string.tweets));
@@ -181,10 +192,11 @@ public class ProfileFragment extends Fragment {
 			@Override
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 				if (cursor.moveToNext()) {
+					mTweetLayout.setOnClickListener(tweetsOnclickListener);
 					ViewStub viewStub = (ViewStub) mTweetLayout.findViewById(R.id.latest_tweet);
 					View tweet = viewStub.inflate();
 					CatnutUtils.setText(tweet, R.id.nick, getString(R.string.latest_statues))
-							.setTextColor(R.color.actionbar_background);
+							.setTextColor(getResources().getColor(R.color.actionbar_background));
 					String tweetText = cursor.getString(cursor.getColumnIndex(Status.columnText));
 					TweetTextView text = (TweetTextView) CatnutUtils.setText(tweet, R.id.text,
 							new TweetImageSpan(getActivity()).getImageSpan(tweetText));

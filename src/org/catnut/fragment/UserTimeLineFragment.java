@@ -49,6 +49,15 @@ public class UserTimeLineFragment extends TimelineFragment {
 	private String nick;
 	private boolean mIsCurAuthUser; // 是否当前授权用户
 
+	public static UserTimeLineFragment getFragment(long uid, String nick) {
+		Bundle args = new Bundle();
+		args.putLong(Constants.ID, uid);
+		args.putString(User.screen_name, nick);
+		UserTimeLineFragment fragment = new UserTimeLineFragment();
+		fragment.setArguments(args);
+		return fragment;
+	}
+
 	@Override
 	protected void fetchTweetsFromCloud(boolean isRefresh, long offset) {
 		int size = super.getDefaultFetchSize();
