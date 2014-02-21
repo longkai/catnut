@@ -64,6 +64,11 @@
 	<string name="enable_analytics">匿名统计</string>
 	<string name="enable_analytics_summary">使用「Google Analytics」的匿名统计数据帮助作者改进「Catnut」</string>
 	<string name="latest_statues">最新状态</string>
+	<string name="like">赞</string>
+	<string name="photos">照片</string>
+	<string name="his">Ta的</string>
+	<string name="user_not_found">该用户不存在！</string>
+	<string name="load_cover_fail">载入封面图片失败，使用默认图片Orz</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>微博</item>

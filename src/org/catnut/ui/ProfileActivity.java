@@ -38,7 +38,7 @@ public class ProfileActivity extends Activity {
 			long uid = getIntent().getLongExtra(Constants.ID, 0L);
 			getFragmentManager()
 					.beginTransaction()
-					.replace(android.R.id.content, ProfileFragment.getInstance(screenName, uid))
+					.replace(android.R.id.content, ProfileFragment.getFragment(uid, screenName))
 					.commit();
 			ActionBar bar = getActionBar();
 			bar.setDisplayShowHomeEnabled(false);

@@ -126,7 +126,8 @@ public class CatnutUtils {
 
 	/**
 	 * 设置某个view里面的textview的text
-	 * @param parent 父容器
+	 *
+	 * @param parent     父容器
 	 * @param textViewId textview的id
 	 * @param text
 	 * @return that textview
@@ -198,6 +199,13 @@ public class CatnutUtils {
 	}
 
 	/**
+	 * 给字符串首位加上单引号
+	 */
+	public static String quote(String string) {
+		return "'" + string + "'";
+	}
+
+	/**
 	 * 拼接投影sql
 	 *
 	 * @param projection
@@ -244,6 +252,7 @@ public class CatnutUtils {
 
 	/**
 	 * 当使用list pref时只能存储string array，so 这个方法你懂的
+	 *
 	 * @param pref
 	 * @param key
 	 * @param defaultValue

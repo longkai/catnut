@@ -13,6 +13,8 @@ package org.catnut.util;
  */
 public class Constants {
 
+	public static final String WEIBO_DOMAIN = "weibo.com/";
+	
 	public static final String ID = "id";
 
 	// for error dialog box

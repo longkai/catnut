@@ -228,7 +228,8 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 						User.description,
 						User.statuses_count,
 						User.followers_count,
-						User.friends_count
+						User.friends_count,
+						User.verified
 				},
 				null,
 				null,

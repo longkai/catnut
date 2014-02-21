@@ -16,12 +16,110 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent" />
 
-	<include
-		layout="@layout/profile"
+	<RelativeLayout
 		android:id="@id/drawer"
 		android:padding="@dimen/medium"
 		android:layout_gravity="start"
 		android:layout_width="300dp"
 		android:layout_height="match_parent"
-		android:background="@android:color/white" />
+		android:background="@android:color/white">
+
+		<ImageView
+			android:id="@id/avatar_profile"
+			android:layout_alignParentLeft="true"
+			android:layout_marginRight="@dimen/medium"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+
+		<TextView
+			android:id="@id/nick"
+			android:layout_toRightOf="@id/avatar_profile"
+			android:textAppearance="@android:style/TextAppearance.Large"
+			android:textColor="@color/actionbar_background"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+
+		<ImageView
+			android:id="@id/verified"
+			android:visibility="gone"
+			android:src="@drawable/ic_verified"
+			android:layout_toRightOf="@id/nick"
+			android:layout_alignTop="@id/nick"
+			android:layout_alignBottom="@id/nick"
+			android:layout_marginLeft="@dimen/small"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+
+		<ScrollView
+			android:layout_marginTop="@dimen/medium"
+			android:layout_alignLeft="@id/nick"
+			android:layout_alignBottom="@id/avatar_profile"
+			android:layout_below="@id/nick"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+			<TextView
+				android:id="@id/description"
+				android:textColor="@android:color/darker_gray"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
+		</ScrollView>
+
+		<LinearLayout
+			android:id="@id/statics"
+			android:layout_marginTop="@dimen/medium"
+			android:orientation="horizontal"
+			android:showDividers="middle"
+			android:divider="?android:dividerVertical"
+			android:layout_below="@id/avatar_profile"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+			<include
+				android:id="@id/tweets_count"
+				android:layout_weight="1"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				layout="@layout/two_line_text" />
+
+			<include
+				android:id="@id/following_count"
+				android:layout_weight="1"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				layout="@layout/two_line_text" />
+
+			<include
+				android:id="@id/followers_count"
+				android:layout_weight="1"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				layout="@layout/two_line_text" />
+		</LinearLayout>
+
+		<!-- 显示最新的一条微博，防止下面list的布局错乱，故加frame layout -->
+		<FrameLayout
+			android:id="@id/tweet_layout"
+			android:clickable="true"
+			android:focusable="true"
+			android:background="?android:attr/selectableItemBackground"
+			android:layout_below="@id/statics"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+			<ViewStub
+				android:id="@+id/latest_tweet"
+				android:layout="@layout/tweet"
+				android:padding="@null"
+				android:layout_below="@id/statics"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
+		</FrameLayout>
+
+		<ListView
+			android:id="@android:id/list"
+			android:layout_below="@id/tweet_layout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+	</RelativeLayout>
 </android.support.v4.widget.DrawerLayout>

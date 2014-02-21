@@ -5,98 +5,113 @@
   ~ Copyright (c) 2014 longkai
   ~ The software shall be used for good, not evil.
   -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@id/drawer"
-	android:padding="@dimen/medium"
-	android:layout_gravity="start"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:background="@android:color/white">
-
-	<ImageView
-		android:id="@id/avatar_profile"
-		android:layout_alignParentLeft="true"
-		android:layout_marginRight="@dimen/medium"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content" />
-
-	<TextView
-		android:id="@id/nick"
-		android:layout_toRightOf="@id/avatar_profile"
-		android:textAppearance="@android:style/TextAppearance.Large"
-		android:textColor="@color/actionbar_background"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content" />
-
-	<ScrollView
-		android:layout_marginTop="@dimen/medium"
-		android:layout_alignLeft="@id/nick"
-		android:layout_alignBottom="@id/avatar_profile"
-		android:layout_below="@id/nick"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
-
-		<TextView
-			android:id="@id/description"
-			android:textColor="@android:color/darker_gray"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" />
-	</ScrollView>
+	android:layout_height="match_parent">
 
 	<LinearLayout
-		android:id="@id/statics"
-		android:layout_marginTop="@dimen/medium"
-		android:orientation="horizontal"
-		android:showDividers="middle"
-		android:divider="?android:dividerVertical"
-		android:layout_below="@id/avatar_profile"
+		android:orientation="vertical"
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
+		android:layout_height="match_parent">
 
-		<include
-			android:id="@id/tweets_count"
-			android:layout_weight="1"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			layout="@layout/two_line_text" />
-
-		<include
-			android:id="@id/following_count"
-			android:layout_weight="1"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			layout="@layout/two_line_text" />
-
-		<include
-			android:id="@id/followers_count"
-			android:layout_weight="1"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			layout="@layout/two_line_text" />
-	</LinearLayout>
-
-	<!-- 显示最新的一条微博，防止下面list的布局错乱，故加frame layout -->
-	<FrameLayout
-		android:id="@id/tweet_layout"
-		android:clickable="true"
-		android:focusable="true"
-		android:background="?android:attr/selectableItemBackground"
-		android:layout_below="@id/statics"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
-
-		<ViewStub
-			android:id="@+id/latest_tweet"
-			android:layout="@layout/tweet"
-			android:padding="@null"
-			android:layout_below="@id/statics"
+		<LinearLayout
+			android:id="@+id/place_holder"
+			android:orientation="vertical"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content" />
-	</FrameLayout>
+			android:layout_height="180dp">
 
-	<ListView
-		android:id="@android:id/list"
-		android:layout_below="@id/tweet_layout"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content" />
-</RelativeLayout>
+			<android.support.v4.view.ViewPager
+				android:id="@id/pager"
+				android:layout_width="match_parent"
+				android:layout_weight="1"
+				android:layout_height="0dp" />
+
+			<com.viewpagerindicator.LinePageIndicator
+				android:id="@+id/indicator"
+				android:padding="@dimen/small"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
+		</LinearLayout>
+
+		<LinearLayout
+			android:id="@id/statics"
+			android:layout_marginTop="@dimen/medium"
+			android:orientation="horizontal"
+			android:showDividers="middle"
+			android:divider="?android:dividerVertical"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+			<include
+				android:id="@id/tweets_count"
+				android:layout_weight="1"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				layout="@layout/two_line_text" />
+
+			<include
+				android:id="@id/following_count"
+				android:layout_weight="1"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				layout="@layout/two_line_text" />
+
+			<include
+				android:id="@id/followers_count"
+				android:layout_weight="1"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				layout="@layout/two_line_text" />
+		</LinearLayout>
+
+		<FrameLayout
+			android:id="@id/tweet_layout"
+			android:clickable="true"
+			android:focusable="true"
+			android:background="?android:attr/selectableItemBackground"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+			<ViewStub
+				android:id="@+id/latest_tweet"
+				android:layout="@layout/tweet"
+				android:padding="@null"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
+		</FrameLayout>
+
+		<LinearLayout
+			android:orientation="vertical"
+			android:showDividers="middle"
+			android:padding="@dimen/medium"
+			android:divider="?android:attr/listDivider"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+			<TextView
+				android:id="@+id/action_tweets"
+				android:text="@string/tweets"
+				style="@style/Profile_Action" />
+
+			<TextView
+				android:id="@+id/action_followings"
+				android:text="@string/followings"
+				style="@style/Profile_Action" />
+
+			<TextView
+				android:id="@+id/action_followers"
+				android:text="@string/followers"
+				style="@style/Profile_Action" />
+
+			<TextView
+				android:id="@+id/action_likes"
+				android:text="@string/like"
+				style="@style/Profile_Action" />
+
+			<TextView
+				android:id="@+id/action_photos"
+				android:text="@string/photos"
+				style="@style/Profile_Action" />
+		</LinearLayout>
+	</LinearLayout>
+</ScrollView>

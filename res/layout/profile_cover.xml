@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content">
+
+	<ImageView
+		android:id="@id/avatar"
+		android:layout_centerHorizontal="true"
+		android:clickable="true"
+		android:focusable="true"
+		android:padding="@dimen/small"
+		android:layout_marginTop="@dimen/medium"
+		android:background="@drawable/avatar_background"
+		android:layout_gravity="center_horizontal"
+		android:layout_width="100dp"
+		android:layout_height="100dp" />
+
+	<LinearLayout
+		android:id="@+id/place_holder"
+		android:layout_below="@id/avatar"
+		android:layout_marginTop="@dimen/small"
+		android:layout_centerHorizontal="true"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content">
+
+		<TextView
+			android:id="@+id/remark"
+			android:textStyle="bold"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:textColor="@android:color/white"
+			android:layout_gravity="center_horizontal"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+
+		<ImageView
+			android:id="@id/verified"
+			android:visibility="gone"
+			android:layout_gravity="center_vertical"
+			android:layout_marginLeft="@dimen/small"
+			android:src="@drawable/ic_verified"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+	</LinearLayout>
+
+
+	<TextView
+		android:id="@+id/screen_name"
+		android:layout_below="@id/place_holder"
+		android:layout_centerHorizontal="true"
+		android:layout_marginTop="@dimen/small"
+		android:textColor="@android:color/white"
+		android:layout_gravity="center_horizontal"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+
+</RelativeLayout>
