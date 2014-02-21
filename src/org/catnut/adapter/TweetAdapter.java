@@ -23,11 +23,11 @@ import android.widget.TextView;
 import com.android.volley.toolbox.ImageLoader;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
-import org.catnut.fragment.PrefFragment;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
+import org.catnut.ui.MainActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.DateTime;
 
@@ -146,8 +146,21 @@ public class TweetAdapter extends CursorAdapter {
 		ViewHolder holder = (ViewHolder) view.getTag();
 		// 用户相关
 		if (mUserNick == null) {
+			holder.avatar.setVisibility(View.VISIBLE);
 			mImageLoader.get(cursor.getString(holder.avatarIndex),
 				ImageLoader.getImageListener(holder.avatar, R.drawable.error, R.drawable.error));
+			if (mContext instanceof MainActivity) {
+				// 跳转到该用户的时间线
+				final String nick = cursor.getString(holder.nickIndex);
+				final long uid = cursor.getLong(cursor.getColumnIndex(Status.uid));
+				holder.avatar.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						MainActivity activity = (MainActivity) mContext;
+						activity.viewTweets(uid, nick);
+					}
+				});
+			}
 			holder.nick.setText(cursor.getString(holder.nickIndex));
 		} else {
 			holder.nick.setText(mUserNick);

@@ -35,6 +35,7 @@ public class HomeTimelineFragment extends TimelineFragment {
 	/** 待检索的列 */
 	private static final String[] COLUMNS = new String[]{
 		"s._id",
+		Status.uid,
 		Status.columnText,
 		Status.thumbnail_pic,
 		Status.comments_count,

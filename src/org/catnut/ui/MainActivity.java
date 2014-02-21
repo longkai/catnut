@@ -208,7 +208,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					tweetsCount.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							viewMyTweets();
+							viewTweets(mApp.getAccessToken().uid, null);
 						}
 					});
 					flowerCount.setOnClickListener(new View.OnClickListener() {
@@ -292,7 +292,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					mTweetLayout.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							viewMyTweets();
+							viewTweets(mApp.getAccessToken().uid, null);
 						}
 					});
 					cursor.close();
@@ -309,13 +309,14 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		);
 	}
 
-	private void viewMyTweets() {
+	public void viewTweets(long uid, String nick) {
 		String tag = "my_tweets";
 		Fragment f = getFragmentManager().findFragmentByTag(tag);
 		if (f == null || !f.isVisible()) {
 			UserTimeLineFragment fragment = new UserTimeLineFragment();
 			Bundle args = new Bundle();
-			args.putLong(Constants.ID, mApp.getAccessToken().uid);
+			args.putLong(Constants.ID, uid);
+			args.putString(User.screen_name, nick);
 			fragment.setArguments(args);
 			mShouldPopupLastTile = false;
 			mDrawerLayout.closeDrawer(mDrawer);

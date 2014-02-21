@@ -34,6 +34,17 @@ public class UserTimeLineFragment extends TimelineFragment {
 
 	private static final String TAG = "UserTimeLineFragment";
 
+	private static final String[] PROJECTION = {
+		BaseColumns._ID,
+		Status.columnText,
+		Status.thumbnail_pic,
+		Status.comments_count,
+		Status.reposts_count,
+		Status.attitudes_count,
+		Status.source,
+		Status.created_at,
+	};
+
 	private long uid;
 	private String nick;
 
@@ -113,16 +124,7 @@ public class UserTimeLineFragment extends TimelineFragment {
 		CursorLoader loader = CatnutUtils.getCursorLoader(
 			mActivity,
 			CatnutProvider.parse(Status.MULTIPLE),
-			new String[]{
-				BaseColumns._ID,
-				Status.columnText,
-				Status.thumbnail_pic,
-				Status.comments_count,
-				Status.reposts_count,
-				Status.attitudes_count,
-				Status.source,
-				Status.created_at,
-			},
+			PROJECTION,
 			where.toString(),
 			null,
 			Status.TABLE,
