@@ -7,10 +7,12 @@ package org.catnut.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.BaseColumns;
 import android.text.Html;
 import android.text.format.DateUtils;
@@ -47,6 +49,7 @@ public class ProfileFragment extends Fragment {
 
 	private static final String TAG = "ProfileFragment";
 
+	private Handler mHandler = new Handler();
 	private CatnutApp mApp;
 
 	private long mUid;
@@ -250,7 +253,14 @@ public class ProfileFragment extends Fragment {
 			args.putString(User.screen_name, mScreenName);
 			UserTimeLineFragment fragment = new UserTimeLineFragment();
 			fragment.setArguments(args);
-			getActivity().getFragmentManager()
+			FragmentManager fragmentManager = getActivity().getFragmentManager();
+			fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+				@Override
+				public void onBackStackChanged() {
+					getActivity().invalidateOptionsMenu();
+				}
+			});
+			fragmentManager
 					.beginTransaction()
 					.setCustomAnimations(
 							R.animator.card_flip_right_in, R.animator.card_flip_right_out,
@@ -258,6 +268,12 @@ public class ProfileFragment extends Fragment {
 					.replace(android.R.id.content, fragment)
 					.addToBackStack(null)
 					.commit();
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					getActivity().invalidateOptionsMenu();
+				}
+			});
 		}
 	};
 
