@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@id/drawer"
+	android:padding="@dimen/medium"
+	android:layout_gravity="start"
+	android:layout_width="300dp"
+	android:layout_height="match_parent"
+	android:background="@android:color/white">
+
+	<ImageView
+		android:id="@id/avatar_profile"
+		android:layout_alignParentLeft="true"
+		android:layout_marginRight="@dimen/medium"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+
+	<TextView
+		android:id="@id/nick"
+		android:layout_toRightOf="@id/avatar_profile"
+		android:textAppearance="@android:style/TextAppearance.Large"
+		android:textColor="@color/actionbar_background"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+
+	<TextView
+		android:id="@id/description"
+		android:layout_marginTop="@dimen/medium"
+		android:layout_alignLeft="@id/nick"
+		android:layout_alignBottom="@id/avatar_profile"
+		android:layout_below="@id/nick"
+		android:textColor="@android:color/darker_gray"
+		android:textAppearance="@android:style/TextAppearance.Medium"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+
+	<LinearLayout
+		android:id="@id/statics"
+		android:layout_marginTop="@dimen/medium"
+		android:orientation="horizontal"
+		android:showDividers="middle"
+		android:divider="?android:dividerVertical"
+		android:layout_below="@id/avatar_profile"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<include
+			android:id="@id/tweets_count"
+			android:layout_weight="1"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			layout="@layout/two_line_text" />
+
+		<include
+			android:id="@id/following_count"
+			android:layout_weight="1"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			layout="@layout/two_line_text" />
+
+		<include
+			android:id="@id/followers_count"
+			android:layout_weight="1"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			layout="@layout/two_line_text" />
+	</LinearLayout>
+
+	<!-- 显示最新的一条微博，防止下面list的布局错乱，故加frame layout -->
+	<FrameLayout
+		android:id="@id/tweet_layout"
+		android:clickable="true"
+		android:focusable="true"
+		android:background="?android:attr/selectableItemBackground"
+		android:layout_below="@id/statics"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<ViewStub
+			android:id="@+id/latest_tweet"
+			android:layout="@layout/tweet"
+			android:padding="@null"
+			android:layout_below="@id/statics"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+	</FrameLayout>
+
+	<ListView
+		android:id="@android:id/list"
+		android:layout_below="@id/tweet_layout"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+</RelativeLayout>
