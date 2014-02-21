@@ -47,6 +47,7 @@ public class UserTimeLineFragment extends TimelineFragment {
 
 	private long uid;
 	private String nick;
+	private boolean mIsCurAuthUser; // 是否当前授权用户
 
 	@Override
 	protected void fetchTweetsFromCloud(boolean isRefresh, long offset) {
@@ -74,15 +75,13 @@ public class UserTimeLineFragment extends TimelineFragment {
 		} else {
 			mAdapter = new TweetAdapter(mActivity, mActivity.getDefaultUserNick());
 		}
+		mIsCurAuthUser = nick == null;
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-		mActivity.getActionBar().setTitle(
-			nick == null || nick.equals(mActivity.getDefaultUserNick()) ?
-				getText(R.string.my_timeline) : nick
-		);
+		mActivity.getActionBar().setTitle(mIsCurAuthUser ? getText(R.string.my_timeline) : nick);
 	}
 
 	@Override
@@ -102,6 +101,9 @@ public class UserTimeLineFragment extends TimelineFragment {
 		getListView().addFooterView(mLoadMore);
 		setEmptyText(mActivity.getString(R.string.no_tweets));
 		setListAdapter(mAdapter);
+		if (!mIsCurAuthUser) {
+			fetchTweetsFromCloud(false, 0);
+		}
 		getLoaderManager().initLoader(0, null, this);
 	}
 

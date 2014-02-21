@@ -157,7 +157,7 @@ public class TweetAdapter extends CursorAdapter {
 					@Override
 					public void onClick(View v) {
 						MainActivity activity = (MainActivity) mContext;
-						activity.viewTweets(uid, nick);
+						activity.viewTweets(uid, nick, true);
 					}
 				});
 			}
