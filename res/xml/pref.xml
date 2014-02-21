@@ -10,7 +10,7 @@
 	<PreferenceCategory android:title="@string/general_settings">
 
 		<ListPreference
-			android:key="default_fetch_size"
+			android:key="@string/pref_default_fetch_size"
 			android:defaultValue="@integer/default_fetch_size"
 			android:title="@string/tweets_count_per_fetch"
 			android:summary="@string/tweets_count_per_fetch_summary"
@@ -19,13 +19,13 @@
 			android:entryValues="@array/fetch_size_pref_entries" />
 
 		<CheckBoxPreference
-			android:key="auto_fetch_on_start"
-			android:defaultValue="false"
+			android:key="@string/pref_auto_fetch_on_start"
+			android:defaultValue="true"
 			android:title="@string/auto_fetch_on_start"
 			android:summary="@string/auto_fetch_on_start_summary" />
 
 		<CheckBoxPreference
-			android:key="auto_load_more_from_cloud"
+			android:key="@string/pref_load_more_from_cloud"
 			android:defaultValue="true"
 			android:title="@string/load_more_from_cloud"
 			android:summary="@string/load_more_from_cloud_summary" />
@@ -34,13 +34,13 @@
 	<PreferenceCategory android:title="@string/advanced_settings">
 
 		<Preference
-			android:key="customize_tweet_font"
+			android:key="@string/pref_customize_tweet_font"
 			android:defaultValue="@null"
 			android:title="@string/font"
 			android:summary="@string/change_font_summary" />
 
 		<ListPreference
-			android:key="tweet_font_size"
+			android:key="@string/pref_tweet_font_size"
 			android:defaultValue="@integer/default_tweet_font_size"
 			android:title="@string/font_size"
 			android:summary="@string/adjust_font_size_summary"
@@ -48,7 +48,7 @@
 			android:entryValues="@array/tweet_font_size_entryValues" />
 
 		<CheckBoxPreference
-			android:key="show_tweet_thumbs"
+			android:key="@string/pref_show_tweet_thumbs"
 			android:title="@string/show_thumbs"
 			android:defaultValue="true"
 			android:summary="@string/show_thumbs_summary" />
@@ -63,27 +63,27 @@
 	<PreferenceCategory android:title="@string/about">
 
 		<Preference
-			android:key="about"
+			android:key="@string/pref_about"
 			android:title="@string/version"
 			android:summary="@string/version_name" />
 
 		<Preference
-			android:key="notes"
+			android:key="@string/pref_notes"
 			android:title="@string/notes"
 			android:summary="@string/notes_summary" />
 
 		<Preference
-			android:key="author"
+			android:key="@string/pref_author"
 			android:title="@string/author"
 			android:summary="龙凯 im.longkai@gmail.com" />
 
 		<Preference
-			android:key="source_code"
+			android:key="@string/pref_source_code"
 			android:title="@string/source_code"
 			android:summary="@string/source_code_summary" />
 
 		<Preference
-			android:key="open_source_license"
+			android:key="@string/pref_open_source_license"
 			android:title="Open Source Licenses" />
 	</PreferenceCategory>
 </PreferenceScreen>

@@ -83,7 +83,7 @@ public class UserTimeLineFragment extends TimelineFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		if (mPref.getBoolean(PrefFragment.AUTO_FETCH_ON_START, true)) {
+		if (mPref.getBoolean(getString(R.string.pref_auto_fetch_on_start), true)) {
 			mPullToRefreshLayout.setRefreshing(true);
 			fetchTweetsFromCloud(true, 0);
 		}
@@ -135,9 +135,9 @@ public class UserTimeLineFragment extends TimelineFragment {
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		if (key.equals(PrefFragment.TWEET_FONT_SIZE)
-			|| key.equals(PrefFragment.CUSTOMIZE_TWEET_FONT)
-			|| key.equals(PrefFragment.SHOW_TWEET_THUMBS)) {
+		if (key.equals(getString(R.string.pref_tweet_font_size))
+			|| key.equals(getString(R.string.pref_customize_tweet_font))
+			|| key.equals(getString(R.string.pref_show_tweet_thumbs))) {
 			Log.d(TAG, "pref change, the user timeline fragment needs update!");
 			// 应用新的偏好
 			mAdapter.swapCursor(null);

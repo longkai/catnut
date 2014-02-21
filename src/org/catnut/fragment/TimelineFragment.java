@@ -202,7 +202,7 @@ public abstract class TimelineFragment extends ListFragment
 	protected int getDefaultFetchSize() {
 		return CatnutUtils.resolveListPrefInt(
 			mPref,
-			PrefFragment.DEFAULT_FETCH_SIZE,
+			getString(R.string.pref_default_fetch_size),
 			mActivity.getResources().getInteger(R.integer.default_fetch_size)
 		);
 	}
@@ -225,7 +225,7 @@ public abstract class TimelineFragment extends ListFragment
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		if (mLoadMore.isShown() && !mLoadingFromCloud && !isSearching) {
 			mCurPage++;
-			if (mPref.getBoolean(PrefFragment.AUTO_LOAD_MORE_FROM_CLOUD, true)) {
+			if (mPref.getBoolean(getString(R.string.pref_load_more_from_cloud), true)) {
 				Log.d(TAG, "loading more from cloud!");
 				// 开启worker线程去web抓取数据
 				mLoadingFromCloud = true;

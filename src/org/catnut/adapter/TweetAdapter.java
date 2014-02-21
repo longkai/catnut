@@ -72,10 +72,13 @@ public class TweetAdapter extends CursorAdapter {
 		CatnutApp app = CatnutApp.getTingtingApp();
 		mImageLoader = app.getImageLoader();
 		SharedPreferences preferences = app.getPreferences();
-		mThumbsRequired = preferences.getBoolean(PrefFragment.SHOW_TWEET_THUMBS, true);
-		mCustomizedFontSize = CatnutUtils.resolveListPrefInt(preferences,
-			PrefFragment.TWEET_FONT_SIZE, context.getResources().getInteger(R.integer.default_tweet_font_size));
-		String fontPath = preferences.getString(PrefFragment.CUSTOMIZE_TWEET_FONT, null);
+		mThumbsRequired = preferences.getBoolean(context.getString(R.string.pref_show_tweet_thumbs), true);
+		mCustomizedFontSize = CatnutUtils.resolveListPrefInt(
+			preferences,
+			context.getString(R.string.pref_tweet_font_size),
+			context.getResources().getInteger(R.integer.default_tweet_font_size)
+		);
+		String fontPath = preferences.getString(context.getString(R.string.pref_customize_tweet_font), null);
 		if (fontPath != null) {
 			try {
 				mCustomizedFont = Typeface.createFromFile(new File(fontPath));

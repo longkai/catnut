@@ -63,13 +63,13 @@ public class HomeTimelineFragment extends TimelineFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		// 先尝试去新浪抓一把，避免那啥，empty*_*
-		boolean autoFetch = mPref.getBoolean(PrefFragment.AUTO_FETCH_ON_START, true);
-		boolean firstRun = mPref.getBoolean(PrefFragment.IS_FIRST_RUN, true);
+		boolean autoFetch = mPref.getBoolean(getString(R.string.pref_auto_fetch_on_start), true);
+		boolean firstRun = mPref.getBoolean(getString(R.string.pref_first_run), true);
 		if (autoFetch || firstRun) {
 			mPullToRefreshLayout.setRefreshing(true);
 			fetchTweetsFromCloud(true, 0);
 			if (firstRun) {
-				mPref.edit().putBoolean(PrefFragment.IS_FIRST_RUN, false).commit();
+				mPref.edit().putBoolean(getString(R.string.pref_first_run), false).commit();
 			}
 		}
 		// 接下来办正事
@@ -135,9 +135,9 @@ public class HomeTimelineFragment extends TimelineFragment {
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		if (key.equals(PrefFragment.TWEET_FONT_SIZE)
-				|| key.equals(PrefFragment.CUSTOMIZE_TWEET_FONT)
-				|| key.equals(PrefFragment.SHOW_TWEET_THUMBS)) {
+		if (key.equals(getString(R.string.pref_tweet_font_size))
+				|| key.equals(getString(R.string.pref_customize_tweet_font))
+				|| key.equals(getString(R.string.pref_show_tweet_thumbs))) {
 			Log.d(TAG, "pref change, the home timeline fragment needs update!");
 			// 应用新的偏好
 			mAdapter.swapCursor(null);
