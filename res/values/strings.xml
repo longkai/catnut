@@ -66,6 +66,7 @@
 	<string name="latest_statues">最新状态</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
+		<item>微博</item>
 		<item>关注</item>
 		<item>粉丝</item>
 		<item>分组</item>

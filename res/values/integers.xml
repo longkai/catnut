@@ -10,6 +10,6 @@
 
 	<integer-array name="drawer_list_header_indexes">
 		<item>0</item>
-		<item>6</item>
+		<item>7</item>
 	</integer-array>
 </resources>

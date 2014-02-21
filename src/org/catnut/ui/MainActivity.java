@@ -65,6 +65,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 
 	private static final int[] DRAWER_LIST_ITEMS_IDS = {
 			0, // 我的
+			R.id.action_my_tweets,
 			R.id.action_my_followings,
 			R.id.action_my_followers,
 			R.id.action_my_list,
@@ -132,7 +133,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			mActionBar = getActionBar();
 			mActionBar.setDisplayShowHomeEnabled(false); // 统一不显示home了，不太协调
 			prepareActionBar();
-			fetchLatestTweet();
+//			fetchLatestTweet();
 
 			getFragmentManager()
 					.beginTransaction()
@@ -453,6 +454,9 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		Intent intent;
 		switch (DRAWER_LIST_ITEMS_IDS[position]) {
+			case R.id.action_my_tweets:
+				viewTweets(mApp.getAccessToken().uid, null, false);
+				break;
 			case R.id.action_share_app:
 				intent = new Intent(Intent.ACTION_SEND);
 				intent.setType("image/*");
