@@ -15,7 +15,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,7 +35,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
@@ -100,7 +98,6 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 	private TextView mTextNick;
 	private TextView mDescription;
 	private View mTweetLayout;
-//	private ViewStub mLatestTweet;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -131,9 +128,9 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			mTextNick = (TextView) findViewById(R.id.nick);
 			mDescription = (TextView) findViewById(R.id.description);
 			mTweetLayout = findViewById(R.id.tweet_layout);
-//			mLatestTweet = (ViewStub) findViewById(R.id.latest_tweet);
 
 			mActionBar = getActionBar();
+			mActionBar.setDisplayShowHomeEnabled(false); // 统一不显示home了，不太协调
 			prepareActionBar();
 			fetchLatestTweet();
 
@@ -180,16 +177,6 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					mActionBar.setDisplayUseLogoEnabled(true);
 					mNick = cursor.getString(cursor.getColumnIndex(User.screen_name));
 					mActionBar.setTitle(mNick);
-					mImageLoader.get(cursor.getString(cursor.getColumnIndex(User.profile_image_url)), new ImageLoader.ImageListener() {
-						@Override
-						public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-							mActionBar.setIcon(new BitmapDrawable(getResources(), response.getBitmap()));
-						}
-
-						@Override
-						public void onErrorResponse(VolleyError error) {
-						}
-					});
 					mTextNick.setText(mNick);
 					mImageLoader.get(cursor.getString(cursor.getColumnIndex(User.avatar_large)),
 						ImageLoader.getImageListener(
@@ -234,7 +221,6 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			CatnutProvider.parse(User.MULTIPLE, String.valueOf(mApp.getAccessToken().uid)),
 			new String[]{
 				User.screen_name,
-				User.profile_image_url,
 				User.avatar_large,
 				User.description,
 				User.statuses_count,

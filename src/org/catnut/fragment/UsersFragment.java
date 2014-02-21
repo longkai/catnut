@@ -117,7 +117,7 @@ public abstract class UsersFragment extends ListFragment implements LoaderManage
 		// 搜索相关
 		MenuItem search = menu.add(android.R.string.search_go);
 		search.setIcon(R.drawable.ic_title_search_default);
-		search.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS
+		search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
 			| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
 		mSearchView = new SearchView(mActivity);
 		mSearchView.setOnQueryTextListener(this);
