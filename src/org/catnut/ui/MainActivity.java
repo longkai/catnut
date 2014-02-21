@@ -59,20 +59,20 @@ import org.catnut.util.DateTime;
  * @author longkai
  */
 public class MainActivity extends Activity implements DrawerLayout.DrawerListener, ListView.OnItemClickListener,
-	FragmentManager.OnBackStackChangedListener {
+		FragmentManager.OnBackStackChangedListener {
 
 	private static final String TAG = "MainActivity";
 
 	private static final int[] DRAWER_LIST_ITEMS_IDS = {
-		0, // 我的
-		R.id.action_my_followings,
-		R.id.action_my_followers,
-		R.id.action_my_list,
-		R.id.action_my_favorites,
-		R.id.action_my_drafts,
-		0, // 分享
-		R.id.action_share_app,
-		R.id.action_view_source_code,
+			0, // 我的
+			R.id.action_my_followings,
+			R.id.action_my_followers,
+			R.id.action_my_list,
+			R.id.action_my_favorites,
+			R.id.action_my_drafts,
+			0, // 分享
+			R.id.action_share_app,
+			R.id.action_view_source_code,
 	};
 
 	/** the last title before drawer open */
@@ -114,7 +114,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			mDrawerLayout.setDrawerListener(this);
 
 			mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-				R.drawable.ic_drawer, R.string.open_drawer, R.string.close_drawer);
+					R.drawable.ic_drawer, R.string.open_drawer, R.string.close_drawer);
 
 			// the whole left drawer
 			mDrawer = findViewById(R.id.drawer);
@@ -135,9 +135,9 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			fetchLatestTweet();
 
 			getFragmentManager()
-				.beginTransaction()
-				.replace(R.id.fragment_container, new HomeTimelineFragment())
-				.commit();
+					.beginTransaction()
+					.replace(R.id.fragment_container, new HomeTimelineFragment())
+					.commit();
 			getFragmentManager().addOnBackStackChangedListener(this);
 
 			if (mApp.getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
@@ -179,9 +179,9 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					mActionBar.setTitle(mNick);
 					mTextNick.setText(mNick);
 					mImageLoader.get(cursor.getString(cursor.getColumnIndex(User.avatar_large)),
-						ImageLoader.getImageListener(
-							mProfileCover, R.drawable.error, R.drawable.error
-						));
+							ImageLoader.getImageListener(
+									mProfileCover, R.drawable.error, R.drawable.error
+							));
 					String description = cursor.getString(cursor.getColumnIndex(User.description));
 					mDescription.setText(TextUtils.isEmpty(description) ? getString(R.string.no_description) : description);
 
@@ -201,13 +201,13 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					flowerCount.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							changeMyFollowersFragment();
+							viewFollowers(mNick);
 						}
 					});
 					flowingCount.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							changeMyFollowingFragment();
+							viewFollowings(mNick);
 						}
 					});
 					CatnutUtils.setText(tweetsCount, android.R.id.text1, cursor.getString(cursor.getColumnIndex(User.statuses_count)));
@@ -216,39 +216,39 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				}
 			}
 		}.startQuery(
-			0,
-			null,
-			CatnutProvider.parse(User.MULTIPLE, String.valueOf(mApp.getAccessToken().uid)),
-			new String[]{
-				User.screen_name,
-				User.avatar_large,
-				User.description,
-				User.statuses_count,
-				User.followers_count,
-				User.friends_count
-			},
-			null,
-			null,
-			null
+				0,
+				null,
+				CatnutProvider.parse(User.MULTIPLE, String.valueOf(mApp.getAccessToken().uid)),
+				new String[]{
+						User.screen_name,
+						User.avatar_large,
+						User.description,
+						User.statuses_count,
+						User.followers_count,
+						User.friends_count
+				},
+				null,
+				null,
+				null
 		);
 	}
 
 	private void fetchLatestTweet() {
 		String query = CatnutUtils.buildQuery(
-			new String[]{
-				Status.columnText,
-				Status.thumbnail_pic,
-				Status.comments_count,
-				Status.reposts_count,
-				Status.attitudes_count,
-				Status.source,
-				Status.created_at,
-			},
-			"_id=(select max(s._id) from " + Status.TABLE + " as s where s.uid=" + mApp.getAccessToken().uid + ")",
-			Status.TABLE,
-			null,
-			null,
-			null
+				new String[]{
+						Status.columnText,
+						Status.thumbnail_pic,
+						Status.comments_count,
+						Status.reposts_count,
+						Status.attitudes_count,
+						Status.source,
+						Status.created_at,
+				},
+				"_id=(select max(s._id) from " + Status.TABLE + " as s where s.uid=" + mApp.getAccessToken().uid + ")",
+				Status.TABLE,
+				null,
+				null,
+				null
 		);
 		new AsyncQueryHandler(getContentResolver()) {
 			@Override
@@ -285,20 +285,21 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				}
 			}
 		}.startQuery(
-			0,
-			null,
-			CatnutProvider.parse(Status.MULTIPLE),
-			null,
-			query,
-			null,
-			null
+				0,
+				null,
+				CatnutProvider.parse(Status.MULTIPLE),
+				null,
+				query,
+				null,
+				null
 		);
 	}
 
 	/**
 	 * 查看某个用户的时间线
-	 * @param uid 用户id
-	 * @param nick 如果是当前授权用户，请赋null
+	 *
+	 * @param uid            用户id
+	 * @param nick           如果是当前授权用户，请赋null
 	 * @param popupLastTitle actionbar的title是否回滚，用于drawer的点击事件
 	 */
 	public void viewTweets(long uid, String nick, boolean popupLastTitle) {
@@ -318,23 +319,37 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		}
 	}
 
-	private void changeMyFollowingFragment() {
+	/**
+	 * 查看某个用户关注的用户
+	 *
+	 * @param screenName
+	 */
+	public void viewFollowings(String screenName) {
 		String tag = "following";
 		Fragment usersFragment = getFragmentManager().findFragmentByTag(tag);
 		if (usersFragment == null || !usersFragment.isVisible()) {
 			mShouldPopupLastTitle = false;
-			mDrawerLayout.closeDrawer(mDrawer);
-			flipCard(FriendsFragment.getInstance(mApp.getAccessToken().uid, true), tag);
+			if (mDrawerLayout.isDrawerOpen(mDrawer)) {
+				mDrawerLayout.closeDrawer(mDrawer);
+			}
+			flipCard(FriendsFragment.getInstance(screenName, true), tag);
 		}
 	}
 
-	private void changeMyFollowersFragment() {
+	/**
+	 * 查看某个用户关注的用户
+	 *
+	 * @param screenName
+	 */
+	public void viewFollowers(String screenName) {
 		String tag = "follower";
 		Fragment usersFragment = getFragmentManager().findFragmentByTag(tag);
 		if (usersFragment == null || !usersFragment.isVisible()) {
 			mShouldPopupLastTitle = false;
-			mDrawerLayout.closeDrawer(mDrawer);
-			flipCard(FriendsFragment.getInstance(mApp.getAccessToken().uid, false), tag);
+			if (mDrawerLayout.isDrawerOpen(mDrawer)) {
+				mDrawerLayout.closeDrawer(mDrawer);
+			}
+			flipCard(FriendsFragment.getInstance(screenName, false), tag);
 		}
 	}
 
@@ -354,32 +369,32 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			// 登出，kill掉本app的进程，不同于按下back按钮，这个不保证回到上一个back stack
 			case R.id.logout:
 				new AlertDialog.Builder(this)
-					.setMessage(getString(R.string.logout_confirm))
-					.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							Process.killProcess(Process.myPid());
-						}
-					})
-					.setNegativeButton(android.R.string.no, null)
-					.show();
+						.setMessage(getString(R.string.logout_confirm))
+						.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								Process.killProcess(Process.myPid());
+							}
+						})
+						.setNegativeButton(android.R.string.no, null)
+						.show();
 				break;
 			// 注销，需要重新授权的
 			case R.id.cancellation:
 				new AlertDialog.Builder(this)
-					.setMessage(getString(R.string.cancellation_confirm))
-					.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							mApp.invalidateAccessToken();
-							Intent intent = new Intent(MainActivity.this, HelloActivity.class);
-							// 清除掉之前的back stack哦
-							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-							startActivity(intent);
-						}
-					})
-					.setNegativeButton(android.R.string.no, null)
-					.show();
+						.setMessage(getString(R.string.cancellation_confirm))
+						.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								mApp.invalidateAccessToken();
+								Intent intent = new Intent(MainActivity.this, HelloActivity.class);
+								// 清除掉之前的back stack哦
+								intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+								startActivity(intent);
+							}
+						})
+						.setNegativeButton(android.R.string.no, null)
+						.show();
 				break;
 			case R.id.pref:
 				Fragment pref = getFragmentManager().findFragmentByTag(TAG);
@@ -442,7 +457,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_app));
 				intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text));
 				intent.putExtra(Intent.EXTRA_STREAM,
-					Uri.parse("android.resource://org.catnut/drawable/ic_launcher"));
+						Uri.parse("android.resource://org.catnut/drawable/ic_launcher"));
 				startActivity(intent);
 				break;
 			case R.id.action_view_source_code:
@@ -450,10 +465,10 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				startActivity(intent);
 				break;
 			case R.id.action_my_followings:
-				changeMyFollowingFragment();
+				viewFollowings(mNick);
 				break;
 			case R.id.action_my_followers:
-				changeMyFollowersFragment();
+				viewFollowers(mNick);
 				break;
 			default:
 				Toast.makeText(MainActivity.this, position + " click! not yet implement for now:-(", Toast.LENGTH_SHORT).show();
@@ -469,18 +484,19 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 
 	/**
 	 * 切换fragment时卡片翻转的效果
+	 *
 	 * @param fragment
-	 * @param tag 没有赋null即可
+	 * @param tag      没有赋null即可
 	 */
 	private void flipCard(Fragment fragment, String tag) {
 		getFragmentManager()
-			.beginTransaction()
-			.setCustomAnimations(
-				R.animator.card_flip_right_in, R.animator.card_flip_right_out,
-				R.animator.card_flip_left_in, R.animator.card_flip_left_out)
-			.replace(R.id.fragment_container, fragment, tag)
-			.addToBackStack(null)
-			.commit();
+				.beginTransaction()
+				.setCustomAnimations(
+						R.animator.card_flip_right_in, R.animator.card_flip_right_out,
+						R.animator.card_flip_left_in, R.animator.card_flip_left_out)
+				.replace(R.id.fragment_container, fragment, tag)
+				.addToBackStack(null)
+				.commit();
 		mHandler.post(new Runnable() {
 			@Override
 			public void run() {

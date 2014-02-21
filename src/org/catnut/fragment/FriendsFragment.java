@@ -45,9 +45,9 @@ public class FriendsFragment extends UsersFragment {
 	/** 是加载关注好友呢，还是关注me的人咧 */
 	private boolean mIsFollowing;
 
-	public static FriendsFragment getInstance(long uid, boolean isFollowing) {
+	public static FriendsFragment getInstance(String screenName, boolean isFollowing) {
 		Bundle args = new Bundle();
-		args.putLong(Constants.ID, uid);
+		args.putString(User.screen_name, screenName);
 		args.putBoolean(TAG, isFollowing); // 这里，随便上一个string的key了，懒得定义Orz
 		FriendsFragment fragment = new FriendsFragment();
 		fragment.setArguments(args);
