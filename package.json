@@ -19,7 +19,8 @@
 		"support-v4",
 		"support-v13",
 		"android-volley",
-		"ActionBar-PullToRefresh"
+		"ActionBar-PullToRefresh",
+		"Google Analytics"
 	],
 	"license": {
 		"type": "MIT",

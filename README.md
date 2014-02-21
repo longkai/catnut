@@ -22,6 +22,7 @@
 2. support-v13，for native fragment api
 3. android-volley，异步http请求框架，需要自行[下载][volley]并引入
 4. ActionBar-PullToRefresh，刷新控件，需自行[下载][pull2refresh]或者通过Android Studio引入
+5. Google Analytics，匿名统计使用信息，需自行[下载][Google Analytics]并引入
 
 ## 如何构建
 1. 通过IDE
@@ -62,6 +63,7 @@ document license
 [ProGuard]: http://proguard.sourceforge.net/index.html "ProGuard"
 [volley]: https://android.googlesource.com/platform/frameworks/volley "android-volley"
 [pull2refresh]: https://github.com/chrisbanes/ActionBar-PullToRefresh "ActionBar-PullToRefresh"
+[Google Analytics]: https://developers.google.com/analytics/devguides/collection/android/v3/ "Google Analytics v3"
 [@龙凯Orz]: http://weibo.com/coding4fun "sina weibo"
 [@longkai_1991]: https://twitter.com/longkai_1991 "twitter"
 [creative commons icon]: http://i.creativecommons.org/l/by-nc/4.0/88x31.png "creative commons icon"
