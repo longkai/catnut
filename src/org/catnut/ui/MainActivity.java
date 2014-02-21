@@ -41,7 +41,7 @@ import org.catnut.R;
 import org.catnut.adapter.DrawerNavAdapter;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
-import org.catnut.fragment.FriendsFragment;
+import org.catnut.fragment.MyFriendsFragment;
 import org.catnut.fragment.HomeTimelineFragment;
 import org.catnut.fragment.PrefFragment;
 import org.catnut.fragment.UserTimeLineFragment;
@@ -204,13 +204,13 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					flowerCount.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							viewFollowers(mNick);
+							viewFollowers();
 						}
 					});
 					flowingCount.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							viewFollowings(mNick);
+							viewFollowings();
 						}
 					});
 					CatnutUtils.setText(tweetsCount, android.R.id.text1, cursor.getString(cursor.getColumnIndex(User.statuses_count)));
@@ -325,10 +325,8 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 
 	/**
 	 * 查看某个用户关注的用户
-	 *
-	 * @param screenName
 	 */
-	public void viewFollowings(String screenName) {
+	public void viewFollowings() {
 		String tag = "following";
 		Fragment usersFragment = getFragmentManager().findFragmentByTag(tag);
 		if (usersFragment == null || !usersFragment.isVisible()) {
@@ -336,16 +334,14 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			if (mDrawerLayout.isDrawerOpen(mDrawer)) {
 				mDrawerLayout.closeDrawer(mDrawer);
 			}
-			flipCard(FriendsFragment.getInstance(screenName, true), tag);
+			flipCard(MyFriendsFragment.getInstance(true), tag);
 		}
 	}
 
 	/**
 	 * 查看某个用户关注的用户
-	 *
-	 * @param screenName
 	 */
-	public void viewFollowers(String screenName) {
+	public void viewFollowers() {
 		String tag = "follower";
 		Fragment usersFragment = getFragmentManager().findFragmentByTag(tag);
 		if (usersFragment == null || !usersFragment.isVisible()) {
@@ -353,7 +349,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			if (mDrawerLayout.isDrawerOpen(mDrawer)) {
 				mDrawerLayout.closeDrawer(mDrawer);
 			}
-			flipCard(FriendsFragment.getInstance(screenName, false), tag);
+			flipCard(MyFriendsFragment.getInstance(false), tag);
 		}
 	}
 
@@ -472,10 +468,10 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				startActivity(intent);
 				break;
 			case R.id.action_my_followings:
-				viewFollowings(mNick);
+				viewFollowings();
 				break;
 			case R.id.action_my_followers:
-				viewFollowers(mNick);
+				viewFollowers();
 				break;
 			default:
 				Toast.makeText(MainActivity.this, position + " click! not yet implement for now:-(", Toast.LENGTH_SHORT).show();

@@ -14,21 +14,21 @@ import android.text.TextUtils;
 import org.catnut.R;
 import org.catnut.adapter.UsersAdapter;
 import org.catnut.api.FriendshipsAPI;
+import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutRequest;
 import org.catnut.metadata.User;
 import org.catnut.processor.UserProcessor;
 import org.catnut.core.CatnutProvider;
 import org.catnut.util.CatnutUtils;
-import org.catnut.util.Constants;
 
 /**
- * 好友界面
+ * 好友界面，当前登录用户专用
  *
  * @author longkai
  */
-public class FriendsFragment extends UsersFragment {
+public class MyFriendsFragment extends UsersFragment {
 
-	public static final String TAG = "FriendsFragment";
+	public static final String TAG = "MyFriendsFragment";
 
 	private static final String[] COLUMNS = new String[]{
 		BaseColumns._ID,
@@ -45,11 +45,10 @@ public class FriendsFragment extends UsersFragment {
 	/** 是加载关注好友呢，还是关注me的人咧 */
 	private boolean mIsFollowing;
 
-	public static FriendsFragment getInstance(String screenName, boolean isFollowing) {
+	public static MyFriendsFragment getInstance(boolean isFollowing) {
 		Bundle args = new Bundle();
-		args.putString(User.screen_name, screenName);
 		args.putBoolean(TAG, isFollowing); // 这里，随便上一个string的key了，懒得定义Orz
-		FriendsFragment fragment = new FriendsFragment();
+		MyFriendsFragment fragment = new MyFriendsFragment();
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -78,9 +77,9 @@ public class FriendsFragment extends UsersFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mUid = CatnutApp.getTingtingApp().getAccessToken().uid;
 		mAdapter = new UsersAdapter(mActivity);
 		Bundle args = getArguments();
-		mUid = args.getLong(Constants.ID, 0L);
 		mIsFollowing = args.getBoolean(TAG, false);
 	}
 
