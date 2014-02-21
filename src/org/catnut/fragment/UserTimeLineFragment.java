@@ -73,7 +73,7 @@ public class UserTimeLineFragment extends TimelineFragment {
 		if (nick != null) {
 			mAdapter = new TweetAdapter(mActivity, nick);
 		} else {
-			mAdapter = new TweetAdapter(mActivity, mActivity.getDefaultUserNick());
+			mAdapter = new TweetAdapter(mActivity, mPref.getString(User.screen_name, null));
 		}
 		mIsCurAuthUser = nick == null;
 	}
@@ -148,7 +148,7 @@ public class UserTimeLineFragment extends TimelineFragment {
 			if (nick != null) {
 				mAdapter = new TweetAdapter(mActivity, nick);
 			} else {
-				mAdapter = new TweetAdapter(mActivity, mActivity.getDefaultUserNick());
+				mAdapter = new TweetAdapter(mActivity, mPref.getString(User.screen_name, null));
 			}
 			setListAdapter(mAdapter);
 		}

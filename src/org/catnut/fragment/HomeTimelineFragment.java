@@ -57,7 +57,7 @@ public class HomeTimelineFragment extends TimelineFragment {
 	@Override
 	public void onStart() {
 		super.onStart();
-		mActivity.getActionBar().setTitle(mActivity.getDefaultUserNick());
+		mActivity.getActionBar().setTitle(mPref.getString(User.screen_name, null));
 	}
 
 	@Override

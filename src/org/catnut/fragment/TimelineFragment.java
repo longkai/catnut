@@ -42,7 +42,7 @@ public abstract class TimelineFragment extends ListFragment
 
 	private static final String TAG = "TimelineFragment";
 
-	protected MainActivity mActivity;
+	protected Activity mActivity;
 	protected TweetAdapter mAdapter;
 	protected SharedPreferences mPref;
 	protected RequestQueue mRequestQueue;
@@ -110,7 +110,7 @@ public abstract class TimelineFragment extends ListFragment
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		this.mActivity = (MainActivity) activity;
+		this.mActivity = activity;
 	}
 
 	@Override

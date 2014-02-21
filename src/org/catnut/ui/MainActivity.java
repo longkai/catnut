@@ -173,9 +173,11 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		new AsyncQueryHandler(getContentResolver()) {
 			@Override
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-				if (cursor != null && cursor.moveToNext()) {
+				if (cursor.moveToNext()) {
 					mActionBar.setDisplayUseLogoEnabled(true);
 					mNick = cursor.getString(cursor.getColumnIndex(User.screen_name));
+					// add it to pref for convenient
+					mApp.getPreferences().edit().putString(User.screen_name, mNick).commit();
 					mActionBar.setTitle(mNick);
 					mTextNick.setText(mNick);
 					mImageLoader.get(cursor.getString(cursor.getColumnIndex(User.avatar_large)),
@@ -212,8 +214,8 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					});
 					CatnutUtils.setText(tweetsCount, android.R.id.text1, cursor.getString(cursor.getColumnIndex(User.statuses_count)));
 					CatnutUtils.setText(tweetsCount, android.R.id.text2, getString(R.string.tweets));
-					cursor.close();
 				}
+				cursor.close();
 			}
 		}.startQuery(
 				0,
@@ -253,7 +255,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		new AsyncQueryHandler(getContentResolver()) {
 			@Override
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-				if (cursor != null && cursor.moveToNext()) {
+				if (cursor.moveToNext()) {
 					ViewStub viewStub = (ViewStub) mTweetLayout.findViewById(R.id.latest_tweet);
 					View tweet = viewStub.inflate();
 					String tweetText = cursor.getString(cursor.getColumnIndex(Status.columnText));
@@ -281,8 +283,8 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 							viewTweets(mApp.getAccessToken().uid, null, false);
 						}
 					});
-					cursor.close();
 				}
+				cursor.close();
 			}
 		}.startQuery(
 				0,
@@ -503,12 +505,5 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				invalidateOptionsMenu();
 			}
 		});
-	}
-
-	/**
-	 * 获取当前授权用户的nick
-	 */
-	public String getDefaultUserNick() {
-		return mNick;
 	}
 }
