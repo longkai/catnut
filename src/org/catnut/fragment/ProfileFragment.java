@@ -102,6 +102,14 @@ public class ProfileFragment extends Fragment {
 		}
 	};
 
+	private View.OnClickListener followingsOnClickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			ProfileActivity activity = (ProfileActivity) getActivity();
+			activity.flipCard(FollowingsFragment.getFragment(mScreenName), null, true);
+		}
+	};
+
 	public static ProfileFragment getFragment(long uid, String screenName) {
 		Bundle args = new Bundle();
 		args.putLong(Constants.ID, uid);
@@ -139,6 +147,7 @@ public class ProfileFragment extends Fragment {
 		mTweetLayout = view.findViewById(R.id.tweet_layout);
 		view.findViewById(R.id.action_tweets).setOnClickListener(tweetsOnclickListener);
 		view.findViewById(R.id.action_followers).setOnClickListener(followersOnclickListener);
+		view.findViewById(R.id.action_followings).setOnClickListener(followingsOnClickListener);
 		// 从本地抓取数据*_*
 		String query = CatnutUtils.buildQuery(PROJECTION,
 				User.screen_name + "=" + CatnutUtils.quote(mScreenName), User.TABLE, null, null, null);
@@ -178,6 +187,7 @@ public class ProfileFragment extends Fragment {
 							cursor.getString(cursor.getColumnIndex(User.followers_count)));
 					CatnutUtils.setText(mFollowersCount, android.R.id.text2, getString(R.string.followers));
 					// 我关注的
+					mFollowingsCount.setOnClickListener(followingsOnClickListener);
 					CatnutUtils.setText(mFollowingsCount, android.R.id.text1,
 							cursor.getString(cursor.getColumnIndex(User.friends_count)));
 					CatnutUtils.setText(mFollowingsCount, android.R.id.text2, getString(R.string.followings));

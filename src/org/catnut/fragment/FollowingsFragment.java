@@ -35,24 +35,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 关注者列表界面
+ * 用户的关注列表
  *
  * @author longkai
  */
-public class FollowersFragment extends ListFragment implements AbsListView.OnScrollListener {
-
-	private int next_cursor = 0;
-	private int total_number = 0;
-
-	private RequestQueue mRequestQueue;
+public class FollowingsFragment extends ListFragment implements AbsListView.OnScrollListener {
 
 	private String mScreenName;
 
-	private ProgressBar mLoadMore;
+	private int next_cursor = 0;
+	private int total_number = 0;
 	private boolean mLoading = false;
+	private ProgressBar mLoadMore;
 
-	private ArrayList<TransientUser> mUsers;
+	private List<TransientUser> mUsers;
 	private TransientUsersAdapter mAdapter;
+
+	private RequestQueue mRequestQueue;
 
 	private Response.Listener<List<TransientUser>> listener = new Response.Listener<List<TransientUser>>() {
 		@Override
@@ -75,20 +74,19 @@ public class FollowersFragment extends ListFragment implements AbsListView.OnScr
 		}
 	};
 
-	public static FollowersFragment getFragment(String screenName) {
+	public static FollowingsFragment getFragment(String screenName) {
 		Bundle args = new Bundle();
 		args.putString(User.screen_name, screenName);
-		FollowersFragment followersFragment = new FollowersFragment();
-		followersFragment.setArguments(args);
-		return followersFragment;
+		FollowingsFragment followingsFragment = new FollowingsFragment();
+		followingsFragment.setArguments(args);
+		return followingsFragment;
 	}
 
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
+		mScreenName = getArguments().getString(User.screen_name);
 		mRequestQueue = CatnutApp.getTingtingApp().getRequestQueue();
-		Bundle args = getArguments();
-		mScreenName = args.getString(User.screen_name);
 	}
 
 	@Override
@@ -96,27 +94,27 @@ public class FollowersFragment extends ListFragment implements AbsListView.OnScr
 		super.onCreate(savedInstanceState);
 		mUsers = new ArrayList<TransientUser>();
 		mAdapter = new TransientUsersAdapter(getActivity(), mUsers);
-		mLoadMore = new ProgressBar(getActivity());
 	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		loadFromCloud();
+		mLoadMore = new ProgressBar(getActivity());
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		getListView().setOnScrollListener(this);
 		setListAdapter(mAdapter);
 		getListView().addFooterView(mLoadMore);
+		getListView().setOnScrollListener(this);
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-		getActivity().getActionBar().setTitle(getString(R.string.his_followers, mScreenName));
+		getActivity().getActionBar().setTitle(getString(R.string.his_followings, mScreenName));
 	}
 
 	@Override
@@ -132,16 +130,15 @@ public class FollowersFragment extends ListFragment implements AbsListView.OnScr
 
 	private void loadFromCloud() {
 		mLoading = true;
-		CatnutAPI api = FriendshipsAPI.followers(mScreenName, 0, next_cursor, 1);
+		CatnutAPI api = FriendshipsAPI.friends(mScreenName, 0, next_cursor, 1);
 		mRequestQueue.add(new TransientRequest<List<TransientUser>>(api, listener, errorListener) {
 			@Override
 			protected Response<List<TransientUser>> parseNetworkResponse(NetworkResponse response) {
-				return FollowersFragment.this.parseNetworkResponse(response);
+				return FollowingsFragment.this.parseNetworkResponse(response);
 			}
 		});
 	}
 
-	// inner use... todo: make it a class, how the next_cursor field?
 	private Response<List<TransientUser>> parseNetworkResponse(NetworkResponse response) {
 		try {
 			String jsonString =
