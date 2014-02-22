@@ -7,22 +7,23 @@ package org.catnut.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.AsyncQueryHandler;
 import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Html;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
@@ -180,9 +181,8 @@ public class ProfileFragment extends Fragment {
 					CatnutUtils.setText(mFollowingsCount, android.R.id.text1,
 							cursor.getString(cursor.getColumnIndex(User.friends_count)));
 					CatnutUtils.setText(mFollowingsCount, android.R.id.text2, getString(R.string.followings));
-					// pager adapter
-					Log.d("xx", "set adapter");
-					mViewPager.setAdapter(new CoverPagerFragment(getFragmentManager()));
+					// pager adapter, not fragment pager any more
+					mViewPager.setAdapter(coverPager);
 					mIndicator.setViewPager(mViewPager);
 				} else {
 					Toast.makeText(getActivity(), getString(R.string.user_not_found), Toast.LENGTH_SHORT).show();
@@ -242,28 +242,57 @@ public class ProfileFragment extends Fragment {
 		return view;
 	}
 
-	private class CoverPagerFragment extends FragmentPagerAdapter {
+	private final PagerAdapter coverPager = new PagerAdapter() {
 
-		public CoverPagerFragment(FragmentManager fm) {
-			super(fm);
-		}
-
-		@Override
-		public Fragment getItem(int position) {
-			Log.d("pos", mAvatarUrl + " " + position);
-			switch (position) {
-				default:
-				case 0:
-					return CoverImageFragment.getFragment(mAvatarUrl, mScreenName, mRemark, mVerified);
-				case 1:
-					return CoverIntroFragment.getFragment(mDescription, mLocation, mProfileUrl);
-			}
-		}
+		private LayoutInflater mLayoutInflater;
 
 		@Override
 		public int getCount() {
-			return COVER_SIZE;
+			return 2;
 		}
-	}
 
+		@Override
+		public boolean isViewFromObject(View view, Object object) {
+			return view == object;
+		}
+
+		@Override
+		public void destroyItem(ViewGroup container, int position, Object object) {
+			container.removeView((View) object);
+		}
+
+		@Override
+		public Object instantiateItem(ViewGroup container, int position) {
+			if (mLayoutInflater == null) {
+				mLayoutInflater = LayoutInflater.from(getActivity());
+			}
+			switch (position) {
+				case 0:
+					View frontPage = mLayoutInflater.inflate(R.layout.profile_cover, container, false);
+					ImageView avatar = (ImageView) frontPage.findViewById(R.id.avatar);
+					mApp.getImageLoader().get(mAvatarUrl,
+							ImageLoader.getImageListener(avatar, R.drawable.error, R.drawable.error));
+					TextView screenName = (TextView) frontPage.findViewById(R.id.screen_name);
+					screenName.setText("@" + mScreenName);
+					TextView remark = (TextView) frontPage.findViewById(R.id.remark);
+					// 如果说没有备注的话那就和微博id一样
+					remark.setText(TextUtils.isEmpty(mRemark) ? mScreenName : mRemark);
+					if (mVerified) {
+						frontPage.findViewById(R.id.verified).setVisibility(View.VISIBLE);
+					}
+					container.addView(frontPage);
+					return frontPage;
+				case 1:
+					View introPage = mLayoutInflater.inflate(R.layout.profile_intro, container, false);
+					CatnutUtils.setText(introPage, R.id.description, TextUtils.isEmpty(mDescription)
+							? getString(R.string.no_description) : mDescription);
+					CatnutUtils.setText(introPage, R.id.location, mLocation);
+					CatnutUtils.setText(introPage, R.id.profile_url, Constants.WEIBO_DOMAIN + mProfileUrl);
+					container.addView(introPage);
+					return introPage;
+				default:
+					return null;
+			}
+		}
+	};
 }
