@@ -35,23 +35,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 用户的关注列表
+ * 关注者列表界面
  *
  * @author longkai
  */
-public class FollowingsFragment extends ListFragment implements AbsListView.OnScrollListener {
+public class TransientUsersFragment extends ListFragment implements AbsListView.OnScrollListener {
 
-	private String mScreenName;
+	private static final String TAG = "TransientUsersFragment";
 
 	private int next_cursor = 0;
 	private int total_number = 0;
-	private boolean mLoading = false;
-	private ProgressBar mLoadMore;
-
-	private List<TransientUser> mUsers;
-	private TransientUsersAdapter mAdapter;
 
 	private RequestQueue mRequestQueue;
+
+	private String mScreenName;
+	private boolean mFollowing;
+
+	private ProgressBar mLoadMore;
+	private boolean mLoading = false;
+
+	private ArrayList<TransientUser> mUsers;
+	private TransientUsersAdapter mAdapter;
 
 	private Response.Listener<List<TransientUser>> listener = new Response.Listener<List<TransientUser>>() {
 		@Override
@@ -74,19 +78,22 @@ public class FollowingsFragment extends ListFragment implements AbsListView.OnSc
 		}
 	};
 
-	public static FollowingsFragment getFragment(String screenName) {
+	public static TransientUsersFragment getFragment(String screenName, boolean following) {
 		Bundle args = new Bundle();
 		args.putString(User.screen_name, screenName);
-		FollowingsFragment followingsFragment = new FollowingsFragment();
-		followingsFragment.setArguments(args);
-		return followingsFragment;
+		args.putBoolean(TAG, following);
+		TransientUsersFragment transientUsersFragment = new TransientUsersFragment();
+		transientUsersFragment.setArguments(args);
+		return transientUsersFragment;
 	}
 
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		mScreenName = getArguments().getString(User.screen_name);
 		mRequestQueue = CatnutApp.getTingtingApp().getRequestQueue();
+		Bundle args = getArguments();
+		mScreenName = args.getString(User.screen_name);
+		mFollowing = args.getBoolean(TAG);
 	}
 
 	@Override
@@ -94,27 +101,29 @@ public class FollowingsFragment extends ListFragment implements AbsListView.OnSc
 		super.onCreate(savedInstanceState);
 		mUsers = new ArrayList<TransientUser>();
 		mAdapter = new TransientUsersAdapter(getActivity(), mUsers);
+		mLoadMore = new ProgressBar(getActivity());
 	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		loadFromCloud();
-		mLoadMore = new ProgressBar(getActivity());
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		getListView().setOnScrollListener(this);
 		setListAdapter(mAdapter);
 		getListView().addFooterView(mLoadMore);
-		getListView().setOnScrollListener(this);
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-		getActivity().getActionBar().setTitle(getString(R.string.his_followings, mScreenName));
+		getActivity().getActionBar().setTitle(getString(
+				mFollowing ? R.string.his_followings : R.string.his_followers, mScreenName)
+		);
 	}
 
 	@Override
@@ -130,15 +139,18 @@ public class FollowingsFragment extends ListFragment implements AbsListView.OnSc
 
 	private void loadFromCloud() {
 		mLoading = true;
-		CatnutAPI api = FriendshipsAPI.friends(mScreenName, 0, next_cursor, 1);
+		CatnutAPI api = mFollowing
+				? FriendshipsAPI.followers(mScreenName, 0, next_cursor, 1)
+				: FriendshipsAPI.friends(mScreenName, 0, next_cursor, 1);
 		mRequestQueue.add(new TransientRequest<List<TransientUser>>(api, listener, errorListener) {
 			@Override
 			protected Response<List<TransientUser>> parseNetworkResponse(NetworkResponse response) {
-				return FollowingsFragment.this.parseNetworkResponse(response);
+				return TransientUsersFragment.this.parseNetworkResponse(response);
 			}
 		});
 	}
 
+	// inner use
 	private Response<List<TransientUser>> parseNetworkResponse(NetworkResponse response) {
 		try {
 			String jsonString =

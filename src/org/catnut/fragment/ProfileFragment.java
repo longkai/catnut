@@ -98,7 +98,7 @@ public class ProfileFragment extends Fragment {
 		@Override
 		public void onClick(View v) {
 			ProfileActivity activity = (ProfileActivity) getActivity();
-			activity.flipCard(FollowersFragment.getFragment(mScreenName), null, true);
+			activity.flipCard(TransientUsersFragment.getFragment(mScreenName, false), null, true);
 		}
 	};
 
@@ -106,7 +106,7 @@ public class ProfileFragment extends Fragment {
 		@Override
 		public void onClick(View v) {
 			ProfileActivity activity = (ProfileActivity) getActivity();
-			activity.flipCard(FollowingsFragment.getFragment(mScreenName), null, true);
+			activity.flipCard(TransientUsersFragment.getFragment(mScreenName, true), null, true);
 		}
 	};
 
