@@ -111,6 +111,7 @@ public class TweetAdapter extends CursorAdapter {
 
 		ImageView thumbs;
 		int thumbsIndex;
+		int remarkIndex;
 	}
 
 	@Override
@@ -139,6 +140,7 @@ public class TweetAdapter extends CursorAdapter {
 		holder.sourceIndex = cursor.getColumnIndex(Status.source);
 		holder.thumbsIndex = cursor.getColumnIndex(Status.thumbnail_pic);
 		holder.thumbs = (ImageView) view.findViewById(R.id.thumbs);
+		holder.remarkIndex = cursor.getColumnIndex(User.remark);
 		view.setTag(holder);
 		return view;
 	}
@@ -163,7 +165,8 @@ public class TweetAdapter extends CursorAdapter {
 					mContext.startActivity(intent);
 				}
 			});
-			holder.nick.setText(cursor.getString(holder.nickIndex));
+			String remark = cursor.getString(holder.remarkIndex);
+			holder.nick.setText(TextUtils.isEmpty(remark) ? cursor.getString(holder.nickIndex) : remark);
 		} else {
 			holder.nick.setText(mUserNick);
 		}
