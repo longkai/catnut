@@ -7,9 +7,11 @@ package org.catnut.fragment;
 
 import android.app.Activity;
 import android.app.ListFragment;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.android.volley.NetworkResponse;
@@ -21,11 +23,15 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import org.catnut.R;
 import org.catnut.adapter.TransientUsersAdapter;
 import org.catnut.api.FriendshipsAPI;
+import org.catnut.api.UserAPI;
 import org.catnut.core.CatnutAPI;
 import org.catnut.core.CatnutApp;
+import org.catnut.core.CatnutRequest;
 import org.catnut.metadata.User;
+import org.catnut.processor.UserProcessor;
 import org.catnut.support.TransientRequest;
 import org.catnut.support.TransientUser;
+import org.catnut.ui.ProfileActivity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -124,6 +130,34 @@ public class TransientUsersFragment extends ListFragment implements AbsListView.
 		getActivity().getActionBar().setTitle(getString(
 				mFollowing ? R.string.his_followings : R.string.his_followers, mScreenName)
 		);
+	}
+
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id) {
+		final TransientUser user = mUsers.get(position);
+		CatnutAPI api = UserAPI.profile(user.id);
+		final ProgressDialog loading = ProgressDialog.show(getActivity(), null, getString(R.string.loading));
+		loading.show();
+		mRequestQueue.add(new CatnutRequest(
+				getActivity(),
+				api,
+				new UserProcessor.UserProfileProcessor(),
+				new Response.Listener<JSONObject>() {
+					@Override
+					public void onResponse(JSONObject response) {
+						loading.dismiss();
+						ProfileActivity activity = (ProfileActivity) getActivity();
+						activity.flipCard(ProfileFragment.getFragment(user.id, user.screenName), null, true);
+					}
+				},
+				new Response.ErrorListener() {
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						loading.dismiss();
+						Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+					}
+				}
+		));
 	}
 
 	@Override

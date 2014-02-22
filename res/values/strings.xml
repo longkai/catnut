@@ -71,6 +71,7 @@
 	<string name="load_cover_fail">载入封面图片失败，使用默认图片Orz</string>
 	<string name="his_followers">%1$s 的粉丝</string>
 	<string name="his_followings">%1$s 的关注</string>
+	<string name="loading">载入中</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>微博</item>
