@@ -25,6 +25,12 @@
 			android:summary="@string/auto_fetch_on_start_summary" />
 
 		<CheckBoxPreference
+			android:key="@string/pref_show_latest_tweet"
+			android:defaultValue="true"
+			android:title="@string/show_latest_tweet"
+			android:summary="@string/show_latest_tweet_summary" />
+
+		<CheckBoxPreference
 			android:key="@string/pref_load_more_from_cloud"
 			android:defaultValue="true"
 			android:title="@string/load_more_from_cloud"

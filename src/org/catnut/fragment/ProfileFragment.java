@@ -8,6 +8,7 @@ package org.catnut.fragment;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.AsyncQueryHandler;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -45,7 +46,7 @@ import org.catnut.util.DateTime;
  *
  * @author longkai
  */
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
 	private static final int COVER_SIZE = 2;
 
@@ -200,55 +201,57 @@ public class ProfileFragment extends Fragment {
 				cursor.close();
 			}
 		}.startQuery(0, null, CatnutProvider.parse(User.MULTIPLE), null, query, null, null);
-		// 接下来抓最新的一条微博，这里弄得稍微复杂了，以后设置一个偏好吧 todo
-		String queryLatestTweet = CatnutUtils.buildQuery(
-				new String[]{
-						Status.columnText,
-						Status.thumbnail_pic,
-						Status.comments_count,
-						Status.reposts_count,
-						Status.attitudes_count,
-						Status.source,
-						Status.created_at,
-				},
-				"uid=(select _id from " + User.TABLE + " where " + User.screen_name
-						+ "=" + CatnutUtils.quote(mScreenName) + ")",
-				Status.TABLE,
-				null,
-				BaseColumns._ID + " desc",
-				"1"
-		);
-		new AsyncQueryHandler(getActivity().getContentResolver()) {
-			@Override
-			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-				if (cursor.moveToNext()) {
-					mTweetLayout.setOnClickListener(tweetsOnclickListener);
-					ViewStub viewStub = (ViewStub) mTweetLayout.findViewById(R.id.latest_tweet);
-					View tweet = viewStub.inflate();
-					CatnutUtils.setText(tweet, R.id.nick, getString(R.string.latest_statues))
-							.setTextColor(getResources().getColor(R.color.actionbar_background));
-					String tweetText = cursor.getString(cursor.getColumnIndex(Status.columnText));
-					TweetTextView text = (TweetTextView) CatnutUtils.setText(tweet, R.id.text,
-							new TweetImageSpan(getActivity()).getImageSpan(tweetText));
-					Linkify.addLinks(text, TweetTextView.MENTION_PATTERN, TweetTextView.MENTION_SCHEME, null, TweetTextView.MENTION_FILTER);
-					Linkify.addLinks(text, TweetTextView.TOPIC_PATTERN, TweetTextView.TOPIC_SCHEME, null, TweetTextView.TOPIC_FILTER);
-					Linkify.addLinks(text, TweetTextView.WEB_URL, null, null, TweetTextView.URL_FILTER);
-					CatnutUtils.removeLinkUnderline(text);
+		// 接下来抓最新的一条微博
+		if (mApp.getPreferences().getBoolean(getString(R.string.pref_show_latest_tweet), true)) {
+			String queryLatestTweet = CatnutUtils.buildQuery(
+					new String[]{
+							Status.columnText,
+							Status.thumbnail_pic,
+							Status.comments_count,
+							Status.reposts_count,
+							Status.attitudes_count,
+							Status.source,
+							Status.created_at,
+					},
+					"uid=(select _id from " + User.TABLE + " where " + User.screen_name
+							+ "=" + CatnutUtils.quote(mScreenName) + ")",
+					Status.TABLE,
+					null,
+					BaseColumns._ID + " desc",
+					"1"
+			);
+			new AsyncQueryHandler(getActivity().getContentResolver()) {
+				@Override
+				protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+					if (cursor.moveToNext()) {
+						mTweetLayout.setOnClickListener(tweetsOnclickListener);
+						ViewStub viewStub = (ViewStub) mTweetLayout.findViewById(R.id.latest_tweet);
+						View tweet = viewStub.inflate();
+						CatnutUtils.setText(tweet, R.id.nick, getString(R.string.latest_statues))
+								.setTextColor(getResources().getColor(R.color.actionbar_background));
+						String tweetText = cursor.getString(cursor.getColumnIndex(Status.columnText));
+						TweetTextView text = (TweetTextView) CatnutUtils.setText(tweet, R.id.text,
+								new TweetImageSpan(getActivity()).getImageSpan(tweetText));
+						Linkify.addLinks(text, TweetTextView.MENTION_PATTERN, TweetTextView.MENTION_SCHEME, null, TweetTextView.MENTION_FILTER);
+						Linkify.addLinks(text, TweetTextView.TOPIC_PATTERN, TweetTextView.TOPIC_SCHEME, null, TweetTextView.TOPIC_FILTER);
+						Linkify.addLinks(text, TweetTextView.WEB_URL, null, null, TweetTextView.URL_FILTER);
+						CatnutUtils.removeLinkUnderline(text);
 
-					int replyCount = cursor.getInt(cursor.getColumnIndex(Status.comments_count));
-					CatnutUtils.setText(tweet, R.id.reply_count, CatnutUtils.approximate(replyCount));
-					int retweetCount = cursor.getInt(cursor.getColumnIndex(Status.reposts_count));
-					CatnutUtils.setText(tweet, R.id.reteet_count, CatnutUtils.approximate(retweetCount));
-					int favoriteCount = cursor.getInt(cursor.getColumnIndex(Status.attitudes_count));
-					CatnutUtils.setText(tweet, R.id.favorite_count, CatnutUtils.approximate(favoriteCount));
-					String source = cursor.getString(cursor.getColumnIndex(Status.source));
-					CatnutUtils.setText(tweet, R.id.source, Html.fromHtml(source).toString());
-					String create_at = cursor.getString(cursor.getColumnIndex(Status.created_at));
-					CatnutUtils.setText(tweet, R.id.create_at, DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(create_at)));
+						int replyCount = cursor.getInt(cursor.getColumnIndex(Status.comments_count));
+						CatnutUtils.setText(tweet, R.id.reply_count, CatnutUtils.approximate(replyCount));
+						int retweetCount = cursor.getInt(cursor.getColumnIndex(Status.reposts_count));
+						CatnutUtils.setText(tweet, R.id.reteet_count, CatnutUtils.approximate(retweetCount));
+						int favoriteCount = cursor.getInt(cursor.getColumnIndex(Status.attitudes_count));
+						CatnutUtils.setText(tweet, R.id.favorite_count, CatnutUtils.approximate(favoriteCount));
+						String source = cursor.getString(cursor.getColumnIndex(Status.source));
+						CatnutUtils.setText(tweet, R.id.source, Html.fromHtml(source).toString());
+						String create_at = cursor.getString(cursor.getColumnIndex(Status.created_at));
+						CatnutUtils.setText(tweet, R.id.create_at, DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(create_at)));
+					}
+					cursor.close();
 				}
-				cursor.close();
-			}
-		}.startQuery(0, null, CatnutProvider.parse(Status.MULTIPLE), null, queryLatestTweet, null, null);
+			}.startQuery(0, null, CatnutProvider.parse(Status.MULTIPLE), null, queryLatestTweet, null, null);
+		}
 		return view;
 	}
 
@@ -305,4 +308,17 @@ public class ProfileFragment extends Fragment {
 			}
 		}
 	};
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+		if (key.equals(getString(R.string.pref_show_latest_tweet))) {
+			boolean show = mApp.getPreferences().getBoolean(key, true);
+			// 如果已经显示那么隐藏，反之，如果根本就没有初始化数据，那么不会再去抓数据
+			if (show) {
+				mTweetLayout.setVisibility(View.VISIBLE);
+			} else {
+				mTweetLayout.setVisibility(View.GONE);
+			}
+		}
+	}
 }

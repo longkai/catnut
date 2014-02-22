@@ -20,6 +20,7 @@
 	<string name="pref_source_code">pref_source_code</string>
 	<string name="pref_open_source_license">pref_open_source_license</string>
 	<string name="pref_enable_analytics">pref_enable_analytics</string>
+	<string name="pref_show_latest_tweet">pref_show_latest_tweet</string>
 
 	<integer name="default_fetch_size">20</integer>
 	<integer name="default_tweet_font_size">16</integer>
