@@ -240,10 +240,15 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 					mCoverUrl = cursor.getString(cursor.getColumnIndex(User.cover_image));
 					// +关注
 					mFollowing = CatnutUtils.getBoolean(cursor, User.following);
-					if (!mFollowing && mMenu != null) {
-						mMenu.add(Menu.NONE, R.id.action_follow, Menu.NONE, R.string.follow)
-								.setIcon(R.drawable.ic_title_follow)
-								.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+					if (mMenu != null) {
+						if (!mFollowing) {
+							mMenu.add(Menu.NONE, R.id.action_follow, Menu.NONE, R.string.follow)
+									.setIcon(R.drawable.ic_title_follow)
+									.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+						} else {
+							mMenu.add(Menu.NONE, R.id.action_unfollow, Menu.NONE, R.string.unfollow)
+									.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+						}
 					}
 					// load封面图片
 					mApp.getImageLoader().get(mCoverUrl, new ImageLoader.ImageListener() {
@@ -287,7 +292,10 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.action_follow:
-				follow();
+				toggleFollow(true);
+				break;
+			case R.id.action_unfollow:
+				toggleFollow(false);
 				break;
 			default:
 				break;
@@ -295,24 +303,36 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 		return super.onOptionsItemSelected(item);
 	}
 
-	private void follow() {
+	private void toggleFollow(final boolean follow) {
 		mApp.getRequestQueue().add(new CatnutRequest(
 				getActivity(),
-				FriendshipsAPI.create(mScreenName, null),
+				follow ? FriendshipsAPI.create(mScreenName, null) : FriendshipsAPI.destroy(mScreenName),
 				new UserProcessor.UserProfileProcessor(),
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {
-						Toast.makeText(getActivity(), getString(R.string.follow_success), Toast.LENGTH_SHORT).show();
-						mMenu.removeItem(R.id.action_follow);
-						mFollowing = true;
+						Toast.makeText(getActivity(),
+								getString(follow ? R.string.follow_success : R.string.unfollow_success),
+								Toast.LENGTH_SHORT).show();
+						if (follow) {
+							mMenu.removeItem(R.id.action_follow);
+							mMenu.add(Menu.NONE, R.id.action_follow, Menu.NONE, R.string.unfollow)
+									.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+						} else {
+							mMenu.removeItem(R.id.action_unfollow);
+							mMenu.add(Menu.NONE, R.id.action_follow, Menu.NONE, R.string.follow)
+									.setIcon(R.drawable.ic_title_follow)
+									.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+						}
+						mFollowing = !mFollowing;
 						// 更新本地数据库
+						final String str = follow ? "+1" : "-1";
 						new Thread(new Runnable() {
 							@Override
 							public void run() {
 								long uid = mApp.getAccessToken().uid;
 								String update = "update " + User.TABLE + " SET " + User.friends_count + "="
-										+ User.friends_count + "+1 WHERE " + BaseColumns._ID + "=" + uid;
+										+ User.friends_count + str + " WHERE " + BaseColumns._ID + "=" + uid;
 								getActivity().getContentResolver().update(
 										CatnutProvider.parse(User.MULTIPLE, uid),
 										null,

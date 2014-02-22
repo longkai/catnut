@@ -50,14 +50,9 @@ public class FriendshipsAPI {
 	 * @return 用户的关注列表api
 	 */
 	public static CatnutAPI friends(String screen_name, int count, int cursor, int trim_status) {
-		String encode = null;
-		try {
-			encode = URLEncoder.encode(screen_name, "utf-8");
-		} catch (UnsupportedEncodingException e) {
-		}
 		StringBuilder uri = new StringBuilder(BASE_URI);
 		uri.append("friends.json")
-				.append("?screen_name=").append(encode)
+				.append("?screen_name=").append(CatnutAPI.encode(screen_name))
 				.append("&count=").append(CatnutUtils.optValue(count, 50))
 				.append("&cursor=").append(CatnutUtils.optValue(cursor, 0))
 				.append("&trim_status=").append(CatnutUtils.optValue(trim_status, 1));
@@ -93,14 +88,9 @@ public class FriendshipsAPI {
 	 * @return api
 	 */
 	public static CatnutAPI followers(String screen_name, int count, int cursor, int trim_status) {
-		String encode = null;
-		try {
-			encode = URLEncoder.encode(screen_name, "utf-8");
-		} catch (UnsupportedEncodingException e) {
-		}
 		StringBuilder uri = new StringBuilder(BASE_URI);
 		uri.append("followers.json")
-				.append("?screen_name=").append(encode)
+				.append("?screen_name=").append(CatnutAPI.encode(screen_name))
 				.append("&count=").append(CatnutUtils.optValue(count, 50))
 				.append("&cursor=").append(CatnutUtils.optValue(cursor, 0))
 				.append("&trim_status=").append(CatnutUtils.optValue(trim_status, 1));
@@ -115,15 +105,23 @@ public class FriendshipsAPI {
 	 * @return api
 	 */
 	public static CatnutAPI create(String screen_name, String rip) {
-		String encode = null;
-		try {
-			encode = URLEncoder.encode(screen_name, "utf-8");
-		} catch (UnsupportedEncodingException e) {
-		}
 		StringBuilder uri = new StringBuilder(BASE_URI);
 		uri.append("create.json")
-				.append("?screen_name=").append(encode)
+				.append("?screen_name=").append(CatnutAPI.encode(screen_name))
 				.append("&rip=").append(rip);
+		return new CatnutAPI(Request.Method.POST, uri.toString(), true, null);
+	}
+
+	/**
+	 * 取消关注一个用户
+	 *
+	 * @param screen_name 需要取消关注的用户昵称
+	 * @return api
+	 */
+	public static CatnutAPI destroy(String screen_name) {
+		StringBuilder uri = new StringBuilder(BASE_URI);
+		uri.append("destroy.json")
+				.append("?screen_name=").append(CatnutAPI.encode(screen_name));
 		return new CatnutAPI(Request.Method.POST, uri.toString(), true, null);
 	}
 }

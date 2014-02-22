@@ -42,14 +42,9 @@ public class UserAPI {
 	 * @return api
 	 */
 	public static CatnutAPI profile(String screen_name) {
-		String encode = null;
-		try {
-			encode = URLEncoder.encode(screen_name, "utf-8");
-		} catch (UnsupportedEncodingException e) {
-		}
 		return new CatnutAPI(
 				Request.Method.GET,
-				BASE_URI + "show.json?screen_name=" + encode,
+				BASE_URI + "show.json?screen_name=" + CatnutAPI.encode(screen_name),
 				true,
 				null
 		);

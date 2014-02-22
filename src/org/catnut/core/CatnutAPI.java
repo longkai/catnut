@@ -5,6 +5,8 @@
  */
 package org.catnut.core;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Map;
 
 /**
@@ -31,5 +33,14 @@ public class CatnutAPI {
 		this.uri = uri;
 		this.authRequired = authRequired;
 		this.params = params;
+	}
+
+	public static String encode(String string) {
+		String encode = null;
+		try {
+			encode = URLEncoder.encode(string, "utf-8");
+		} catch (UnsupportedEncodingException e) {
+		}
+		return encode;
 	}
 }
