@@ -18,6 +18,7 @@ import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,6 +65,7 @@ public class ProfileFragment extends Fragment {
 	};
 
 	private CatnutApp mApp;
+	private Activity mActivity;
 
 	private long mUid;
 	private String mScreenName;
@@ -91,6 +93,14 @@ public class ProfileFragment extends Fragment {
 		}
 	};
 
+	private View.OnClickListener followersOnclickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			ProfileActivity activity = (ProfileActivity) getActivity();
+			activity.flipCard(FollowersFragment.getFragment(mScreenName), null, true);
+		}
+	};
+
 	public static ProfileFragment getFragment(long uid, String screenName) {
 		Bundle args = new Bundle();
 		args.putLong(Constants.ID, uid);
@@ -104,9 +114,16 @@ public class ProfileFragment extends Fragment {
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		mApp = CatnutApp.getTingtingApp();
+		mActivity = activity;
 		Bundle args = getArguments();
 		mUid = args.getLong(Constants.ID);
 		mScreenName = args.getString(User.screen_name);
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		getActivity().getActionBar().setTitle(mScreenName);
 	}
 
 	@Override
@@ -120,6 +137,7 @@ public class ProfileFragment extends Fragment {
 		mFollowersCount = view.findViewById(R.id.followers_count);
 		mTweetLayout = view.findViewById(R.id.tweet_layout);
 		view.findViewById(R.id.action_tweets).setOnClickListener(tweetsOnclickListener);
+		view.findViewById(R.id.action_followers).setOnClickListener(followersOnclickListener);
 		// 从本地抓取数据*_*
 		String query = CatnutUtils.buildQuery(PROJECTION,
 				User.screen_name + "=" + CatnutUtils.quote(mScreenName), User.TABLE, null, null, null);
@@ -145,7 +163,7 @@ public class ProfileFragment extends Fragment {
 						@Override
 						public void onErrorResponse(VolleyError error) {
 							mPlaceHolder.setBackgroundResource(R.raw.default_cover);
-							Toast.makeText(getActivity(), getString(R.string.load_cover_fail), Toast.LENGTH_SHORT).show();
+//							Toast.makeText(getActivity(), getString(R.string.load_cover_fail), Toast.LENGTH_SHORT).show();
 						}
 					});
 					// 我的微博
@@ -154,6 +172,7 @@ public class ProfileFragment extends Fragment {
 							cursor.getString(cursor.getColumnIndex(User.statuses_count)));
 					CatnutUtils.setText(mTweetsCount, android.R.id.text2, getString(R.string.tweets));
 					// 关注我的
+					mFollowersCount.setOnClickListener(followersOnclickListener);
 					CatnutUtils.setText(mFollowersCount, android.R.id.text1,
 							cursor.getString(cursor.getColumnIndex(User.followers_count)));
 					CatnutUtils.setText(mFollowersCount, android.R.id.text2, getString(R.string.followers));
@@ -162,6 +181,7 @@ public class ProfileFragment extends Fragment {
 							cursor.getString(cursor.getColumnIndex(User.friends_count)));
 					CatnutUtils.setText(mFollowingsCount, android.R.id.text2, getString(R.string.followings));
 					// pager adapter
+					Log.d("xx", "set adapter");
 					mViewPager.setAdapter(new CoverPagerFragment(getFragmentManager()));
 					mIndicator.setViewPager(mViewPager);
 				} else {
@@ -230,6 +250,7 @@ public class ProfileFragment extends Fragment {
 
 		@Override
 		public Fragment getItem(int position) {
+			Log.d("pos", mAvatarUrl + " " + position);
 			switch (position) {
 				default:
 				case 0:

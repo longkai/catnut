@@ -55,6 +55,7 @@
 		android:layout_height="wrap_content" />
 
 	<ImageView
+		android:visibility="gone"
 		android:id="@+id/toggle_following"
 		android:layout_alignParentRight="true"
 		android:layout_alignTop="@id/nick"

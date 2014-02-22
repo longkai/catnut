@@ -91,12 +91,12 @@ public class UsersAdapter extends CursorAdapter {
 		String desc = cursor.getString(holder.descriptionIndex);
 		if (!TextUtils.isEmpty(desc)) {
 			holder.description.setText(desc);
-			Linkify.addLinks(holder.description, TweetTextView.WEB_URL, null, null, TweetTextView.URL_FILTER);
-			CatnutUtils.removeLinkUnderline(holder.description);
+//			Linkify.addLinks(holder.description, TweetTextView.WEB_URL, null, null, TweetTextView.URL_FILTER);
+//			CatnutUtils.removeLinkUnderline(holder.description);
 		} else {
 			holder.description.setText(context.getText(R.string.no_description));
 		}
-
+		holder.toggleFollowing.setVisibility(View.VISIBLE);
 		if (cursor.getInt(holder.followingIndex) == 1) {
 			holder.toggleFollowing.setImageResource(R.drawable.btn_inline_following);
 		} else {
