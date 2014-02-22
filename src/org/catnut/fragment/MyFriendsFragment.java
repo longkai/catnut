@@ -6,20 +6,25 @@
 package org.catnut.fragment;
 
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
+import android.view.View;
+import android.widget.ListView;
 import org.catnut.R;
 import org.catnut.adapter.UsersAdapter;
 import org.catnut.api.FriendshipsAPI;
 import org.catnut.core.CatnutApp;
+import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
 import org.catnut.metadata.User;
 import org.catnut.processor.UserProcessor;
-import org.catnut.core.CatnutProvider;
+import org.catnut.ui.ProfileActivity;
 import org.catnut.util.CatnutUtils;
+import org.catnut.util.Constants;
 
 /**
  * 好友界面，当前登录用户专用
@@ -141,5 +146,14 @@ public class MyFriendsFragment extends UsersFragment {
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
 		mAdapter.swapCursor(null);
+	}
+
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id) {
+		Cursor cursor = (Cursor) mAdapter.getItem(position);
+		Intent intent = new Intent(getActivity(), ProfileActivity.class);
+		intent.putExtra(User.screen_name, cursor.getString(cursor.getColumnIndex(User.screen_name)));
+		intent.putExtra(Constants.ID, id);
+		getActivity().startActivity(intent);
 	}
 }

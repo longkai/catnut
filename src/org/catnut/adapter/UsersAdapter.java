@@ -8,7 +8,6 @@ package org.catnut.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.text.TextUtils;
-import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,6 @@ import com.android.volley.toolbox.ImageLoader;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.metadata.User;
-import org.catnut.support.TweetTextView;
 import org.catnut.util.CatnutUtils;
 
 /**
@@ -91,8 +89,6 @@ public class UsersAdapter extends CursorAdapter {
 		String desc = cursor.getString(holder.descriptionIndex);
 		if (!TextUtils.isEmpty(desc)) {
 			holder.description.setText(desc);
-//			Linkify.addLinks(holder.description, TweetTextView.WEB_URL, null, null, TweetTextView.URL_FILTER);
-//			CatnutUtils.removeLinkUnderline(holder.description);
 		} else {
 			holder.description.setText(context.getText(R.string.no_description));
 		}
