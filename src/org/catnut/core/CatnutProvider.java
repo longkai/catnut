@@ -60,7 +60,7 @@ public class CatnutProvider extends ContentProvider {
 	 * @param id
 	 * @return Uri
 	 */
-	public static Uri parse(String path, String id) {
+	public static Uri parse(String path, long id) {
 		return Uri.parse(BASE_URI + "/" + path + "/" + id);
 	}
 
@@ -174,7 +174,16 @@ public class CatnutProvider extends ContentProvider {
 
 	@Override
 	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-		throw new UnsupportedOperationException("not supported for now!");
+		switch (matcher.match(uri)) {
+			case USER:
+				SQLiteDatabase db = mDb.getWritableDatabase();
+				db.execSQL(selection);
+				break;
+			default:
+				throw new UnsupportedOperationException("not supported for now!");
+		}
+		getContext().getContentResolver().notifyChange(uri, null, false);
+		return 1; // 随便填的
 	}
 
 	/**

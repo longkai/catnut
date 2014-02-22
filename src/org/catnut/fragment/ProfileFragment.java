@@ -20,26 +20,34 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.viewpagerindicator.LinePageIndicator;
 import org.catnut.R;
+import org.catnut.api.FriendshipsAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
+import org.catnut.core.CatnutRequest;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
+import org.catnut.processor.UserProcessor;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.ui.ProfileActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
+import org.json.JSONObject;
 
 /**
  * 用户信息界面
@@ -47,8 +55,6 @@ import org.catnut.util.DateTime;
  * @author longkai
  */
 public class ProfileFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
-
-	private static final int COVER_SIZE = 2;
 
 	private static final String[] PROJECTION = new String[]{
 			BaseColumns._ID,
@@ -63,17 +69,19 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 			User.favourites_count,
 			User.friends_count,
 			User.statuses_count,
-			User.followers_count
+			User.followers_count,
+			User.following
 	};
 
 	private CatnutApp mApp;
-	private Activity mActivity;
+	private Menu mMenu;
 
 	private long mUid;
 	private String mScreenName;
 	private String mCoverUrl;
 	private String mAvatarUrl;
 	private boolean mVerified;
+	private boolean mFollowing; // 哥是否关注他
 	private String mRemark;
 	private String mDescription;
 	private String mLocation;
@@ -124,10 +132,15 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		mApp = CatnutApp.getTingtingApp();
-		mActivity = activity;
 		Bundle args = getArguments();
 		mUid = args.getLong(Constants.ID);
 		mScreenName = args.getString(User.screen_name);
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
 	}
 
 	@Override
@@ -149,59 +162,12 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 		view.findViewById(R.id.action_tweets).setOnClickListener(tweetsOnclickListener);
 		view.findViewById(R.id.action_followers).setOnClickListener(followersOnclickListener);
 		view.findViewById(R.id.action_followings).setOnClickListener(followingsOnClickListener);
-		// 从本地抓取数据*_*
-		String query = CatnutUtils.buildQuery(PROJECTION,
-				User.screen_name + "=" + CatnutUtils.quote(mScreenName), User.TABLE, null, null, null);
-		new AsyncQueryHandler(getActivity().getContentResolver()) {
-			@Override
-			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-				if (cursor.moveToNext()) {
-					// 暂存元数据
-					mAvatarUrl = cursor.getString(cursor.getColumnIndex(User.avatar_large));
-					mVerified = CatnutUtils.getBoolean(cursor, User.verified);
-					mRemark = cursor.getString(cursor.getColumnIndex(User.remark));
-					mDescription = cursor.getString(cursor.getColumnIndex(User.description));
-					mLocation = cursor.getString(cursor.getColumnIndex(User.location));
-					mProfileUrl = cursor.getString(cursor.getColumnIndex(User.profile_url));
-					mCoverUrl = cursor.getString(cursor.getColumnIndex(User.cover_image));
-					// load封面图片
-					mApp.getImageLoader().get(mCoverUrl, new ImageLoader.ImageListener() {
-						@Override
-						public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-							mPlaceHolder.setBackground(new BitmapDrawable(getResources(), response.getBitmap()));
-						}
+		return view;
+	}
 
-						@Override
-						public void onErrorResponse(VolleyError error) {
-							mPlaceHolder.setBackgroundResource(R.raw.default_cover);
-//							Toast.makeText(getActivity(), getString(R.string.load_cover_fail), Toast.LENGTH_SHORT).show();
-						}
-					});
-					// 我的微博
-					mTweetsCount.setOnClickListener(tweetsOnclickListener);
-					CatnutUtils.setText(mTweetsCount, android.R.id.text1,
-							cursor.getString(cursor.getColumnIndex(User.statuses_count)));
-					CatnutUtils.setText(mTweetsCount, android.R.id.text2, getString(R.string.tweets));
-					// 关注我的
-					mFollowersCount.setOnClickListener(followersOnclickListener);
-					CatnutUtils.setText(mFollowersCount, android.R.id.text1,
-							cursor.getString(cursor.getColumnIndex(User.followers_count)));
-					CatnutUtils.setText(mFollowersCount, android.R.id.text2, getString(R.string.followers));
-					// 我关注的
-					mFollowingsCount.setOnClickListener(followingsOnClickListener);
-					CatnutUtils.setText(mFollowingsCount, android.R.id.text1,
-							cursor.getString(cursor.getColumnIndex(User.friends_count)));
-					CatnutUtils.setText(mFollowingsCount, android.R.id.text2, getString(R.string.followings));
-					// pager adapter, not fragment pager any more
-					mViewPager.setAdapter(coverPager);
-					mIndicator.setViewPager(mViewPager);
-				} else {
-					Toast.makeText(getActivity(), getString(R.string.user_not_found), Toast.LENGTH_SHORT).show();
-				}
-				cursor.close();
-			}
-		}.startQuery(0, null, CatnutProvider.parse(User.MULTIPLE), null, query, null, null);
-		// 接下来抓最新的一条微博
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		// 抓最新的一条微博
 		if (mApp.getPreferences().getBoolean(getString(R.string.pref_show_latest_tweet), true)) {
 			String queryLatestTweet = CatnutUtils.buildQuery(
 					new String[]{
@@ -252,7 +218,118 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 				}
 			}.startQuery(0, null, CatnutProvider.parse(Status.MULTIPLE), null, queryLatestTweet, null, null);
 		}
-		return view;
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		mMenu = menu;
+		// 从本地抓取数据*_*，有一个时间先后的问题，所以把view的创建放到这个地方来了
+		String query = CatnutUtils.buildQuery(PROJECTION,
+				User.screen_name + "=" + CatnutUtils.quote(mScreenName), User.TABLE, null, null, null);
+		new AsyncQueryHandler(getActivity().getContentResolver()) {
+			@Override
+			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+				if (cursor.moveToNext()) {
+					// 暂存元数据
+					mAvatarUrl = cursor.getString(cursor.getColumnIndex(User.avatar_large));
+					mVerified = CatnutUtils.getBoolean(cursor, User.verified);
+					mRemark = cursor.getString(cursor.getColumnIndex(User.remark));
+					mDescription = cursor.getString(cursor.getColumnIndex(User.description));
+					mLocation = cursor.getString(cursor.getColumnIndex(User.location));
+					mProfileUrl = cursor.getString(cursor.getColumnIndex(User.profile_url));
+					mCoverUrl = cursor.getString(cursor.getColumnIndex(User.cover_image));
+					// +关注
+					mFollowing = CatnutUtils.getBoolean(cursor, User.following);
+					if (!mFollowing && mMenu != null) {
+						mMenu.add(Menu.NONE, R.id.action_follow, Menu.NONE, R.string.follow)
+								.setIcon(R.drawable.ic_title_follow)
+								.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+					}
+					// load封面图片
+					mApp.getImageLoader().get(mCoverUrl, new ImageLoader.ImageListener() {
+						@Override
+						public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+							mPlaceHolder.setBackground(new BitmapDrawable(getResources(), response.getBitmap()));
+						}
+
+						@Override
+						public void onErrorResponse(VolleyError error) {
+							mPlaceHolder.setBackgroundResource(R.raw.default_cover);
+						}
+					});
+					// 我的微博
+					mTweetsCount.setOnClickListener(tweetsOnclickListener);
+					CatnutUtils.setText(mTweetsCount, android.R.id.text1,
+							cursor.getString(cursor.getColumnIndex(User.statuses_count)));
+					CatnutUtils.setText(mTweetsCount, android.R.id.text2, getString(R.string.tweets));
+					// 关注我的
+					mFollowersCount.setOnClickListener(followersOnclickListener);
+					CatnutUtils.setText(mFollowersCount, android.R.id.text1,
+							cursor.getString(cursor.getColumnIndex(User.followers_count)));
+					CatnutUtils.setText(mFollowersCount, android.R.id.text2, getString(R.string.followers));
+					// 我关注的
+					mFollowingsCount.setOnClickListener(followingsOnClickListener);
+					CatnutUtils.setText(mFollowingsCount, android.R.id.text1,
+							cursor.getString(cursor.getColumnIndex(User.friends_count)));
+					CatnutUtils.setText(mFollowingsCount, android.R.id.text2, getString(R.string.followings));
+					// pager adapter, not fragment pager any more
+					mViewPager.setAdapter(coverPager);
+					mIndicator.setViewPager(mViewPager);
+				} else {
+					Toast.makeText(getActivity(), getString(R.string.user_not_found), Toast.LENGTH_SHORT).show();
+				}
+				cursor.close();
+			}
+		}.startQuery(0, null, CatnutProvider.parse(User.MULTIPLE), null, query, null, null);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.action_follow:
+				follow();
+				break;
+			default:
+				break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	private void follow() {
+		mApp.getRequestQueue().add(new CatnutRequest(
+				getActivity(),
+				FriendshipsAPI.create(mScreenName, null),
+				new UserProcessor.UserProfileProcessor(),
+				new Response.Listener<JSONObject>() {
+					@Override
+					public void onResponse(JSONObject response) {
+						Toast.makeText(getActivity(), getString(R.string.follow_success), Toast.LENGTH_SHORT).show();
+						mMenu.removeItem(R.id.action_follow);
+						mFollowing = true;
+						// 更新本地数据库
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								long uid = mApp.getAccessToken().uid;
+								String update = "update " + User.TABLE + " SET " + User.friends_count + "="
+										+ User.friends_count + "+1 WHERE " + BaseColumns._ID + "=" + uid;
+								getActivity().getContentResolver().update(
+										CatnutProvider.parse(User.MULTIPLE, uid),
+										null,
+										update,
+										null
+								);
+							}
+						}).start();
+					}
+				},
+				new Response.ErrorListener() {
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+					}
+				}
+		));
 	}
 
 	private final PagerAdapter coverPager = new PagerAdapter() {

@@ -221,7 +221,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		}.startQuery(
 				0,
 				null,
-				CatnutProvider.parse(User.MULTIPLE, String.valueOf(mApp.getAccessToken().uid)),
+				CatnutProvider.parse(User.MULTIPLE, mApp.getAccessToken().uid),
 				new String[]{
 						User.screen_name,
 						User.avatar_large,

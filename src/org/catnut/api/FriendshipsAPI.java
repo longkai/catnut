@@ -106,4 +106,24 @@ public class FriendshipsAPI {
 				.append("&trim_status=").append(CatnutUtils.optValue(trim_status, 1));
 		return new CatnutAPI(Request.Method.GET, uri.toString(), true, null);
 	}
+
+	/**
+	 * 关注一个用户
+	 *
+	 * @param screen_name 需要关注的用户昵称
+	 * @param rip         开发者上报的操作用户真实IP，形如：211.156.0.1
+	 * @return api
+	 */
+	public static CatnutAPI create(String screen_name, String rip) {
+		String encode = null;
+		try {
+			encode = URLEncoder.encode(screen_name, "utf-8");
+		} catch (UnsupportedEncodingException e) {
+		}
+		StringBuilder uri = new StringBuilder(BASE_URI);
+		uri.append("create.json")
+				.append("?screen_name=").append(encode)
+				.append("&rip=").append(rip);
+		return new CatnutAPI(Request.Method.POST, uri.toString(), true, null);
+	}
 }

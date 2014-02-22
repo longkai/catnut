@@ -5,6 +5,7 @@
  */
 package org.catnut.util;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.SharedPreferences;
@@ -16,6 +17,9 @@ import android.text.style.URLSpan;
 import android.view.View;
 import android.widget.TextView;
 import org.catnut.support.TweetURLSpan;
+
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 工具类
@@ -220,6 +224,30 @@ public class CatnutUtils {
 			}
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * 更新sql
+	 */
+	public static String update(ContentValues values, String from, String where) {
+		StringBuilder sb = new StringBuilder("UPDATE ").append(from).append(" SET");
+		for (String key : values.keySet()) {
+			sb.append(" ").append(key).append("=").append(reflectString(values.get(key))).append(",");
+		}
+		sb.deleteCharAt(sb.length() - 1); // remove the last ','
+		if (where != null) {
+			sb.append(" WHERE ").append(where);
+		}
+		return sb.toString();
+	}
+
+	private static String reflectString(Object object) {
+		if (object instanceof CharSequence) {
+			return quote(object.toString());
+		} else {
+			// 其它情况下一律认为是number类型
+			return object.toString();
+		}
 	}
 
 	/**

@@ -74,6 +74,8 @@
 	<string name="loading">载入中</string>
 	<string name="show_latest_tweet">显示最新一条微博</string>
 	<string name="show_latest_tweet_summary">查看用户信息时显示Ta最新的一条微博</string>
+	<string name="follow">关注Ta</string>
+	<string name="follow_success">关注成功！</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>微博</item>
