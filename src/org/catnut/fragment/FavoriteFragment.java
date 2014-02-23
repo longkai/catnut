@@ -273,15 +273,17 @@ public class FavoriteFragment extends ListFragment implements LoaderManager.Load
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		if (key.equals(mApp.getString(R.string.pref_tweet_font_size))
-				|| key.equals(mApp.getString(R.string.pref_customize_tweet_font))
-				|| key.equals(mApp.getString(R.string.pref_show_tweet_thumbs))) {
-			Log.d(TAG, "pref change, the home timeline fragment needs update!");
-			// 应用新的偏好
-			mAdapter.swapCursor(null);
-			mAdapter = new TweetAdapter(getActivity(), null);
-			setListAdapter(mAdapter);
-			getLoaderManager().restartLoader(0, null, this);
+		if (isAdded()) {
+			if (key.equals(mApp.getString(R.string.pref_tweet_font_size))
+					|| key.equals(mApp.getString(R.string.pref_customize_tweet_font))
+					|| key.equals(mApp.getString(R.string.pref_show_tweet_thumbs))) {
+				Log.d(TAG, "pref change, the home timeline fragment needs update!");
+				// 应用新的偏好
+				mAdapter.swapCursor(null);
+				mAdapter = new TweetAdapter(getActivity(), null);
+				setListAdapter(mAdapter);
+				getLoaderManager().restartLoader(0, null, this);
+			}
 		}
 	}
 }

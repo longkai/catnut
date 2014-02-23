@@ -148,19 +148,21 @@ public class UserTimeLineFragment extends TimelineFragment {
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		if (key.equals(getString(R.string.pref_tweet_font_size))
-			|| key.equals(getString(R.string.pref_customize_tweet_font))
-			|| key.equals(getString(R.string.pref_show_tweet_thumbs))) {
-			Log.d(TAG, "pref change, the user timeline fragment needs update!");
-			// 应用新的偏好
-			mAdapter.swapCursor(null);
-			if (nick != null) {
-				mAdapter = new TweetAdapter(mActivity, nick);
-			} else {
-				mAdapter = new TweetAdapter(mActivity, mPref.getString(User.screen_name, null));
+		if (isAdded()) {
+			if (key.equals(getString(R.string.pref_tweet_font_size))
+					|| key.equals(getString(R.string.pref_customize_tweet_font))
+					|| key.equals(getString(R.string.pref_show_tweet_thumbs))) {
+				Log.d(TAG, "pref change, the user timeline fragment needs update!");
+				// 应用新的偏好
+				mAdapter.swapCursor(null);
+				if (nick != null) {
+					mAdapter = new TweetAdapter(mActivity, nick);
+				} else {
+					mAdapter = new TweetAdapter(mActivity, mPref.getString(User.screen_name, null));
+				}
+				setListAdapter(mAdapter);
+				getLoaderManager().restartLoader(0, null, this);
 			}
-			setListAdapter(mAdapter);
-			getLoaderManager().restartLoader(0, null, this);
 		}
 	}
 }
