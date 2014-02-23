@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<!--微博本来就是一个社交分享工具，没有必要强调这一点，所以就never了-->
+	<item
+		android:id="@+id/share"
+		android:title="@string/share"
+		android:showAsAction="never"
+		android:actionProviderClass="android.widget.ShareActionProvider" />
+</menu>

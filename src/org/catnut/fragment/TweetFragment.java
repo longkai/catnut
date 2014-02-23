@@ -17,14 +17,17 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.RequestQueue;
@@ -101,6 +104,10 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 	private TextView mSource;
 	private TextView mCreateAt;
 
+	// others
+	private ShareActionProvider mShareActionProvider;
+	private Intent mShareIntent;
+
 	private Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
 		@Override
 		public void onResponse(JSONObject response) {
@@ -143,6 +150,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
 		mAdapter = new CommentsAdapter(getActivity());
 	}
 
@@ -209,7 +217,8 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 					String screenName = cursor.getString(cursor.getColumnIndex(User.screen_name));
 					mRemark.setText(TextUtils.isEmpty(remark) ? screenName : remark);
 					mScreenName.setText("@" + screenName);
-					mText.setText(cursor.getString(cursor.getColumnIndex(Status.columnText)));
+					String text = cursor.getString(cursor.getColumnIndex(Status.columnText));
+					mText.setText(text);
 					CatnutUtils.vividTweet(mText, mImageSpan);
 					int replyCount = cursor.getInt(cursor.getColumnIndex(Status.comments_count));
 					mReplayCount.setText(CatnutUtils.approximate(replyCount));
@@ -223,6 +232,14 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 							DateTime.getTimeMills(cursor.getString(cursor.getColumnIndex(Status.created_at)))));
 					if (CatnutUtils.getBoolean(cursor, User.verified)) {
 						view.findViewById(R.id.verified).setVisibility(View.VISIBLE);
+					}
+
+					// share...
+					mShareIntent = new Intent(Intent.ACTION_SEND).setType("text/plain");
+					mShareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.tweet_share_subject));
+					mShareIntent.putExtra(Intent.EXTRA_TEXT, text);
+					if (mShareActionProvider != null) {
+						mShareActionProvider.setShareIntent(mShareIntent);
 					}
 				}
 				cursor.close();
@@ -326,5 +343,28 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 		intent.putExtra(Constants.ID, id);
 		intent.putExtra(User.screen_name, cursor.getString(cursor.getColumnIndex(User.screen_name)));
 		startActivity(intent);
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.tweet, menu);
+		MenuItem share = menu.findItem(R.id.share);
+		mShareActionProvider = (ShareActionProvider) share.getActionProvider();
+		mShareActionProvider.setOnShareTargetSelectedListener(new ShareActionProvider.OnShareTargetSelectedListener() {
+			@Override
+			public boolean onShareTargetSelected(ShareActionProvider source, Intent intent) {
+				startActivity(intent);
+				return true;
+			}
+		});
+		mShareActionProvider.setShareIntent(mShareIntent);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+
+		}
+		return super.onOptionsItemSelected(item);
 	}
 }
