@@ -10,17 +10,20 @@ import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +42,7 @@ import org.catnut.metadata.User;
 import org.catnut.processor.StatusProcessor;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
+import org.catnut.ui.ProfileActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
@@ -313,5 +317,14 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+	}
+
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id) {
+		Intent intent = new Intent(getActivity(), ProfileActivity.class);
+		Cursor cursor = (Cursor) mAdapter.getItem(position - 1); // a header view in top...
+		intent.putExtra(Constants.ID, id);
+		intent.putExtra(User.screen_name, cursor.getString(cursor.getColumnIndex(User.screen_name)));
+		startActivity(intent);
 	}
 }
