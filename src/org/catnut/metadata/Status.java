@@ -22,6 +22,19 @@ public final class Status implements CatnutMetadata<JSONObject, ContentValues> {
 
 	private static final String TAG = "Status";
 
+	/** 标记微博的类型，本地使用 */
+	public static final String TYPE = "_type";
+
+	/** 本地使用，标记为主页微博 */
+	public static final int HOME = 1;
+	/** 本地使用，标记为转发微博 */
+	public static final int RETWEET = 2;
+	/** 本地使用，标记为评论 */
+	public static final int COMMENT = 3;
+	/** 本地使用，标记为其它类型的微博 */
+	public static final int OTHERS = 4;
+
+
 	public static final String TABLE = "statuses";
 	public static final String SINGLE = "status";
 	public static final String MULTIPLE = "statuses";
@@ -89,6 +102,7 @@ public final class Status implements CatnutMetadata<JSONObject, ContentValues> {
 		StringBuilder ddl = new StringBuilder("CREATE TABLE ");
 		ddl.append(TABLE).append("(")
 				.append(BaseColumns._ID).append(" int primary key,")
+				.append(TYPE).append(" int,") // 标记微博的类型
 				.append(created_at).append(" text,")
 				.append(columnText).append(" text,")
 				.append(source).append(" text,")
