@@ -167,7 +167,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 		mScreenName = (TextView) mTweetLayout.findViewById(R.id.screen_name);
 		mText = (TweetTextView) mTweetLayout.findViewById(R.id.text);
 		mReplayCount = (TextView) mTweetLayout.findViewById(R.id.reply_count);
-		mReteetCount = (TextView) mTweetLayout.findViewById(R.id.reply_count);
+		mReteetCount = (TextView) mTweetLayout.findViewById(R.id.reteet_count);
 		mFavoriteCount = (TextView) mTweetLayout.findViewById(R.id.favorite_count);
 		mSource = (TextView) mTweetLayout.findViewById(R.id.source);
 		mCreateAt = (TextView) mTweetLayout.findViewById(R.id.create_at);
