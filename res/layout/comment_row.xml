@@ -11,7 +11,7 @@
 	android:layout_height="wrap_content">
 
 	<ImageView
-		android:id="@id/avatar"
+		android:id="@+id/avatar"
 		android:padding="@dimen/small"
 		android:background="?android:attr/selectableItemBackground"
 		android:layout_marginRight="@dimen/medium"
@@ -19,7 +19,7 @@
 		android:layout_height="wrap_content" />
 
 	<TextView
-		android:id="@id/screen_name"
+		android:id="@+id/screen_name"
 		android:text="@string/adjust_font_size_summary"
 		android:layout_toRightOf="@id/avatar"
 		android:singleLine="true"

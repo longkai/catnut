@@ -7,6 +7,7 @@ package org.catnut.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.ListFragment;
 import android.content.AsyncQueryHandler;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -36,7 +37,7 @@ import org.catnut.util.DateTime;
  *
  * @author longkai
  */
-public class TweetFragment extends Fragment {
+public class TweetFragment extends ListFragment {
 
 	private static final String TAG = "TweetFragment";
 
@@ -47,6 +48,7 @@ public class TweetFragment extends Fragment {
 	private long mId;
 
 	// widgets
+	private View mTweetLayout;
 	private ImageView mAvatar;
 	private TextView mRemark;
 	private TextView mScreenName;
@@ -75,17 +77,18 @@ public class TweetFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.tweet, container, false);
-		mAvatar = (ImageView) view.findViewById(R.id.avatar);
-		mRemark = (TextView) view.findViewById(R.id.remark);
-		mScreenName = (TextView) view.findViewById(R.id.screen_name);
-		mText = (TweetTextView) view.findViewById(R.id.text);
-		mReplayCount = (TextView) view.findViewById(R.id.reply_count);
-		mReteetCount = (TextView) view.findViewById(R.id.reply_count);
-		mFavoriteCount = (TextView) view.findViewById(R.id.favorite_count);
-		mSource = (TextView) view.findViewById(R.id.source);
-		mCreateAt = (TextView) view.findViewById(R.id.create_at);
-		return view;
+		mTweetLayout = inflater.inflate(R.layout.tweet, container, false);
+		mAvatar = (ImageView) mTweetLayout.findViewById(R.id.avatar);
+		mRemark = (TextView) mTweetLayout.findViewById(R.id.remark);
+		mScreenName = (TextView) mTweetLayout.findViewById(R.id.screen_name);
+		mText = (TweetTextView) mTweetLayout.findViewById(R.id.text);
+		mReplayCount = (TextView) mTweetLayout.findViewById(R.id.reply_count);
+		mReteetCount = (TextView) mTweetLayout.findViewById(R.id.reply_count);
+		mFavoriteCount = (TextView) mTweetLayout.findViewById(R.id.favorite_count);
+		mSource = (TextView) mTweetLayout.findViewById(R.id.source);
+		mCreateAt = (TextView) mTweetLayout.findViewById(R.id.create_at);
+		// just return the list
+		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
 	@Override
@@ -146,5 +149,11 @@ public class TweetFragment extends Fragment {
 	public void onStart() {
 		super.onStart();
 		getActivity().getActionBar().setTitle(getString(R.string.tweet));
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		getListView().addHeaderView(mTweetLayout);
 	}
 }
