@@ -16,10 +16,13 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.RequestQueue;
@@ -41,13 +44,16 @@ import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
 import org.json.JSONObject;
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 /**
  * 微博界面
  *
  * @author longkai
  */
-public class TweetFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class TweetFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>,OnRefreshListener, AbsListView.OnScrollListener {
 
 	private static final String TAG = "TweetFragment";
 
@@ -69,6 +75,12 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 	private ImageLoader mImageLoader;
 	private TweetImageSpan mImageSpan;
 
+	private PullToRefreshLayout mPullToRefreshLayout;
+	private int mCurrentPage = -1;
+	private int mTotalSize = 0;
+	private long mMaxId = 0; // 加载更多使用
+	private ProgressBar mLoadMore;
+
 	private CommentsAdapter mAdapter;
 
 	// tweet id
@@ -89,13 +101,20 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 	private Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
 		@Override
 		public void onResponse(JSONObject response) {
-			// todo
+			mTotalSize = response.optInt(Status.total_number);
+			if (mTotalSize == 0) {
+				getListView().removeFooterView(mLoadMore);
+			}
+			mCurrentPage++;
+			getLoaderManager().restartLoader(0, null, TweetFragment.this);
+			mPullToRefreshLayout.setRefreshComplete();
 		}
 	};
 
 	private Response.ErrorListener errorListener = new Response.ErrorListener() {
 		@Override
 		public void onErrorResponse(VolleyError error) {
+			mPullToRefreshLayout.setRefreshComplete();
 			Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
 		}
 	};
@@ -142,7 +161,18 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 
 	@Override
 	public void onViewCreated(final View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		mLoadMore = new ProgressBar(getActivity());
+		// set actionbar refresh facility
+		ViewGroup viewGroup = (ViewGroup) view;
+		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+		ActionBarPullToRefresh.from(getActivity())
+				.insertLayoutInto(viewGroup)
+				.theseChildrenArePullable(android.R.id.list, android.R.id.empty)
+				.listener(this)
+				.setup(mPullToRefreshLayout);
 		// load comment from cloud
+		mPullToRefreshLayout.setRefreshing(true);
 		loadComments();
 		// load from local...
 		String query = CatnutUtils.buildQuery(
@@ -207,6 +237,8 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		getListView().addHeaderView(mTweetLayout);
+		getListView().addFooterView(mLoadMore);
+		getListView().setOnScrollListener(this);
 		setListAdapter(mAdapter);
 		getLoaderManager().initLoader(0, null, this);
 	}
@@ -214,7 +246,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 	private void loadComments() {
 		mRequestQueue.add(new CatnutRequest(
 				getActivity(),
-				CommentsAPI.show(mId, 0, 0, BATCH_SIZE, 0, 0),
+				CommentsAPI.show(mId, 0, mMaxId, BATCH_SIZE, 0, 0),
 				new StatusProcessor.CommentTweetsProcessor(mId),
 				listener,
 				errorListener
@@ -223,7 +255,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		String limit = String.valueOf(BATCH_SIZE);
+		String limit = String.valueOf(BATCH_SIZE * (mCurrentPage + 1));
 		CursorLoader cursorLoader = CatnutUtils.getCursorLoader(
 				getActivity(),
 				CatnutProvider.parse(Status.MULTIPLE),
@@ -241,10 +273,34 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		mAdapter.swapCursor(data);
+		// 标记当前评论尾部的id
+		int count = mAdapter.getCount();
+		Log.d("count", count + "");
+		mMaxId = mAdapter.getItemId(count - 1);
+		// 移除加载更多
+		if (mTotalSize != 0 && count == mTotalSize) {
+			getListView().removeFooterView(mLoadMore);
+		}
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
 		mAdapter.swapCursor(null);
+	}
+
+	@Override
+	public void onRefreshStarted(View view) {
+		loadComments();
+	}
+
+	@Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+		if (mLoadMore.isShown() && !mPullToRefreshLayout.isRefreshing()) {
+			loadComments();
+		}
+	}
+
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 	}
 }
