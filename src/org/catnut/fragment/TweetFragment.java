@@ -142,4 +142,9 @@ public class TweetFragment extends Fragment {
 		}.startQuery(0, null, CatnutProvider.parse(Status.MULTIPLE), null, query, null, null);
 	}
 
+	@Override
+	public void onStart() {
+		super.onStart();
+		getActivity().getActionBar().setTitle(getString(R.string.tweet));
+	}
 }

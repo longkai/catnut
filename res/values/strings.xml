@@ -78,6 +78,7 @@
 	<string name="follow_success">关注成功！</string>
 	<string name="unfollow">取消关注</string>
 	<string name="unfollow_success">取消关注成功！</string>
+	<string name="tweet">微博</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>微博</item>
