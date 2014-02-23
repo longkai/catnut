@@ -16,7 +16,6 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -173,7 +172,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 				.setup(mPullToRefreshLayout);
 		// load comment from cloud
 		mPullToRefreshLayout.setRefreshing(true);
-		loadComments();
+		loadComments(false); // first time call, no need to reinitialize the metadata
 		// load from local...
 		String query = CatnutUtils.buildQuery(
 				new String[]{
@@ -243,10 +242,22 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 		getLoaderManager().initLoader(0, null, this);
 	}
 
-	private void loadComments() {
+	private void loadComments(boolean refresh) {
+		if (refresh) {
+			// 重置
+			mMaxId = 0;
+			mTotalSize = 0;
+			mCurrentPage = -1;
+			mAdapter.swapCursor(null);
+			mAdapter = new CommentsAdapter(getActivity());
+			setListAdapter(mAdapter);
+			getLoaderManager().restartLoader(0, null, this);
+		}
 		mRequestQueue.add(new CatnutRequest(
 				getActivity(),
-				CommentsAPI.show(mId, 0, mMaxId, BATCH_SIZE, 0, 0),
+				refresh
+						? CommentsAPI.show(mId, 0, 0, BATCH_SIZE, 0, 0)
+						: CommentsAPI.show(mId, 0, mMaxId, BATCH_SIZE, 0, 0),
 				new StatusProcessor.CommentTweetsProcessor(mId),
 				listener,
 				errorListener
@@ -275,7 +286,6 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 		mAdapter.swapCursor(data);
 		// 标记当前评论尾部的id
 		int count = mAdapter.getCount();
-		Log.d("count", count + "");
 		mMaxId = mAdapter.getItemId(count - 1);
 		// 移除加载更多
 		if (mTotalSize != 0 && count == mTotalSize) {
@@ -290,13 +300,14 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 
 	@Override
 	public void onRefreshStarted(View view) {
-		loadComments();
+		loadComments(true);
 	}
 
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
+		// todo: shall we need pref?
 		if (mLoadMore.isShown() && !mPullToRefreshLayout.isRefreshing()) {
-			loadComments();
+			loadComments(false);
 		}
 	}
 
