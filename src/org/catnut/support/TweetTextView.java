@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 public class TweetTextView extends TextView {
 
 	public static final String TOPIC_SCHEME = "http://huati.weibo.com/k/";
-	public static final String MENTION_SCHEME = "http://weibo.com/n/";
+	public static final String MENTION_SCHEME = "org.catnut://profiles/";
 
 	/** 微博中 @xx 正则 */
 	public static final Pattern MENTION_PATTERN = Pattern.compile("@[\\u4e00-\\u9fa5a-zA-Z0-9_-]+");

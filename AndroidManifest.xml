@@ -31,7 +31,13 @@
 			</intent-filter>
 		</activity>
 		<activity android:name=".ui.MainActivity" />
-		<activity android:name=".ui.ProfileActivity" />
+		<activity android:name=".ui.ProfileActivity">
+			<intent-filter>
+				<category android:name="android.intent.category.DEFAULT" />
+				<action android:name="android.intent.action.VIEW" />
+				<data android:scheme="org.catnut" />
+			</intent-filter>
+		</activity>
 		<activity android:name=".ui.TweetActivity" />
 		<activity android:name=".ui.SingleFragmentActivity" />
 

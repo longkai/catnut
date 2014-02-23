@@ -10,16 +10,27 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
+import org.catnut.api.UserAPI;
 import org.catnut.core.CatnutApp;
+import org.catnut.core.CatnutRequest;
 import org.catnut.fragment.ProfileFragment;
 import org.catnut.metadata.User;
+import org.catnut.metadata.WeiboAPIError;
+import org.catnut.processor.UserProcessor;
 import org.catnut.util.Constants;
+import org.json.JSONObject;
 
 /**
  * 用户信息界面
@@ -41,18 +52,47 @@ public class ProfileActivity extends Activity implements FragmentManager.OnBackS
 			if (mApp.getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
 				mTracker = EasyTracker.getInstance(this);
 			}
-			String screenName = getIntent().getStringExtra(User.screen_name);
-			long uid = getIntent().getLongExtra(Constants.ID, 0L);
-			FragmentManager fragmentManager = getFragmentManager();
+			final FragmentManager fragmentManager = getFragmentManager();
 			fragmentManager.addOnBackStackChangedListener(this);
-			fragmentManager
-					.beginTransaction()
-					.replace(android.R.id.content, ProfileFragment.getFragment(uid, screenName))
-					.commit();
+			Intent intent = getIntent();
+			final long uid = intent.getLongExtra(Constants.ID, 0L);
+			Uri uri = intent.getData();
+			if (uri != null) {
+				final String screenName = uri.getLastPathSegment();
+				final ProgressDialog dialog = ProgressDialog.show(this, null, getString(R.string.loading));
+				dialog.show();
+				mApp.getRequestQueue().add(new CatnutRequest(
+						this,
+						UserAPI.profile(screenName),
+						new UserProcessor.UserProfileProcessor(),
+						new Response.Listener<JSONObject>() {
+							@Override
+							public void onResponse(JSONObject response) {
+								dialog.dismiss();
+								fragmentManager.beginTransaction()
+										.replace(android.R.id.content, ProfileFragment.getFragment(uid, screenName))
+										.commit();
+							}
+						},
+						new Response.ErrorListener() {
+							@Override
+							public void onErrorResponse(VolleyError error) {
+								dialog.dismiss();
+								WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
+								Toast.makeText(ProfileActivity.this, weiboAPIError.error, Toast.LENGTH_SHORT).show();
+							}
+						}
+				));
+			} else {
+				String screenName = intent.getStringExtra(User.screen_name);
+				fragmentManager
+						.beginTransaction()
+						.replace(android.R.id.content, ProfileFragment.getFragment(uid, screenName))
+						.commit();
+			}
 			ActionBar bar = getActionBar();
 			bar.setDisplayShowHomeEnabled(false);
 			bar.setDisplayHomeAsUpEnabled(true);
-			bar.setTitle(screenName);
 		}
 	}
 

@@ -18,7 +18,6 @@ import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -175,6 +174,7 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 				if (cursor.moveToNext()) {
 					// 暂存元数据
+					mUid = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 					mAvatarUrl = cursor.getString(cursor.getColumnIndex(User.avatar_large));
 					mVerified = CatnutUtils.getBoolean(cursor, User.verified);
 					mRemark = cursor.getString(cursor.getColumnIndex(User.remark));
