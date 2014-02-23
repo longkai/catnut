@@ -117,7 +117,7 @@ public class TweetAdapter extends CursorAdapter {
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 		ViewHolder holder = new ViewHolder();
-		View view = LayoutInflater.from(context).inflate(R.layout.tweet, null);
+		View view = LayoutInflater.from(context).inflate(R.layout.tweet_row, null);
 		holder.nick = (TextView) view.findViewById(R.id.nick);
 		// 如果是某个主页时间线
 		if (mUserNick == null) {

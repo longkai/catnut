@@ -109,7 +109,7 @@
 
 			<ViewStub
 				android:id="@+id/latest_tweet"
-				android:layout="@layout/tweet"
+				android:layout="@layout/tweet_row"
 				android:padding="@null"
 				android:layout_below="@id/statics"
 				android:layout_width="match_parent"
