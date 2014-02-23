@@ -158,6 +158,7 @@ public class HomeTimelineFragment extends TimelineFragment {
 			mAdapter.swapCursor(null);
 			mAdapter = new TweetAdapter(mActivity, null);
 			setListAdapter(mAdapter);
+			getLoaderManager().restartLoader(0, null, this);
 		}
 	}
 }

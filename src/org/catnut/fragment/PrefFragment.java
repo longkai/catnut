@@ -5,6 +5,7 @@
  */
 package org.catnut.fragment;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,6 +42,10 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 
 	private SharedPreferences mPref;
 
+	public static PreferenceFragment getFragment() {
+		return new PrefFragment();
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -51,7 +56,9 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 	@Override
 	public void onStart() {
 		super.onStart();
-		getActivity().getActionBar().setTitle(getText(R.string.pref));
+		ActionBar bar = getActivity().getActionBar();
+		bar.setTitle(getText(R.string.pref));
+		bar.setIcon(R.drawable.ico_title_pref);
 	}
 
 	@Override

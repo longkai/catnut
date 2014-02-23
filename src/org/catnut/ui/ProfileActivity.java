@@ -12,6 +12,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Menu;
 import android.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
@@ -72,10 +73,20 @@ public class ProfileActivity extends Activity implements FragmentManager.OnBackS
 	}
 
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add(Menu.NONE, R.id.pref, Menu.NONE, R.string.pref)
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+		return true;
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
 				this.navigateUpTo(getIntent());
+				break;
+			case R.id.pref:
+				startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.PREF));
 				break;
 			default:
 				break;

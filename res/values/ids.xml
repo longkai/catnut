@@ -6,6 +6,7 @@
   -->
 <resources>
 	<item name="refresh" type="id" />
+	<item name="pref" type="id" />
 	<item name="fragment_container" type="id" />
 	<item name="drawer_layout" type="id" />
 	<item name="drawer" type="id" />

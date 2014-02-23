@@ -25,4 +25,9 @@
 		android:title="@string/share"
 		android:showAsAction="never"
 		android:actionProviderClass="android.widget.ShareActionProvider" />
+
+	<item
+		android:id="@id/pref"
+		android:title="@string/pref"
+		android:showAsAction="never" />
 </menu>

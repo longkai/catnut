@@ -48,6 +48,7 @@ import org.catnut.processor.StatusProcessor;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.ui.ProfileActivity;
+import org.catnut.ui.SingleFragmentActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
@@ -391,6 +392,9 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 		switch (item.getItemId()) {
 			case R.id.action_toggle_favorite:
 				toggleFavorite();
+				break;
+			case R.id.pref:
+				startActivity(SingleFragmentActivity.getIntent(getActivity(), SingleFragmentActivity.PREF));
 				break;
 			default:
 				break;

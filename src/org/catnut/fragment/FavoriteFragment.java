@@ -281,8 +281,7 @@ public class FavoriteFragment extends ListFragment implements LoaderManager.Load
 			mAdapter.swapCursor(null);
 			mAdapter = new TweetAdapter(getActivity(), null);
 			setListAdapter(mAdapter);
-//			todo: check the method is needed? android will auto provide us a newer cursor?
-//			getLoaderManager().restartLoader(0, null, this);
+			getLoaderManager().restartLoader(0, null, this);
 		}
 	}
 }

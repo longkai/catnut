@@ -160,6 +160,7 @@ public class UserTimeLineFragment extends TimelineFragment {
 				mAdapter = new TweetAdapter(mActivity, mPref.getString(User.screen_name, null));
 			}
 			setListAdapter(mAdapter);
+			getLoaderManager().restartLoader(0, null, this);
 		}
 	}
 }

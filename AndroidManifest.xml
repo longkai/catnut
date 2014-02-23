@@ -33,6 +33,7 @@
 		<activity android:name=".ui.MainActivity" />
 		<activity android:name=".ui.ProfileActivity" />
 		<activity android:name=".ui.TweetActivity" />
+		<activity android:name=".ui.SingleFragmentActivity" />
 
 		<provider
 			android:authorities="org.catnut"
