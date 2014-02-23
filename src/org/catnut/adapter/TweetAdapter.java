@@ -203,13 +203,7 @@ public class TweetAdapter extends CursorAdapter {
 		if (!show) {
 			holder.thumbs.setVisibility(View.GONE);
 		}
-		// 表情处理
-		holder.text.setText(mImageSpan.getImageSpan(holder.text.getText()));
-		// 分别对微博的链接，@，##话题过滤
-		// todo：对@，## 进行处理
-		Linkify.addLinks(holder.text, MENTION_PATTERN, MENTION_SCHEME, null, MENTION_FILTER);
-		Linkify.addLinks(holder.text, TOPIC_PATTERN, TOPIC_SCHEME, null, TOPIC_FILTER);
-		Linkify.addLinks(holder.text, WEB_URL, null, null, URL_FILTER);
-		CatnutUtils.removeLinkUnderline(holder.text);
+		// 文字处理
+		CatnutUtils.vividTweet(holder.text, mImageSpan);
 	}
 }

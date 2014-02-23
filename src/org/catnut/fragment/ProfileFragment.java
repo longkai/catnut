@@ -253,10 +253,7 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 						String tweetText = cursor.getString(cursor.getColumnIndex(Status.columnText));
 						TweetTextView text = (TweetTextView) CatnutUtils.setText(tweet, R.id.text,
 								new TweetImageSpan(getActivity()).getImageSpan(tweetText));
-						Linkify.addLinks(text, TweetTextView.MENTION_PATTERN, TweetTextView.MENTION_SCHEME, null, TweetTextView.MENTION_FILTER);
-						Linkify.addLinks(text, TweetTextView.TOPIC_PATTERN, TweetTextView.TOPIC_SCHEME, null, TweetTextView.TOPIC_FILTER);
-						Linkify.addLinks(text, TweetTextView.WEB_URL, null, null, TweetTextView.URL_FILTER);
-						CatnutUtils.removeLinkUnderline(text);
+						CatnutUtils.vividTweet(text, null);
 
 						int replyCount = cursor.getInt(cursor.getColumnIndex(Status.comments_count));
 						CatnutUtils.setText(tweet, R.id.reply_count, CatnutUtils.approximate(replyCount));

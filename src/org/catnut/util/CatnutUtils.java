@@ -14,12 +14,24 @@ import android.net.Uri;
 import android.text.Spannable;
 import android.text.TextUtils;
 import android.text.style.URLSpan;
+import android.text.util.Linkify;
 import android.view.View;
 import android.widget.TextView;
+import org.catnut.support.TweetImageSpan;
+import org.catnut.support.TweetTextView;
 import org.catnut.support.TweetURLSpan;
 
 import java.util.Map;
 import java.util.Objects;
+
+import static org.catnut.support.TweetTextView.MENTION_FILTER;
+import static org.catnut.support.TweetTextView.MENTION_PATTERN;
+import static org.catnut.support.TweetTextView.MENTION_SCHEME;
+import static org.catnut.support.TweetTextView.TOPIC_FILTER;
+import static org.catnut.support.TweetTextView.TOPIC_PATTERN;
+import static org.catnut.support.TweetTextView.TOPIC_SCHEME;
+import static org.catnut.support.TweetTextView.URL_FILTER;
+import static org.catnut.support.TweetTextView.WEB_URL;
 
 /**
  * 工具类
@@ -258,6 +270,21 @@ public class CatnutUtils {
 	 */
 	public static String like(String keywords) {
 		return "'%" + keywords + "%'";
+	}
+
+	/**
+	 * 给微博文字加上样式，表情，##，@，链接等
+	 * @param text 微博
+	 * @param imageSpan 不需要表情传入null
+	 */
+	public static void vividTweet(TweetTextView text, TweetImageSpan imageSpan) {
+		if (imageSpan != null) {
+			text.setText(imageSpan.getImageSpan(text.getText()));
+		}
+		Linkify.addLinks(text, MENTION_PATTERN, MENTION_SCHEME, null, MENTION_FILTER);
+		Linkify.addLinks(text, TOPIC_PATTERN, TOPIC_SCHEME, null, TOPIC_FILTER);
+		Linkify.addLinks(text, WEB_URL, null, null, URL_FILTER);
+		removeLinkUnderline(text);
 	}
 
 	/**
