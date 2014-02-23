@@ -9,6 +9,9 @@ import com.android.volley.Request;
 import org.catnut.core.CatnutAPI;
 import org.catnut.util.CatnutUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 评论接口
  *
@@ -39,5 +42,24 @@ public class CommentsAPI {
 				.append("&page=").append(CatnutUtils.optValue(page, 1))
 				.append("&filter_by_author=").append(CatnutUtils.optValue(filter_by_author, 0));
 		return new CatnutAPI(Request.Method.GET, uri.toString(), true, null);
+	}
+
+	/**
+	 * 对一条微博进行评论
+	 *
+	 * @param comment     评论内容，必须做URLencode，内容不超过140个汉字
+	 * @param id          需要评论的微博ID
+	 * @param comment_ori 当评论转发微博时，是否评论给原微博，0：否、1：是，默认为0
+	 * @param rip         开发者上报的操作用户真实IP，形如：211.156.0.1
+	 * @return api
+	 */
+	public static CatnutAPI create(String comment, long id, int comment_ori, String rip) {
+		StringBuilder uri = new StringBuilder(BASE_URI).append("create.json");
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("comment", comment);
+		params.put("id", String.valueOf(id));
+		params.put("comment_ori", String.valueOf(CatnutUtils.optValue(comment_ori, 0)));
+		params.put("rip", String.valueOf(rip));
+		return new CatnutAPI(Request.Method.POST, uri.toString(), true, params);
 	}
 }
