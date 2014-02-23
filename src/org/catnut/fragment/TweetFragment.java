@@ -373,7 +373,6 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-
 		}
 		return super.onOptionsItemSelected(item);
 	}

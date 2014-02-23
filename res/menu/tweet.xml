@@ -7,6 +7,18 @@
   -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+	<item
+		android:id="@+id/action_reteet"
+		android:title="@string/retweet"
+		android:showAsAction="always"
+		android:icon="@drawable/ic_title_retweet" />
+
+	<item
+		android:id="@+id/action_favorite"
+		android:title="@string/favorite"
+		android:showAsAction="ifRoom"
+		android:icon="@drawable/ic_title_favorite" />
+
 	<!--微博本来就是一个社交分享工具，没有必要强调这一点，所以就never了-->
 	<item
 		android:id="@+id/share"
