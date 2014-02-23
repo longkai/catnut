@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:padding="@dimen/medium"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<ImageView
+		android:id="@id/avatar"
+		android:background="@color/actionbar_background"
+		android:padding="@dimen/small"
+		android:layout_width="80dp"
+		android:layout_height="80dp" />
+
+	<TextView
+		android:id="@+id/remark"
+		android:textStyle="bold"
+		android:text="龙凯Orz"
+		android:layout_toRightOf="@id/avatar"
+		android:layout_alignTop="@id/avatar"
+		android:layout_marginTop="@dimen/medium"
+		android:layout_marginLeft="@dimen/medium"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:textColor="@android:color/primary_text_light"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+
+	<ImageView
+		android:visibility="visible"
+		android:layout_toRightOf="@id/remark"
+		android:src="@drawable/ic_verified"
+		android:layout_alignTop="@id/remark"
+		android:layout_alignBottom="@id/remark"
+		android:layout_marginLeft="@dimen/small"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+
+	<TextView
+		android:id="@+id/screen_name"
+		android:text="longkai"
+		android:layout_alignLeft="@id/remark"
+		android:layout_below="@id/remark"
+		android:layout_marginTop="@dimen/medium"
+		android:textColor="@android:color/darker_gray"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+
+	<org.catnut.support.TweetTextView
+		android:id="@id/text"
+		android:text="@string/adjust_font_size_summary"
+		android:layout_below="@id/avatar"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:textColor="@android:color/secondary_text_light"
+		android:layout_marginTop="@dimen/medium"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+
+	<!--todo: some photos goes here-->
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_marginTop="@dimen/small"
+		android:layout_below="@id/text"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<ImageView
+			android:id="@id/action_reply"
+			style="@style/Tweet_Inline.Icon"
+			android:src="@drawable/ic_inline_reply" />
+
+		<TextView
+			android:id="@+id/reply_count"
+			style="@style/Tweet_Inline"
+			android:textSize="@dimen/text_size_small"
+			android:textColor="@android:color/darker_gray"
+			android:layout_width="@dimen/counter_width"
+			android:layout_height="wrap_content" />
+
+		<ImageView
+			android:id="@id/action_reteet"
+			style="@style/Tweet_Inline.Icon"
+			android:src="@drawable/ic_inline_reteet" />
+
+		<TextView
+			android:id="@+id/reteet_count"
+			style="@style/Tweet_Inline"
+			android:textSize="@dimen/text_size_small"
+			android:textColor="@android:color/darker_gray"
+			android:layout_width="@dimen/counter_width"
+			android:layout_height="wrap_content" />
+
+		<ImageView
+			android:id="@id/action_favorite"
+			style="@style/Tweet_Inline.Icon"
+			android:src="@drawable/ic_inline_favorite" />
+
+		<TextView
+			android:id="@+id/favorite_count"
+			style="@style/Tweet_Inline"
+			android:textSize="@dimen/text_size_small"
+			android:layout_marginRight="@dimen/medium"
+			android:textColor="@android:color/darker_gray"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+
+		<TextView
+			android:id="@+id/source"
+			style="@style/Tweet_Inline"
+			android:textSize="@dimen/text_size_small"
+			android:singleLine="true"
+			android:ellipsize="end"
+			android:textColor="@android:color/darker_gray"
+			android:gravity="right"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+	</LinearLayout>
+</RelativeLayout>
