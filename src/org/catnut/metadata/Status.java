@@ -22,7 +22,7 @@ public final class Status implements CatnutMetadata<JSONObject, ContentValues> {
 
 	private static final String TAG = "Status";
 
-	/** 标记微博的类型，本地使用 */
+	/** 标记微博的类型，本地使用 */ // todo: 可能一条微博有多个type...
 	public static final String TYPE = "_type";
 	/** 评论指向的微博id，本地使用 */
 	public static final String TO_WHICH_TWEET = "_to";
@@ -33,6 +33,8 @@ public final class Status implements CatnutMetadata<JSONObject, ContentValues> {
 	public static final int RETWEET = 3;
 	/** 本地使用，标记为评论 */
 	public static final int COMMENT = 4;
+	/** 本地使用，标记为收藏 */
+	public static final int FAVORITE = 5;
 	/** 本地使用，标记为其它类型的微博 */
 	public static final int OTHERS = 1;
 

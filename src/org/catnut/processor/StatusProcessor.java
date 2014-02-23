@@ -97,4 +97,23 @@ public class StatusProcessor {
 			context.getContentResolver().bulkInsert(CatnutProvider.parse(User.MULTIPLE), users);
 		}
 	}
+
+	/**
+	 * 收藏/取消收藏处理器
+	 *
+	 * @author longkai
+	 */
+	public static class FavoriteTweetProcessor implements CatnutProcessor<JSONObject> {
+
+		@Override
+		public void asyncProcess(Context context, JSONObject data) throws Exception {
+			JSONObject jsonObject = data.optJSONObject(Status.SINGLE);
+			ContentValues status = Status.METADATA.convert(jsonObject);
+			// set fav type
+			status.put(Status.TYPE, Status.FAVORITE);
+			ContentValues user = User.METADATA.convert(jsonObject.optJSONObject(User.SINGLE));
+			context.getContentResolver().insert(CatnutProvider.parse(User.MULTIPLE), user);
+			context.getContentResolver().insert(CatnutProvider.parse(Status.MULTIPLE), status);
+		}
+	}
 }

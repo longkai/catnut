@@ -44,6 +44,12 @@ public class WeiboAPIError implements Parcelable {
 	 * @return WeiboAPIError
 	 */
 	public static WeiboAPIError fromVolleyError(VolleyError volleyError) {
+		// very bad situation!
+		if (volleyError.networkResponse == null) {
+			String message = volleyError.getLocalizedMessage();
+			return new WeiboAPIError(-1, null,
+					TextUtils.isEmpty(message) ? volleyError.getClass().getName() : message);
+		}
 		// 很可能出现response body为空的情况
 		String jsonString;
 		try {
@@ -53,17 +59,17 @@ public class WeiboAPIError implements Parcelable {
 			// fall back to http error!
 			String msg = volleyError.getLocalizedMessage();
 			return new WeiboAPIError(
-				volleyError.networkResponse.statusCode,
-				null,
-				TextUtils.isEmpty(msg) ? "Unknown error! Please try again later:-(" : msg);
+					volleyError.networkResponse.statusCode,
+					null,
+					TextUtils.isEmpty(msg) ? "Unknown error! Please try again later:-(" : msg);
 		}
 
 		try {
 			JSONObject jsonObject = new JSONObject(jsonString);
 			return new WeiboAPIError(
-				jsonObject.optInt(ERROR_CODE),
-				jsonObject.optString(REQUEST),
-				jsonObject.optString(ERROR)
+					jsonObject.optInt(ERROR_CODE),
+					jsonObject.optString(REQUEST),
+					jsonObject.optString(ERROR)
 			);
 		} catch (JSONException e) {
 			Log.wtf(TAG, e.getLocalizedMessage());

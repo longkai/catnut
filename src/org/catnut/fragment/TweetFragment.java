@@ -37,11 +37,13 @@ import com.android.volley.toolbox.ImageLoader;
 import org.catnut.R;
 import org.catnut.adapter.CommentsAdapter;
 import org.catnut.api.CommentsAPI;
+import org.catnut.api.FavoritesAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
+import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.StatusProcessor;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
@@ -387,7 +389,41 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+			case R.id.action_toggle_favorite:
+				toggleFavorite();
+				break;
+			default:
+				break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void toggleFavorite() {
+		mRequestQueue.add(new CatnutRequest(
+				getActivity(),
+				mFavorited ? FavoritesAPI.destroy(mId) : FavoritesAPI.create(mId),
+				new StatusProcessor.FavoriteTweetProcessor(),
+				new Response.Listener<JSONObject>() {
+					@Override
+					public void onResponse(JSONObject response) {
+						Toast.makeText(getActivity(),
+								mFavorited ? R.string.cancle_favorite_success
+										: R.string.favorite_success, Toast.LENGTH_SHORT).show();
+						mFavorited = !mFavorited;
+						// 更新一下当前ui
+						JSONObject status = response.optJSONObject(Status.SINGLE);
+						mReplayCount.setText(CatnutUtils.approximate(status.optInt(Status.comments_count)));
+						mReteetCount.setText(CatnutUtils.approximate(status.optInt(Status.reposts_count)));
+						mFavoriteCount.setText(CatnutUtils.approximate(status.optInt(Status.attitudes_count)));
+					}
+				},
+				new Response.ErrorListener() {
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
+						Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_SHORT).show();
+					}
+				}
+		));
 	}
 }
