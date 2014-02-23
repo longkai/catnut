@@ -24,6 +24,8 @@ public final class Status implements CatnutMetadata<JSONObject, ContentValues> {
 
 	/** 标记微博的类型，本地使用 */
 	public static final String TYPE = "_type";
+	/** 评论指向的微博id，本地使用 */
+	public static final String TO_WHICH_TWEET = "_to";
 
 	/** 本地使用，标记为主页微博 */
 	public static final int HOME = 2;
@@ -104,6 +106,7 @@ public final class Status implements CatnutMetadata<JSONObject, ContentValues> {
 		ddl.append(TABLE).append("(")
 				.append(BaseColumns._ID).append(" int primary key,")
 				.append(TYPE).append(" int,") // 标记微博的类型
+				.append(TO_WHICH_TWEET).append(" int,") // 评论指向的微博id
 				.append(created_at).append(" text,")
 				.append(columnText).append(" text,")
 				.append(source).append(" text,")

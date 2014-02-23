@@ -65,6 +65,14 @@ public class StatusProcessor {
 	 */
 	public static class CommentTweetsProcessor implements CatnutProcessor<JSONObject> {
 
+		/** 改评论指向的微博id */
+		private long to;
+
+		public CommentTweetsProcessor(long to) {
+			this.to = to;
+		}
+
+
 		@Override
 		public void asyncProcess(Context context, JSONObject data) throws Exception {
 			JSONArray array = data.optJSONArray(Status.COMMENTS);
@@ -78,6 +86,7 @@ public class StatusProcessor {
 				jsonStatus = array.optJSONObject(i);
 				comment = Status.METADATA.convert(jsonStatus);
 				comment.put(Status.TYPE, Status.COMMENT); // 标记为评论微博
+				comment.put(Status.TO_WHICH_TWEET, to);
 				comments[i] = comment;
 				// 解析评论作者
 				jsonUser = jsonStatus.optJSONObject(User.SINGLE);

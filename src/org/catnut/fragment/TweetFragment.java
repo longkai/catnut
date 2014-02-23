@@ -6,12 +6,13 @@
 package org.catnut.fragment;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.ListFragment;
+import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
+import android.content.CursorLoader;
+import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -20,29 +21,55 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import org.catnut.R;
+import org.catnut.adapter.CommentsAdapter;
+import org.catnut.api.CommentsAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
+import org.catnut.core.CatnutRequest;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
+import org.catnut.processor.StatusProcessor;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
+import org.json.JSONObject;
 
 /**
  * 微博界面
  *
  * @author longkai
  */
-public class TweetFragment extends ListFragment {
+public class TweetFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
 	private static final String TAG = "TweetFragment";
 
+	private static final int BATCH_SIZE = 50;
+
+	/** 待检索的列 */
+	private static final String[] PROJECTION = new String[]{
+			"s._id",
+			Status.uid,
+			Status.columnText,
+//			Status.source,
+			"s." + Status.created_at,
+			User.screen_name,
+			User.profile_image_url,
+			User.remark
+	};
+
+	private RequestQueue mRequestQueue;
 	private ImageLoader mImageLoader;
 	private TweetImageSpan mImageSpan;
+
+	private CommentsAdapter mAdapter;
 
 	// tweet id
 	private long mId;
@@ -59,6 +86,20 @@ public class TweetFragment extends ListFragment {
 	private TextView mSource;
 	private TextView mCreateAt;
 
+	private Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+		@Override
+		public void onResponse(JSONObject response) {
+			// todo
+		}
+	};
+
+	private Response.ErrorListener errorListener = new Response.ErrorListener() {
+		@Override
+		public void onErrorResponse(VolleyError error) {
+			Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+		}
+	};
+
 	public static TweetFragment getFragment(long id) {
 		Bundle args = new Bundle();
 		args.putLong(Constants.ID, id);
@@ -70,14 +111,22 @@ public class TweetFragment extends ListFragment {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		mImageLoader = CatnutApp.getTingtingApp().getImageLoader();
+		CatnutApp app = CatnutApp.getTingtingApp();
+		mImageLoader = app.getImageLoader();
+		mRequestQueue = app.getRequestQueue();
 		mImageSpan = new TweetImageSpan(activity);
 		mId = getArguments().getLong(Constants.ID);
 	}
 
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		mAdapter = new CommentsAdapter(getActivity());
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		mTweetLayout = inflater.inflate(R.layout.tweet, container, false);
+		mTweetLayout = inflater.inflate(R.layout.tweet, null, false);
 		mAvatar = (ImageView) mTweetLayout.findViewById(R.id.avatar);
 		mRemark = (TextView) mTweetLayout.findViewById(R.id.remark);
 		mScreenName = (TextView) mTweetLayout.findViewById(R.id.screen_name);
@@ -93,6 +142,9 @@ public class TweetFragment extends ListFragment {
 
 	@Override
 	public void onViewCreated(final View view, Bundle savedInstanceState) {
+		// load comment from cloud
+		loadComments();
+		// load from local...
 		String query = CatnutUtils.buildQuery(
 				new String[]{
 						Status.uid,
@@ -155,5 +207,44 @@ public class TweetFragment extends ListFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		getListView().addHeaderView(mTweetLayout);
+		setListAdapter(mAdapter);
+		getLoaderManager().initLoader(0, null, this);
+	}
+
+	private void loadComments() {
+		mRequestQueue.add(new CatnutRequest(
+				getActivity(),
+				CommentsAPI.show(mId, 0, 0, BATCH_SIZE, 0, 0),
+				new StatusProcessor.CommentTweetsProcessor(mId),
+				listener,
+				errorListener
+		));
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		String limit = String.valueOf(BATCH_SIZE);
+		CursorLoader cursorLoader = CatnutUtils.getCursorLoader(
+				getActivity(),
+				CatnutProvider.parse(Status.MULTIPLE),
+				PROJECTION,
+				Status.TYPE + "=" + Status.COMMENT + " and " + Status.TO_WHICH_TWEET + "=" + mId,
+				null,
+				Status.TABLE + " as s",
+				"inner join " + User.TABLE + " as u on s.uid=u._id",
+				"s._id desc",
+				limit
+		);
+		return cursorLoader;
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		mAdapter.swapCursor(data);
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		mAdapter.swapCursor(null);
 	}
 }
