@@ -50,16 +50,6 @@ public class StatusProcessor {
 				if (json.has(User.SINGLE)) {
 					users.add(userMetadata.convert(json.optJSONObject(User.SINGLE)));
 				}
-				// 转发微博
-				while (json.has(Status.retweeted_status)) {
-					json = json.optJSONObject(Status.retweeted_status);
-					status.put(Status.TYPE, Status.RETWEET); // 标记为转发微博
-					statues.add(status);
-					// 没有uid则标识返回用户的全部字段
-					if (!json.has(Status.uid) && json.has(User.SINGLE)) { // 有些时候，数据也是不可靠的...
-						users.add(userMetadata.convert(json.optJSONObject(User.SINGLE)));
-					}
-				}
 			}
 			ContentValues[] _statuses = statues.toArray(new ContentValues[statues.size()]);
 			context.getContentResolver().bulkInsert(CatnutProvider.parse(Status.MULTIPLE), _statuses);

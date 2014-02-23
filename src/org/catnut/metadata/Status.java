@@ -47,7 +47,7 @@ public final class Status implements CatnutMetadata<JSONObject, ContentValues> {
 	private Status() {
 	}
 
-	// 自关联
+	// 自关联，直接存储json字符串
 	public static final String retweeted_status = "retweeted_status";
 
 	/** 创建时间 */
@@ -112,7 +112,7 @@ public final class Status implements CatnutMetadata<JSONObject, ContentValues> {
 				.append(thumbnail_pic).append(" text,")
 				.append(bmiddle_pic).append(" text,")
 				.append(original_pic).append(" text,")
-				.append(retweeted_status_id).append(" int,")
+				.append(retweeted_status).append(" text,")
 				.append(uid).append(" int,")
 				.append(reposts_count).append(" int,")
 				.append(comments_count).append(" int,")
@@ -141,9 +141,7 @@ public final class Status implements CatnutMetadata<JSONObject, ContentValues> {
 		tweet.put(original_pic, json.optString(original_pic));
 		// 检查是否是转发微博
 		if (json.has(retweeted_status)) {
-			tweet.put(retweeted_status_id, json.optJSONObject(retweeted_status).optLong(Constants.ID));
-		} else {
-			tweet.put(retweeted_status_id, 0L);
+			tweet.put(retweeted_status, json.optJSONObject(retweeted_status).toString());
 		}
 		// 加入作者的外键
 		if (json.has(User.SINGLE)) {
