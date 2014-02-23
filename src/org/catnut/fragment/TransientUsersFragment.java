@@ -174,8 +174,8 @@ public class TransientUsersFragment extends ListFragment implements AbsListView.
 	private void loadFromCloud() {
 		mLoading = true;
 		CatnutAPI api = mFollowing
-				? FriendshipsAPI.followers(mScreenName, 0, next_cursor, 1)
-				: FriendshipsAPI.friends(mScreenName, 0, next_cursor, 1);
+				? FriendshipsAPI.friends(mScreenName, 0, next_cursor, 1)
+				: FriendshipsAPI.followers(mScreenName, 0, next_cursor, 1);
 		mRequestQueue.add(new TransientRequest<List<TransientUser>>(api, listener, errorListener) {
 			@Override
 			protected Response<List<TransientUser>> parseNetworkResponse(NetworkResponse response) {
