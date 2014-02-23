@@ -8,6 +8,7 @@ package org.catnut.fragment;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
+import android.content.AsyncQueryHandler;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
@@ -51,7 +52,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  * @author longkai
  */
 public class FavoriteFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>,
-		OnRefreshListener, AbsListView.OnScrollListener {
+		OnRefreshListener, AbsListView.OnScrollListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
 	public static final String TAG = "FavoriteFragment"; // 计算有多少条删除的微博用
 
@@ -71,6 +72,7 @@ public class FavoriteFragment extends ListFragment implements LoaderManager.Load
 			User.remark
 	};
 
+	private CatnutApp mApp;
 	private SharedPreferences mPref;
 	private RequestQueue mRequestQueue;
 
@@ -135,11 +137,12 @@ public class FavoriteFragment extends ListFragment implements LoaderManager.Load
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		CatnutApp app = CatnutApp.getTingtingApp();
-		mRequestQueue = app.getRequestQueue();
-		mPref = app.getPreferences();
+		mApp = CatnutApp.getTingtingApp();
+		mRequestQueue = mApp.getRequestQueue();
+		mPref = mApp.getPreferences();
 		int defaultSize = getResources().getInteger(R.integer.default_fetch_size);
 		mPageSize = CatnutUtils.resolveListPrefInt(mPref, getString(R.string.pref_default_fetch_size), defaultSize);
+		mPref.registerOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override
@@ -166,6 +169,18 @@ public class FavoriteFragment extends ListFragment implements LoaderManager.Load
 			mPullToRefreshLayout.setRefreshing(true);
 			loadFromCloud(false); // first, every thing is init.
 		}
+		// load total count from sqlite
+		String query = CatnutUtils
+				.buildQuery(new String[]{"count(0)"}, Status.favorited + "=1", Status.TABLE, null, null, null);
+		new AsyncQueryHandler(getActivity().getContentResolver()) {
+			@Override
+			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+				if (cursor.moveToNext()) {
+					mTotalNumber = cursor.getInt(0);
+				}
+				cursor.close();
+			}
+		}.startQuery(0, null, CatnutProvider.parse(Status.MULTIPLE), null, query, null, null);
 	}
 
 	@Override
@@ -232,7 +247,12 @@ public class FavoriteFragment extends ListFragment implements LoaderManager.Load
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		if (mLoadMore.isShown() && !mPullToRefreshLayout.isRefreshing()) {
-			loadFromCloud(false);
+			if (mPref.getBoolean(getString(R.string.pref_load_more_from_cloud), true)) {
+				loadFromCloud(false);
+			} else {
+				mCurrentPage++;
+				getLoaderManager().restartLoader(0, null, this);
+			}
 		}
 	}
 
@@ -249,5 +269,20 @@ public class FavoriteFragment extends ListFragment implements LoaderManager.Load
 		intent.putExtra(Constants.ID, id);
 		intent.putExtra(User.screen_name, screenName);
 		startActivity(intent);
+	}
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+		if (key.equals(mApp.getString(R.string.pref_tweet_font_size))
+				|| key.equals(mApp.getString(R.string.pref_customize_tweet_font))
+				|| key.equals(mApp.getString(R.string.pref_show_tweet_thumbs))) {
+			Log.d(TAG, "pref change, the home timeline fragment needs update!");
+			// 应用新的偏好
+			mAdapter.swapCursor(null);
+			mAdapter = new TweetAdapter(getActivity(), null);
+			setListAdapter(mAdapter);
+//			todo: check the method is needed? android will auto provide us a newer cursor?
+//			getLoaderManager().restartLoader(0, null, this);
+		}
 	}
 }
