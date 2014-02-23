@@ -25,7 +25,7 @@ import java.util.List;
 public class StatusProcessor {
 
 	/**
-	 * 持久化我的微博。
+	 * 持久化主页时间线
 	 *
 	 * @author longkai
 	 */
@@ -55,6 +55,37 @@ public class StatusProcessor {
 			context.getContentResolver().bulkInsert(CatnutProvider.parse(Status.MULTIPLE), _statuses);
 			ContentValues[] _users = users.toArray(new ContentValues[users.size()]);
 			context.getContentResolver().bulkInsert(CatnutProvider.parse(User.MULTIPLE), _users);
+		}
+	}
+
+	/**
+	 * 持久化评论时间线
+	 *
+	 * @author longkai
+	 */
+	public static class CommentTweetsProcessor implements CatnutProcessor<JSONObject> {
+
+		@Override
+		public void asyncProcess(Context context, JSONObject data) throws Exception {
+			JSONArray array = data.optJSONArray(Status.COMMENTS);
+			ContentValues[] comments = new ContentValues[array.length()];
+			ContentValues[] users = new ContentValues[array.length()];
+			ContentValues comment;
+			JSONObject jsonUser;
+			JSONObject jsonStatus;
+			for (int i = 0; i < comments.length; i++) {
+				// 解析微博
+				jsonStatus = array.optJSONObject(i);
+				comment = Status.METADATA.convert(jsonStatus);
+				comment.put(Status.TYPE, Status.COMMENT); // 标记为评论微博
+				comments[i] = comment;
+				// 解析评论作者
+				jsonUser = jsonStatus.optJSONObject(User.SINGLE);
+				users[i] = User.METADATA.convert(jsonUser);
+			}
+			// 持久化
+			context.getContentResolver().bulkInsert(CatnutProvider.parse(Status.MULTIPLE), comments);
+			context.getContentResolver().bulkInsert(CatnutProvider.parse(User.MULTIPLE), users);
 		}
 	}
 }
