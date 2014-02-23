@@ -26,13 +26,13 @@ public final class Status implements CatnutMetadata<JSONObject, ContentValues> {
 	public static final String TYPE = "_type";
 
 	/** 本地使用，标记为主页微博 */
-	public static final int HOME = 1;
+	public static final int HOME = 2;
 	/** 本地使用，标记为转发微博 */
-	public static final int RETWEET = 2;
+	public static final int RETWEET = 3;
 	/** 本地使用，标记为评论 */
-	public static final int COMMENT = 3;
+	public static final int COMMENT = 4;
 	/** 本地使用，标记为其它类型的微博 */
-	public static final int OTHERS = 4;
+	public static final int OTHERS = 1;
 
 
 	public static final String TABLE = "statuses";

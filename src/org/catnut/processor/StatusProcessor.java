@@ -29,7 +29,7 @@ public class StatusProcessor {
 	 *
 	 * @author longkai
 	 */
-	public static class TweetsProcessor implements CatnutProcessor<JSONObject> {
+	public static class HomeTweetsProcessor implements CatnutProcessor<JSONObject> {
 
 		@Override
 		public void asyncProcess(Context context, JSONObject jsonObject) throws Exception {
@@ -39,10 +39,13 @@ public class StatusProcessor {
 			User userMetadata = User.METADATA;
 			Status statusMetadata = Status.METADATA;
 			JSONObject json;
+			ContentValues status;
 			for (int i = 0; i < jsonArray.length(); i++) {
 				json = jsonArray.optJSONObject(i);
 				// 一次持久化微博和作者信息
-				statues.add(statusMetadata.convert(json));
+				status = statusMetadata.convert(json);
+				status.put(Status.TYPE, Status.HOME); // 标记为主页微博
+				statues.add(status);
 				// 如果这条微博包含了原作者信息
 				if (json.has(User.SINGLE)) {
 					users.add(userMetadata.convert(json.optJSONObject(User.SINGLE)));
@@ -50,7 +53,8 @@ public class StatusProcessor {
 				// 转发微博
 				while (json.has(Status.retweeted_status)) {
 					json = json.optJSONObject(Status.retweeted_status);
-					statues.add(statusMetadata.convert(json));
+					status.put(Status.TYPE, Status.RETWEET); // 标记为转发微博
+					statues.add(status);
 					// 没有uid则标识返回用户的全部字段
 					if (!json.has(Status.uid) && json.has(User.SINGLE)) { // 有些时候，数据也是不可靠的...
 						users.add(userMetadata.convert(json.optJSONObject(User.SINGLE)));

@@ -93,14 +93,16 @@ public class HomeTimelineFragment extends TimelineFragment {
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		String where = null;
+		StringBuilder where = new StringBuilder(Status.TYPE).append("=").append(Status.HOME);
 		int size = super.getDefaultFetchSize();
 		String limit = String.valueOf(size * (mCurPage + 1));
 		// 搜索只能是本地搜索
 		if (!TextUtils.isEmpty(mCurFilter) && mCurFilter.trim().length() != 0) {
-			where = Status.columnText + " like " + CatnutUtils.like(mCurFilter) +
-				" or " +
-				User.screen_name + " like " + CatnutUtils.like(mCurFilter);
+			where.append(" and (")
+					.append(Status.columnText).append(" like ").append(CatnutUtils.like(mCurFilter))
+					.append(" or ")
+					.append(User.screen_name).append(" like ").append(CatnutUtils.like(mCurFilter))
+					.append(")");
 			limit = null;
 			if (!isSearching) {
 				getListView().removeFooterView(mLoadMore);
@@ -115,7 +117,7 @@ public class HomeTimelineFragment extends TimelineFragment {
 			mActivity,
 			CatnutProvider.parse(Status.MULTIPLE),
 			COLUMNS,
-			where,
+			where.toString(),
 			null,
 			Status.TABLE + " as s",
 			"inner join " + User.TABLE + " as u on s.uid=u._id",
@@ -140,7 +142,7 @@ public class HomeTimelineFragment extends TimelineFragment {
 		mRequestQueue.add(new CatnutRequest(
 			mActivity,
 			api,
-			new StatusProcessor.TweetsProcessor(),
+			new StatusProcessor.HomeTweetsProcessor(),
 			isRefresh ? refreshSuccessListener : loadMoreSuccessListener,
 			isRefresh ? refreshFailListener : loadMoreFailListener
 		)).setTag(TAG);

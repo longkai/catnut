@@ -67,7 +67,7 @@ public class UserTimeLineFragment extends TimelineFragment {
 		mRequestQueue.add(new CatnutRequest(
 			mActivity,
 			api,
-			new StatusProcessor.TweetsProcessor(),
+			new StatusProcessor.HomeTweetsProcessor(),
 			isRefresh ? refreshSuccessListener : loadMoreSuccessListener,
 			isRefresh ? refreshFailListener : loadMoreFailListener
 		)).setTag(TAG);
