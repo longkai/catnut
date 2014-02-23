@@ -7,12 +7,13 @@ package org.catnut.processor;
 
 import android.content.ContentValues;
 import android.content.Context;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.catnut.core.CatnutProcessor;
 import org.catnut.core.CatnutProvider;
+import org.catnut.fragment.FavoriteFragment;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,11 +110,44 @@ public class StatusProcessor {
 		public void asyncProcess(Context context, JSONObject data) throws Exception {
 			JSONObject jsonObject = data.optJSONObject(Status.SINGLE);
 			ContentValues status = Status.METADATA.convert(jsonObject);
-			// set fav type
-			status.put(Status.TYPE, Status.FAVORITE);
 			ContentValues user = User.METADATA.convert(jsonObject.optJSONObject(User.SINGLE));
 			context.getContentResolver().insert(CatnutProvider.parse(User.MULTIPLE), user);
 			context.getContentResolver().insert(CatnutProvider.parse(Status.MULTIPLE), status);
+		}
+	}
+
+	/**
+	 * 持久化收藏列表
+	 *
+	 * @author longkai
+	 */
+	public static class FavoriteTweetsProcessor implements CatnutProcessor<JSONObject> {
+
+		@Override
+		public void asyncProcess(Context context, JSONObject data) throws Exception {
+			int delete = 0;
+			JSONArray array = data.optJSONArray("favorites");
+			ContentValues[] favorites = new ContentValues[array.length()];
+			ContentValues[] users = new ContentValues[favorites.length];
+			JSONObject json;
+			for (int i = 0; i < favorites.length; i++) {
+				// 解析微博，这里共用了变量名
+				json = array.optJSONObject(i).optJSONObject(Status.SINGLE);
+				if (json.optInt("deleted") == 1) {
+					// 可能微博已经被删除了
+					delete++;
+					continue;
+				}
+				ContentValues values = Status.METADATA.convert(json);
+				values.put(Status.favorited, 1);
+				favorites[i] = values;
+				// 解析用户
+				users[i] = User.METADATA.convert(json.optJSONObject(User.SINGLE));
+			}
+			// persist
+			context.getContentResolver().bulkInsert(CatnutProvider.parse(User.MULTIPLE), users);
+			context.getContentResolver().bulkInsert(CatnutProvider.parse(Status.MULTIPLE), favorites);
+			data.put(FavoriteFragment.TAG, delete);
 		}
 	}
 }

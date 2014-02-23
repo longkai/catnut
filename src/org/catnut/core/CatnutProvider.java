@@ -159,7 +159,9 @@ public class CatnutProvider extends ContentProvider {
 		SQLiteDatabase db = mDb.getWritableDatabase();
 		db.beginTransaction();
 		for (int i = 0; i < values.length; i++) {
-			db.insertWithOnConflict(table, null, values[i], SQLiteDatabase.CONFLICT_REPLACE);
+			if (values[i] != null) {
+				db.insertWithOnConflict(table, null, values[i], SQLiteDatabase.CONFLICT_REPLACE);
+			}
 		}
 		db.setTransactionSuccessful();
 		db.endTransaction();
