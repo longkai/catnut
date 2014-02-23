@@ -167,6 +167,61 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
+		// 从本地抓取数据*_*，有一个时间先后的问题，所以把view的创建放到这个地方来了
+		String query = CatnutUtils.buildQuery(PROJECTION,
+				User.screen_name + "=" + CatnutUtils.quote(mScreenName), User.TABLE, null, null, null);
+		new AsyncQueryHandler(getActivity().getContentResolver()) {
+			@Override
+			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+				if (cursor.moveToNext()) {
+					// 暂存元数据
+					mAvatarUrl = cursor.getString(cursor.getColumnIndex(User.avatar_large));
+					mVerified = CatnutUtils.getBoolean(cursor, User.verified);
+					mRemark = cursor.getString(cursor.getColumnIndex(User.remark));
+					mDescription = cursor.getString(cursor.getColumnIndex(User.description));
+					mLocation = cursor.getString(cursor.getColumnIndex(User.location));
+					mProfileUrl = cursor.getString(cursor.getColumnIndex(User.profile_url));
+					mCoverUrl = cursor.getString(cursor.getColumnIndex(User.cover_image));
+					// +关注
+					mFollowing = CatnutUtils.getBoolean(cursor, User.following);
+					// menu
+					buildMenu();
+					// load封面图片
+					mApp.getImageLoader().get(mCoverUrl, new ImageLoader.ImageListener() {
+						@Override
+						public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+							mPlaceHolder.setBackground(new BitmapDrawable(getResources(), response.getBitmap()));
+						}
+
+						@Override
+						public void onErrorResponse(VolleyError error) {
+							mPlaceHolder.setBackgroundResource(R.raw.default_cover);
+						}
+					});
+					// 我的微博
+					mTweetsCount.setOnClickListener(tweetsOnclickListener);
+					CatnutUtils.setText(mTweetsCount, android.R.id.text1,
+							cursor.getString(cursor.getColumnIndex(User.statuses_count)));
+					CatnutUtils.setText(mTweetsCount, android.R.id.text2, getString(R.string.tweets));
+					// 关注我的
+					mFollowersCount.setOnClickListener(followersOnclickListener);
+					CatnutUtils.setText(mFollowersCount, android.R.id.text1,
+							cursor.getString(cursor.getColumnIndex(User.followers_count)));
+					CatnutUtils.setText(mFollowersCount, android.R.id.text2, getString(R.string.followers));
+					// 我关注的
+					mFollowingsCount.setOnClickListener(followingsOnClickListener);
+					CatnutUtils.setText(mFollowingsCount, android.R.id.text1,
+							cursor.getString(cursor.getColumnIndex(User.friends_count)));
+					CatnutUtils.setText(mFollowingsCount, android.R.id.text2, getString(R.string.followings));
+					// pager adapter, not fragment pager any more
+					mViewPager.setAdapter(coverPager);
+					mIndicator.setViewPager(mViewPager);
+				} else {
+					Toast.makeText(getActivity(), getString(R.string.user_not_found), Toast.LENGTH_SHORT).show();
+				}
+				cursor.close();
+			}
+		}.startQuery(0, null, CatnutProvider.parse(User.MULTIPLE), null, query, null, null);
 		// 抓最新的一条微博
 		if (mApp.getPreferences().getBoolean(getString(R.string.pref_show_latest_tweet), true)) {
 			String queryLatestTweet = CatnutUtils.buildQuery(
@@ -223,69 +278,7 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		mMenu = menu;
-		// 从本地抓取数据*_*，有一个时间先后的问题，所以把view的创建放到这个地方来了
-		String query = CatnutUtils.buildQuery(PROJECTION,
-				User.screen_name + "=" + CatnutUtils.quote(mScreenName), User.TABLE, null, null, null);
-		new AsyncQueryHandler(getActivity().getContentResolver()) {
-			@Override
-			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-				if (cursor.moveToNext()) {
-					// 暂存元数据
-					mAvatarUrl = cursor.getString(cursor.getColumnIndex(User.avatar_large));
-					mVerified = CatnutUtils.getBoolean(cursor, User.verified);
-					mRemark = cursor.getString(cursor.getColumnIndex(User.remark));
-					mDescription = cursor.getString(cursor.getColumnIndex(User.description));
-					mLocation = cursor.getString(cursor.getColumnIndex(User.location));
-					mProfileUrl = cursor.getString(cursor.getColumnIndex(User.profile_url));
-					mCoverUrl = cursor.getString(cursor.getColumnIndex(User.cover_image));
-					// +关注
-					mFollowing = CatnutUtils.getBoolean(cursor, User.following);
-					if (mMenu != null) {
-						if (!mFollowing) {
-							mMenu.add(Menu.NONE, R.id.action_follow, Menu.NONE, R.string.follow)
-									.setIcon(R.drawable.ic_title_follow)
-									.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-						} else {
-							mMenu.add(Menu.NONE, R.id.action_unfollow, Menu.NONE, R.string.unfollow)
-									.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-						}
-					}
-					// load封面图片
-					mApp.getImageLoader().get(mCoverUrl, new ImageLoader.ImageListener() {
-						@Override
-						public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-							mPlaceHolder.setBackground(new BitmapDrawable(getResources(), response.getBitmap()));
-						}
-
-						@Override
-						public void onErrorResponse(VolleyError error) {
-							mPlaceHolder.setBackgroundResource(R.raw.default_cover);
-						}
-					});
-					// 我的微博
-					mTweetsCount.setOnClickListener(tweetsOnclickListener);
-					CatnutUtils.setText(mTweetsCount, android.R.id.text1,
-							cursor.getString(cursor.getColumnIndex(User.statuses_count)));
-					CatnutUtils.setText(mTweetsCount, android.R.id.text2, getString(R.string.tweets));
-					// 关注我的
-					mFollowersCount.setOnClickListener(followersOnclickListener);
-					CatnutUtils.setText(mFollowersCount, android.R.id.text1,
-							cursor.getString(cursor.getColumnIndex(User.followers_count)));
-					CatnutUtils.setText(mFollowersCount, android.R.id.text2, getString(R.string.followers));
-					// 我关注的
-					mFollowingsCount.setOnClickListener(followingsOnClickListener);
-					CatnutUtils.setText(mFollowingsCount, android.R.id.text1,
-							cursor.getString(cursor.getColumnIndex(User.friends_count)));
-					CatnutUtils.setText(mFollowingsCount, android.R.id.text2, getString(R.string.followings));
-					// pager adapter, not fragment pager any more
-					mViewPager.setAdapter(coverPager);
-					mIndicator.setViewPager(mViewPager);
-				} else {
-					Toast.makeText(getActivity(), getString(R.string.user_not_found), Toast.LENGTH_SHORT).show();
-				}
-				cursor.close();
-			}
-		}.startQuery(0, null, CatnutProvider.parse(User.MULTIPLE), null, query, null, null);
+		buildMenu();
 	}
 
 	@Override
@@ -301,6 +294,23 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 				break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	// 创建menu，只创建一次哦
+	private void buildMenu() {
+		if (mMenu != null && mAvatarUrl != null) { // 确保数据已经从sqlite载入
+			// 只有当两者均为空时才创建menu
+			if (mMenu.findItem(R.id.action_follow) == null && mMenu.findItem(R.id.action_unfollow) == null) {
+				if (!mFollowing) {
+					mMenu.add(Menu.NONE, R.id.action_follow, Menu.NONE, R.string.follow)
+							.setIcon(R.drawable.ic_title_follow)
+							.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+				} else {
+					mMenu.add(Menu.NONE, R.id.action_unfollow, Menu.NONE, R.string.unfollow)
+							.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				}
+			}
+		}
 	}
 
 	private void toggleFollow(final boolean follow) {
