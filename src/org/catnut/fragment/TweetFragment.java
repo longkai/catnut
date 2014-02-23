@@ -213,8 +213,18 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 				if (cursor.moveToNext()) {
 					mImageLoader.get(cursor.getString(cursor.getColumnIndex(User.avatar_large)),
 							ImageLoader.getImageListener(mAvatar, R.drawable.error, R.drawable.error));
+					final long uid = cursor.getLong(cursor.getColumnIndex(Status.uid));
+					final String screenName = cursor.getString(cursor.getColumnIndex(User.screen_name));
+					mAvatar.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							Intent intent = new Intent(getActivity(), ProfileActivity.class);
+							intent.putExtra(Constants.ID, uid);
+							intent.putExtra(User.screen_name, screenName);
+							startActivity(intent);
+						}
+					});
 					String remark = cursor.getString(cursor.getColumnIndex(User.remark));
-					String screenName = cursor.getString(cursor.getColumnIndex(User.screen_name));
 					mRemark.setText(TextUtils.isEmpty(remark) ? screenName : remark);
 					mScreenName.setText("@" + screenName);
 					String text = cursor.getString(cursor.getColumnIndex(Status.columnText));
