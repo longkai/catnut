@@ -91,6 +91,8 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 
 	// tweet id
 	private long mId;
+	// 是否收藏这条微博
+	private boolean mFavorited = false;
 
 	// widgets
 	private View mTweetLayout;
@@ -195,6 +197,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 						Status.reposts_count,
 						Status.attitudes_count,
 						Status.source,
+						Status.favorited,
 						"s." + Status.created_at,
 						User.screen_name,
 						User.avatar_large,
@@ -251,6 +254,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 					if (mShareActionProvider != null) {
 						mShareActionProvider.setShareIntent(mShareIntent);
 					}
+					mFavorited = CatnutUtils.getBoolean(cursor, Status.favorited);
 				}
 				cursor.close();
 			}
@@ -368,6 +372,16 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 			}
 		});
 		mShareActionProvider.setShareIntent(mShareIntent);
+	}
+
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		MenuItem fav = menu.findItem(R.id.action_toggle_favorite);
+		if (mFavorited) {
+			fav.setTitle(getString(R.string.cancle_favorite)).setIcon(R.drawable.ic_title_decline);
+		} else {
+			fav.setTitle(getString(R.string.favorite)).setIcon(R.drawable.ic_title_favorite);
+		}
 	}
 
 	@Override

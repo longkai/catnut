@@ -83,6 +83,7 @@
 	<string name="tweet_share_subject">来自Catnut的分享</string>
 	<string name="favorite">收藏</string>
 	<string name="retweet">转发</string>
+	<string name="cancle_favorite">取消收藏</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>微博</item>

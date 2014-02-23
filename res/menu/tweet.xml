@@ -14,7 +14,7 @@
 		android:icon="@drawable/ic_title_retweet" />
 
 	<item
-		android:id="@+id/action_favorite"
+		android:id="@+id/action_toggle_favorite"
 		android:title="@string/favorite"
 		android:showAsAction="ifRoom"
 		android:icon="@drawable/ic_title_favorite" />
