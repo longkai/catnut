@@ -104,12 +104,12 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mApp = CatnutApp.getTingtingApp();
+		mImageLoader = mApp.getImageLoader();
+		mActionBar = getActionBar();
+		mActionBar.setIcon(R.drawable.ic_title_home);
 		if (savedInstanceState == null) {
 			setContentView(R.layout.main);
-
-			mApp = CatnutApp.getTingtingApp();
-			mImageLoader = mApp.getImageLoader();
-
 			// drawer specific
 			mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 			mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, Gravity.START);
@@ -131,8 +131,6 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			mDescription = (TextView) findViewById(R.id.description);
 			mTweetLayout = findViewById(R.id.tweet_layout);
 
-			mActionBar = getActionBar();
-			mActionBar.setDisplayShowHomeEnabled(false); // 统一不显示home了，不太协调
 			prepareActionBar();
 //			fetchLatestTweet();
 
@@ -176,7 +174,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			@Override
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 				if (cursor.moveToNext()) {
-					mActionBar.setDisplayUseLogoEnabled(true);
+//					mActionBar.setDisplayUseLogoEnabled(true);
 					mNick = cursor.getString(cursor.getColumnIndex(User.screen_name));
 					// add it to pref for convenient
 					mApp.getPreferences().edit().putString(User.screen_name, mNick).commit();
