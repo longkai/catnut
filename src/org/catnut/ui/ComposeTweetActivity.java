@@ -46,18 +46,8 @@ public class ComposeTweetActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mApp = CatnutApp.getTingtingApp();
-		if (savedInstanceState == null) {
-			setContentView(R.layout.compose);
-			mAvatar = (ImageView) findViewById(R.id.avatar);
-			mScreenName = (TextView) findViewById(R.id.screen_name);
-			mTextCounter = (TextView) findViewById(R.id.text_counter);
-			mText = (EditText) findViewById(R.id.text);
-			mGallery = (ImageView) findViewById(R.id.action_gallery);
-			mCamera = (ImageView) findViewById(R.id.action_camera);
-			mGeo = (ImageView) findViewById(R.id.action_geo);
-			// set data to layout...
-			injectLayout();
-		}
+		injectLayout();
+
 		ActionBar bar = getActionBar();
 		bar.setIcon(R.drawable.ic_title_compose);
 		bar.setDisplayHomeAsUpEnabled(true);
@@ -89,6 +79,15 @@ public class ComposeTweetActivity extends Activity {
 	}
 
 	private void injectLayout() {
+		setContentView(R.layout.compose);
+		mAvatar = (ImageView) findViewById(R.id.avatar);
+		mScreenName = (TextView) findViewById(R.id.screen_name);
+		mTextCounter = (TextView) findViewById(R.id.text_counter);
+		mText = (EditText) findViewById(R.id.text);
+		mGallery = (ImageView) findViewById(R.id.action_gallery);
+		mCamera = (ImageView) findViewById(R.id.action_camera);
+		mGeo = (ImageView) findViewById(R.id.action_geo);
+		// set data to layout...
 		new AsyncQueryHandler(getContentResolver()) {
 			@Override
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
