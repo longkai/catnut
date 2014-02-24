@@ -10,10 +10,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Typeface;
+import android.provider.BaseColumns;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,20 +29,12 @@ import org.catnut.metadata.User;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.ui.ProfileActivity;
+import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
 
 import java.io.File;
-
-import static org.catnut.support.TweetTextView.MENTION_FILTER;
-import static org.catnut.support.TweetTextView.MENTION_PATTERN;
-import static org.catnut.support.TweetTextView.MENTION_SCHEME;
-import static org.catnut.support.TweetTextView.TOPIC_FILTER;
-import static org.catnut.support.TweetTextView.TOPIC_PATTERN;
-import static org.catnut.support.TweetTextView.TOPIC_SCHEME;
-import static org.catnut.support.TweetTextView.URL_FILTER;
-import static org.catnut.support.TweetTextView.WEB_URL;
 
 /**
  * 微博列表适配器
@@ -112,6 +104,10 @@ public class TweetAdapter extends CursorAdapter {
 		ImageView thumbs;
 		int thumbsIndex;
 		int remarkIndex;
+
+		ImageView reply;
+		ImageView retweet;
+		ImageView favorite;
 	}
 
 	@Override
@@ -141,13 +137,17 @@ public class TweetAdapter extends CursorAdapter {
 		holder.thumbsIndex = cursor.getColumnIndex(Status.thumbnail_pic);
 		holder.thumbs = (ImageView) view.findViewById(R.id.thumbs);
 		holder.remarkIndex = cursor.getColumnIndex(User.remark);
+		holder.reply = (ImageView) view.findViewById(R.id.action_reply);
+		holder.retweet = (ImageView) view.findViewById(R.id.action_reteet);
+		holder.favorite = (ImageView) view.findViewById(R.id.action_favorite);
 		view.setTag(holder);
 		return view;
 	}
 
 	@Override
-	public void bindView(View view, Context context, Cursor cursor) {
+	public void bindView(View view, final Context context, Cursor cursor) {
 		ViewHolder holder = (ViewHolder) view.getTag();
+		final long id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 		// 用户相关
 		if (mUserNick == null) {
 			holder.avatar.setVisibility(View.VISIBLE);
@@ -175,6 +175,37 @@ public class TweetAdapter extends CursorAdapter {
 			// 用户自定义字体
 			holder.text.setTypeface(mCustomizedFont);
 		}
+		holder.reply.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(context, TweetActivity.class);
+				intent.putExtra(Constants.ID, id);
+				context.startActivity(intent);
+			}
+		});
+		if (CatnutUtils.getBoolean(cursor, Status.favorited)) {
+			holder.favorite.setImageResource(R.drawable.ic_tweet_action_inline_favorite_on);
+		} else {
+			holder.favorite.setImageResource(R.drawable.ic_tweet_action_inline_favorite_off);
+		}
+		holder.favorite.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// just go to the tweet' s detail todo maybe will need forward?
+				Intent intent = new Intent(context, TweetActivity.class);
+				intent.putExtra(Constants.ID, id);
+				context.startActivity(intent);
+			}
+		});
+		holder.retweet.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// just go to the tweet' s detail todo maybe will need forward?
+				Intent intent = new Intent(context, TweetActivity.class);
+				intent.putExtra(Constants.ID, id);
+				context.startActivity(intent);
+			}
+		});
 		holder.text.setTextSize(mCustomizedFontSize);
 		holder.text.setText(cursor.getString(holder.textIndex));
 		String create_at = cursor.getString(holder.create_atIndex);

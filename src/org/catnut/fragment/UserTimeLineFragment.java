@@ -6,6 +6,7 @@
 package org.catnut.fragment;
 
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -13,6 +14,8 @@ import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.widget.ListView;
 import org.catnut.R;
 import org.catnut.adapter.TweetAdapter;
 import org.catnut.api.TweetAPI;
@@ -22,6 +25,7 @@ import org.catnut.metadata.User;
 import org.catnut.processor.StatusProcessor;
 import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
+import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 
@@ -43,6 +47,7 @@ public class UserTimeLineFragment extends TimelineFragment {
 		Status.attitudes_count,
 		Status.source,
 		Status.created_at,
+		Status.favorited
 	};
 
 	private long uid;
@@ -145,6 +150,13 @@ public class UserTimeLineFragment extends TimelineFragment {
 			limit
 		);
 		return loader;
+	}
+
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id) {
+		Intent intent = new Intent(getActivity(), TweetActivity.class);
+		intent.putExtra(Constants.ID, id);
+		startActivity(intent);
 	}
 
 	@Override

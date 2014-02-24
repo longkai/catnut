@@ -50,7 +50,8 @@ public class HomeTimelineFragment extends TimelineFragment {
 		"s." + Status.created_at,
 		User.screen_name,
 		User.profile_image_url,
-		User.remark
+		User.remark,
+		Status.favorited
 	};
 
 	@Override

@@ -119,7 +119,7 @@ public class RetweetBoxFragment extends DialogFragment implements DialogInterfac
 		mApp.getRequestQueue().add(new CatnutRequest(
 				getActivity(),
 				TweetAPI.repost(mId, mRetweetText.getText().toString(), mRetweetOption, null),
-				new StatusProcessor.SingleTweetProcessor(Status.HOME),
+				new StatusProcessor.SingleTweetProcessor(Status.RETWEET),
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {
