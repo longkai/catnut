@@ -119,7 +119,8 @@ public class UserTimeLineFragment extends TimelineFragment {
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		int size = super.getDefaultFetchSize();
-		StringBuilder where = new StringBuilder(Status.uid).append("=").append(uid);
+		StringBuilder where = new StringBuilder(Status.uid).append("=").append(uid)
+				.append(" and ").append(Status.TYPE).append(" != ").append(Status.COMMENT);
 		String limit = String.valueOf((mCurPage + 1) * size);
 		if (!TextUtils.isEmpty(mCurFilter) && mCurFilter.trim().length() != 0) {
 			where.append(" and ").append(Status.columnText).append(" like ").append(CatnutUtils.like(mCurFilter));
