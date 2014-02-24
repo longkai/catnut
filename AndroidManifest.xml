@@ -40,6 +40,9 @@
 		</activity>
 		<activity android:name=".ui.TweetActivity" />
 		<activity android:name=".ui.SingleFragmentActivity" />
+		<activity
+			android:name=".ui.ComposeTweetActivity"
+			android:windowSoftInputMode="adjustResize" />
 
 		<provider
 			android:authorities="org.catnut"

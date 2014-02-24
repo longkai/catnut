@@ -415,6 +415,9 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			case R.id.pref:
 				startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.PREF));
 				break;
+			case R.id.action_compose:
+				startActivity(new Intent(this, ComposeTweetActivity.class));
+				break;
 			default:
 				break;
 		}

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:padding="@dimen/medium"
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<LinearLayout
+		android:layout_margin="@dimen/medium"
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<ImageView
+			android:id="@id/avatar"
+			android:layout_width="50dp"
+			android:layout_height="50dp" />
+
+		<TextView
+			android:id="@+id/screen_name"
+			android:text="@string/about"
+			android:layout_marginLeft="@dimen/medium"
+			android:textColor="@android:color/primary_text_light"
+			android:textStyle="bold"
+			android:singleLine="true"
+			android:ellipsize="end"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_gravity="center_vertical"
+			android:gravity="center_vertical"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+	</LinearLayout>
+
+	<EditText
+		android:id="@+id/text"
+		android:gravity="left|top"
+		android:maxLength="140"
+		android:padding="@dimen/medium"
+		android:textColor="@android:color/primary_text_light"
+		android:layout_weight="1"
+		android:hint="@string/new_tweet_hint"
+		android:layout_width="match_parent"
+		android:layout_height="0dp" />
+
+	<LinearLayout
+		android:background="@drawable/overflow_dropdown_light"
+		android:orientation="horizontal"
+		android:showDividers="middle"
+		android:divider="?android:dividerVertical"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<ImageView
+			android:id="@+id/action_gallery"
+			android:clickable="true"
+			android:focusable="true"
+			android:background="?android:attr/selectableItemBackground"
+			android:src="@drawable/btn_gallery"
+			android:layout_weight="1"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content" />
+
+		<ImageView
+			android:id="@+id/action_gallery"
+			android:clickable="true"
+			android:focusable="true"
+			android:background="?android:attr/selectableItemBackground"
+			android:src="@drawable/btn_camera"
+			android:layout_weight="1"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content" />
+
+		<ImageView
+			android:id="@+id/action_gallery"
+			android:clickable="true"
+			android:focusable="true"
+			android:background="?android:attr/selectableItemBackground"
+			android:src="@drawable/btn_geo"
+			android:layout_weight="1"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content" />
+	</LinearLayout>
+</LinearLayout>
