@@ -483,6 +483,13 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 					mReply.requestFocus();
 				}
 				break;
+			case R.id.action_reteet:
+				RetweetBoxFragment.getFragment(
+						mId,
+						mText.getText().toString(),
+						mScreenName.getText().toString()
+				).show(getFragmentManager(), null);
+				break;
 			default:
 				break;
 		}
