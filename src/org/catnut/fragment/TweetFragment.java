@@ -6,10 +6,12 @@
 package org.catnut.fragment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -19,6 +21,7 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -105,6 +108,8 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	private long mId;
 	// 是否收藏这条微博
 	private boolean mFavorited = false;
+	// 回复那个评论id
+	private long mReplyTo = 0L;
 
 	// widgets
 	private View mTweetLayout;
@@ -198,7 +203,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 			@Override
 			public void onClick(View v) {
 				// 发送评论！
-				sendReply();
+				sendComment();
 			}
 		});
 		mLoadMore = new ProgressBar(getActivity());
@@ -378,12 +383,37 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		Intent intent = new Intent(getActivity(), ProfileActivity.class);
+	public void onItemClick(AdapterView<?> parent, View view, final int position, final long id) {
+		if (mReply.length() > 0) {
+			new AlertDialog.Builder(getActivity())
+					.setMessage(getString(R.string.abort_existing_reply_alert))
+					.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							intentToReply(position, id);
+						}
+					})
+					.setNegativeButton(android.R.string.no, null)
+					.show();
+		} else {
+			intentToReply(position, id);
+		}
+	}
+
+	/**
+	 * 想要去回复某个评论?
+	 * @param position
+	 */
+	private void intentToReply(int position, long id) {
+		// 清除text，调用之前最好询问一下用户
+		mReply.setText(null);
+
 		Cursor cursor = (Cursor) mAdapter.getItem(position - 1); // a header view in top...
-		intent.putExtra(Constants.ID, id);
-		intent.putExtra(User.screen_name, cursor.getString(cursor.getColumnIndex(User.screen_name)));
-		startActivity(intent);
+		String screenName = cursor.getString(cursor.getColumnIndex(User.screen_name));
+		// 标记一下
+		mReplyTo = id;
+		mReply.requestFocus();
+		mReply.setHint(getString(R.string.reply_comment_hint, screenName));
 	}
 
 	@Override
@@ -482,16 +512,21 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 		}
 	}
 
-	// 发送评论，注意这个是对微博的评论，不是对评论的评论！
-	private void sendReply() {
+	// 发送评论
+	private void sendComment() {
+		// 简单的通过hint来判断是回复微博还是回复评论
+		boolean replyToComment = mReply.getHint().toString().contains("@");
+		String text = mReply.getText().toString();
 		mRequestQueue.add(new CatnutRequest(
 				getActivity(),
-				CommentsAPI.create(mReply.getText().toString(), mId, 0, null),
-				new StatusProcessor.CommentTweetProcessor(mId),
+				replyToComment
+						? CommentsAPI.reply(mReplyTo, mId, text, 0, 0, null)
+						: CommentsAPI.create(text, mId, 0, null),
+				new StatusProcessor.CommentTweetProcessor(mId), // 这里共用一个了
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {
-						Toast.makeText(getActivity(), getString(R.string.reply_success), Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), getString(R.string.comment_success), Toast.LENGTH_SHORT).show();
 						// 删除刚才评论的内容
 						mReply.setText(null);
 						// 更新ui
@@ -504,13 +539,16 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 						// list会自动更新，无需手动！
 					}
 				},
-				new Response.ErrorListener() {
-					@Override
-					public void onErrorResponse(VolleyError error) {
-						WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
-						Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_SHORT).show();
-					}
-				}
+				replyListener
 		));
 	}
+
+	// 来个默认的回复错误监听吧
+	private Response.ErrorListener replyListener = new Response.ErrorListener() {
+		@Override
+		public void onErrorResponse(VolleyError error) {
+			WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
+			Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_SHORT).show();
+		}
+	};
 }

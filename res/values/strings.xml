@@ -87,7 +87,10 @@
 	<string name="favorite_success">收藏成功！</string>
 	<string name="cancle_favorite_success">取消收藏成功！</string>
 	<string name="my_favorites">我的收藏</string>
-	<string name="reply_success">评论成功！</string>
+	<string name="comment_success">评论成功！</string>
+	<string name="reply_success">回复成功！</string>
+	<string name="reply_comment_hint">回复@%1$s:</string>
+	<string name="abort_existing_reply_alert">确定放弃现在编辑的评论?</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>微博</item>

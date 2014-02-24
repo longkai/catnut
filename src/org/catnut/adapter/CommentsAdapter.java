@@ -6,7 +6,9 @@
 package org.catnut.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -22,7 +24,9 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
+import org.catnut.ui.ProfileActivity;
 import org.catnut.util.CatnutUtils;
+import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
 
 /**
@@ -71,12 +75,24 @@ public class CommentsAdapter extends CursorAdapter {
 	}
 
 	@Override
-	public void bindView(View view, Context context, Cursor cursor) {
+	public void bindView(View view, final Context context, Cursor cursor) {
 		ViewHolder holder = (ViewHolder) view.getTag();
 		mImageLoader.get(cursor.getString(holder.avatarIndex),
 				ImageLoader.getImageListener(holder.avatar, R.drawable.error, R.drawable.error));
+		// 点击头像查看该用户主页
+		final long id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
+		final String screenName = cursor.getString(holder.screenNameIndex);
+		holder.avatar.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(context, ProfileActivity.class);
+				intent.putExtra(Constants.ID, id);
+				intent.putExtra(User.screen_name, screenName);
+				context.startActivity(intent);
+			}
+		});
 		String remark = cursor.getString(holder.remarkIndex);
-		holder.screenName.setText(TextUtils.isEmpty(remark) ? cursor.getString(holder.screenNameIndex) : remark);
+		holder.screenName.setText(TextUtils.isEmpty(remark) ? screenName : remark);
 		String date = cursor.getString(holder.createAtIndex);
 		holder.createAt.setText(DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(date)));
 		holder.text.setText(cursor.getString(holder.textIndex));

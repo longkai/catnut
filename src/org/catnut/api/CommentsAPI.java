@@ -62,4 +62,27 @@ public class CommentsAPI {
 		params.put("rip", String.valueOf(rip));
 		return new CatnutAPI(Request.Method.POST, uri.toString(), true, params);
 	}
+
+	/**
+	 * 回复一条评论
+	 *
+	 * @param cid             需要回复的评论ID
+	 * @param id              需要评论的微博ID
+	 * @param comment         回复评论内容，必须做URLencode，内容不超过140个汉字
+	 * @param without_mention 回复中是否自动加入“回复@用户名”，0：是、1：否，默认为0
+	 * @param comment_ori     当评论转发微博时，是否评论给原微博，0：否、1：是，默认为0
+	 * @param rip             开发者上报的操作用户真实IP，形如：211.156.0.1
+	 * @return api
+	 */
+	public static CatnutAPI reply(long cid, long id, String comment, int without_mention, int comment_ori, String rip) {
+		StringBuilder uri = new StringBuilder(BASE_URI).append("reply.json");
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("cid", String.valueOf(cid));
+		params.put("id", String.valueOf(id));
+		params.put("comment", comment);
+		params.put("without_mention", String.valueOf(CatnutUtils.optValue(without_mention, 0)));
+		params.put("comment_ori", String.valueOf(CatnutUtils.optValue(comment_ori, 0)));
+		params.put("rip", String.valueOf(rip));
+		return new CatnutAPI(Request.Method.POST, uri.toString(), true, params);
+	}
 }

@@ -31,6 +31,7 @@
 				android:id="@+id/action_reply"
 				android:layout_weight="1"
 				android:maxLength="140"
+				android:textSize="15sp"
 				android:maxLines="3"
 				android:hint="reply to him"
 				android:layout_width="0dp"
