@@ -94,6 +94,7 @@
 	<string name="comment_tweet">回复微博</string>
 	<string name="require_not_empty">码几个字先嘛*_*</string>
 	<string name="compose">发微博</string>
+	<string name="action_send">发送</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>微博</item>

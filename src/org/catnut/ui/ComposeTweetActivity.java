@@ -8,6 +8,8 @@ package org.catnut.ui;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import org.catnut.R;
 
@@ -17,6 +19,8 @@ import org.catnut.R;
  * @author longkai
  */
 public class ComposeTweetActivity extends Activity {
+
+	public static final String TAG = "ComposeTweetActivity";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -31,10 +35,22 @@ public class ComposeTweetActivity extends Activity {
 	}
 
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.compose, menu);
+		return true;
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
 				navigateUpTo(getIntent());
+				break;
+			case R.id.action_send:
+				Log.d(TAG, "TODO");
+				break;
+			case R.id.pref:
+				startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.PREF));
 				break;
 			default:
 				break;
