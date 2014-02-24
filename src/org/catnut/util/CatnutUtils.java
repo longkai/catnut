@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import android.text.style.URLSpan;
 import android.text.util.Linkify;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
@@ -316,5 +317,18 @@ public class CatnutUtils {
 			return defaultValue;
 		}
 		return Integer.parseInt(value);
+	}
+
+	/**
+	 * 简单的判断一下edit text的是否有输入，裁剪掉两边的空白
+	 */
+	public static boolean hasLength(EditText editText) {
+		// text never null!
+		String str = editText.getText().toString();
+		if (!TextUtils.isEmpty(str)) {
+			return str.trim().length() > 0;
+		} else {
+			return false;
+		}
 	}
 }

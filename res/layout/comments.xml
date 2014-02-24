@@ -33,7 +33,7 @@
 				android:maxLength="140"
 				android:textSize="15sp"
 				android:maxLines="3"
-				android:hint="reply to him"
+				android:hint="@string/comment_tweet"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content" />
 

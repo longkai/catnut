@@ -91,6 +91,8 @@
 	<string name="reply_success">回复成功！</string>
 	<string name="reply_comment_hint">回复@%1$s:</string>
 	<string name="abort_existing_reply_alert">确定放弃现在编辑的评论?</string>
+	<string name="comment_tweet">回复微博</string>
+	<string name="require_not_empty">码几个字先嘛*_*</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>微博</item>

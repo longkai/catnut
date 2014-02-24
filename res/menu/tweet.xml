@@ -8,6 +8,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<item
+		android:id="@+id/action_comment"
+		android:title="@string/comment_tweet"
+		android:showAsAction="always"
+		android:icon="@drawable/ic_title_reply" />
+
+	<item
 		android:id="@+id/action_reteet"
 		android:title="@string/retweet"
 		android:showAsAction="always"
@@ -16,7 +22,7 @@
 	<item
 		android:id="@+id/action_toggle_favorite"
 		android:title="@string/favorite"
-		android:showAsAction="ifRoom"
+		android:showAsAction="never"
 		android:icon="@drawable/ic_title_favorite" />
 
 	<!--微博本来就是一个社交分享工具，没有必要强调这一点，所以就never了-->

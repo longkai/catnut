@@ -299,6 +299,12 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	}
 
 	@Override
+	public void onStop() {
+		super.onStop();
+		mRequestQueue.cancelAll(TAG);
+	}
+
+	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		mListView.addHeaderView(mTweetLayout);
@@ -328,7 +334,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 				new StatusProcessor.CommentTweetsProcessor(mId),
 				listener,
 				errorListener
-		));
+		)).setTag(TAG);
 	}
 
 	@Override
@@ -384,20 +390,26 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, final int position, final long id) {
-		if (mReply.length() > 0) {
-			new AlertDialog.Builder(getActivity())
-					.setMessage(getString(R.string.abort_existing_reply_alert))
-					.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							intentToReply(position, id);
-						}
-					})
-					.setNegativeButton(android.R.string.no, null)
-					.show();
+		if (CatnutUtils.hasLength(mReply)) {
+			confirmAbortEdit(new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					mReply.setText(null);
+					intentToReply(position, id);
+				}
+			});
 		} else {
 			intentToReply(position, id);
 		}
+	}
+
+	// 确认一下是否需要放弃修改
+	private void confirmAbortEdit(DialogInterface.OnClickListener abortListener) {
+		new AlertDialog.Builder(getActivity())
+				.setMessage(R.string.abort_existing_reply_alert)
+				.setPositiveButton(android.R.string.ok, abortListener)
+				.setNegativeButton(android.R.string.no, null)
+				.show();
 	}
 
 	/**
@@ -450,6 +462,26 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 			case R.id.pref:
 				startActivity(SingleFragmentActivity.getIntent(getActivity(), SingleFragmentActivity.PREF));
 				break;
+			case R.id.action_comment:
+				// 确认放弃修改
+				// never be null but empty
+				if (CatnutUtils.hasLength(mReply)) {
+					confirmAbortEdit(new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// 重置
+							mReplyTo = 0L;
+							mReply.setText(null);
+							mReply.setHint(R.string.comment_tweet);
+							mReply.requestFocus();
+						}
+					});
+				} else {
+					mReplyTo = 0L; // 这句其实无所谓
+					mReply.setHint(R.string.comment_tweet);
+					mReply.requestFocus();
+				}
+				break;
 			default:
 				break;
 		}
@@ -482,7 +514,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 						Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_SHORT).show();
 					}
 				}
-		));
+		)).setTag(TAG);
 	}
 
 	@Override
@@ -514,6 +546,10 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	// 发送评论
 	private void sendComment() {
+		if (!CatnutUtils.hasLength(mReply)) {
+			Toast.makeText(getActivity(), getString(R.string.require_not_empty), Toast.LENGTH_SHORT).show();
+			return; // 提前结束
+		}
 		// 简单的通过hint来判断是回复微博还是回复评论
 		boolean replyToComment = mReply.getHint().toString().contains("@");
 		String text = mReply.getText().toString();
@@ -540,7 +576,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 					}
 				},
 				replyListener
-		));
+		)).setTag(TAG);
 	}
 
 	// 来个默认的回复错误监听吧
