@@ -73,7 +73,6 @@ public class StatusProcessor {
 			this.to = to;
 		}
 
-
 		@Override
 		public void asyncProcess(Context context, JSONObject data) throws Exception {
 			JSONArray array = data.optJSONArray(Status.COMMENTS);
@@ -96,6 +95,31 @@ public class StatusProcessor {
 			// 持久化
 			context.getContentResolver().bulkInsert(CatnutProvider.parse(Status.MULTIPLE), comments);
 			context.getContentResolver().bulkInsert(CatnutProvider.parse(User.MULTIPLE), users);
+		}
+	}
+
+	/**
+	 * 处理单条评论
+	 *
+	 * @author longkai
+	 */
+	public static class CommentTweetProcessor implements CatnutProcessor<JSONObject> {
+
+		private long id;
+
+		public CommentTweetProcessor(long id) {
+			this.id = id;
+		}
+
+		@Override
+		public void asyncProcess(Context context, JSONObject data) throws Exception {
+			ContentValues[] statues = new ContentValues[2];
+			statues[0] = Status.METADATA.convert(data);
+			statues[0].put(Status.TYPE, Status.COMMENT);
+			statues[0].put(Status.TO_WHICH_TWEET, id);
+
+			statues[1] = Status.METADATA.convert(data.optJSONObject(Status.SINGLE));
+			context.getContentResolver().bulkInsert(CatnutProvider.parse(Status.MULTIPLE), statues);
 		}
 	}
 

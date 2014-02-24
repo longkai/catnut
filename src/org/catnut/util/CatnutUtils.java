@@ -21,9 +21,6 @@ import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.support.TweetURLSpan;
 
-import java.util.Map;
-import java.util.Objects;
-
 import static org.catnut.support.TweetTextView.MENTION_FILTER;
 import static org.catnut.support.TweetTextView.MENTION_PATTERN;
 import static org.catnut.support.TweetTextView.MENTION_SCHEME;

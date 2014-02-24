@@ -14,8 +14,10 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -64,7 +67,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  * @author longkai
  */
 public class TweetFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
-		OnRefreshListener, AbsListView.OnScrollListener, AdapterView.OnItemClickListener {
+		OnRefreshListener, AbsListView.OnScrollListener, AdapterView.OnItemClickListener, TextWatcher {
 
 	private static final String TAG = "TweetFragment";
 
@@ -94,6 +97,9 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	private ListView mListView;
 	private CommentsAdapter mAdapter;
+	private EditText mReply;
+	private ImageView mSend;
+	private TextView mTextCounter;
 
 	// tweet id
 	private long mId;
@@ -166,6 +172,10 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.comments, container, false);
 		mListView = (ListView) view.findViewById(android.R.id.list);
+		mReply = (EditText) view.findViewById(R.id.action_reply);
+		mSend = (ImageView) view.findViewById(R.id.action_send);
+		mTextCounter = (TextView) view.findViewById(R.id.text_counter);
+		// for our headers
 		mTweetLayout = inflater.inflate(R.layout.tweet, null);
 		mAvatar = (ImageView) mTweetLayout.findViewById(R.id.avatar);
 		mRemark = (TextView) mTweetLayout.findViewById(R.id.remark);
@@ -182,7 +192,15 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
+		mReply.addTextChangedListener(this);
+		mReply.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+		mSend.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// 发送评论！
+				sendReply();
+			}
+		});
 		mLoadMore = new ProgressBar(getActivity());
 		// set actionbar refresh facility
 		ViewGroup viewGroup = (ViewGroup) view;
@@ -425,6 +443,65 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 						mReplayCount.setText(CatnutUtils.approximate(status.optInt(Status.comments_count)));
 						mReteetCount.setText(CatnutUtils.approximate(status.optInt(Status.reposts_count)));
 						mFavoriteCount.setText(CatnutUtils.approximate(status.optInt(Status.attitudes_count)));
+					}
+				},
+				new Response.ErrorListener() {
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
+						Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_SHORT).show();
+					}
+				}
+		));
+	}
+
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+		// no-op
+	}
+
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+		// no-op
+	}
+
+	@Override
+	public void afterTextChanged(Editable s) {
+		int count = 140 - mReply.length();
+		mTextCounter.setText(String.valueOf(count));
+		mTextCounter.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+		// never lt 140, 'cause the edit text' s max length is 140
+		if (count != 140) {
+			mSend.setClickable(true);
+			mSend.setFocusable(true);
+			mSend.setImageResource(R.drawable.ic_dm_send_default);
+		} else {
+			mSend.setClickable(false);
+			mSend.setFocusable(false);
+			mSend.setImageResource(R.drawable.ic_dm_send_disabled);
+		}
+	}
+
+	// 发送评论，注意这个是对微博的评论，不是对评论的评论！
+	private void sendReply() {
+		mRequestQueue.add(new CatnutRequest(
+				getActivity(),
+				CommentsAPI.create(mReply.getText().toString(), mId, 0, null),
+				new StatusProcessor.CommentTweetProcessor(mId),
+				new Response.Listener<JSONObject>() {
+					@Override
+					public void onResponse(JSONObject response) {
+						Toast.makeText(getActivity(), getString(R.string.reply_success), Toast.LENGTH_SHORT).show();
+						// 删除刚才评论的内容
+						mReply.setText(null);
+						// 更新ui
+						String before = mReplayCount.getText().toString();
+						if (TextUtils.isEmpty(before)) {
+							mReplayCount.setText(1);
+						} else {
+							mReplayCount.setText(String.valueOf(Integer.parseInt(before) + 1));
+						}
+						// list会自动更新，无需手动！
 					}
 				},
 				new Response.ErrorListener() {
