@@ -174,4 +174,28 @@ public class StatusProcessor {
 			data.put(FavoriteFragment.TAG, delete);
 		}
 	}
+
+	/**
+	 * 普通的一条微博解析，需要提供一个微博类型
+	 *
+	 * @author longkai
+	 */
+	public static class SingleTweetProcessor implements CatnutProcessor<JSONObject> {
+
+		// 微博类型
+		private int type;
+
+		public SingleTweetProcessor(int type) {
+			this.type = type;
+		}
+
+		@Override
+		public void asyncProcess(Context context, JSONObject data) throws Exception {
+			ContentValues status = Status.METADATA.convert(data);
+			status.put(Status.TYPE, type); // 添加类型
+			ContentValues user = User.METADATA.convert(data.optJSONObject(User.SINGLE));
+			context.getContentResolver().insert(CatnutProvider.parse(Status.MULTIPLE), status);
+			context.getContentResolver().insert(CatnutProvider.parse(User.MULTIPLE), user);
+		}
+	}
 }
