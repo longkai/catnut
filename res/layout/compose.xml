@@ -11,9 +11,8 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent">
 
-	<LinearLayout
+	<RelativeLayout
 		android:layout_margin="@dimen/medium"
-		android:orientation="horizontal"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
 
@@ -24,18 +23,28 @@
 
 		<TextView
 			android:id="@+id/screen_name"
-			android:text="@string/about"
+			android:layout_alignTop="@id/avatar"
+			android:layout_alignBottom="@id/avatar"
+			android:layout_toRightOf="@id/avatar"
 			android:layout_marginLeft="@dimen/medium"
 			android:textColor="@android:color/primary_text_light"
 			android:textStyle="bold"
 			android:singleLine="true"
 			android:ellipsize="end"
 			android:textAppearance="?android:attr/textAppearanceMedium"
-			android:layout_gravity="center_vertical"
 			android:gravity="center_vertical"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content" />
-	</LinearLayout>
+
+		<TextView
+			android:id="@+id/text_counter"
+			android:text="140"
+			android:layout_alignTop="@id/screen_name"
+			android:textColor="@android:color/holo_green_light"
+			android:layout_alignParentRight="true"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+	</RelativeLayout>
 
 	<EditText
 		android:id="@+id/text"
@@ -67,7 +76,7 @@
 			android:layout_height="wrap_content" />
 
 		<ImageView
-			android:id="@+id/action_gallery"
+			android:id="@+id/action_camera"
 			android:clickable="true"
 			android:focusable="true"
 			android:background="?android:attr/selectableItemBackground"
@@ -77,7 +86,7 @@
 			android:layout_height="wrap_content" />
 
 		<ImageView
-			android:id="@+id/action_gallery"
+			android:id="@+id/action_geo"
 			android:clickable="true"
 			android:focusable="true"
 			android:background="?android:attr/selectableItemBackground"
