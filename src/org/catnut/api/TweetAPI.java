@@ -131,4 +131,22 @@ public class TweetAPI {
 		params.put("rip", String.valueOf(rip));
 		return new CatnutAPI(Request.Method.POST, BASE_URI + "update.json", true, params);
 	}
+
+	/**
+	 * 转发一条微博
+	 *
+	 * @param id         要转发的微博ID
+	 * @param status     添加的转发文本，必须做URLencode，内容不超过140个汉字，不填则默认为“转发微博”
+	 * @param is_comment 是否在转发的同时发表评论，0：否、1：评论给当前微博、2：评论给原微博、3：都评论，默认为0
+	 * @param rip        开发者上报的操作用户真实IP，形如：211.156.0.1
+	 * @return api
+	 */
+	public static CatnutAPI repost(long id, String status, int is_comment, String rip) {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("id", String.valueOf(id));
+		params.put("status", status);
+		params.put("is_comment", String.valueOf(CatnutUtils.optValue(is_comment, 0)));
+		params.put("rip", String.valueOf(rip));
+		return new CatnutAPI(Request.Method.POST, BASE_URI + "repost.json", true, params);
+	}
 }
