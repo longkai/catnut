@@ -10,9 +10,10 @@ import android.util.Log;
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
+import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.android.volley.toolbox.JsonRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,7 +27,7 @@ import java.util.Map;
  *
  * @author longkai
  */
-public class CatnutRequest extends JsonRequest<JSONObject> {
+public class CatnutRequest extends Request<JSONObject> {
 
 	public static final String TAG = "CatnutRequest";
 
@@ -41,7 +42,7 @@ public class CatnutRequest extends JsonRequest<JSONObject> {
 		CatnutProcessor<JSONObject> processor,
 		Response.Listener<JSONObject> listener,
 		Response.ErrorListener errorListener) {
-		super(api.method, api.uri, null, listener, errorListener);
+		super(api.method, api.uri, errorListener);
 		mContext = context;
 		mApi = api;
 		mProcessor = processor;
@@ -65,7 +66,7 @@ public class CatnutRequest extends JsonRequest<JSONObject> {
 		} catch (JSONException je) {
 			return Response.error(new ParseError(je));
 		} catch (Exception ex) {
-			return Response.error(new ParseError(ex));
+			return Response.error(new VolleyError(response));
 		}
 	}
 

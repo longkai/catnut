@@ -7,9 +7,13 @@ package org.catnut.core;
 
 import android.content.Context;
 import android.util.Log;
-import com.android.volley.*;
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.android.volley.toolbox.JsonRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -21,7 +25,7 @@ import java.util.Map;
  *
  * @author longkai
  */
-public class CatnutArrayRequest extends JsonRequest<JSONArray> {
+public class CatnutArrayRequest extends Request<JSONArray> {
 
 	public static final String TAG = "CatnutArrayRequest";
 
@@ -36,7 +40,7 @@ public class CatnutArrayRequest extends JsonRequest<JSONArray> {
 		CatnutProcessor<JSONArray> processor,
 		Response.Listener<JSONArray> listener,
 		Response.ErrorListener errorListener) {
-		super(api.method, api.uri, null, listener, errorListener);
+		super(api.method, api.uri, errorListener);
 		mContext = context;
 		mApi = api;
 		mProcessor = processor;
@@ -60,7 +64,7 @@ public class CatnutArrayRequest extends JsonRequest<JSONArray> {
 		} catch (JSONException je) {
 			return Response.error(new ParseError(je));
 		} catch (Exception ex) {
-			return Response.error(new ParseError(ex));
+			return Response.error(new VolleyError(ex));
 		}
 	}
 
