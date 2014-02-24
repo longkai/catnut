@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<RelativeLayout
+		android:padding="@dimen/medium"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<TextView
+			android:id="@+id/screen_name"
+			android:text="@string/action_send"
+			android:textColor="@android:color/primary_text_light"
+			android:textStyle="bold"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+
+		<TextView
+			android:id="@+id/text"
+			android:layout_alignTop="@id/screen_name"
+			android:text="@string/abort_existing_reply_alert"
+			android:layout_marginLeft="@dimen/small"
+			android:layout_toRightOf="@id/screen_name"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
+		<TextView
+			android:id="@+id/text_counter"
+			android:text="140"
+			android:layout_marginTop="@dimen/small"
+			android:textColor="@android:color/holo_green_light"
+			android:layout_below="@id/text"
+			android:layout_alignParentRight="true"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+
+		<EditText
+			android:id="@+id/retweet_text"
+			android:layout_below="@id/text_counter"
+			android:layout_marginTop="@dimen/small"
+			android:textColor="@android:color/primary_text_light"
+			android:maxLength="140"
+			android:maxLines="3"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
+		<TextView
+			android:layout_marginTop="@dimen/medium"
+			android:id="@+id/place_holder"
+			android:layout_below="@id/retweet_text"
+			android:text="转发的同时发表评论?"
+			android:textColor="@android:color/secondary_text_light"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+
+		<!--这里的index的值和api上的一样的哟-->
+		<Spinner
+			android:id="@+id/retweet_options"
+			android:layout_toRightOf="@id/place_holder"
+			android:layout_marginLeft="@dimen/small"
+			android:layout_alignTop="@id/place_holder"
+			android:entries="@array/reteet_options"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+
+		<!--todo: may be emotions goes here!-->
+	</RelativeLayout>
+</ScrollView>
