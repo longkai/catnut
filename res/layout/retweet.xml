@@ -46,6 +46,7 @@
 			android:id="@+id/retweet_text"
 			android:layout_below="@id/text_counter"
 			android:layout_marginTop="@dimen/small"
+			android:hint="@string/retweet"
 			android:textColor="@android:color/primary_text_light"
 			android:maxLength="140"
 			android:maxLines="3"

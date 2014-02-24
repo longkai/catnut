@@ -108,37 +108,33 @@ public class RetweetBoxFragment extends DialogFragment implements DialogInterfac
 				.setPositiveButton(android.R.string.ok, this)
 				.create();
 		alertDialog.getWindow().setSoftInputMode(
-						WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 		return alertDialog;
 	}
 
 	@Override
 	public void onClick(DialogInterface dialog, int which) {
 		// todo: alert user whether keeping their data
-		if (CatnutUtils.hasLength(mRetweetText)) {
-			mApp.getRequestQueue().add(new CatnutRequest(
-					getActivity(),
-					TweetAPI.repost(mId, mRetweetText.getText().toString(), mRetweetOption, null),
-					new StatusProcessor.SingleTweetProcessor(Status.HOME),
-					new Response.Listener<JSONObject>() {
-						@Override
-						public void onResponse(JSONObject response) {
-							Log.d("xx", "xxxxxxxxxx");
-							Toast.makeText(getActivity(), getString(R.string.retweet_success), Toast.LENGTH_SHORT).show();
-						}
-					},
-					new Response.ErrorListener() {
-						@Override
-						public void onErrorResponse(VolleyError error) {
-							Log.e(TAG, "retweet error!", error);
-							WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
-							Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_SHORT).show();
-						}
+		// 转发时允许为空
+		mApp.getRequestQueue().add(new CatnutRequest(
+				getActivity(),
+				TweetAPI.repost(mId, mRetweetText.getText().toString(), mRetweetOption, null),
+				new StatusProcessor.SingleTweetProcessor(Status.HOME),
+				new Response.Listener<JSONObject>() {
+					@Override
+					public void onResponse(JSONObject response) {
+						Toast.makeText(getActivity(), getString(R.string.retweet_success), Toast.LENGTH_SHORT).show();
 					}
-			)).setTag(TAG);
-		} else {
-			Toast.makeText(getActivity(), R.string.require_not_empty, Toast.LENGTH_SHORT).show();
-		}
+				},
+				new Response.ErrorListener() {
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						Log.e(TAG, "retweet error!", error);
+						WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
+						Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_SHORT).show();
+					}
+				}
+		)).setTag(TAG);
 	}
 
 	@Override
