@@ -8,11 +8,13 @@ package org.catnut.ui;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.fragment.TweetFragment;
+import org.catnut.support.OnFragmentBackPressedListener;
 import org.catnut.util.Constants;
 
 /**
@@ -24,6 +26,8 @@ public class TweetActivity extends Activity {
 
 	private EasyTracker mTracker;
 
+	private OnFragmentBackPressedListener mKeyDownListener;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -33,13 +37,30 @@ public class TweetActivity extends Activity {
 				mTracker = EasyTracker.getInstance(this);
 			}
 			long id = getIntent().getLongExtra(Constants.ID, 0L);
+			TweetFragment fragment = TweetFragment.getFragment(id);
+			// 添加back回调
+			mKeyDownListener = fragment;
 			getFragmentManager().beginTransaction()
-					.replace(android.R.id.content, TweetFragment.getFragment(id))
+					.replace(android.R.id.content, fragment)
 					.commit();
 			ActionBar bar = getActionBar();
 			bar.setDisplayShowHomeEnabled(false);
 			bar.setDisplayHomeAsUpEnabled(true);
 		}
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		switch (keyCode) {
+			case KeyEvent.KEYCODE_BACK:
+				if (mKeyDownListener != null) {
+					mKeyDownListener.onBackPressed();
+				}
+				break;
+			default:
+				break;
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 
 	@Override
@@ -62,7 +83,11 @@ public class TweetActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
-				this.navigateUpTo(getIntent());
+				if (mKeyDownListener != null) {
+					mKeyDownListener.onBackPressed();
+				} else {
+					this.navigateUpTo(getIntent());
+				}
 				break;
 			default:
 				break;

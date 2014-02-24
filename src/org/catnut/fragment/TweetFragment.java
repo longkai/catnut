@@ -21,7 +21,7 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -52,6 +52,7 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.StatusProcessor;
+import org.catnut.support.OnFragmentBackPressedListener;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.ui.ProfileActivity;
@@ -70,7 +71,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  * @author longkai
  */
 public class TweetFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
-		OnRefreshListener, AbsListView.OnScrollListener, AdapterView.OnItemClickListener, TextWatcher {
+		OnRefreshListener, AbsListView.OnScrollListener, AdapterView.OnItemClickListener, TextWatcher, OnFragmentBackPressedListener {
 
 	private static final String TAG = "TweetFragment";
 
@@ -587,4 +588,19 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 			Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_SHORT).show();
 		}
 	};
+
+
+	@Override
+	public void onBackPressed() {
+		if (CatnutUtils.hasLength(mReply)) {
+			confirmAbortEdit(new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					getActivity().onBackPressed();
+				}
+			});
+		} else {
+			getActivity().onBackPressed();
+		}
+	}
 }
