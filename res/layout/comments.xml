@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<!--todo: is it a bug? nonsense to have the frame layout-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+		<org.catnut.support.QuickReturnListView
+			android:id="@android:id/list"
+			android:layout_weight="1"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
+		<LinearLayout
+			android:background="@drawable/overflow_dropdown_light"
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+			<EditText
+				android:id="@+id/action_reply"
+				android:layout_weight="1"
+				android:maxLength="140"
+				android:maxLines="3"
+				android:hint="reply to him"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content" />
+
+			<LinearLayout
+				android:orientation="horizontal"
+				android:showDividers="middle"
+				android:layout_gravity="bottom"
+				android:divider="?android:dividerVertical"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content">
+
+				<TextView
+					android:text="140"
+					android:layout_margin="@dimen/small"
+					android:id="@+id/text_counter"
+					android:gravity="center_horizontal|center_vertical"
+					android:layout_gravity="bottom"
+					android:textColor="@android:color/darker_gray"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content" />
+
+				<ImageView
+					android:id="@+id/action_send"
+					android:background="?android:attr/selectableItemBackground"
+					android:layout_margin="@dimen/small"
+					android:src="@drawable/ic_dm_send_disabled"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content" />
+			</LinearLayout>
+		</LinearLayout>
+	</LinearLayout>
+</FrameLayout>

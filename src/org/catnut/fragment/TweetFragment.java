@@ -6,7 +6,7 @@
 package org.catnut.fragment;
 
 import android.app.Activity;
-import android.app.ListFragment;
+import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
 import android.content.CursorLoader;
@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -62,7 +63,8 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  *
  * @author longkai
  */
-public class TweetFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>,OnRefreshListener, AbsListView.OnScrollListener {
+public class TweetFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
+		OnRefreshListener, AbsListView.OnScrollListener, AdapterView.OnItemClickListener {
 
 	private static final String TAG = "TweetFragment";
 
@@ -90,6 +92,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 	private long mMaxId = 0; // 加载更多使用
 	private ProgressBar mLoadMore;
 
+	private ListView mListView;
 	private CommentsAdapter mAdapter;
 
 	// tweet id
@@ -118,7 +121,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 		public void onResponse(JSONObject response) {
 			mTotalSize = response.optInt(Status.total_number);
 			if (mTotalSize == 0) {
-				getListView().removeFooterView(mLoadMore);
+				mListView.removeFooterView(mLoadMore);
 			}
 			mCurrentPage++;
 			getLoaderManager().restartLoader(0, null, TweetFragment.this);
@@ -161,7 +164,9 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		mTweetLayout = inflater.inflate(R.layout.tweet, null, false);
+		View view = inflater.inflate(R.layout.comments, container, false);
+		mListView = (ListView) view.findViewById(android.R.id.list);
+		mTweetLayout = inflater.inflate(R.layout.tweet, null);
 		mAvatar = (ImageView) mTweetLayout.findViewById(R.id.avatar);
 		mRemark = (TextView) mTweetLayout.findViewById(R.id.remark);
 		mScreenName = (TextView) mTweetLayout.findViewById(R.id.screen_name);
@@ -172,11 +177,11 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 		mSource = (TextView) mTweetLayout.findViewById(R.id.source);
 		mCreateAt = (TextView) mTweetLayout.findViewById(R.id.create_at);
 		// just return the list
-		return super.onCreateView(inflater, container, savedInstanceState);
+		return view;
 	}
 
 	@Override
-	public void onViewCreated(final View view, Bundle savedInstanceState) {
+	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		mLoadMore = new ProgressBar(getActivity());
 		// set actionbar refresh facility
@@ -247,7 +252,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 					mCreateAt.setText(DateUtils.getRelativeTimeSpanString(
 							DateTime.getTimeMills(cursor.getString(cursor.getColumnIndex(Status.created_at)))));
 					if (CatnutUtils.getBoolean(cursor, User.verified)) {
-						view.findViewById(R.id.verified).setVisibility(View.VISIBLE);
+						mTweetLayout.findViewById(R.id.verified).setVisibility(View.VISIBLE);
 					}
 
 					// share...
@@ -273,10 +278,11 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		getListView().addHeaderView(mTweetLayout);
-		getListView().addFooterView(mLoadMore);
-		getListView().setOnScrollListener(this);
-		setListAdapter(mAdapter);
+		mListView.addHeaderView(mTweetLayout);
+		mListView.addFooterView(mLoadMore);
+		mListView.setOnScrollListener(this);
+		mListView.setAdapter(mAdapter);
+		mListView.setOnItemClickListener(this);
 		getLoaderManager().initLoader(0, null, this);
 	}
 
@@ -288,7 +294,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 			mCurrentPage = -1;
 			mAdapter.swapCursor(null);
 			mAdapter = new CommentsAdapter(getActivity());
-			setListAdapter(mAdapter);
+			mListView.setAdapter(mAdapter);
 			getLoaderManager().restartLoader(0, null, this);
 		}
 		mRequestQueue.add(new CatnutRequest(
@@ -327,7 +333,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 		mMaxId = mAdapter.getItemId(count - 1);
 		// 移除加载更多
 		if (mTotalSize != 0 && count == mTotalSize) {
-			getListView().removeFooterView(mLoadMore);
+			mListView.removeFooterView(mLoadMore);
 		}
 	}
 
@@ -354,7 +360,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 	}
 
 	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		Intent intent = new Intent(getActivity(), ProfileActivity.class);
 		Cursor cursor = (Cursor) mAdapter.getItem(position - 1); // a header view in top...
 		intent.putExtra(Constants.ID, id);
