@@ -7,12 +7,15 @@ package org.catnut.ui;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.AsyncQueryHandler;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -121,7 +124,11 @@ public class ComposeTweetActivity extends Activity implements TextWatcher {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
-				navigateUpTo(getIntent());
+				if (CatnutUtils.hasLength(mText)) {
+					abort();
+				} else {
+					navigateUpTo(getIntent());
+				}
 				break;
 			case R.id.action_send:
 				sendTweet(false);
@@ -133,6 +140,33 @@ public class ComposeTweetActivity extends Activity implements TextWatcher {
 				break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		switch (keyCode) {
+			case KeyEvent.KEYCODE_BACK:
+				if (CatnutUtils.hasLength(mText)) {
+					abort();
+					return true; // deal it
+				}
+				break;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
+	// 确定是否放弃已在编辑的内容
+	private void abort() {
+		new AlertDialog.Builder(this)
+				.setMessage(getString(R.string.abort_existing_tweet_alert))
+				.setNegativeButton(android.R.string.no, null)
+				.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						navigateUpTo(getIntent());
+					}
+				})
+				.show();
 	}
 
 	private void injectLayout() {
