@@ -670,6 +670,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 					int cursor = mSendText.getSelectionStart();
 					mSendText.getText().insert(cursor, CatnutUtils.text2Emotion(getActivity(),
 							TweetImageSpan.EMOTION_KEYS[position]));
+					mSendText.requestFocus();
 				}
 			});
 			AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
