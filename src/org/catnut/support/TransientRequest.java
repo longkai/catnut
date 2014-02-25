@@ -25,6 +25,7 @@ public abstract class TransientRequest<T> extends Request<T> {
 
 	public TransientRequest(CatnutAPI api, Response.Listener<T> listener, Response.ErrorListener errorListener) {
 		super(api.method, api.uri, errorListener);
+		mListener = listener;
 		mApi = api;
 	}
 
