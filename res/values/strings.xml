@@ -100,6 +100,9 @@
 	<string name="retweet_success">转发成功！</string>
 	<string name="retweet_option_hint">转发同时评论?</string>
 	<string name="add_emotions">添加表情</string>
+	<string name="reply_current">评论给当前微博</string>
+	<string name="reply_original">评论给原微博</string>
+	<string name="reply_both">都评论</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>微博</item>

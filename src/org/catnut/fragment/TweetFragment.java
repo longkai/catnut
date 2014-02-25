@@ -21,7 +21,7 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
-import android.view.KeyEvent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -66,6 +66,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 		OnRefreshListener, AbsListView.OnScrollListener, AdapterView.OnItemClickListener, TextWatcher, OnFragmentBackPressedListener, PopupMenu.OnMenuItemClickListener {
 
 	private static final String TAG = "TweetFragment";
+	private static final String RETWEET_INDICATOR = ">"; // 标记转发
 
 	private static final int BATCH_SIZE = 50;
 
@@ -93,7 +94,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	private ListView mListView;
 	private CommentsAdapter mAdapter;
-	private EditText mReply;
+	private EditText mSendText;
 	private ImageView mSend;
 	private TextView mTextCounter;
 	private ImageView mOverflow;
@@ -105,6 +106,8 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	private boolean mFavorited = false;
 	// 回复那个评论id
 	private long mReplyTo = 0L;
+	// 转发选项
+	private int mRetweetOption = 0;
 
 	// widgets
 	private View mTweetLayout;
@@ -172,7 +175,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.comments, container, false);
 		mListView = (ListView) view.findViewById(android.R.id.list);
-		mReply = (EditText) view.findViewById(R.id.action_reply);
+		mSendText = (EditText) view.findViewById(R.id.action_reply);
 		mSend = (ImageView) view.findViewById(R.id.action_send);
 		mTextCounter = (TextView) view.findViewById(R.id.text_counter);
 		mOverflow = (ImageView) view.findViewById(R.id.action_overflow);
@@ -194,8 +197,8 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
-		mReply.addTextChangedListener(this);
-		mReply.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+		mSendText.addTextChangedListener(this);
+		mSendText.setTextColor(getResources().getColor(android.R.color.primary_text_light));
 		mSend.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -395,11 +398,11 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, final int position, final long id) {
-		if (CatnutUtils.hasLength(mReply)) {
+		if (CatnutUtils.hasLength(mSendText)) {
 			confirmAbortEdit(new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					mReply.setText(null);
+					mSendText.setText(null);
 					intentToReply(position, id);
 				}
 			});
@@ -423,14 +426,14 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	 */
 	private void intentToReply(int position, long id) {
 		// 清除text，调用之前最好询问一下用户
-		mReply.setText(null);
+		mSendText.setText(null);
 
 		Cursor cursor = (Cursor) mAdapter.getItem(position - 1); // a header view in top...
 		String screenName = cursor.getString(cursor.getColumnIndex(User.screen_name));
 		// 标记一下
 		mReplyTo = id;
-		mReply.requestFocus();
-		mReply.setHint(getString(R.string.reply_comment_hint, screenName));
+		mSendText.requestFocus();
+		mSendText.setHint(getString(R.string.reply_comment_hint, screenName));
 	}
 
 	@Override
@@ -470,34 +473,43 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 			case R.id.action_comment:
 				// 确认放弃修改
 				// never be null but empty
-				if (CatnutUtils.hasLength(mReply)) {
+				if (CatnutUtils.hasLength(mSendText)) {
 					confirmAbortEdit(new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							// 重置
 							mReplyTo = 0L;
-							mReply.setText(null);
-							mReply.setHint(R.string.comment_tweet);
-							mReply.requestFocus();
+							resetEditor(getString(R.string.comment_tweet), false);
 						}
 					});
 				} else {
 					mReplyTo = 0L; // 这句其实无所谓
-					mReply.setHint(R.string.comment_tweet);
-					mReply.requestFocus();
+					resetEditor(getString(R.string.comment_tweet), false);
 				}
 				break;
 			case R.id.action_reteet:
-				RetweetBoxFragment.getFragment(
-						mId,
-						mText.getText().toString(),
-						mScreenName.getText().toString()
-				).show(getFragmentManager(), null);
+				if (CatnutUtils.hasLength(mSendText)) {
+					confirmAbortEdit(new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							resetEditor(RETWEET_INDICATOR + getString(R.string.retweet), true);
+						}
+					});
+				} else {
+					resetEditor(RETWEET_INDICATOR + getString(R.string.retweet), true);
+				}
 				break;
 			default:
 				break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void resetEditor(String hint, boolean sendEnabled) {
+		mSendText.setText(null);
+		mSendText.setHint(hint);
+		mSendText.requestFocus();
+		mSend.setImageResource(sendEnabled ? R.drawable.ic_dm_send_default : R.drawable.ic_dm_send_disabled);
 	}
 
 	private void toggleFavorite() {
@@ -541,7 +553,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	@Override
 	public void afterTextChanged(Editable s) {
-		int count = 140 - mReply.length();
+		int count = 140 - mSendText.length();
 		mTextCounter.setText(String.valueOf(count));
 		mTextCounter.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
 		// never lt 140, 'cause the edit text' s max length is 140
@@ -558,13 +570,13 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	// 发送评论
 	private void sendComment() {
-		if (!CatnutUtils.hasLength(mReply)) {
+		if (!CatnutUtils.hasLength(mSendText)) {
 			Toast.makeText(getActivity(), getString(R.string.require_not_empty), Toast.LENGTH_SHORT).show();
 			return; // 提前结束
 		}
 		// 简单的通过hint来判断是回复微博还是回复评论
-		boolean replyToComment = mReply.getHint().toString().contains("@");
-		String text = mReply.getText().toString();
+		boolean replyToComment = mSendText.getHint().toString().contains("@");
+		String text = mSendText.getText().toString();
 		mRequestQueue.add(new CatnutRequest(
 				getActivity(),
 				replyToComment
@@ -576,7 +588,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 					public void onResponse(JSONObject response) {
 						Toast.makeText(getActivity(), getString(R.string.comment_success), Toast.LENGTH_SHORT).show();
 						// 删除刚才评论的内容
-						mReply.setText(null);
+						mSendText.setText(null);
 						// 更新ui
 						String before = mReplayCount.getText().toString();
 						if (TextUtils.isEmpty(before)) {
@@ -603,7 +615,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	@Override
 	public void onBackPressed() {
-		if (CatnutUtils.hasLength(mReply)) {
+		if (CatnutUtils.hasLength(mSendText)) {
 			confirmAbortEdit(new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -617,19 +629,31 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	@Override
 	public boolean onMenuItemClick(MenuItem item) {
+		// first check emotions
+		if (item.getItemId() == R.id.action_emotions) {
+			Log.d(TAG, "todo");
+			return true;
+		}
 		switch (item.getItemId()) {
 			case R.id.action_reply_none:
-			case R.id.action_reply_both:
+				mRetweetOption = 0;
+				break;
 			case R.id.action_reply_current:
+				mRetweetOption = 1;
+				break;
 			case R.id.action_reply_original:
-				if (!item.isChecked()) {
-					item.setChecked(true);
-				} else {
-					item.setChecked(false);
-				}
+				mRetweetOption = 2;
+				break;
+			case R.id.action_reply_both:
+				mRetweetOption = 3;
 				break;
 			default:
 				break;
+		}
+		if (!item.isChecked()) {
+			item.setChecked(true);
+		} else {
+			item.setChecked(false);
 		}
 		return true;
 	}

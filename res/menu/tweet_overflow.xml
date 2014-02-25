@@ -19,16 +19,16 @@
 				<item
 					android:checked="true"
 					android:id="@+id/action_reply_none"
-					android:title="否" />
+					android:title="@android:string/no" />
 				<item
 					android:id="@+id/action_reply_current"
-					android:title="评论给当前微博" />
+					android:title="@string/reply_current" />
 				<item
 					android:id="@+id/action_reply_original"
-					android:title="评论给原微博" />
+					android:title="@string/reply_original" />
 				<item
 					android:id="@+id/action_reply_both"
-					android:title="都评论" />
+					android:title="@string/reply_both" />
 			</group>
 		</menu>
 	</item>
