@@ -28,15 +28,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.ShareActionProvider;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -71,7 +63,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  * @author longkai
  */
 public class TweetFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
-		OnRefreshListener, AbsListView.OnScrollListener, AdapterView.OnItemClickListener, TextWatcher, OnFragmentBackPressedListener {
+		OnRefreshListener, AbsListView.OnScrollListener, AdapterView.OnItemClickListener, TextWatcher, OnFragmentBackPressedListener, PopupMenu.OnMenuItemClickListener {
 
 	private static final String TAG = "TweetFragment";
 
@@ -104,6 +96,8 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	private EditText mReply;
 	private ImageView mSend;
 	private TextView mTextCounter;
+	private ImageView mOverflow;
+	private PopupMenu mPopupMenu;
 
 	// tweet id
 	private long mId;
@@ -181,6 +175,8 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 		mReply = (EditText) view.findViewById(R.id.action_reply);
 		mSend = (ImageView) view.findViewById(R.id.action_send);
 		mTextCounter = (TextView) view.findViewById(R.id.text_counter);
+		mOverflow = (ImageView) view.findViewById(R.id.action_overflow);
+		mPopupMenu = new PopupMenu(getActivity(), mOverflow);
 		// for our headers
 		mTweetLayout = inflater.inflate(R.layout.tweet, null);
 		mAvatar = (ImageView) mTweetLayout.findViewById(R.id.avatar);
@@ -205,6 +201,14 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 			public void onClick(View v) {
 				// 发送评论！
 				sendComment();
+			}
+		});
+		mPopupMenu.inflate(R.menu.tweet_overflow);
+		mPopupMenu.setOnMenuItemClickListener(this);
+		mOverflow.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mPopupMenu.show();
 			}
 		});
 		mLoadMore = new ProgressBar(getActivity());
@@ -609,5 +613,24 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 		} else {
 			getActivity().onBackPressed();
 		}
+	}
+
+	@Override
+	public boolean onMenuItemClick(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.action_reply_none:
+			case R.id.action_reply_both:
+			case R.id.action_reply_current:
+			case R.id.action_reply_original:
+				if (!item.isChecked()) {
+					item.setChecked(true);
+				} else {
+					item.setChecked(false);
+				}
+				break;
+			default:
+				break;
+		}
+		return true;
 	}
 }
