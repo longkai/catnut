@@ -37,6 +37,8 @@ import org.catnut.R;
 import org.catnut.adapter.CommentsAdapter;
 import org.catnut.api.CommentsAPI;
 import org.catnut.api.FavoritesAPI;
+import org.catnut.api.TweetAPI;
+import org.catnut.core.CatnutAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
@@ -67,6 +69,10 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	private static final String TAG = "TweetFragment";
 	private static final String RETWEET_INDICATOR = ">"; // 标记转发
+	private static final int COMMENT = 0;
+	private static final int REPLY = 1;
+	private static final int RETWEET = 2;
+
 
 	private static final int BATCH_SIZE = 50;
 
@@ -142,7 +148,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 		@Override
 		public void onErrorResponse(VolleyError error) {
 			mPullToRefreshLayout.setRefreshComplete();
-			Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(), WeiboAPIError.fromVolleyError(error).error, Toast.LENGTH_SHORT).show();
 		}
 	};
 
@@ -203,7 +209,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 			@Override
 			public void onClick(View v) {
 				// 发送评论！
-				sendComment();
+				send();
 			}
 		});
 		mPopupMenu.inflate(R.menu.tweet_overflow);
@@ -569,42 +575,66 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	}
 
 	// 发送评论
-	private void sendComment() {
-		if (!CatnutUtils.hasLength(mSendText)) {
-			Toast.makeText(getActivity(), getString(R.string.require_not_empty), Toast.LENGTH_SHORT).show();
-			return; // 提前结束
+	private void send() {
+		// 简单的通过hint来判断是啥类型
+		int tmp;
+		String hint = mSendText.getHint().toString();
+		if (hint.startsWith(RETWEET_INDICATOR)) {
+			tmp = RETWEET;
+		} else {
+			tmp = hint.contains("@") ? REPLY : COMMENT;
 		}
-		// 简单的通过hint来判断是回复微博还是回复评论
-		boolean replyToComment = mSendText.getHint().toString().contains("@");
+		final int type = tmp; // awful...
+		if (type != RETWEET) { // 转发允许啥都不写...
+			if (!CatnutUtils.hasLength(mSendText)) {
+				Toast.makeText(getActivity(), getString(R.string.require_not_empty), Toast.LENGTH_SHORT).show();
+				return; // 提前结束
+			}
+		}
 		String text = mSendText.getText().toString();
+		CatnutAPI api;
+		switch (type) {
+			default:
+			case COMMENT:
+				api = CommentsAPI.create(text, mId, 0, null);
+				break;
+			case REPLY:
+				api = CommentsAPI.reply(mReplyTo, mId, text, 0, 0, null);
+				break;
+			case RETWEET:
+				api = TweetAPI.repost(mId, text, mRetweetOption, null);
+				break;
+		}
 		mRequestQueue.add(new CatnutRequest(
 				getActivity(),
-				replyToComment
-						? CommentsAPI.reply(mReplyTo, mId, text, 0, 0, null)
-						: CommentsAPI.create(text, mId, 0, null),
-				new StatusProcessor.CommentTweetProcessor(mId), // 这里共用一个了
+				api,
+				type == RETWEET
+						? new StatusProcessor.SingleTweetProcessor(Status.RETWEET)
+						: new StatusProcessor.CommentTweetProcessor(mId), // 这里共用一个了
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {
 						Toast.makeText(getActivity(), getString(R.string.comment_success), Toast.LENGTH_SHORT).show();
-						// 删除刚才评论的内容
+						// 删除刚才编辑的内容
 						mSendText.setText(null);
 						// 更新ui
-						String before = mReplayCount.getText().toString();
+						TextView which =
+								type == RETWEET ? mReteetCount : mReplayCount;
+						String before = which.getText().toString();
 						if (TextUtils.isEmpty(before)) {
-							mReplayCount.setText(1);
+							which.setText("1"); // 小心，这里不要写数字，因为R.string.xx，很容易犯错
 						} else {
-							mReplayCount.setText(String.valueOf(Integer.parseInt(before) + 1));
+							which.setText(String.valueOf(Integer.parseInt(before) + 1));
 						}
 						// list会自动更新，无需手动！
 					}
 				},
-				replyListener
+				sendErrorListener
 		)).setTag(TAG);
 	}
 
 	// 来个默认的回复错误监听吧
-	private Response.ErrorListener replyListener = new Response.ErrorListener() {
+	private Response.ErrorListener sendErrorListener = new Response.ErrorListener() {
 		@Override
 		public void onErrorResponse(VolleyError error) {
 			WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
@@ -652,8 +682,6 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 		}
 		if (!item.isChecked()) {
 			item.setChecked(true);
-		} else {
-			item.setChecked(false);
 		}
 		return true;
 	}
