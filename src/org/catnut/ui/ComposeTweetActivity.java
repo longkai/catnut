@@ -11,16 +11,21 @@ import android.app.AlertDialog;
 import android.content.AsyncQueryHandler;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -40,15 +45,19 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.StatusProcessor;
+import org.catnut.support.TweetImageSpan;
 import org.catnut.util.CatnutUtils;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * 发微博
  *
  * @author longkai
  */
-public class ComposeTweetActivity extends Activity implements TextWatcher {
+public class ComposeTweetActivity extends Activity implements TextWatcher, AdapterView.OnItemClickListener {
 
 	public static final String TAG = "ComposeTweetActivity";
 
@@ -195,6 +204,7 @@ public class ComposeTweetActivity extends Activity implements TextWatcher {
 		mSlidingPaneLayout = (SlidingPaneLayout) findViewById(R.id.sliding_pane_layout);
 		mEmotions = (GridView) findViewById(R.id.emotions);
 		mEmotions.setAdapter(new EmotionsAdapter(this));
+		mEmotions.setOnItemClickListener(this);
 		mSlidingPaneLayout.setPanelSlideListener(new SliderListener());
 		mSlidingPaneLayout.openPane();
 		mSlidingPaneLayout.getViewTreeObserver().addOnGlobalLayoutListener(new FirstLayoutListener());
@@ -262,6 +272,40 @@ public class ComposeTweetActivity extends Activity implements TextWatcher {
 		)).setTag(TAG);
 	}
 
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		// 插入到编辑框里
+		int cursor = mText.getSelectionStart();
+		mText.getText().insert(cursor, text2Emotion(TweetImageSpan.EMOTION_KEYS[position]));
+	}
+
+	// 插入表情*_*
+	private SpannableString text2Emotion(String key) {
+		SpannableString spannable = new SpannableString(key);
+		InputStream inputStream = null;
+		Drawable drawable = null;
+		try {
+			inputStream = getAssets().open(TweetImageSpan.EMOTIONS_DIR + TweetImageSpan.EMOTIONS.get(key));
+			drawable = Drawable.createFromStream(inputStream, null);
+		} catch (IOException e) {
+			Log.e(TAG, "load emotion error!", e);
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					Log.e(TAG, "close input error!", e);
+				}
+			}
+		}
+		if (drawable != null) {
+			drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+			ImageSpan span = new ImageSpan(drawable, ImageSpan.ALIGN_BASELINE);
+			spannable.setSpan(span, 0, key.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		}
+		return spannable;
+	}
+
 	private class SliderListener extends SlidingPaneLayout.SimplePanelSlideListener {
 		@Override
 		public void onPanelOpened(View panel) {
@@ -292,6 +336,7 @@ public class ComposeTweetActivity extends Activity implements TextWatcher {
 		mActionBar.setHomeButtonEnabled(false);
 		mActionBar.setDisplayHomeAsUpEnabled(false);
 		mActionBar.setTitle(mTitle);
+		mText.requestFocus();
 	}
 
 	private void onFirstLayout() {

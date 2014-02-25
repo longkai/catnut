@@ -28,22 +28,19 @@ public class EmotionsAdapter extends BaseAdapter {
 	private static final String TAG = "EmotionsAdapter";
 
 	private Context mContext;
-	private String[] mKeys;
 
 	public EmotionsAdapter(Context context) {
 		mContext = context;
-		mKeys = new String[TweetImageSpan.EMOTIONS.size()];
-		TweetImageSpan.EMOTIONS.keySet().toArray(mKeys);
 	}
 
 	@Override
 	public int getCount() {
-		return mKeys.length;
+		return TweetImageSpan.EMOTION_KEYS.length;
 	}
 
 	@Override
 	public Object getItem(int position) {
-		return mKeys[position];
+		return TweetImageSpan.EMOTION_KEYS[position];
 	}
 
 	@Override
@@ -63,7 +60,7 @@ public class EmotionsAdapter extends BaseAdapter {
 		InputStream inputStream = null;
 		try {
 			inputStream = mContext.getAssets()
-					.open(TweetImageSpan.EMOTIONS_DIR + TweetImageSpan.EMOTIONS.get(mKeys[position]));
+					.open(TweetImageSpan.EMOTIONS_DIR + TweetImageSpan.EMOTIONS.get(TweetImageSpan.EMOTION_KEYS[position]));
 			imageView.setImageBitmap(BitmapFactory.decodeStream(inputStream));
 		} catch (IOException e) {
 			imageView.setImageResource(R.drawable.error);

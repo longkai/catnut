@@ -116,6 +116,9 @@ public class TweetImageSpan implements Html.ImageGetter {
 		EMOTIONS.put("[顶]", "ding.png");
 	}
 
+	// is it worth?
+	public static String[] EMOTION_KEYS = EMOTIONS.keySet().toArray(new String[EMOTIONS.size()]);
+
 	public TweetImageSpan(Context mContext) {
 		this.mContext = mContext;
 	}

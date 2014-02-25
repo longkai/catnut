@@ -108,7 +108,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		mImageLoader = mApp.getImageLoader();
 		mActionBar = getActionBar();
 		mActionBar.setIcon(R.drawable.ic_title_home);
-		if (savedInstanceState == null) {
+//		if (savedInstanceState == null) {
 			setContentView(R.layout.main);
 			// drawer specific
 			mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -143,7 +143,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			if (mApp.getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
 				mTracker = EasyTracker.getInstance(this);
 			}
-		}
+//		}
 	}
 
 	@Override
