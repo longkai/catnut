@@ -8,8 +8,10 @@ package org.catnut.ui;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.AsyncQueryHandler;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -45,6 +47,7 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.StatusProcessor;
+import org.catnut.support.MultiPartRequest;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.util.CatnutUtils;
 import org.json.JSONObject;
@@ -109,6 +112,7 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 		mActionBar = getActionBar();
 
 		injectLayout();
+		injectListener();
 
 		mTitle = getString(R.string.compose);
 		mEmotionTitle = getString(R.string.add_emotions);
@@ -232,6 +236,41 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 				new String[]{User.avatar_large, User.screen_name}, null, null, null);
 		// other stuffs...
 		mText.addTextChangedListener(this);
+	}
+
+	private void injectListener() {
+		mGallery.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (CatnutUtils.hasLength(mText)) {
+					Intent intent = new Intent(Intent.ACTION_PICK).setType("image/*");
+					startActivityForResult(intent, 1, null);
+				} else {
+					Toast.makeText(ComposeTweetActivity.this, R.string.require_not_empty, Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == 1 && data != null) {
+			final ProgressDialog dialog = ProgressDialog.show(this, null, "上传中...");
+			dialog.dismiss();
+			mApp.getRequestQueue().add(new MultiPartRequest(
+					this,
+					TweetAPI.upload(mText.getText().toString(), 0, null, data.getData(), 0.f, 0.f, null, null),
+					new StatusProcessor.SingleTweetProcessor(Status.HOME), // 这里随意了...
+					new Response.Listener<JSONObject>() {
+						@Override
+						public void onResponse(JSONObject response) {
+							dialog.dismiss();
+							Toast.makeText(ComposeTweetActivity.this, R.string.post_success, Toast.LENGTH_SHORT).show();
+						}
+					},
+					errorListener
+			)).setTag(TAG);
+		}
 	}
 
 	@Override

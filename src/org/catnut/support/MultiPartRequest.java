@@ -6,6 +6,7 @@
 package org.catnut.support;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
@@ -14,14 +15,15 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
-import org.catnut.core.CatnutAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProcessor;
+import org.catnut.util.CatnutUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.Map;
@@ -35,17 +37,18 @@ public class MultiPartRequest extends Request<JSONObject> {
 
 	private static final String TAG = "MultiPartRequest";
 
-	private static String delimiter = "--";
-	private String boundary = "SwA" + System.currentTimeMillis() + "SwA";
+	private static String delimiter = "--"; // 分隔符
+	private String boundary = "SwA" + System.currentTimeMillis() + "SwA"; // 随机字串
 
+	// 发送的数据字节流
 	private ByteArrayOutputStream os;
 
 	private Context mContext;
-	private CatnutAPI mApi;
+	private MultipartAPI mApi;
 	private CatnutProcessor<JSONObject> mProcessor;
 	private Response.Listener<JSONObject> mListener;
 
-	public MultiPartRequest(Context context, CatnutAPI api, CatnutProcessor<JSONObject> processor,
+	public MultiPartRequest(Context context, MultipartAPI api, CatnutProcessor<JSONObject> processor,
 							Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
 		super(api.method, api.uri, errorListener);
 		mContext = context;
@@ -83,6 +86,14 @@ public class MultiPartRequest extends Request<JSONObject> {
 
 	@Override
 	public byte[] getBody() throws AuthFailureError {
+		// this method runs on background thread*_*
+		try {
+			addParams();
+			addFiles();
+			os.write( (delimiter + boundary + delimiter + "\r\n").getBytes());
+		} catch (IOException e) {
+			Log.d(TAG, "error finish multipart writing!");
+		}
 		return os.toByteArray();
 	}
 
@@ -100,15 +111,46 @@ public class MultiPartRequest extends Request<JSONObject> {
 		}
 	}
 
-	public MultiPartRequest addFormPart(String paramName, String value) throws Exception {
+	private void addParams() throws IOException {
+		if (mApi.params != null) {
+			for (String key : mApi.params.keySet()) {
+				addFormPart(key, mApi.params.get(key));
+			}
+		}
+	}
+
+	private void addFiles() {
+		if (mApi.files != null) {
+			InputStream in = null;
+			Uri uri;
+			for (String key : mApi.files.keySet()) {
+				uri = mApi.files.get(key);
+				try {
+					in = mContext.getContentResolver().openInputStream(uri);
+					addFilePart(key, uri.getLastPathSegment(), CatnutUtils.getBytes(in));
+				} catch (IOException e) {
+					Log.e(TAG, "write file part error!", e);
+				} finally {
+					if (in != null) {
+						try {
+							in.close();
+						} catch (IOException e) {
+							Log.e(TAG, "close input stream error!", e);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void addFormPart(String paramName, String value) throws IOException {
 		os.write((delimiter + boundary + "\r\n").getBytes());
 		os.write("Content-Type: text/plain\r\n".getBytes());
 		os.write(("Content-Disposition: form-data; name=\"" + paramName + "\"\r\n").getBytes());
 		os.write(("\r\n" + value + "\r\n").getBytes());
-		return this;
 	}
 
-	public MultiPartRequest addFilePart(String paramName, String fileName, byte[] data) throws Exception {
+	private void addFilePart(String paramName, String fileName, byte[] data) throws IOException {
 		os.write((delimiter + boundary + "\r\n").getBytes());
 		os.write(("Content-Disposition: form-data; name=\"" + paramName + "\"; filename=\"" + fileName + "\"\r\n").getBytes());
 		os.write(("Content-Type: application/octet-stream\r\n").getBytes());
@@ -118,6 +160,5 @@ public class MultiPartRequest extends Request<JSONObject> {
 		os.write(data);
 
 		os.write("\r\n".getBytes());
-		return this;
 	}
 }

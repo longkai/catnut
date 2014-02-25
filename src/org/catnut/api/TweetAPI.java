@@ -5,8 +5,10 @@
  */
 package org.catnut.api;
 
+import android.net.Uri;
 import com.android.volley.Request;
 import org.catnut.core.CatnutAPI;
+import org.catnut.support.MultipartAPI;
 import org.catnut.util.CatnutUtils;
 import org.json.JSONObject;
 
@@ -148,5 +150,38 @@ public class TweetAPI {
 		params.put("is_comment", String.valueOf(CatnutUtils.optValue(is_comment, 0)));
 		params.put("rip", String.valueOf(rip));
 		return new CatnutAPI(Request.Method.POST, BASE_URI + "repost.json", true, params);
+	}
+
+
+	/**
+	 * 上传图片并发布一条新微博
+	 *
+	 * @param status      要发布的微博文本内容，必须做URLencode，内容不超过140个汉字
+	 * @param visible     微博的可见性，0：所有人能看，1：仅自己可见，2：密友可见，3：指定分组可见，默认为0
+	 * @param list_id     微博的保护投递指定分组ID，只有当visible参数为3时生效且必选
+	 * @param pic         要上传的图片，仅支持JPEG、GIF、PNG格式，图片大小小于5M
+	 * @param lat         纬度，有效范围：-90.0到+90.0，+表示北纬，默认为0.0
+	 * @param _long       经度，有效范围：-180.0到+180.0，+表示东经，默认为0.0
+	 * @param annotations 元数据，主要是为了方便第三方应用记录一些适合于自己使用的信息，每条微博可以包含一个或者多个元数据，必须以json字串的形式提交，字串长度不超过512个字符，具体内容可以自定
+	 * @param rip         开发者上报的操作用户真实IP，形如：211.156.0.1
+	 * @return api
+	 */
+	public static MultipartAPI upload(String status, int visible, String list_id, Uri pic, float lat, float _long, JSONObject annotations, String rip) {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("status", status);
+		params.put("status", status);
+		params.put("visible", String.valueOf(CatnutUtils.optValue(visible, 0)));
+		if (visible == 3) { // 暂时不碰这个先
+			params.put("list_id", list_id);
+		}
+		params.put("lat", String.valueOf(CatnutUtils.optValue(lat, 0.0)));
+		params.put("long", String.valueOf(CatnutUtils.optValue(_long, 0.0)));
+		if (annotations != null) {
+			params.put("annotations", annotations.toString());
+		}
+		params.put("rip", String.valueOf(rip));
+		Map<String, Uri> files = new HashMap<String, Uri>();
+		files.put("pic", pic);
+		return new MultipartAPI(Request.Method.POST, BASE_URI + "upload.json", true, params, files);
 	}
 }

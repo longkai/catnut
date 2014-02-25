@@ -26,6 +26,7 @@ import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.support.TweetURLSpan;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -281,7 +282,8 @@ public class CatnutUtils {
 
 	/**
 	 * 给微博文字加上样式，表情，##，@，链接等
-	 * @param text 微博
+	 *
+	 * @param text      微博
 	 * @param imageSpan 不需要表情传入null
 	 */
 	public static void vividTweet(TweetTextView text, TweetImageSpan imageSpan) {
@@ -368,5 +370,24 @@ public class CatnutUtils {
 			spannable.setSpan(span, 0, key.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
 		}
 		return spannable;
+	}
+
+	/**
+	 * get byte[] from input stream
+	 *
+	 * @param inputStream
+	 * @return byte[]
+	 * @throws IOException
+	 */
+	public static byte[] getBytes(InputStream inputStream) throws IOException {
+		ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+		int bufferSize = 2048;
+		byte[] buffer = new byte[bufferSize];
+
+		int len;
+		while ((len = inputStream.read(buffer)) != -1) {
+			byteBuffer.write(buffer, 0, len);
+		}
+		return byteBuffer.toByteArray();
 	}
 }
