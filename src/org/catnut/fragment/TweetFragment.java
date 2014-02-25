@@ -615,7 +615,20 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {
-						Toast.makeText(getActivity(), getString(R.string.comment_success), Toast.LENGTH_SHORT).show();
+						String msg;
+						switch (type) {
+							default:
+							case COMMENT:
+								msg = getString(R.string.comment_success);
+								break;
+							case REPLY:
+								msg = getString(R.string.reply_success);
+								break;
+							case RETWEET:
+								msg = getString(R.string.retweet_success);
+								break;
+						}
+						Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
 						// 删除刚才编辑的内容
 						mSendText.setText(null);
 						// 更新ui

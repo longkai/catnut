@@ -90,8 +90,8 @@
 	<string name="comment_success">评论成功！</string>
 	<string name="reply_success">回复成功！</string>
 	<string name="reply_comment_hint">回复@%1$s:</string>
-	<string name="abort_existing_reply_alert">确定抛弃刚才码的评论?</string>
-	<string name="comment_tweet">回复微博</string>
+	<string name="abort_existing_reply_alert">确定抛弃刚才码的东西？</string>
+	<string name="comment_tweet">评论微博</string>
 	<string name="require_not_empty">码几个字先嘛*_*</string>
 	<string name="compose">发微博</string>
 	<string name="action_send">发送</string>
