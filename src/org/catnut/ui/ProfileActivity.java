@@ -48,10 +48,6 @@ public class ProfileActivity extends Activity implements FragmentManager.OnBackS
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (savedInstanceState == null) {
-			mApp = CatnutApp.getTingtingApp();
-			if (mApp.getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
-				mTracker = EasyTracker.getInstance(this);
-			}
 			final FragmentManager fragmentManager = getFragmentManager();
 			fragmentManager.addOnBackStackChangedListener(this);
 			Intent intent = getIntent();
@@ -89,6 +85,10 @@ public class ProfileActivity extends Activity implements FragmentManager.OnBackS
 						.beginTransaction()
 						.replace(android.R.id.content, ProfileFragment.getFragment(uid, screenName))
 						.commit();
+			}
+			mApp = CatnutApp.getTingtingApp();
+			if (mApp.getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
+				mTracker = EasyTracker.getInstance(this);
 			}
 			ActionBar bar = getActionBar();
 			bar.setDisplayShowHomeEnabled(false);

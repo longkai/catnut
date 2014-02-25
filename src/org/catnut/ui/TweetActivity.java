@@ -31,21 +31,22 @@ public class TweetActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		if (CatnutApp.getTingtingApp().getPreferences()
+				.getBoolean(getString(R.string.pref_enable_analytics), true)) {
+			mTracker = EasyTracker.getInstance(this);
+		}
+		ActionBar bar = getActionBar();
+		bar.setDisplayShowHomeEnabled(false);
+		bar.setDisplayHomeAsUpEnabled(true);
+
+		long id = getIntent().getLongExtra(Constants.ID, 0L);
 		if (savedInstanceState == null) {
-			if (CatnutApp.getTingtingApp().getPreferences()
-					.getBoolean(getString(R.string.pref_enable_analytics), true)) {
-				mTracker = EasyTracker.getInstance(this);
-			}
-			long id = getIntent().getLongExtra(Constants.ID, 0L);
 			TweetFragment fragment = TweetFragment.getFragment(id);
 			// 添加back回调
 			mKeyDownListener = fragment;
 			getFragmentManager().beginTransaction()
 					.replace(android.R.id.content, fragment)
 					.commit();
-			ActionBar bar = getActionBar();
-			bar.setDisplayShowHomeEnabled(false);
-			bar.setDisplayHomeAsUpEnabled(true);
 		}
 	}
 

@@ -11,6 +11,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import com.google.analytics.tracking.android.EasyTracker;
+import org.catnut.R;
+import org.catnut.core.CatnutApp;
 import org.catnut.fragment.PrefFragment;
 
 /**
@@ -22,6 +25,8 @@ public class SingleFragmentActivity extends Activity {
 
 	public static final String TAG = "SingleFragmentActivity";
 	public static final int PREF = 0;
+
+	private EasyTracker mTracker;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -37,8 +42,12 @@ public class SingleFragmentActivity extends Activity {
 					break;
 			}
 			ft.commit();
-			getActionBar().setDisplayHomeAsUpEnabled(true);
 		}
+		if (CatnutApp.getTingtingApp().getPreferences()
+				.getBoolean(getString(R.string.pref_enable_analytics), true)) {
+			mTracker = EasyTracker.getInstance(this);
+		}
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override
@@ -60,5 +69,21 @@ public class SingleFragmentActivity extends Activity {
 		Intent intent = new Intent(context, SingleFragmentActivity.class);
 		intent.putExtra(TAG, which);
 		return intent;
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		if (mTracker != null) {
+			mTracker.activityStart(this);
+		}
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		if (mTracker != null) {
+			mTracker.activityStop(this);
+		}
 	}
 }
