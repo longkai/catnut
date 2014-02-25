@@ -35,6 +35,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import org.catnut.R;
 import org.catnut.adapter.CommentsAdapter;
+import org.catnut.adapter.EmotionsAdapter;
 import org.catnut.api.CommentsAPI;
 import org.catnut.api.FavoritesAPI;
 import org.catnut.api.TweetAPI;
@@ -661,7 +662,21 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	public boolean onMenuItemClick(MenuItem item) {
 		// first check emotions
 		if (item.getItemId() == R.id.action_emotions) {
-			Log.d(TAG, "todo");
+			GridView emotions = (GridView) LayoutInflater.from(getActivity()).inflate(R.layout.emotions, null);
+			emotions.setAdapter(new EmotionsAdapter(getActivity()));
+			emotions.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					int cursor = mSendText.getSelectionStart();
+					mSendText.getText().insert(cursor, CatnutUtils.text2Emotion(getActivity(),
+							TweetImageSpan.EMOTION_KEYS[position]));
+				}
+			});
+			AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
+					.setView(emotions).create();
+			alertDialog.show();
+			alertDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
+					getResources().getDimensionPixelSize(R.dimen.emotion_window_height));
 			return true;
 		}
 		switch (item.getItemId()) {

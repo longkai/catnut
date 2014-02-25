@@ -276,35 +276,9 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		// 插入到编辑框里
 		int cursor = mText.getSelectionStart();
-		mText.getText().insert(cursor, text2Emotion(TweetImageSpan.EMOTION_KEYS[position]));
+		mText.getText().insert(cursor, CatnutUtils.text2Emotion(this, TweetImageSpan.EMOTION_KEYS[position]));
 	}
 
-	// 插入表情*_*
-	private SpannableString text2Emotion(String key) {
-		SpannableString spannable = new SpannableString(key);
-		InputStream inputStream = null;
-		Drawable drawable = null;
-		try {
-			inputStream = getAssets().open(TweetImageSpan.EMOTIONS_DIR + TweetImageSpan.EMOTIONS.get(key));
-			drawable = Drawable.createFromStream(inputStream, null);
-		} catch (IOException e) {
-			Log.e(TAG, "load emotion error!", e);
-		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					Log.e(TAG, "close input error!", e);
-				}
-			}
-		}
-		if (drawable != null) {
-			drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-			ImageSpan span = new ImageSpan(drawable, ImageSpan.ALIGN_BASELINE);
-			spannable.setSpan(span, 0, key.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-		}
-		return spannable;
-	}
 
 	private class SliderListener extends SlidingPaneLayout.SimplePanelSlideListener {
 		@Override

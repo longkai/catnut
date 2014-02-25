@@ -10,17 +10,24 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.style.ImageSpan;
 import android.text.style.URLSpan;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.support.TweetURLSpan;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import static org.catnut.support.TweetTextView.MENTION_FILTER;
 import static org.catnut.support.TweetTextView.MENTION_PATTERN;
@@ -37,6 +44,8 @@ import static org.catnut.support.TweetTextView.WEB_URL;
  * @author longkai
  */
 public class CatnutUtils {
+
+	private static final String TAG = "CatnutUtils";
 
 	/**
 	 * cursor默认没有得到boolean类型的值，所以才有了这个方法
@@ -330,5 +339,34 @@ public class CatnutUtils {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * 微博文字转表情
+	 */
+	public static SpannableString text2Emotion(Context context, String key) {
+		SpannableString spannable = new SpannableString(key);
+		InputStream inputStream = null;
+		Drawable drawable = null;
+		try {
+			inputStream = context.getAssets().open(TweetImageSpan.EMOTIONS_DIR + TweetImageSpan.EMOTIONS.get(key));
+			drawable = Drawable.createFromStream(inputStream, null);
+		} catch (IOException e) {
+			Log.e(TAG, "load emotion error!", e);
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					Log.e(TAG, "close input error!", e);
+				}
+			}
+		}
+		if (drawable != null) {
+			drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+			ImageSpan span = new ImageSpan(drawable, ImageSpan.ALIGN_BASELINE);
+			spannable.setSpan(span, 0, key.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+		}
+		return spannable;
 	}
 }
