@@ -8,6 +8,7 @@
 	<integer name="card_flip_time_full">300</integer>
 	<integer name="card_flip_time_half">150</integer>
 
+	<integer name="emotions_columns">5</integer>
 	<integer-array name="drawer_list_header_indexes">
 		<item>0</item>
 		<item>7</item>

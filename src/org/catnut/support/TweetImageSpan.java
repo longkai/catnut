@@ -13,7 +13,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,13 +27,14 @@ public class TweetImageSpan implements Html.ImageGetter {
 
 	private static final String TAG = "TweetImageSpan";
 	/** 默认表情存放目录 */
-	private static final String EMOTIONS_DIR = "emotions/";
+	public static final String EMOTIONS_DIR = "emotions/";
 	/** 微博表情匹配 [xx] */
 	public static final Pattern EMOTION_PATTEN = Pattern.compile("\\[([^\\]\\[/ ]+)\\]");
 
 	private Context mContext;
 
-	private static final Map<String, String> EMOTIONS = new HashMap<String, String>();
+	// 为了保持有序，so换成linked的啦
+	public static final Map<String, String> EMOTIONS = new LinkedHashMap<String, String>();
 
 	static {
 		EMOTIONS.put("[拜拜]", "baibai.png");

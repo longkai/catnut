@@ -12,13 +12,17 @@ import android.content.AsyncQueryHandler;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.widget.SlidingPaneLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +31,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
+import org.catnut.adapter.EmotionsAdapter;
 import org.catnut.api.TweetAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
@@ -52,6 +57,14 @@ public class ComposeTweetActivity extends Activity implements TextWatcher {
 	private EasyTracker mTracker;
 
 	// widgets
+	private SlidingPaneLayout mSlidingPaneLayout;
+	private GridView mEmotions;
+	private ActionBar mActionBar;
+
+	// str
+	private String mTitle;
+	private String mEmotionTitle;
+
 	private ImageView mAvatar;
 	private TextView mScreenName;
 	private TextView mTextCounter;
@@ -84,13 +97,17 @@ public class ComposeTweetActivity extends Activity implements TextWatcher {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.compose);
 		mApp = CatnutApp.getTingtingApp();
+		mActionBar = getActionBar();
 
 		injectLayout();
 
-		ActionBar bar = getActionBar();
-		bar.setIcon(R.drawable.ic_title_compose);
-		bar.setDisplayHomeAsUpEnabled(true);
-		bar.setTitle(R.string.compose);
+		mTitle = getString(R.string.compose);
+		mEmotionTitle = getString(R.string.add_emotions);
+
+		mActionBar.setIcon(R.drawable.ic_title_compose);
+		mActionBar.setTitle(mTitle);
+		mActionBar.setDisplayHomeAsUpEnabled(true);
+		mActionBar.setHomeButtonEnabled(true);
 
 		if (mApp.getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
 			mTracker = EasyTracker.getInstance(this);
@@ -122,6 +139,10 @@ public class ComposeTweetActivity extends Activity implements TextWatcher {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == android.R.id.home && !mSlidingPaneLayout.isOpen()) {
+			mSlidingPaneLayout.openPane();
+			return true;
+		}
 		switch (item.getItemId()) {
 			case android.R.id.home:
 				if (CatnutUtils.hasLength(mText)) {
@@ -170,6 +191,14 @@ public class ComposeTweetActivity extends Activity implements TextWatcher {
 	}
 
 	private void injectLayout() {
+		// for panel
+		mSlidingPaneLayout = (SlidingPaneLayout) findViewById(R.id.sliding_pane_layout);
+		mEmotions = (GridView) findViewById(R.id.emotions);
+		mEmotions.setAdapter(new EmotionsAdapter(this));
+		mSlidingPaneLayout.setPanelSlideListener(new SliderListener());
+		mSlidingPaneLayout.openPane();
+		mSlidingPaneLayout.getViewTreeObserver().addOnGlobalLayoutListener(new FirstLayoutListener());
+		// for tweet
 		mAvatar = (ImageView) findViewById(R.id.avatar);
 		mScreenName = (TextView) findViewById(R.id.screen_name);
 		mTextCounter = (TextView) findViewById(R.id.text_counter);
@@ -233,4 +262,43 @@ public class ComposeTweetActivity extends Activity implements TextWatcher {
 		)).setTag(TAG);
 	}
 
+	private class SliderListener extends SlidingPaneLayout.SimplePanelSlideListener {
+		@Override
+		public void onPanelOpened(View panel) {
+			ComposeTweetActivity.this.onPanelOpened();
+		}
+
+		@Override
+		public void onPanelClosed(View panel) {
+			ComposeTweetActivity.this.onPanelClosed();
+		}
+	}
+
+	private class FirstLayoutListener implements ViewTreeObserver.OnGlobalLayoutListener {
+		@Override
+		public void onGlobalLayout() {
+			onFirstLayout();
+			mSlidingPaneLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+		}
+	}
+
+	private void onPanelClosed() {
+		mActionBar.setDisplayHomeAsUpEnabled(true);
+		mActionBar.setHomeButtonEnabled(true);
+		mActionBar.setTitle(mEmotionTitle);
+	}
+
+	private void onPanelOpened() {
+		mActionBar.setHomeButtonEnabled(false);
+		mActionBar.setDisplayHomeAsUpEnabled(false);
+		mActionBar.setTitle(mTitle);
+	}
+
+	private void onFirstLayout() {
+		if (mSlidingPaneLayout.isSlideable() && !mSlidingPaneLayout.isOpen()) {
+			onPanelClosed();
+		} else {
+			onPanelOpened();
+		}
+	}
 }
