@@ -13,6 +13,7 @@ import org.catnut.util.CatnutUtils;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -166,7 +167,7 @@ public class TweetAPI {
 	 * @param rip         开发者上报的操作用户真实IP，形如：211.156.0.1
 	 * @return api
 	 */
-	public static MultipartAPI upload(String status, int visible, String list_id, Uri pic, float lat, float _long, JSONObject annotations, String rip) {
+	public static MultipartAPI upload(String status, int visible, String list_id, List<Uri> pic, float lat, float _long, JSONObject annotations, String rip) {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("status", status);
 		params.put("status", status);
@@ -180,7 +181,7 @@ public class TweetAPI {
 			params.put("annotations", annotations.toString());
 		}
 		params.put("rip", String.valueOf(rip));
-		Map<String, Uri> files = new HashMap<String, Uri>();
+		Map<String, List<Uri>> files = new HashMap<String, List<Uri>>();
 		files.put("pic", pic);
 		return new MultipartAPI(Request.Method.POST, BASE_URI + "upload.json", true, params, files);
 	}

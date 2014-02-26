@@ -123,12 +123,13 @@ public class MultiPartRequest extends Request<JSONObject> {
 	private void addFiles() {
 		if (mApi.files != null) {
 			InputStream in = null;
-			Uri uri;
 			for (String key : mApi.files.keySet()) {
-				uri = mApi.files.get(key);
 				try {
-					in = mContext.getContentResolver().openInputStream(uri);
-					addFilePart(key, uri.getLastPathSegment(), CatnutUtils.getBytes(in));
+					for (Uri uri : mApi.files.get(key)) {
+						in = mContext.getContentResolver().openInputStream(uri);
+						addFilePart(key, uri.getLastPathSegment(), CatnutUtils.getBytes(in));
+						in.close();
+					}
 				} catch (IOException e) {
 					throw new RuntimeException("write file part error!", e);
 				} finally {

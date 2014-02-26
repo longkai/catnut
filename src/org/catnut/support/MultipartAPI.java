@@ -8,6 +8,7 @@ package org.catnut.support;
 import android.net.Uri;
 import org.catnut.core.CatnutAPI;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,9 +19,9 @@ import java.util.Map;
 public class MultipartAPI extends CatnutAPI {
 
 	/** 需上传的文件，键值为文件参数名 */
-	public final Map<String, Uri> files;
+	public final Map<String, List<Uri>> files;
 
-	public MultipartAPI(int method, String uri, boolean authRequired, Map<String, String> params, Map<String, Uri> files) {
+	public MultipartAPI(int method, String uri, boolean authRequired, Map<String, String> params, Map<String, List<Uri>> files) {
 		super(method, uri, authRequired, params);
 		this.files = files;
 	}

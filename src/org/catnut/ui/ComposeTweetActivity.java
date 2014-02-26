@@ -159,7 +159,12 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 				startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.PREF));
 				break;
 			case R.id.action_gallery:
-				startActivityForResult(new Intent(Intent.ACTION_PICK).setType("image/*"), 1);
+				// todo: 暂时只支持上传一张图片，因为没有高级权限Orz
+				if (mUris != null && mUris.size() > 0) {
+					Toast.makeText(this, getString(R.string.only_one_pic_hint), Toast.LENGTH_LONG).show();
+				} else {
+					startActivityForResult(new Intent(Intent.ACTION_PICK).setType("image/*"), 1);
+				}
 				break;
 			default:
 				break;
@@ -301,6 +306,13 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 						return true;
 					}
 				});
+				// 单击直接查看
+				mPhotos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+					@Override
+					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+						startActivity(new Intent(Intent.ACTION_VIEW, mUris.get(position)));
+					}
+				});
 			}
 			mUris.add(data.getData());
 			mAdapter.notifyDataSetChanged();
@@ -337,13 +349,12 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 			return; // stop here
 		}
 		// 防止多次提交
-
 		mSender.setVisibility(View.GONE);
 		mProgressor.setVisibility(View.VISIBLE);
 		if (mUris != null && mUris.size() > 0) { // 有图片的
 			mApp.getRequestQueue().add(new MultiPartRequest(
 					this,
-					TweetAPI.upload(mText.getText().toString(), 0, null, mUris.get(0), 0f, 0f, null, null),
+					TweetAPI.upload(mText.getText().toString(), 0, null, mUris, 0f, 0f, null, null),
 					new StatusProcessor.SingleTweetProcessor(Status.HOME),
 					listener,
 					errorListener
