@@ -13,6 +13,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.location.Location;
+import android.location.LocationListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SlidingPaneLayout;
@@ -50,11 +52,13 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.StatusProcessor;
+import org.catnut.support.LocationSupport;
 import org.catnut.support.MultiPartRequest;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.util.CatnutUtils;
 import org.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -63,7 +67,8 @@ import java.util.List;
  *
  * @author longkai
  */
-public class ComposeTweetActivity extends Activity implements TextWatcher, AdapterView.OnItemClickListener, View.OnClickListener {
+public class ComposeTweetActivity extends Activity implements TextWatcher,
+		AdapterView.OnItemClickListener, View.OnClickListener {
 
 	public static final String TAG = "ComposeTweetActivity";
 
@@ -78,7 +83,6 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 	private TextView mTextCounter;
 	private View mSender; // 发送触发按钮
 	private View mProgressor; // 发送进度条
-
 
 	// widgets
 	private SlidingPaneLayout mSlidingPaneLayout;
@@ -100,6 +104,11 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 	// listeners
 	private Response.Listener<JSONObject> listener;
 	private Response.ErrorListener errorListener;
+
+	// location
+	private LocationSupport.LocationResult mLocationResult; // lazy, if user require.
+	private double mLongitude;
+	private double mAltitude;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -165,6 +174,9 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 				} else {
 					startActivityForResult(new Intent(Intent.ACTION_PICK).setType("image/*"), 1);
 				}
+				break;
+			case R.id.action_geo:
+				requireLocation().getLocation(this, mLocationResult);
 				break;
 			default:
 				break;
@@ -288,6 +300,26 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 		mCustomizedBar.findViewById(R.id.action_send).setOnClickListener(this);
 	}
 
+	private LocationSupport requireLocation() {
+		Toast.makeText(this, getString(R.string.locating), Toast.LENGTH_SHORT).show();
+		if (mLocationResult == null) {
+			mLocationResult = new LocationSupport.LocationResult() {
+				@Override
+				public void gotLocation(Location location) {
+					if (location == null) {
+						Toast.makeText(ComposeTweetActivity.this, getString(R.string.sorry_cannot_locate),
+								Toast.LENGTH_SHORT).show();
+						return;
+					}
+					mAltitude = location.getAltitude();
+					mLongitude = location.getLongitude();
+					Toast.makeText(ComposeTweetActivity.this, getString(R.string.locate_success), Toast.LENGTH_SHORT).show();
+				}
+			};
+		}
+		return new LocationSupport();
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == 1 && data != null) {
@@ -354,7 +386,7 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 		if (mUris != null && mUris.size() > 0) { // 有图片的
 			mApp.getRequestQueue().add(new MultiPartRequest(
 					this,
-					TweetAPI.upload(mText.getText().toString(), 0, null, mUris, 0f, 0f, null, null),
+					TweetAPI.upload(mText.getText().toString(), 0, null, mUris, (float) mAltitude, (float) mLongitude, null, null),
 					new StatusProcessor.SingleTweetProcessor(Status.HOME),
 					listener,
 					errorListener
@@ -362,7 +394,7 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 		} else {
 			mApp.getRequestQueue().add(new CatnutRequest(
 					this,
-					TweetAPI.update(mText.getText().toString(), 0, null, 0f, 0f, null, null),
+					TweetAPI.update(mText.getText().toString(), 0, null, (float) mAltitude, (float) mLongitude, null, null),
 					new StatusProcessor.SingleTweetProcessor(Status.HOME),
 					listener,
 					errorListener
