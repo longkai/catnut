@@ -59,7 +59,6 @@
 	</FrameLayout>
 
 	<FrameLayout
-		android:id="@+id/action_send"
 		android:clickable="true"
 		android:focusable="true"
 		android:background="@drawable/actionbar_item_background_light"
@@ -67,6 +66,7 @@
 		android:layout_height="match_parent">
 
 		<ImageView
+			android:id="@+id/action_send"
 			android:src="@drawable/ic_action_send"
 			android:adjustViewBounds="true"
 			android:layout_gravity="center_horizontal|center_vertical"
@@ -75,8 +75,8 @@
 
 		<!--用于发送过程的指示-->
 		<ProgressBar
-			android:visibility="gone"
 			android:id="@android:id/progress"
+			android:visibility="gone"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" />
 	</FrameLayout>

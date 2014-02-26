@@ -14,7 +14,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.text.Editable;
@@ -51,6 +50,7 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.StatusProcessor;
+import org.catnut.support.MultiPartRequest;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.util.CatnutUtils;
 import org.json.JSONObject;
@@ -76,6 +76,8 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 	// customized actionbar widgets
 	private View mCustomizedBar;
 	private TextView mTextCounter;
+	private View mSender; // 发送触发按钮
+	private View mProgressor; // 发送进度条
 
 
 	// widgets
@@ -96,23 +98,8 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 	private EditText mText;
 
 	// listeners
-	private Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
-		@Override
-		public void onResponse(JSONObject response) {
-			// delete posted text
-			mText.setText(null);
-			Toast.makeText(ComposeTweetActivity.this, R.string.post_success, Toast.LENGTH_SHORT).show();
-		}
-	};
-
-	private Response.ErrorListener  errorListener = new Response.ErrorListener() {
-		@Override
-		public void onErrorResponse(VolleyError error) {
-			Log.e(TAG, "post tweet error!", error);
-			WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
-			Toast.makeText(ComposeTweetActivity.this, weiboAPIError.error, Toast.LENGTH_SHORT).show();
-		}
-	};
+	private Response.Listener<JSONObject> listener;
+	private Response.ErrorListener errorListener;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -121,13 +108,13 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 		mApp = CatnutApp.getTingtingApp();
 		mActionBar = getActionBar();
 
-		injectLayout();
-		injectActionBar();
-		injectListener();
-
 		mTitle = getString(R.string.compose);
 		mEmotionTitle = getString(R.string.add_emotions);
 		mImageThumbSize = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_size);
+
+		injectLayout();
+		injectActionBar();
+		injectListener();
 
 		mActionBar.setIcon(R.drawable.ic_title_compose);
 		mActionBar.setTitle(mTitle);
@@ -184,7 +171,7 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 	public void onClick(View v) {
 		switch (v.getId()) {
 			case R.id.action_send:
-				sendTweet(false);
+				sendTweet();
 				break;
 			default:
 				break;
@@ -227,17 +214,6 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 		mSlidingPaneLayout.setPanelSlideListener(new SliderListener());
 		mSlidingPaneLayout.openPane();
 		mSlidingPaneLayout.getViewTreeObserver().addOnGlobalLayoutListener(new FirstLayoutListener());
-//		mSlidingPaneLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//			@Override
-//			public void onGlobalLayout() {
-//				int heightDiff = mSlidingPaneLayout.getRootView().getHeight() - mSlidingPaneLayout.getHeight();
-//				if (heightDiff > getResources().getInteger(R.integer.keyboard_hidden_offset)) { // if more than 100 pixels, its probably a keyboard...
-//					mKeyboardShown = true;
-//				} else {
-//					mKeyboardShown = false;
-//				}
-//			}
-//		});
 		// for tweet
 		mAvatar = (ImageView) findViewById(R.id.avatar);
 		mScreenName = (TextView) findViewById(R.id.screen_name);
@@ -264,12 +240,38 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 		mActionBar.setDisplayShowCustomEnabled(true);
 		mCustomizedBar = LayoutInflater.from(this).inflate(R.layout.customized_actionbar, null);
 		mTextCounter = (TextView) mCustomizedBar.findViewById(R.id.text_counter);
+		mSender = mCustomizedBar.findViewById(R.id.action_send);
+		mProgressor = mCustomizedBar.findViewById(android.R.id.progress);
 		mActionBar.setCustomView(mCustomizedBar, new ActionBar.LayoutParams(
 				ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.MATCH_PARENT, Gravity.END));
 	}
 
 	private void injectListener() {
+		listener = new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				mSender.setVisibility(View.VISIBLE);
+				mProgressor.setVisibility(View.GONE);
+				// delete posted text and thumbs
+				mText.setText(null);
+				if (mUris != null) {
+					mUris.clear();
+					mAdapter.notifyDataSetChanged();
+				}
+				Toast.makeText(ComposeTweetActivity.this, R.string.post_success, Toast.LENGTH_SHORT).show();
+			}
+		};
+		errorListener = new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				mSender.setVisibility(View.VISIBLE);
+				mProgressor.setVisibility(View.GONE);
+				Log.e(TAG, "post tweet error!", error);
+				WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
+				Toast.makeText(ComposeTweetActivity.this, weiboAPIError.error, Toast.LENGTH_SHORT).show();
+			}
+		};
 		mCustomizedBar.findViewById(R.id.action_discovery).setOnClickListener(this);
 		mCustomizedBar.findViewById(R.id.action_mention).setOnClickListener(this);
 		mCustomizedBar.findViewById(R.id.action_send).setOnClickListener(this);
@@ -284,24 +286,18 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 				mUris = new LinkedList<Uri>();
 				mAdapter = new ThumbsAdapter(this, mUris);
 				mPhotos.setAdapter(mAdapter);
+				// 长按删除之
+				mPhotos.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+					@Override
+					public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+						mUris.remove(position);
+						mAdapter.notifyDataSetChanged();
+						return true;
+					}
+				});
 			}
 			mUris.add(data.getData());
 			mAdapter.notifyDataSetChanged();
-//			final ProgressDialog dialog = ProgressDialog.show(this, null, "上传中...");
-//			dialog.dismiss();
-//			mApp.getRequestQueue().add(new MultiPartRequest(
-//					this,
-//					TweetAPI.upload(mText.getText().toString(), 0, null, data.getData(), 0.f, 0.f, null, null),
-//					new StatusProcessor.SingleTweetProcessor(Status.HOME), // 这里随意了...
-//					new Response.Listener<JSONObject>() {
-//						@Override
-//						public void onResponse(JSONObject response) {
-//							dialog.dismiss();
-//							Toast.makeText(ComposeTweetActivity.this, R.string.post_success, Toast.LENGTH_SHORT).show();
-//						}
-//					},
-//					errorListener
-//			)).setTag(TAG);
 		}
 	}
 
@@ -329,18 +325,32 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 		}
 	}
 
-	private void sendTweet(boolean withImage) {
+	private void sendTweet() {
 		if (!CatnutUtils.hasLength(mText)) {
 			Toast.makeText(this, R.string.require_not_empty, Toast.LENGTH_SHORT).show();
 			return; // stop here
 		}
-		mApp.getRequestQueue().add(new CatnutRequest(
-				this,
-				TweetAPI.update(mText.getText().toString(), 0, null, 0f, 0f, null, null),
-				new StatusProcessor.SingleTweetProcessor(Status.HOME),
-				listener,
-				errorListener
-		)).setTag(TAG);
+		// 防止多次提交
+
+		mSender.setVisibility(View.GONE);
+		mProgressor.setVisibility(View.VISIBLE);
+		if (mUris != null && mUris.size() > 0) { // 有图片的
+			mApp.getRequestQueue().add(new MultiPartRequest(
+					this,
+					TweetAPI.upload(mText.getText().toString(), 0, null, mUris.get(0), 0f, 0f, null, null),
+					new StatusProcessor.SingleTweetProcessor(Status.HOME),
+					listener,
+					errorListener
+			)).setTag(TAG);
+		} else {
+			mApp.getRequestQueue().add(new CatnutRequest(
+					this,
+					TweetAPI.update(mText.getText().toString(), 0, null, 0f, 0f, null, null),
+					new StatusProcessor.SingleTweetProcessor(Status.HOME),
+					listener,
+					errorListener
+			)).setTag(TAG);
+		}
 	}
 
 	@Override

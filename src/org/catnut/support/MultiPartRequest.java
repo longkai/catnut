@@ -92,7 +92,8 @@ public class MultiPartRequest extends Request<JSONObject> {
 			addFiles();
 			os.write( (delimiter + boundary + delimiter + "\r\n").getBytes());
 		} catch (IOException e) {
-			Log.d(TAG, "error finish multipart writing!");
+			// rethrow, abort request
+			throw new RuntimeException("error finish multipart writing!", e);
 		}
 		return os.toByteArray();
 	}
@@ -129,7 +130,7 @@ public class MultiPartRequest extends Request<JSONObject> {
 					in = mContext.getContentResolver().openInputStream(uri);
 					addFilePart(key, uri.getLastPathSegment(), CatnutUtils.getBytes(in));
 				} catch (IOException e) {
-					Log.e(TAG, "write file part error!", e);
+					throw new RuntimeException("write file part error!", e);
 				} finally {
 					if (in != null) {
 						try {
