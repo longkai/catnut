@@ -188,7 +188,7 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		switch (keyCode) {
 			case KeyEvent.KEYCODE_BACK:
-				if (CatnutUtils.hasLength(mText)) {
+				if (CatnutUtils.hasLength(mText) || (mUris != null && mUris.size() > 0)) {
 					abort();
 					return true; // deal it
 				}
