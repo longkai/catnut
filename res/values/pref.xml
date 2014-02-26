@@ -6,6 +6,7 @@
   -->
 <resources>
 	<string name="version_name">0.1</string>
+	<string name="camera_cached_dir">/camera/</string>
 
 	<string name="pref_first_run">pref_first_run</string>
 	<string name="pref_auto_fetch_on_start">pref_auto_fetch_on_start</string>

@@ -14,9 +14,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
-import android.location.LocationListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -58,7 +58,6 @@ import org.catnut.support.TweetImageSpan;
 import org.catnut.util.CatnutUtils;
 import org.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -71,6 +70,8 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 		AdapterView.OnItemClickListener, View.OnClickListener {
 
 	public static final String TAG = "ComposeTweetActivity";
+	private static final int GALLERY = 1;
+	private static final int CAMERA = 2;
 
 	// app specifics
 	private CatnutApp mApp;
@@ -91,6 +92,8 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 	private GridView mPhotos; // 待上传的图片
 	private List<Uri> mUris;
 	private ArrayAdapter<Uri> mAdapter;
+
+	private Uri mTmpUri; // 暂存刚才拍照的图片
 
 	// str
 	private String mTitle;
@@ -177,6 +180,22 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 				break;
 			case R.id.action_geo:
 				requireLocation().getLocation(this, mLocationResult);
+				break;
+			case R.id.action_camera:
+				// same as above
+				if (mUris != null && mUris.size() > 0) {
+					break;
+				}
+				Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+				if (intent.resolveActivity(getPackageManager()) != null) {
+					mTmpUri = CatnutUtils.createImageFile();
+					if (mTmpUri != null) {
+						intent.putExtra(MediaStore.EXTRA_OUTPUT, mTmpUri);
+					}
+					startActivityForResult(intent, CAMERA);
+				} else {
+					Toast.makeText(this, getString(R.string.device_not_support), Toast.LENGTH_SHORT).show();
+				}
 				break;
 			default:
 				break;
@@ -322,33 +341,51 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == 1 && data != null) {
+		if (resultCode == RESULT_OK) { // for the moment, just check ok
 			if (mPhotos == null) {
-				ViewStub viewStub = (ViewStub) findViewById(R.id.view_stub);
-				mPhotos = (GridView) viewStub.inflate();
-				mUris = new LinkedList<Uri>();
-				mAdapter = new ThumbsAdapter(this, mUris);
-				mPhotos.setAdapter(mAdapter);
-				// 长按删除之
-				mPhotos.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-					@Override
-					public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-						mUris.remove(position);
-						mAdapter.notifyDataSetChanged();
-						return true;
-					}
-				});
-				// 单击直接查看
-				mPhotos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-					@Override
-					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-						startActivity(new Intent(Intent.ACTION_VIEW, mUris.get(position)));
-					}
-				});
+				initGallery();
 			}
-			mUris.add(data.getData());
-			mAdapter.notifyDataSetChanged();
+			switch (requestCode) {
+				case GALLERY:
+					if (data != null) {
+						mUris.add(data.getData());
+						mAdapter.notifyDataSetChanged();
+					}
+					break;
+				case CAMERA:
+					mUris.add(mTmpUri);
+					mAdapter.notifyDataSetChanged();
+					// reset
+					mTmpUri = null;
+					break;
+				default:
+					break;
+			}
 		}
+	}
+
+	private void initGallery() {
+		ViewStub viewStub = (ViewStub) findViewById(R.id.view_stub);
+		mPhotos = (GridView) viewStub.inflate();
+		mUris = new LinkedList<Uri>();
+		mAdapter = new ThumbsAdapter(this, mUris);
+		mPhotos.setAdapter(mAdapter);
+		// 长按删除之
+		mPhotos.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+				mUris.remove(position);
+				mAdapter.notifyDataSetChanged();
+				return true;
+			}
+		});
+		// 单击直接查看
+		mPhotos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				startActivity(new Intent(Intent.ACTION_VIEW, mUris.get(position)));
+			}
+		});
 	}
 
 	@Override

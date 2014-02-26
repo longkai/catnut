@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Environment;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -22,13 +23,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import org.catnut.R;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.support.TweetURLSpan;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import static org.catnut.support.TweetTextView.MENTION_FILTER;
 import static org.catnut.support.TweetTextView.MENTION_PATTERN;
@@ -389,5 +395,25 @@ public class CatnutUtils {
 			byteBuffer.write(buffer, 0, len);
 		}
 		return byteBuffer.toByteArray();
+	}
+
+	public static Uri createImageFile() {
+		// Create an image file name
+		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+		String imageFileName = "JPEG_" + timeStamp + "_";
+		File storageDir = Environment.getExternalStoragePublicDirectory(
+				Environment.DIRECTORY_PICTURES);
+		File image;
+		try {
+			image = File.createTempFile(
+					imageFileName,  /* prefix */
+					".jpg",         /* suffix */
+					storageDir      /* directory */
+			);
+		} catch (IOException e) {
+			Log.d(TAG, "create tmp file error!", e);
+			return null;
+		}
+		return Uri.fromFile(image);
 	}
 }

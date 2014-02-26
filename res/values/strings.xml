@@ -111,6 +111,7 @@
 	<string name="sorry_cannot_locate">抱歉，无法定位！</string>
 	<string name="locating">正在定位中...</string>
 	<string name="locate_success">定位成功！</string>
+	<string name="device_not_support">你的设备好像不支持拍照功能?</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>微博</item>
