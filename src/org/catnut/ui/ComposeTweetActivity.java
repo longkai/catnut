@@ -173,6 +173,12 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 			case R.id.action_send:
 				sendTweet();
 				break;
+			case R.id.action_discovery:
+				int cursor = mText.getSelectionStart();
+				mText.getText().append("##");
+				mText.setSelection(cursor + 1);
+				mText.requestFocus();
+				break;
 			default:
 				break;
 		}
