@@ -28,6 +28,19 @@
 				android:layout_width="50dp"
 				android:layout_height="50dp" />
 
+			<!--标记是否定位ok-->
+			<ImageView
+				android:id="@+id/location_marker"
+				android:background="?android:attr/selectableItemBackground"
+				android:clickable="true"
+				android:focusable="true"
+				android:visibility="gone"
+				android:layout_alignTop="@id/avatar"
+				android:src="@drawable/ic_location_place_light"
+				android:layout_alignParentRight="true"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+
 			<TextView
 				android:id="@+id/screen_name"
 				android:layout_alignTop="@id/avatar"

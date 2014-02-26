@@ -16,6 +16,7 @@ import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.text.Editable;
@@ -73,6 +74,7 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 	private static final int GALLERY = 1;
 	private static final int CAMERA = 2;
 
+	private Handler mHandler = new Handler();
 	// app specifics
 	private CatnutApp mApp;
 	private EasyTracker mTracker;
@@ -110,8 +112,9 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 
 	// location
 	private LocationSupport.LocationResult mLocationResult; // lazy, if user require.
+	private View mLocationMarker;
 	private double mLongitude;
-	private double mAltitude;
+	private double mLatitude;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -179,7 +182,11 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 				}
 				break;
 			case R.id.action_geo:
-				requireLocation().getLocation(this, mLocationResult);
+				if (mLocationMarker.getVisibility() == View.VISIBLE) {
+					invalidateLocation();
+				} else {
+					requireLocation().getLocation(this, mLocationResult);
+				}
 				break;
 			case R.id.action_camera:
 				// same as above
@@ -214,6 +221,9 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 				mText.getText().append("##");
 				mText.setSelection(cursor + 1);
 				mText.requestFocus();
+				break;
+			case R.id.location_marker:
+				invalidateLocation();
 				break;
 			default:
 				break;
@@ -260,6 +270,7 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 		mAvatar = (ImageView) findViewById(R.id.avatar);
 		mScreenName = (TextView) findViewById(R.id.screen_name);
 		mText = (EditText) findViewById(R.id.text);
+		mLocationMarker = findViewById(R.id.location_marker);
 		// set data to layout...
 		new AsyncQueryHandler(getContentResolver()) {
 			@Override
@@ -311,12 +322,13 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 				mProgressor.setVisibility(View.GONE);
 				Log.e(TAG, "post tweet error!", error);
 				WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
-				Toast.makeText(ComposeTweetActivity.this, weiboAPIError.error, Toast.LENGTH_SHORT).show();
+				Toast.makeText(ComposeTweetActivity.this, weiboAPIError.error, Toast.LENGTH_LONG).show();
 			}
 		};
 		mCustomizedBar.findViewById(R.id.action_discovery).setOnClickListener(this);
 		mCustomizedBar.findViewById(R.id.action_mention).setOnClickListener(this);
 		mCustomizedBar.findViewById(R.id.action_send).setOnClickListener(this);
+		mLocationMarker.setOnClickListener(this);
 	}
 
 	private LocationSupport requireLocation() {
@@ -325,18 +337,34 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 			mLocationResult = new LocationSupport.LocationResult() {
 				@Override
 				public void gotLocation(Location location) {
+					final boolean ok;
 					if (location == null) {
-						Toast.makeText(ComposeTweetActivity.this, getString(R.string.sorry_cannot_locate),
-								Toast.LENGTH_SHORT).show();
-						return;
+						ok = false;
+					} else {
+						mLatitude = location.getLatitude();
+						mLongitude = location.getLongitude();
+						ok = true;
 					}
-					mAltitude = location.getAltitude();
-					mLongitude = location.getLongitude();
-					Toast.makeText(ComposeTweetActivity.this, getString(R.string.locate_success), Toast.LENGTH_SHORT).show();
+					mHandler.post(new Runnable() {
+						@Override
+						public void run() {
+							findViewById(R.id.location_marker).setVisibility(ok ? View.VISIBLE : View.GONE);
+							Toast.makeText(ComposeTweetActivity.this,
+									ok ? R.string.locate_success : R.string.sorry_cannot_locate,
+									Toast.LENGTH_SHORT).show();
+						}
+					});
 				}
 			};
 		}
 		return new LocationSupport();
+	}
+
+	// 取消定位
+	private void invalidateLocation() {
+		mLongitude = 0;
+		mLatitude = 0;
+		mLocationMarker.setVisibility(View.GONE);
 	}
 
 	@Override
@@ -423,7 +451,7 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 		if (mUris != null && mUris.size() > 0) { // 有图片的
 			mApp.getRequestQueue().add(new MultiPartRequest(
 					this,
-					TweetAPI.upload(mText.getText().toString(), 0, null, mUris, (float) mAltitude, (float) mLongitude, null, null),
+					TweetAPI.upload(mText.getText().toString(), 0, null, mUris, (float) mLatitude, (float) mLongitude, null, null),
 					new StatusProcessor.SingleTweetProcessor(Status.HOME),
 					listener,
 					errorListener
@@ -431,7 +459,7 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 		} else {
 			mApp.getRequestQueue().add(new CatnutRequest(
 					this,
-					TweetAPI.update(mText.getText().toString(), 0, null, (float) mAltitude, (float) mLongitude, null, null),
+					TweetAPI.update(mText.getText().toString(), 0, null, (float) mLatitude, (float) mLongitude, null, null),
 					new StatusProcessor.SingleTweetProcessor(Status.HOME),
 					listener,
 					errorListener

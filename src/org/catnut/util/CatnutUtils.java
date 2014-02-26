@@ -155,6 +155,18 @@ public class CatnutUtils {
 	}
 
 	/**
+	 * 四舍五入float
+	 *
+	 * @param num 浮点数
+	 * @param bit 多少位
+	 * @return the converted number you required
+	 */
+	public static float scaleNumber(float num, int bit) {
+		int range = 10 * bit;
+		return (float) Math.round(num * range) / range;
+	}
+
+	/**
 	 * 设置某个view里面的textview的text
 	 *
 	 * @param parent     父容器

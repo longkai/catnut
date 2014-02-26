@@ -110,7 +110,7 @@
 	<string name="only_one_pic_hint">对不起，非技术上的原因，目前只能上传一张图片，你可以长按已上传的图片删除掉再上传Orz</string>
 	<string name="sorry_cannot_locate">抱歉，无法定位！</string>
 	<string name="locating">正在定位中...</string>
-	<string name="locate_success">定位成功！</string>
+	<string name="locate_success">定位成功！点击定位图标可以取消定位</string>
 	<string name="device_not_support">你的设备好像不支持拍照功能?</string>
 	<string-array name="drawer_list">
 		<item>我的</item>

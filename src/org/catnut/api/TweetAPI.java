@@ -126,8 +126,8 @@ public class TweetAPI {
 		if (visible == 3) { // 暂时不碰这个先
 			params.put("list_id", list_id);
 		}
-		params.put("lat", String.valueOf(CatnutUtils.optValue(lat, 0.0)));
-		params.put("long", String.valueOf(CatnutUtils.optValue(_long, 0.0)));
+		params.put("lat", String.valueOf(CatnutUtils.scaleNumber(CatnutUtils.optValue(lat, 0.f), 1)));
+		params.put("long", String.valueOf(CatnutUtils.scaleNumber(CatnutUtils.optValue(_long, 0.f), 1)));
 		if (annotations != null) {
 			params.put("annotations", annotations.toString());
 		}
@@ -175,8 +175,8 @@ public class TweetAPI {
 		if (visible == 3) { // 暂时不碰这个先
 			params.put("list_id", list_id);
 		}
-		params.put("lat", String.valueOf(CatnutUtils.optValue(lat, 0.0)));
-		params.put("long", String.valueOf(CatnutUtils.optValue(_long, 0.0)));
+		params.put("lat", String.valueOf(CatnutUtils.scaleNumber(CatnutUtils.optValue(lat, 0.f), 1)));
+		params.put("long", String.valueOf(CatnutUtils.scaleNumber(CatnutUtils.optValue(_long, 0.f), 1)));
 		if (annotations != null) {
 			params.put("annotations", annotations.toString());
 		}
