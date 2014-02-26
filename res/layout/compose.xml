@@ -57,7 +57,6 @@
 
 		<ViewStub
 			android:id="@id/view_stub"
-			android:background="@drawable/overflow_dropdown_light"
 			android:inflatedId="@+id/photo"
 			android:layout="@layout/photos_show"
 			android:layout_width="match_parent"

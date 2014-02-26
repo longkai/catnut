@@ -108,41 +108,41 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		mImageLoader = mApp.getImageLoader();
 		mActionBar = getActionBar();
 		mActionBar.setIcon(R.drawable.ic_title_home);
-		if (savedInstanceState == null) {
-			setContentView(R.layout.main);
-			// drawer specific
-			mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-			mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, Gravity.START);
-			mDrawerLayout.setDrawerListener(this);
+		setContentView(R.layout.main);
+		// drawer specific
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, Gravity.START);
+		mDrawerLayout.setDrawerListener(this);
 
-			mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-					R.drawable.ic_drawer, R.string.open_drawer, R.string.close_drawer);
+		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+				R.drawable.ic_drawer, R.string.open_drawer, R.string.close_drawer);
 
-			// the whole left drawer
-			mDrawer = findViewById(R.id.drawer);
+		// the whole left drawer
+		mDrawer = findViewById(R.id.drawer);
 
-			mListView = (ListView) findViewById(android.R.id.list);
-			mListView.setAdapter(new DrawerNavAdapter(this, R.array.drawer_list, R.array.drawer_list_header_indexes));
-			mListView.setOnItemClickListener(this);
+		mListView = (ListView) findViewById(android.R.id.list);
+		mListView.setAdapter(new DrawerNavAdapter(this, R.array.drawer_list, R.array.drawer_list_header_indexes));
+		mListView.setOnItemClickListener(this);
 
-			// drawer customized view
-			mProfileCover = (ImageView) findViewById(R.id.avatar_profile);
-			mTextNick = (TextView) findViewById(R.id.nick);
-			mDescription = (TextView) findViewById(R.id.description);
-			mTweetLayout = findViewById(R.id.tweet_layout);
+		// drawer customized view
+		mProfileCover = (ImageView) findViewById(R.id.avatar_profile);
+		mTextNick = (TextView) findViewById(R.id.nick);
+		mDescription = (TextView) findViewById(R.id.description);
+		mTweetLayout = findViewById(R.id.tweet_layout);
 
-			prepareActionBar();
+		prepareActionBar();
 //			fetchLatestTweet();
 
+		if (savedInstanceState == null) {
 			getFragmentManager()
 					.beginTransaction()
 					.replace(R.id.fragment_container, new HomeTimelineFragment())
 					.commit();
-			getFragmentManager().addOnBackStackChangedListener(this);
+		}
+		getFragmentManager().addOnBackStackChangedListener(this);
 
-			if (mApp.getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
-				mTracker = EasyTracker.getInstance(this);
-			}
+		if (mApp.getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
+			mTracker = EasyTracker.getInstance(this);
 		}
 	}
 

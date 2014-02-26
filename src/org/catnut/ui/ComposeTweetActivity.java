@@ -14,6 +14,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.text.Editable;
@@ -163,25 +164,31 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == android.R.id.home && !mSlidingPaneLayout.isOpen()) {
+		if (!mSlidingPaneLayout.isOpen()) {
 			mSlidingPaneLayout.openPane();
-			return true;
 		}
 		switch (item.getItemId()) {
-			case android.R.id.home:
-				if (CatnutUtils.hasLength(mText)) {
-					abort();
-				} else {
-					navigateUpTo(getIntent());
-				}
-				break;
 			case R.id.pref:
 				startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.PREF));
+				break;
+			case R.id.action_gallery:
+				startActivityForResult(new Intent(Intent.ACTION_PICK).setType("image/*"), 1);
 				break;
 			default:
 				break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+			case R.id.action_send:
+				sendTweet(false);
+				break;
+			default:
+				break;
+		}
 	}
 
 	@Override
@@ -345,18 +352,6 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 		mText.requestFocus();
 	}
 
-	@Override
-	public void onClick(View v) {
-		switch (v.getId()) {
-			case R.id.action_send:
-				sendTweet(false);
-				break;
-			default:
-				break;
-		}
-	}
-
-
 	private class SliderListener extends SlidingPaneLayout.SimplePanelSlideListener {
 		@Override
 		public void onPanelOpened(View panel) {
@@ -401,14 +396,16 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 	private class ThumbsAdapter extends ArrayAdapter<Uri> {
 
 		public ThumbsAdapter(Context context, List<Uri> uris) {
-			super(context, R.layout.thumb, uris);
+			super(context, 0, uris);
 		}
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			final ImageView photo;
 			if (convertView == null) {
-				photo = (ImageView) LayoutInflater.from(getContext()).inflate(R.layout.thumb, null);
+				photo = new ImageView(ComposeTweetActivity.this);
+				photo.setBackgroundResource(R.drawable.overflow_dropdown_light);
+				photo.setScaleType(ImageView.ScaleType.CENTER_CROP);
 			} else {
 				photo = (ImageView) convertView;
 			}
