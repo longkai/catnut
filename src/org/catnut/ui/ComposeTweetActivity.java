@@ -8,26 +8,28 @@ package org.catnut.ui;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.AsyncQueryHandler;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.text.Editable;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.TextWatcher;
-import android.text.style.ImageSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -37,6 +39,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.google.analytics.tracking.android.EasyTracker;
+import com.squareup.picasso.Picasso;
 import org.catnut.R;
 import org.catnut.adapter.EmotionsAdapter;
 import org.catnut.api.TweetAPI;
@@ -47,20 +50,19 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.StatusProcessor;
-import org.catnut.support.MultiPartRequest;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.util.CatnutUtils;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 发微博
  *
  * @author longkai
  */
-public class ComposeTweetActivity extends Activity implements TextWatcher, AdapterView.OnItemClickListener {
+public class ComposeTweetActivity extends Activity implements TextWatcher, AdapterView.OnItemClickListener, View.OnClickListener {
 
 	public static final String TAG = "ComposeTweetActivity";
 
@@ -68,22 +70,29 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 	private CatnutApp mApp;
 	private EasyTracker mTracker;
 
+//	private boolean mKeyboardShown = false; // 软键盘是否显示
+
+	// customized actionbar widgets
+	private View mCustomizedBar;
+	private TextView mTextCounter;
+
+
 	// widgets
 	private SlidingPaneLayout mSlidingPaneLayout;
 	private GridView mEmotions;
 	private ActionBar mActionBar;
+	private GridView mPhotos; // 待上传的图片
+	private List<Uri> mUris;
+	private ArrayAdapter<Uri> mAdapter;
 
 	// str
 	private String mTitle;
 	private String mEmotionTitle;
+	private int mImageThumbSize;
 
 	private ImageView mAvatar;
 	private TextView mScreenName;
-	private TextView mTextCounter;
 	private EditText mText;
-	private ImageView mGallery;
-	private ImageView mGeo;
-	private ImageView mCamera;
 
 	// listeners
 	private Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
@@ -112,10 +121,12 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 		mActionBar = getActionBar();
 
 		injectLayout();
+		injectActionBar();
 		injectListener();
 
 		mTitle = getString(R.string.compose);
 		mEmotionTitle = getString(R.string.add_emotions);
+		mImageThumbSize = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_size);
 
 		mActionBar.setIcon(R.drawable.ic_title_compose);
 		mActionBar.setTitle(mTitle);
@@ -164,9 +175,6 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 					navigateUpTo(getIntent());
 				}
 				break;
-			case R.id.action_send:
-				sendTweet(false);
-				break;
 			case R.id.pref:
 				startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.PREF));
 				break;
@@ -212,14 +220,21 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 		mSlidingPaneLayout.setPanelSlideListener(new SliderListener());
 		mSlidingPaneLayout.openPane();
 		mSlidingPaneLayout.getViewTreeObserver().addOnGlobalLayoutListener(new FirstLayoutListener());
+//		mSlidingPaneLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//			@Override
+//			public void onGlobalLayout() {
+//				int heightDiff = mSlidingPaneLayout.getRootView().getHeight() - mSlidingPaneLayout.getHeight();
+//				if (heightDiff > getResources().getInteger(R.integer.keyboard_hidden_offset)) { // if more than 100 pixels, its probably a keyboard...
+//					mKeyboardShown = true;
+//				} else {
+//					mKeyboardShown = false;
+//				}
+//			}
+//		});
 		// for tweet
 		mAvatar = (ImageView) findViewById(R.id.avatar);
 		mScreenName = (TextView) findViewById(R.id.screen_name);
-		mTextCounter = (TextView) findViewById(R.id.text_counter);
 		mText = (EditText) findViewById(R.id.text);
-		mGallery = (ImageView) findViewById(R.id.action_gallery);
-		mCamera = (ImageView) findViewById(R.id.action_camera);
-		mGeo = (ImageView) findViewById(R.id.action_geo);
 		// set data to layout...
 		new AsyncQueryHandler(getContentResolver()) {
 			@Override
@@ -238,38 +253,48 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 		mText.addTextChangedListener(this);
 	}
 
+	private void injectActionBar() {
+		mActionBar.setDisplayShowCustomEnabled(true);
+		mCustomizedBar = LayoutInflater.from(this).inflate(R.layout.customized_actionbar, null);
+		mTextCounter = (TextView) mCustomizedBar.findViewById(R.id.text_counter);
+		mActionBar.setCustomView(mCustomizedBar, new ActionBar.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.MATCH_PARENT, Gravity.END));
+	}
+
 	private void injectListener() {
-		mGallery.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (CatnutUtils.hasLength(mText)) {
-					Intent intent = new Intent(Intent.ACTION_PICK).setType("image/*");
-					startActivityForResult(intent, 1, null);
-				} else {
-					Toast.makeText(ComposeTweetActivity.this, R.string.require_not_empty, Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
+		mCustomizedBar.findViewById(R.id.action_discovery).setOnClickListener(this);
+		mCustomizedBar.findViewById(R.id.action_mention).setOnClickListener(this);
+		mCustomizedBar.findViewById(R.id.action_send).setOnClickListener(this);
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == 1 && data != null) {
-			final ProgressDialog dialog = ProgressDialog.show(this, null, "上传中...");
-			dialog.dismiss();
-			mApp.getRequestQueue().add(new MultiPartRequest(
-					this,
-					TweetAPI.upload(mText.getText().toString(), 0, null, data.getData(), 0.f, 0.f, null, null),
-					new StatusProcessor.SingleTweetProcessor(Status.HOME), // 这里随意了...
-					new Response.Listener<JSONObject>() {
-						@Override
-						public void onResponse(JSONObject response) {
-							dialog.dismiss();
-							Toast.makeText(ComposeTweetActivity.this, R.string.post_success, Toast.LENGTH_SHORT).show();
-						}
-					},
-					errorListener
-			)).setTag(TAG);
+			if (mPhotos == null) {
+				ViewStub viewStub = (ViewStub) findViewById(R.id.view_stub);
+				mPhotos = (GridView) viewStub.inflate();
+				mUris = new LinkedList<Uri>();
+				mAdapter = new ThumbsAdapter(this, mUris);
+				mPhotos.setAdapter(mAdapter);
+			}
+			mUris.add(data.getData());
+			mAdapter.notifyDataSetChanged();
+//			final ProgressDialog dialog = ProgressDialog.show(this, null, "上传中...");
+//			dialog.dismiss();
+//			mApp.getRequestQueue().add(new MultiPartRequest(
+//					this,
+//					TweetAPI.upload(mText.getText().toString(), 0, null, data.getData(), 0.f, 0.f, null, null),
+//					new StatusProcessor.SingleTweetProcessor(Status.HOME), // 这里随意了...
+//					new Response.Listener<JSONObject>() {
+//						@Override
+//						public void onResponse(JSONObject response) {
+//							dialog.dismiss();
+//							Toast.makeText(ComposeTweetActivity.this, R.string.post_success, Toast.LENGTH_SHORT).show();
+//						}
+//					},
+//					errorListener
+//			)).setTag(TAG);
 		}
 	}
 
@@ -289,11 +314,11 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 		mTextCounter.setText(String.valueOf(count));
 		if (count >= 10) {
 			// def color
-			mTextCounter.setTextColor(getResources().getColor(android.R.color.holo_green_light));
+			mTextCounter.setTextColor(getResources().getColor(android.R.color.white));
 		} else if (count <= 0) { // in fact, never lt 0
-			mTextCounter.setTextColor(getResources().getColor(android.R.color.holo_red_light));
+			mTextCounter.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
 		} else {
-			mTextCounter.setTextColor(getResources().getColor(android.R.color.holo_orange_light));
+			mTextCounter.setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
 		}
 	}
 
@@ -318,6 +343,17 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 		mText.getText().insert(cursor, CatnutUtils.text2Emotion(this, TweetImageSpan.EMOTION_KEYS[position]));
 		// focus
 		mText.requestFocus();
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+			case R.id.action_send:
+				sendTweet(false);
+				break;
+			default:
+				break;
+		}
 	}
 
 
@@ -359,6 +395,30 @@ public class ComposeTweetActivity extends Activity implements TextWatcher, Adapt
 			onPanelClosed();
 		} else {
 			onPanelOpened();
+		}
+	}
+
+	private class ThumbsAdapter extends ArrayAdapter<Uri> {
+
+		public ThumbsAdapter(Context context, List<Uri> uris) {
+			super(context, R.layout.thumb, uris);
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			final ImageView photo;
+			if (convertView == null) {
+				photo = (ImageView) LayoutInflater.from(getContext()).inflate(R.layout.thumb, null);
+			} else {
+				photo = (ImageView) convertView;
+			}
+			// load image efficiently
+			Picasso.with(getContext())
+					.load(getItem(position))
+					.resize(mImageThumbSize, mImageThumbSize)
+					.centerCrop()
+					.into(photo);
+			return photo;
 		}
 	}
 }

@@ -8,9 +8,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<item
-		android:id="@+id/action_send"
-		android:title="@string/action_send"
-		android:icon="@drawable/ic_action_send"
+		android:id="@+id/action_gallery"
+		android:title="@string/add_photo"
+		android:icon="@drawable/ic_title_new_picture"
+		android:showAsAction="always" />
+
+	<item
+		android:id="@+id/action_camera"
+		android:title="@string/take_a_photo"
+		android:icon="@drawable/ic_title_camera"
+		android:showAsAction="always" />
+
+	<item
+		android:id="@+id/action_geo"
+		android:title="@string/where_am_i"
+		android:icon="@drawable/ic_title_geo"
 		android:showAsAction="always" />
 
 	<item

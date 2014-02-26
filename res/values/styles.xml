@@ -39,6 +39,7 @@
 	<style name="ActionBar_Light" parent="android:Widget.Holo.ActionBar">
 		<item name="android:titleTextStyle">@style/ActionBar_Light_TextStyle</item>
 		<item name="android:background">@color/actionbar_background</item>
+		<item name="android:backgroundSplit">@color/actionbar_background</item>
 	</style>
 
 	<style name="ActionBar_Light_TextStyle" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">

@@ -47,6 +47,7 @@ public class ProfileActivity extends Activity implements FragmentManager.OnBackS
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mApp = CatnutApp.getTingtingApp();
 		if (savedInstanceState == null) {
 			final FragmentManager fragmentManager = getFragmentManager();
 			fragmentManager.addOnBackStackChangedListener(this);
@@ -86,7 +87,6 @@ public class ProfileActivity extends Activity implements FragmentManager.OnBackS
 						.replace(android.R.id.content, ProfileFragment.getFragment(uid, screenName))
 						.commit();
 			}
-			mApp = CatnutApp.getTingtingApp();
 			if (mApp.getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
 				mTracker = EasyTracker.getInstance(this);
 			}

@@ -16,4 +16,7 @@
 	<dimen name="text_size_small">11sp</dimen>
 
 	<dimen name="emotion_window_height">400dp</dimen>
+	<dimen name="image_thumbnail_size">100dp</dimen>
+
+	<dimen name="actionbar_item_width">48dp</dimen>
 </resources>

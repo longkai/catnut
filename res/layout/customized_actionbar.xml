@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="horizontal"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content">
+
+	<FrameLayout
+		android:id="@+id/action_discovery"
+		android:clickable="true"
+		android:focusable="true"
+		android:background="@drawable/actionbar_item_background_light"
+		android:layout_width="@dimen/actionbar_item_width"
+		android:layout_height="match_parent">
+
+		<ImageView
+			android:src="@drawable/ic_title_discover"
+			android:adjustViewBounds="true"
+			android:layout_gravity="center_horizontal|center_vertical"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+	</FrameLayout>
+
+	<FrameLayout
+		android:id="@+id/action_mention"
+		android:clickable="true"
+		android:focusable="true"
+		android:background="@drawable/actionbar_item_background_light"
+		android:layout_width="@dimen/actionbar_item_width"
+		android:layout_height="match_parent">
+
+		<ImageView
+			android:src="@drawable/ic_stat_mention"
+			android:adjustViewBounds="true"
+			android:layout_gravity="center_horizontal|center_vertical"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+	</FrameLayout>
+
+	<FrameLayout
+		android:clickable="true"
+		android:layout_width="@dimen/actionbar_item_width"
+		android:layout_height="match_parent">
+
+		<TextView
+			android:id="@+id/text_counter"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:text="140"
+			android:textColor="@android:color/white"
+			android:layout_gravity="center_horizontal|center_vertical"
+			android:gravity="center_horizontal|center_vertical"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+	</FrameLayout>
+
+	<FrameLayout
+		android:id="@+id/action_send"
+		android:clickable="true"
+		android:focusable="true"
+		android:background="@drawable/actionbar_item_background_light"
+		android:layout_width="@dimen/actionbar_item_width"
+		android:layout_height="match_parent">
+
+		<ImageView
+			android:visibility="gone"
+			android:src="@drawable/ic_action_send"
+			android:adjustViewBounds="true"
+			android:layout_gravity="center_horizontal|center_vertical"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+
+		<!--用于发送过程的指示-->
+		<ProgressBar
+			android:id="@android:id/progress"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+	</FrameLayout>
+</LinearLayout>

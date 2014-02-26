@@ -41,6 +41,7 @@
 		<activity android:name=".ui.TweetActivity" />
 		<activity android:name=".ui.SingleFragmentActivity" />
 		<activity
+			android:uiOptions="splitActionBarWhenNarrow"
 			android:name=".ui.ComposeTweetActivity"
 			android:windowSoftInputMode="adjustResize" />
 
