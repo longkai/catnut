@@ -20,10 +20,11 @@
 		android:showAsAction="always" />
 
 	<item
-		android:id="@+id/action_geo"
-		android:title="@string/where_am_i"
-		android:icon="@drawable/ic_title_geo"
-		android:showAsAction="always" />
+		android:id="@+id/action_mention"
+		android:title="@string/mention"
+		android:showAsAction="ifRoom|collapseActionView"
+		android:actionLayout="@layout/search"
+		android:icon="@drawable/ic_stat_mention" />
 
 	<item
 		android:id="@id/pref"

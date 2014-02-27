@@ -159,7 +159,7 @@ public class CatnutUtils {
 	 *
 	 * @param num 浮点数
 	 * @param bit 多少位
-	 * @return the converted number you required
+	 * @return the  you required
 	 */
 	public static float scaleNumber(float num, int bit) {
 		int range = 10 * bit;

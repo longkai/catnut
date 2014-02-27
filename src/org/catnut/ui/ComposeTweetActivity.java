@@ -8,18 +8,22 @@ package org.catnut.ui;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
@@ -31,8 +35,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -45,6 +51,7 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.squareup.picasso.Picasso;
 import org.catnut.R;
 import org.catnut.adapter.EmotionsAdapter;
+import org.catnut.adapter.MentionSearchAdapter;
 import org.catnut.api.TweetAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
@@ -68,7 +75,7 @@ import java.util.List;
  * @author longkai
  */
 public class ComposeTweetActivity extends Activity implements TextWatcher,
-		AdapterView.OnItemClickListener, View.OnClickListener {
+		AdapterView.OnItemClickListener, View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor>, MenuItem.OnActionExpandListener {
 
 	public static final String TAG = "ComposeTweetActivity";
 	private static final int GALLERY = 1;
@@ -106,6 +113,13 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 	private TextView mScreenName;
 	private EditText mText;
 
+	// @ search
+	private String mCurKeywords;
+	private MenuItem mMentionItem;
+	private AutoCompleteTextView mAutoCompleteTextView;
+	private InputMethodManager mInputMethodManager;
+	private MentionSearchAdapter mMentionSearchAdapter;
+
 	// listeners
 	private Response.Listener<JSONObject> listener;
 	private Response.ErrorListener errorListener;
@@ -136,6 +150,8 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 		mActionBar.setDisplayHomeAsUpEnabled(true);
 		mActionBar.setHomeButtonEnabled(true);
 
+		mInputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
 		if (mApp.getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
 			mTracker = EasyTracker.getInstance(this);
 		}
@@ -161,6 +177,8 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.compose, menu);
+		mMentionItem = menu.findItem(R.id.action_mention);
+		mMentionItem.setOnActionExpandListener(this);
 		return true;
 	}
 
@@ -181,13 +199,7 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 					startActivityForResult(new Intent(Intent.ACTION_PICK).setType("image/*"), 1);
 				}
 				break;
-			case R.id.action_geo:
-				if (mLocationMarker.getVisibility() == View.VISIBLE) {
-					invalidateLocation();
-				} else {
-					requireLocation().getLocation(this, mLocationResult);
-				}
-				break;
+
 			case R.id.action_camera:
 				// same as above
 				if (mUris != null && mUris.size() > 0) {
@@ -222,8 +234,18 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 				mText.setSelection(cursor + 1);
 				mText.requestFocus();
 				break;
+			case R.id.action_geo:
+				if (mLocationMarker.getVisibility() == View.VISIBLE) {
+					invalidateLocation();
+				} else {
+					requireLocation().getLocation(this, mLocationResult);
+				}
+				break;
 			case R.id.location_marker:
 				invalidateLocation();
+				break;
+			case R.id.clear:
+				mAutoCompleteTextView.setText(null);
 				break;
 			default:
 				break;
@@ -326,7 +348,7 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 			}
 		};
 		mCustomizedBar.findViewById(R.id.action_discovery).setOnClickListener(this);
-		mCustomizedBar.findViewById(R.id.action_mention).setOnClickListener(this);
+		mCustomizedBar.findViewById(R.id.action_geo).setOnClickListener(this);
 		mCustomizedBar.findViewById(R.id.action_send).setOnClickListener(this);
 		mLocationMarker.setOnClickListener(this);
 	}
@@ -474,6 +496,104 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 		mText.getText().insert(cursor, CatnutUtils.text2Emotion(this, TweetImageSpan.EMOTION_KEYS[position]));
 		// focus
 		mText.requestFocus();
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		Log.d(TAG, mCurKeywords);
+		StringBuilder where = new StringBuilder();
+		where.append(User.screen_name).append(" like ").append(CatnutUtils.like(mCurKeywords))
+				.append(" or ").append(User.remark).append(" like ").append(CatnutUtils.like(mCurKeywords));
+		return CatnutUtils.getCursorLoader(
+				this,
+				CatnutProvider.parse(User.MULTIPLE),
+				new String[]{
+						User.screen_name,
+						User.remark,
+						BaseColumns._ID,
+				},
+				where.toString(),
+				null,
+				User.TABLE,
+				null,
+				null,
+				null
+		);
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		mMentionSearchAdapter.swapCursor(data);
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		mMentionSearchAdapter.swapCursor(null);
+	}
+
+	@Override
+	public boolean onMenuItemActionExpand(MenuItem item) {
+		if (mAutoCompleteTextView == null) {
+			mAutoCompleteTextView = (AutoCompleteTextView) item.getActionView().findViewById(R.id.mention_search);
+			mAutoCompleteTextView.setThreshold(1); // 每输入一个字就可以查询了
+			mMentionSearchAdapter = new MentionSearchAdapter(ComposeTweetActivity.this);
+			mAutoCompleteTextView.setAdapter(mMentionSearchAdapter);
+		}
+//		Toast.makeText(ComposeTweetActivity.this, getString(R.string.mention_helper_toast), Toast.LENGTH_SHORT).show();
+		final View clear = item.getActionView().findViewById(R.id.clear);
+		clear.setOnClickListener(ComposeTweetActivity.this);
+		mAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				// no-op
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				// no-op
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				String text = s.toString();
+				if (text.length() > 0) {
+					clear.setVisibility(View.VISIBLE);
+				} else {
+					clear.setVisibility(View.GONE);
+				}
+				String key = text.trim();
+				if (!TextUtils.isEmpty(key) && !key.equals(mCurKeywords)) {
+					mCurKeywords = key;
+					getLoaderManager().restartLoader(0, null, ComposeTweetActivity.this);
+				}
+			}
+		});
+		mAutoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Cursor cursor = (Cursor) mMentionSearchAdapter.getItem(position);
+				mText.getText().append(getString(R.string.mention_text,
+						cursor.getString(cursor.getColumnIndex(User.screen_name))));
+				mText.setSelection(mText.length());
+			}
+		});
+		mText.clearFocus();
+		mAutoCompleteTextView.requestFocus();
+		mAutoCompleteTextView.post(new Runnable() {
+			@Override
+			public void run() {
+				mInputMethodManager.showSoftInput(mAutoCompleteTextView, InputMethodManager.SHOW_FORCED);
+			}
+		});
+		return true;
+	}
+
+	@Override
+	public boolean onMenuItemActionCollapse(MenuItem item) {
+		mInputMethodManager.hideSoftInputFromInputMethod(mAutoCompleteTextView.getWindowToken(), 0);
+		mAutoCompleteTextView.setText(null);
+		mText.requestFocus();
+		return true;
 	}
 
 	private class SliderListener extends SlidingPaneLayout.SimplePanelSlideListener {
