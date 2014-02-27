@@ -71,62 +71,12 @@
 
 	<!--todo: some photos goes here-->
 
-	<LinearLayout
-		android:orientation="horizontal"
-		android:layout_marginTop="@dimen/small"
+	<FrameLayout
 		android:layout_below="@id/text"
+		android:layout_marginTop="@dimen/small"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
 
-		<ImageView
-			android:id="@id/action_reply"
-			style="@style/Tweet_Inline.Icon"
-			android:src="@drawable/ic_inline_reply" />
-
-		<TextView
-			android:id="@+id/reply_count"
-			style="@style/Tweet_Inline"
-			android:textSize="@dimen/text_size_small"
-			android:textColor="@android:color/darker_gray"
-			android:layout_width="@dimen/counter_width"
-			android:layout_height="wrap_content" />
-
-		<ImageView
-			android:id="@id/action_reteet"
-			style="@style/Tweet_Inline.Icon"
-			android:src="@drawable/ic_inline_reteet" />
-
-		<TextView
-			android:id="@+id/reteet_count"
-			style="@style/Tweet_Inline"
-			android:textSize="@dimen/text_size_small"
-			android:textColor="@android:color/darker_gray"
-			android:layout_width="@dimen/counter_width"
-			android:layout_height="wrap_content" />
-
-		<ImageView
-			android:id="@id/action_favorite"
-			style="@style/Tweet_Inline.Icon"
-			android:src="@drawable/ic_inline_favorite" />
-
-		<TextView
-			android:id="@+id/favorite_count"
-			style="@style/Tweet_Inline"
-			android:textSize="@dimen/text_size_small"
-			android:layout_marginRight="@dimen/medium"
-			android:textColor="@android:color/darker_gray"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
-
-		<TextView
-			android:id="@+id/source"
-			style="@style/Tweet_Inline"
-			android:textSize="@dimen/text_size_small"
-			android:singleLine="true"
-			android:ellipsize="end"
-			android:textColor="@android:color/darker_gray"
-			android:gravity="right"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" />
-	</LinearLayout>
+		<include layout="@layout/tweet_row_inline" />
+	</FrameLayout>
 </RelativeLayout>
