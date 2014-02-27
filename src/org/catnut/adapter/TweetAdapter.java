@@ -268,7 +268,11 @@ public class TweetAdapter extends CursorAdapter {
 			}
 			holder.retweetView.setVisibility(View.VISIBLE);
 			JSONObject user = json.optJSONObject(User.SINGLE);
-			CatnutUtils.setText(holder.retweetView, R.id.retweet_nick, "@" + user.optString(User.screen_name));
+			String str = user.optString(User.remark);
+			if (TextUtils.isEmpty(str)) {
+				str = user.optString(User.screen_name);
+			}
+			CatnutUtils.setText(holder.retweetView, R.id.retweet_nick, "@" + str);
 			TweetTextView text = (TweetTextView) holder.retweetView.findViewById(R.id.retweet_text);
 			long createAt = DateTime.getTimeMills(json.optString(Status.created_at));
 			CatnutUtils.setText(holder.retweetView, R.id.retweet_create_at, DateUtils.getRelativeTimeSpanString(createAt));

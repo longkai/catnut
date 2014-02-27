@@ -9,13 +9,16 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.app.ProgressDialog;
 import android.content.AsyncQueryHandler;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
@@ -28,6 +31,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.*;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -52,9 +56,11 @@ import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.ui.ProfileActivity;
 import org.catnut.ui.SingleFragmentActivity;
+import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
+import org.json.JSONException;
 import org.json.JSONObject;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
@@ -77,7 +83,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	private static final int BATCH_SIZE = 50;
 
-	/** 待检索的列 */
+	/** 回复待检索的列 */
 	private static final String[] PROJECTION = new String[]{
 			"s._id",
 			Status.uid,
@@ -127,6 +133,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	private TextView mFavoriteCount;
 	private TextView mSource;
 	private TextView mCreateAt;
+	private View mRetweetLayout;
 
 	// others
 	private ShareActionProvider mShareActionProvider;
@@ -198,6 +205,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 		mFavoriteCount = (TextView) mTweetLayout.findViewById(R.id.favorite_count);
 		mSource = (TextView) mTweetLayout.findViewById(R.id.source);
 		mCreateAt = (TextView) mTweetLayout.findViewById(R.id.create_at);
+		mRetweetLayout = mTweetLayout.findViewById(R.id.place_holder);
 		// just return the list
 		return view;
 	}
@@ -244,6 +252,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 						Status.attitudes_count,
 						Status.source,
 						Status.favorited,
+						Status.retweeted_status,
 						"s." + Status.created_at,
 						User.screen_name,
 						User.avatar_large,
@@ -293,6 +302,29 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 						mTweetLayout.findViewById(R.id.verified).setVisibility(View.VISIBLE);
 					}
 
+					// retweet
+					String jsonString = cursor.getString(cursor.getColumnIndex(Status.retweeted_status));
+					if (!TextUtils.isEmpty(jsonString)) {
+						try {
+							final JSONObject json = new JSONObject(jsonString);
+							JSONObject user = json.optJSONObject(User.SINGLE);
+							String _remark = user.optString(User.remark);
+							if (TextUtils.isEmpty(_remark)) {
+								_remark = user.optString(User.screen_name);
+							}
+							CatnutUtils.setText(mRetweetLayout, R.id.retweet_nick, _remark);
+							long mills = DateTime.getTimeMills(json.optString(Status.created_at));
+							CatnutUtils.setText(mRetweetLayout, R.id.retweet_create_at, DateUtils.getRelativeTimeSpanString(mills));
+							TweetTextView retweetText = (TweetTextView) CatnutUtils.setText(mRetweetLayout, R.id.retweet_text, json.optString(Status.text));
+							CatnutUtils.vividTweet(retweetText, mImageSpan);
+							mRetweetLayout.setVisibility(View.VISIBLE);
+						} catch (JSONException e) {
+							Log.e(TAG, "convert text to string error!", e);
+							mRetweetLayout.setVisibility(View.GONE);
+						}
+					} else {
+						mRetweetLayout.setVisibility(View.GONE);
+					}
 					// share...
 					mShareIntent = new Intent(Intent.ACTION_SEND).setType("text/plain");
 					mShareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.tweet_share_subject));
@@ -429,6 +461,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	/**
 	 * 想要去回复某个评论?
+	 *
 	 * @param position
 	 */
 	private void intentToReply(int position, long id) {

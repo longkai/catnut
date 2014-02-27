@@ -72,7 +72,22 @@
 	<!--todo: some photos goes here-->
 
 	<FrameLayout
+		android:id="@+id/place_holder"
+		android:clickable="true"
+		android:focusable="true"
 		android:layout_below="@id/text"
+		android:layout_marginTop="@dimen/small"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<include
+			android:clickable="true"
+			android:focusable="true"
+			layout="@layout/retweet" />
+	</FrameLayout>
+
+	<FrameLayout
+		android:layout_below="@id/place_holder"
 		android:layout_marginTop="@dimen/small"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
