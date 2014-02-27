@@ -37,6 +37,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
+import com.squareup.picasso.Picasso;
 import org.catnut.R;
 import org.catnut.adapter.CommentsAdapter;
 import org.catnut.adapter.EmotionsAdapter;
@@ -133,6 +134,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	private TextView mFavoriteCount;
 	private TextView mSource;
 	private TextView mCreateAt;
+	private ImageView mThumbs;
 	private View mRetweetLayout;
 
 	// others
@@ -205,6 +207,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 		mFavoriteCount = (TextView) mTweetLayout.findViewById(R.id.favorite_count);
 		mSource = (TextView) mTweetLayout.findViewById(R.id.source);
 		mCreateAt = (TextView) mTweetLayout.findViewById(R.id.create_at);
+		mThumbs = (ImageView) mTweetLayout.findViewById(R.id.thumbs);
 		mRetweetLayout = mTweetLayout.findViewById(R.id.place_holder);
 		// just return the list
 		return view;
@@ -246,7 +249,8 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 				new String[]{
 						Status.uid,
 						Status.columnText,
-						Status.thumbnail_pic,
+						Status.bmiddle_pic,
+						Status.original_pic,
 						Status.comments_count,
 						Status.reposts_count,
 						Status.attitudes_count,
@@ -301,7 +305,19 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 					if (CatnutUtils.getBoolean(cursor, User.verified)) {
 						mTweetLayout.findViewById(R.id.verified).setVisibility(View.VISIBLE);
 					}
-
+					String thumb = cursor.getString(cursor.getColumnIndex(Status.bmiddle_pic));
+					if (!TextUtils.isEmpty(thumb)) {
+						Picasso.with(getActivity()).load(thumb).into(mThumbs);
+						mThumbs.setVisibility(View.VISIBLE);
+						mThumbs.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								Log.d(TAG, "todo");
+							}
+						});
+					} else {
+						mThumbs.setVisibility(View.GONE);
+					}
 					// retweet
 					String jsonString = cursor.getString(cursor.getColumnIndex(Status.retweeted_status));
 					if (!TextUtils.isEmpty(jsonString)) {
