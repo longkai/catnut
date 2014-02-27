@@ -119,6 +119,7 @@
 	<string name="no_links_hint">没有可以转换的链接哦，注意得以http/https这样开头哟</string>
 	<string name="converting">转换中...</string>
 	<string name="shorten">短链接转换</string>
+	<string name="view_photos">查看照片</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>微博</item>

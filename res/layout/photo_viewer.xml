@@ -5,7 +5,7 @@
   ~ Copyright (c) 2014 longkai
   ~ The software shall be used for good, not evil.
   -->
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-	android:scaleType="fitCenter"
+<org.catnut.support.TouchImageView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:background="#ff333333"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent" />

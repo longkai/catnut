@@ -5,6 +5,7 @@
  */
 package org.catnut.fragment;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -37,6 +38,9 @@ public class PhotoViewerFragment extends Fragment {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
+		ActionBar bar = getActivity().getActionBar();
+		bar.setTitle(activity.getString(R.string.view_photos));
+		bar.setIcon(R.drawable.ic_title_content_picture_dark);
 		mUri = getArguments().getString(TAG);
 	}
 
@@ -52,11 +56,5 @@ public class PhotoViewerFragment extends Fragment {
 				.error(R.drawable.error)
 				.placeholder(R.drawable.error)
 				.into((ImageView) view);
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-		getActivity().getActionBar().hide();
 	}
 }
