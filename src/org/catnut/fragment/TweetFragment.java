@@ -309,10 +309,14 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 					if (!TextUtils.isEmpty(thumb)) {
 						Picasso.with(getActivity()).load(thumb).into(mThumbs);
 						mThumbs.setVisibility(View.VISIBLE);
+						final String url = cursor.getString(cursor.getColumnIndex(Status.original_pic));
 						mThumbs.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								Log.d(TAG, "todo");
+								Intent intent = SingleFragmentActivity.getIntent(getActivity(),
+										SingleFragmentActivity.PHOTO_VIEWER);
+								intent.putExtra(Constants.PIC, url);
+								startActivity(intent);
 							}
 						});
 					} else {

@@ -6,6 +6,7 @@
 package org.catnut.ui;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +15,9 @@ import android.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
+import org.catnut.fragment.PhotoViewerFragment;
 import org.catnut.fragment.PrefFragment;
+import org.catnut.util.Constants;
 
 /**
  * helper activity, just show a single fragment
@@ -25,6 +28,7 @@ public class SingleFragmentActivity extends Activity {
 
 	public static final String TAG = "SingleFragmentActivity";
 	public static final int PREF = 0;
+	public static final int PHOTO_VIEWER = 1;
 
 	private EasyTracker mTracker;
 
@@ -34,14 +38,21 @@ public class SingleFragmentActivity extends Activity {
 		if (savedInstanceState == null) {
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
 			int which = getIntent().getIntExtra(TAG, PREF);
+			Fragment fragment = null;
 			switch (which) {
 				case PREF:
-					ft.replace(android.R.id.content, PrefFragment.getFragment());
+					fragment = PrefFragment.getFragment();
+					break;
+				case PHOTO_VIEWER:
+					String picUrl = getIntent().getStringExtra(Constants.PIC);
+					fragment = PhotoViewerFragment.getFragment(picUrl);
 					break;
 				default:
+					// get out!
+					navigateUpTo(getIntent());
 					break;
 			}
-			ft.commit();
+			ft.replace(android.R.id.content, fragment).commit();
 		}
 		if (CatnutApp.getTingtingApp().getPreferences()
 				.getBoolean(getString(R.string.pref_enable_analytics), true)) {

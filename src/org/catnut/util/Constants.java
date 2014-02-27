@@ -16,6 +16,7 @@ public class Constants {
 	public static final String WEIBO_DOMAIN = "weibo.com/";
 	
 	public static final String ID = "id";
+	public static final String PIC = "pic";
 
 	// for error dialog box
 	public static final String TITLE = "title";
