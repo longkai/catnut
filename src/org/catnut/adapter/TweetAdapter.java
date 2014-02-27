@@ -5,11 +5,16 @@
  */
 package org.catnut.adapter;
 
+import android.app.ProgressDialog;
+import android.content.AsyncQueryHandler;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.Handler;
 import android.provider.BaseColumns;
 import android.text.Html;
 import android.text.TextUtils;
@@ -24,6 +29,7 @@ import android.widget.TextView;
 import com.android.volley.toolbox.ImageLoader;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
+import org.catnut.core.CatnutProvider;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.support.TweetImageSpan;
@@ -49,6 +55,7 @@ public class TweetAdapter extends CursorAdapter {
 
 	private Context mContext;
 	private ImageLoader mImageLoader;
+	private Handler mHandler = new Handler();
 	private TweetImageSpan mImageSpan;
 	private boolean mThumbsRequired;
 	private String mUserNick;
@@ -251,7 +258,7 @@ public class TweetAdapter extends CursorAdapter {
 
 	private void retweet(String jsonString, ViewHolder holder) {
 		if (!TextUtils.isEmpty(jsonString)) {
-			JSONObject json;
+			final JSONObject json;
 			try {
 				json = new JSONObject(jsonString);
 			} catch (JSONException e) {
@@ -267,8 +274,39 @@ public class TweetAdapter extends CursorAdapter {
 			CatnutUtils.setText(holder.retweetView, R.id.retweet_create_at, DateUtils.getRelativeTimeSpanString(createAt));
 			text.setText(json.optString(Status.text));
 			CatnutUtils.vividTweet(text, mImageSpan);
+			holder.retweetView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					injectRetweetListener(json);
+				}
+			});
 		} else {
 			holder.retweetView.setVisibility(View.GONE);
 		}
+	}
+
+	private void injectRetweetListener(final JSONObject json) {
+		// 先存入本地sqlite，再跳转
+		final ProgressDialog dialog = ProgressDialog.show(mContext, null, mContext.getString(R.string.loading));
+		// thread go!
+		(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				ContentValues status = Status.METADATA.convert(json);
+				status.put(Status.TYPE, Status.RETWEET);
+				ContentValues user = User.METADATA.convert(json.optJSONObject(User.SINGLE));
+				mContext.getContentResolver().insert(CatnutProvider.parse(Status.MULTIPLE), status);
+				mContext.getContentResolver().insert(CatnutProvider.parse(User.MULTIPLE), user);
+				mHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						dialog.dismiss();
+						Intent intent = new Intent(mContext, TweetActivity.class);
+						intent.putExtra(Constants.ID, json.optLong(Constants.ID));
+						mContext.startActivity(intent);
+					}
+				});
+			}
+		})).start();
 	}
 }

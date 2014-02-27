@@ -83,6 +83,8 @@
 		<!--retweet-->
 		<LinearLayout
 			android:id="@+id/retweet"
+			android:clickable="true"
+			android:focusable="true"
 			android:layout_marginTop="@dimen/small"
 			android:padding="@dimen/small"
 			android:orientation="vertical"
