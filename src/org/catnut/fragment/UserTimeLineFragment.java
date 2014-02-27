@@ -47,7 +47,8 @@ public class UserTimeLineFragment extends TimelineFragment {
 		Status.attitudes_count,
 		Status.source,
 		Status.created_at,
-		Status.favorited
+		Status.favorited,
+		Status.retweeted_status
 	};
 
 	private long uid;

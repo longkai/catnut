@@ -33,6 +33,8 @@ import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 
@@ -108,6 +110,9 @@ public class TweetAdapter extends CursorAdapter {
 		ImageView reply;
 		ImageView retweet;
 		ImageView favorite;
+
+		View retweetView;
+		int retweetIndex;
 	}
 
 	@Override
@@ -140,6 +145,9 @@ public class TweetAdapter extends CursorAdapter {
 		holder.reply = (ImageView) view.findViewById(R.id.action_reply);
 		holder.retweet = (ImageView) view.findViewById(R.id.action_reteet);
 		holder.favorite = (ImageView) view.findViewById(R.id.action_favorite);
+		// 转发
+		holder.retweetView = view.findViewById(R.id.retweet);
+		holder.retweetIndex = cursor.getColumnIndex(Status.retweeted_status);
 		view.setTag(holder);
 		return view;
 	}
@@ -236,5 +244,31 @@ public class TweetAdapter extends CursorAdapter {
 		}
 		// 文字处理
 		CatnutUtils.vividTweet(holder.text, mImageSpan);
+
+		// 处理转发
+		retweet(cursor.getString(holder.retweetIndex), holder);
+	}
+
+	private void retweet(String jsonString, ViewHolder holder) {
+		if (!TextUtils.isEmpty(jsonString)) {
+			JSONObject json;
+			try {
+				json = new JSONObject(jsonString);
+			} catch (JSONException e) {
+				Log.e(TAG, "retweet text convert json error!", e);
+				holder.retweetView.setVisibility(View.GONE);
+				return;
+			}
+			holder.retweetView.setVisibility(View.VISIBLE);
+			JSONObject user = json.optJSONObject(User.SINGLE);
+			CatnutUtils.setText(holder.retweetView, R.id.retweet_nick, "@" + user.optString(User.screen_name));
+			TweetTextView text = (TweetTextView) holder.retweetView.findViewById(R.id.retweet_text);
+			long createAt = DateTime.getTimeMills(json.optString(Status.created_at));
+			CatnutUtils.setText(holder.retweetView, R.id.retweet_create_at, DateUtils.getRelativeTimeSpanString(createAt));
+			text.setText(json.optString(Status.text));
+			CatnutUtils.vividTweet(text, mImageSpan);
+		} else {
+			holder.retweetView.setVisibility(View.GONE);
+		}
 	}
 }

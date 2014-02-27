@@ -51,7 +51,8 @@ public class HomeTimelineFragment extends TimelineFragment {
 		User.screen_name,
 		User.profile_image_url,
 		User.remark,
-		Status.favorited
+		Status.favorited,
+		Status.retweeted_status
 	};
 
 	@Override
