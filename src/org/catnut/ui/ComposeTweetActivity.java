@@ -9,6 +9,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
+import android.app.ProgressDialog;
 import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -47,12 +48,15 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.squareup.picasso.Picasso;
 import org.catnut.R;
 import org.catnut.adapter.EmotionsAdapter;
 import org.catnut.adapter.MentionSearchAdapter;
+import org.catnut.api.StuffAPI;
 import org.catnut.api.TweetAPI;
+import org.catnut.core.CatnutAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
@@ -63,11 +67,14 @@ import org.catnut.processor.StatusProcessor;
 import org.catnut.support.LocationSupport;
 import org.catnut.support.MultiPartRequest;
 import org.catnut.support.TweetImageSpan;
+import org.catnut.support.TweetTextView;
 import org.catnut.util.CatnutUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
 
 /**
  * 发微博
@@ -199,7 +206,9 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 					startActivityForResult(new Intent(Intent.ACTION_PICK).setType("image/*"), 1);
 				}
 				break;
-
+			case R.id.action_shorten:
+				shorten();
+				break;
 			case R.id.action_camera:
 				// same as above
 				if (mUris != null && mUris.size() > 0) {
@@ -586,6 +595,57 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 			}
 		});
 		return true;
+	}
+
+	// 将编辑框里的长链接统统转换为短链接
+	private void shorten() {
+		String text = mText.getText().toString();
+		final Matcher matcher = TweetTextView.WEB_URL.matcher(text);
+		String urls = "";
+		while (matcher.find()) {
+			urls += matcher.group() + "婷婷"; // 无所谓最后一个了
+		}
+		// http request
+		if (!TextUtils.isEmpty(urls)) {
+			final ProgressDialog dialog = ProgressDialog.show(this, null, getString(R.string.converting), true, false);
+			CatnutAPI api = StuffAPI.shorten(urls.split("婷婷"));
+			mApp.getRequestQueue().add(new JsonObjectRequest(
+					api.method,
+					api.uri,
+					null,
+					new Response.Listener<JSONObject>() {
+						@Override
+						public void onResponse(JSONObject response) {
+							matcher.reset(); // 重置正则
+							JSONArray _urls = response.optJSONArray("urls");
+							StringBuffer sb = new StringBuffer();
+							int i = 0;
+							try {
+								while (matcher.find()) {
+									matcher.appendReplacement(sb, _urls.optJSONObject(i).optString("url_short"));
+									i++;
+								}
+								matcher.appendTail(sb);
+								mText.setText(sb);
+								mText.setSelection(mText.length());
+							} catch (Exception ex) {
+								Log.e(TAG, "replace shorten url error!", ex);
+							}
+							dialog.dismiss();
+						}
+					},
+					new Response.ErrorListener() {
+						@Override
+						public void onErrorResponse(VolleyError error) {
+							dialog.dismiss();
+							WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
+							Toast.makeText(ComposeTweetActivity.this, weiboAPIError.error, Toast.LENGTH_SHORT).show();
+						}
+					}
+			));
+		} else {
+			Toast.makeText(this, getString(R.string.no_links_hint), Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	@Override

@@ -27,6 +27,11 @@
 		android:icon="@drawable/ic_stat_mention" />
 
 	<item
+		android:id="@+id/action_shorten"
+		android:title="@string/shorten"
+		android:showAsAction="never" />
+
+	<item
 		android:id="@id/pref"
 		android:title="@string/pref"
 		android:showAsAction="never" />
