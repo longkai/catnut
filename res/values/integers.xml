@@ -10,6 +10,8 @@
 
 	<integer name="keyboard_hidden_offset">110</integer>
 
+	<integer name="undobar_hide_delay">5000</integer>
+
 	<integer name="emotions_columns">5</integer>
 	<integer-array name="drawer_list_header_indexes">
 		<item>0</item>
