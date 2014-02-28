@@ -6,5 +6,7 @@
   -->
 <resources>
 	<color name="actionbar_background">#55acee</color>
+	<color name="actionbar_overlay">#8055acee</color>
+	<color name="black_background">#ff333333</color>
 	<color name="menuitem_background">#83c7f8</color>
 </resources>

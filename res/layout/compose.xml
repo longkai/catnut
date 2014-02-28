@@ -87,5 +87,5 @@
 		android:layout_width="300dp"
 		android:layout_height="match_parent"
 		android:layout_weight="1"
-		android:background="#ff333333" />
+		android:background="@color/black_background" />
 </android.support.v4.widget.SlidingPaneLayout>

@@ -10,8 +10,10 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.Window;
 import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
@@ -44,6 +46,7 @@ public class SingleFragmentActivity extends Activity {
 					fragment = PrefFragment.getFragment();
 					break;
 				case PHOTO_VIEWER:
+					getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 					String picUrl = getIntent().getStringExtra(Constants.PIC);
 					fragment = PhotoViewerFragment.getFragment(picUrl);
 					break;
