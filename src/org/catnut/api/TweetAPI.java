@@ -185,4 +185,17 @@ public class TweetAPI {
 		files.put("pic", pic);
 		return new MultipartAPI(Request.Method.POST, BASE_URI + "upload.json", true, params, files);
 	}
+
+	/**
+	 * 根据微博ID删除指定微博
+	 *
+	 * @param id 需要删除的微博ID
+	 * @return api
+	 */
+	public static CatnutAPI destroy(long id) {
+		StringBuilder uri = new StringBuilder(BASE_URI).append("destroy.json");
+		HashMap<String, String> params = new HashMap<String, String>(1);
+		params.put("id", String.valueOf(id));
+		return new CatnutAPI(Request.Method.POST, uri.toString(), true, params);
+	}
 }
