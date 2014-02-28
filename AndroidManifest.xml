@@ -45,7 +45,18 @@
 		<activity
 			android:uiOptions="splitActionBarWhenNarrow"
 			android:name=".ui.ComposeTweetActivity"
-			android:windowSoftInputMode="adjustResize" />
+			android:windowSoftInputMode="adjustResize">
+			<intent-filter>
+				<category android:name="android.intent.category.DEFAULT" />
+				<action android:name="android.intent.action.SEND" />
+				<data android:mimeType="text/plain" />
+			</intent-filter>
+			<intent-filter>
+				<category android:name="android.intent.category.DEFAULT" />
+				<action android:name="android.intent.action.SEND" />
+				<data android:mimeType="image/*" />
+			</intent-filter>
+		</activity>
 
 		<provider
 			android:authorities="org.catnut"

@@ -152,6 +152,8 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 		injectActionBar();
 		injectListener();
 
+		handleOuterShare();
+
 		mActionBar.setIcon(R.drawable.ic_title_compose);
 		mActionBar.setTitle(mTitle);
 		mActionBar.setDisplayHomeAsUpEnabled(true);
@@ -161,6 +163,35 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 
 		if (mApp.getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
 			mTracker = EasyTracker.getInstance(this);
+		}
+	}
+
+	// 处理来自外部的分享
+	private void handleOuterShare() {
+		Intent intent = getIntent();
+		String action = intent.getAction();
+		String mimeType = intent.getType();
+		if (!TextUtils.isEmpty(action)) {
+			if (!TextUtils.isEmpty(mimeType)) {
+				if (mimeType.equals("text/plain")) {
+					mText.setText(intent.getStringExtra(Intent.EXTRA_TEXT));
+					setResult(RESULT_OK); // no result return back
+				} else if (mimeType.startsWith("image/")) {
+					mText.setText(intent.getStringExtra(Intent.EXTRA_TEXT));
+					if (mUris == null) {
+						initGallery();
+						// 不接受binary data，只接受uri
+						// 此时不可能会有两个图片滴
+						mUris.add((Uri) intent.getExtras().get(Intent.EXTRA_STREAM));
+						mAdapter.notifyDataSetChanged();
+						setResult(RESULT_OK);
+					}
+				} else {
+					setResult(RESULT_CANCELED);
+				}
+			} else {
+				setResult(RESULT_CANCELED);
+			}
 		}
 	}
 
