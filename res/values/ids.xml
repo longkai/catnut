@@ -18,6 +18,7 @@
 	<item name="action_search" type="id" />
 	<item name="action_follow" type="id" />
 	<item name="action_unfollow" type="id" />
+	<item name="action_share" type="id" />
 
 	<item name="list_header" type="id" />
 

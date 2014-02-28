@@ -98,6 +98,9 @@ public class TouchImageView extends ImageView {
 	private ScaleGestureDetector mScaleDetector;
 	private GestureDetector mGestureDetector;
 
+	// 方便获取到bitmap
+	private Bitmap mBitmap;
+
 	public TouchImageView(Context context) {
 		super(context);
 		sharedConstructing(context);
@@ -144,9 +147,14 @@ public class TouchImageView extends ImageView {
 	@Override
 	public void setImageBitmap(Bitmap bm) {
 		super.setImageBitmap(bm);
+		this.mBitmap = bm;
 		setImageCalled();
 		savePreviousImageValues();
 		fitImageToView();
+	}
+
+	public Bitmap getBitmap() {
+		return mBitmap;
 	}
 
 	@Override
