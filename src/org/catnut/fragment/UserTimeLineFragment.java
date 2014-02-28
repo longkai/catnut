@@ -5,6 +5,7 @@
  */
 package org.catnut.fragment;
 
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -16,18 +17,25 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import org.catnut.R;
 import org.catnut.adapter.TweetAdapter;
 import org.catnut.api.TweetAPI;
 import org.catnut.core.CatnutAPI;
+import org.catnut.core.CatnutProcessor;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
+import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.StatusProcessor;
 import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
+import org.catnut.support.SwipeDismissListViewTouchListener;
 import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
+import org.json.JSONObject;
 
 /**
  * 用户时间线
@@ -54,6 +62,51 @@ public class UserTimeLineFragment extends TimelineFragment {
 	private long uid;
 	private String nick;
 	private boolean mIsCurAuthUser; // 是否当前授权用户
+	// 只有当前用户有这个删除的选项
+	private SwipeDismissListViewTouchListener mSwipeDismissListViewTouchListener;
+
+	private void setupDismissUtility() {
+		mSwipeDismissListViewTouchListener = new SwipeDismissListViewTouchListener(getListView(), new SwipeDismissListViewTouchListener.DismissCallbacks() {
+			@Override
+			public boolean canDismiss(int position) {
+				return true;
+			}
+
+			@Override
+			public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+				for (int position : reverseSortedPositions) {
+					Cursor cursor = (Cursor) mAdapter.getItem(position);
+					Log.d(TAG, cursor.getString(cursor.getColumnIndex(Status.columnText)));
+					long id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
+					delete(id);
+				}
+			}
+		});
+		getListView().setOnTouchListener(mSwipeDismissListViewTouchListener);
+		getListView().setOnScrollListener(mSwipeDismissListViewTouchListener.makeScrollListener());
+	}
+
+	private void delete(final long id) {
+		CatnutAPI api = TweetAPI.destroy(id);
+		mRequestQueue.add(new CatnutRequest(
+				mActivity,
+				api,
+				new CatnutProcessor<JSONObject>() {
+					@Override
+					public void asyncProcess(Context context, JSONObject data) throws Exception {
+						context.getContentResolver().delete(CatnutProvider.parse(Status.MULTIPLE), BaseColumns._ID + "=" + id, null);
+					}
+				},
+				null,
+				new Response.ErrorListener() {
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
+						Toast.makeText(mActivity, weiboAPIError.error, Toast.LENGTH_LONG).show();
+					}
+				}
+		));
+	}
 
 	public static UserTimeLineFragment getFragment(long uid, String nick) {
 		Bundle args = new Bundle();
@@ -112,7 +165,9 @@ public class UserTimeLineFragment extends TimelineFragment {
 			mPullToRefreshLayout.setRefreshing(true);
 			fetchTweetsFromCloud(true, 0);
 		}
-
+		if (mIsCurAuthUser) {
+			setupDismissUtility();
+		}
 		getListView().addFooterView(mLoadMore);
 		setEmptyText(mActivity.getString(R.string.no_tweets));
 		setListAdapter(mAdapter);

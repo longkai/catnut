@@ -14,6 +14,8 @@ import android.util.Log;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 
+import static org.catnut.core.CatnutProvider.STATUSES;
+
 /**
  * 应用程序数据源。
  *
@@ -171,7 +173,17 @@ public class CatnutProvider extends ContentProvider {
 
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
-		throw new UnsupportedOperationException("not supported for now!");
+		Log.e(TAG, selection);
+		int count;
+		switch (matcher.match(uri)) {
+			case STATUSES:
+				count = mDb.getWritableDatabase().delete(Status.TABLE, selection, selectionArgs);
+				break;
+			default:
+				throw new UnsupportedOperationException("not supported for now!");
+		}
+		getContext().getContentResolver().notifyChange(uri, null, false);
+		return count;
 	}
 
 	@Override
