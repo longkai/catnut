@@ -120,6 +120,8 @@
 	<string name="converting">转换中...</string>
 	<string name="shorten">短链接转换</string>
 	<string name="view_photos">查看照片</string>
+	<string name="save_photo">保存照片</string>
+	<string name="save_at">成功保存在: %1$s</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>微博</item>

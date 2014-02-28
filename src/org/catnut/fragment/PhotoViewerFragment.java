@@ -8,6 +8,7 @@ package org.catnut.fragment;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
@@ -23,10 +24,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ShareActionProvider;
+import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import org.catnut.R;
 import org.catnut.support.TouchImageView;
+import org.catnut.util.Constants;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -61,7 +64,7 @@ public class PhotoViewerFragment extends Fragment {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					File dir = new File(getActivity().getExternalCacheDir().getPath() + "/images/");
+					File dir = new File(getActivity().getExternalCacheDir().getPath() + "/" + Constants.IMAGE_DIR);
 					if (!dir.exists() && !dir.mkdirs()) {
 						return;
 					}
@@ -159,5 +162,22 @@ public class PhotoViewerFragment extends Fragment {
 				return true;
 			}
 		});
+		menu.add(Menu.NONE, R.id.action_save, Menu.NONE, getString(R.string.save_photo))
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.action_save:
+				String uri = getActivity().getExternalCacheDir()
+						+ "/" + Constants.IMAGE_DIR + Uri.parse(mUri).getLastPathSegment();
+				Toast.makeText(getActivity(), getString(R.string.save_at, uri), Toast.LENGTH_LONG).show();
+				break;
+			default:
+				break;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 }
