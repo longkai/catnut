@@ -12,10 +12,13 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.android.volley.Response;
@@ -31,6 +34,7 @@ import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.StatusProcessor;
 import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
+import org.catnut.support.ConfirmBarController;
 import org.catnut.support.SwipeDismissListViewTouchListener;
 import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
@@ -65,6 +69,19 @@ public class UserTimeLineFragment extends TimelineFragment {
 	// 只有当前用户有这个删除的选项
 	private SwipeDismissListViewTouchListener mSwipeDismissListViewTouchListener;
 
+	private ConfirmBarController mUndoBarController;
+	private ConfirmBarController.ConfirmListener mUndoListener;
+
+	private void setupUndo() {
+//		mUndoBarController = new ConfirmBarController();
+		mUndoListener = new ConfirmBarController.ConfirmListener() {
+			@Override
+			public void onUndo(Bundle args) {
+				Log.d(TAG, "todo!");
+			}
+		};
+	}
+
 	private void setupDismissUtility() {
 		mSwipeDismissListViewTouchListener = new SwipeDismissListViewTouchListener(getListView(), new SwipeDismissListViewTouchListener.DismissCallbacks() {
 			@Override
@@ -84,6 +101,12 @@ public class UserTimeLineFragment extends TimelineFragment {
 		});
 		getListView().setOnTouchListener(mSwipeDismissListViewTouchListener);
 		getListView().setOnScrollListener(mSwipeDismissListViewTouchListener.makeScrollListener());
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		mUndoBarController.onSaveInstanceState(outState);
 	}
 
 	private void delete(final long id) {
@@ -115,6 +138,13 @@ public class UserTimeLineFragment extends TimelineFragment {
 		UserTimeLineFragment fragment = new UserTimeLineFragment();
 		fragment.setArguments(args);
 		return fragment;
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		setupUndo();
+		mUndoBarController = new ConfirmBarController(inflater.inflate(R.layout.confirm_bar, null), mUndoListener);
+		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
 	@Override

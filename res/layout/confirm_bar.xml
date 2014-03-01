@@ -14,9 +14,9 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent" />
 
-	<LinearLayout android:id="@+id/undobar" style="@style/UndoBar">
-		<TextView android:id="@+id/undobar_message" style="@style/UndoBarMessage" />
-		<Button android:id="@+id/undobar_button" style="@style/UndoBarButton" />
+	<LinearLayout android:id="@+id/confirmbar" style="@style/ConfirmBar">
+		<TextView android:id="@+id/confirmbar_message" style="@style/ConfirmBarMessage" />
+		<Button android:id="@+id/confirm_button" style="@style/ConfirmBarButton" />
 	</LinearLayout>
 
 </FrameLayout>

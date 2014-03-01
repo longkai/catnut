@@ -20,51 +20,53 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcelable;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
 import android.widget.TextView;
 import org.catnut.R;
 
-public class UndoBarController {
+/**
+ * modify to support a confirm utility by longkai
+ */
+public class ConfirmBarController {
 	private View mBarView;
 	private TextView mMessageView;
 	private ViewPropertyAnimator mBarAnimator;
 	private Handler mHideHandler = new Handler();
 
-	private UndoListener mUndoListener;
+	private ConfirmListener mConfirmListener;
 
 	// State objects
-	private Parcelable mUndoToken;
-	private CharSequence mUndoMessage;
+	private Bundle mConfirmArgs;
+	private CharSequence mConfirmMessage;
 
-	public interface UndoListener {
-		void onUndo(Parcelable token);
+	public interface ConfirmListener {
+		void onUndo(Bundle args);
 	}
 
-	public UndoBarController(View undoBarView, UndoListener undoListener) {
-		mBarView = undoBarView;
+	public ConfirmBarController(View confirmBarView, ConfirmListener confirmListener) {
+		mBarView = confirmBarView;
 		mBarAnimator = mBarView.animate();
-		mUndoListener = undoListener;
+		mConfirmListener = confirmListener;
 
-		mMessageView = (TextView) mBarView.findViewById(R.id.undobar_message);
-		mBarView.findViewById(R.id.undobar_button)
+		mMessageView = (TextView) mBarView.findViewById(R.id.confirmbar_message);
+		mBarView.findViewById(R.id.confirm_button)
 				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View view) {
-						hideUndoBar(false);
-						mUndoListener.onUndo(mUndoToken);
+						hideConfirmBar(false);
+						mConfirmListener.onUndo(mConfirmArgs);
 					}
 				});
 
-		hideUndoBar(true);
+		hideConfirmBar(true);
 	}
 
-	public void showUndoBar(boolean immediate, CharSequence message, Parcelable undoToken) {
-		mUndoToken = undoToken;
-		mUndoMessage = message;
-		mMessageView.setText(mUndoMessage);
+	public void showUndoBar(boolean immediate, CharSequence message, Bundle confirmArgs) {
+		mConfirmArgs = confirmArgs;
+		mConfirmMessage = message;
+		mMessageView.setText(mConfirmMessage);
 
 		mHideHandler.removeCallbacks(mHideRunnable);
 		mHideHandler.postDelayed(mHideRunnable,
@@ -84,14 +86,13 @@ public class UndoBarController {
 		}
 	}
 
-	public void hideUndoBar(boolean immediate) {
+	public void hideConfirmBar(boolean immediate) {
 		mHideHandler.removeCallbacks(mHideRunnable);
 		if (immediate) {
 			mBarView.setVisibility(View.GONE);
 			mBarView.setAlpha(0);
-			mUndoMessage = null;
-			mUndoToken = null;
-
+			mConfirmMessage = null;
+			mConfirmArgs = null;
 		} else {
 			mBarAnimator.cancel();
 			mBarAnimator
@@ -102,25 +103,25 @@ public class UndoBarController {
 						@Override
 						public void onAnimationEnd(Animator animation) {
 							mBarView.setVisibility(View.GONE);
-							mUndoMessage = null;
-							mUndoToken = null;
+							mConfirmMessage = null;
+							mConfirmArgs = null;
 						}
 					});
 		}
 	}
 
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putCharSequence("undo_message", mUndoMessage);
-		outState.putParcelable("undo_token", mUndoToken);
+		outState.putCharSequence("confirm_message", mConfirmMessage);
+		outState.putBundle("confirm_args", mConfirmArgs);
 	}
 
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
-			mUndoMessage = savedInstanceState.getCharSequence("undo_message");
-			mUndoToken = savedInstanceState.getParcelable("undo_token");
+			mConfirmMessage = savedInstanceState.getCharSequence("confirm_message");
+			mConfirmArgs = savedInstanceState.getBundle("confirm_args");
 
-			if (mUndoToken != null || !TextUtils.isEmpty(mUndoMessage)) {
-				showUndoBar(true, mUndoMessage, mUndoToken);
+			if (mConfirmArgs != null || !TextUtils.isEmpty(mConfirmMessage)) {
+				showUndoBar(true, mConfirmMessage, mConfirmArgs);
 			}
 		}
 	}
@@ -128,7 +129,7 @@ public class UndoBarController {
 	private Runnable mHideRunnable = new Runnable() {
 		@Override
 		public void run() {
-			hideUndoBar(false);
+			hideConfirmBar(false);
 		}
 	};
 }
