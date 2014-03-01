@@ -26,13 +26,21 @@ import java.util.List;
 public class StatusProcessor {
 
 	/**
-	 * 持久化主页时间线
+	 * 持久化时间线
 	 *
 	 * @author longkai
 	 */
-	public static class HomeTweetsProcessor implements CatnutProcessor<JSONObject> {
+	public static class TimelineProcessor implements CatnutProcessor<JSONObject> {
 
-		@Override
+		private int type = Status.HOME;
+
+		public TimelineProcessor() {
+		}
+
+		public TimelineProcessor(int type) {
+			this.type = type;
+		}
+
 		public void asyncProcess(Context context, JSONObject jsonObject) throws Exception {
 			JSONArray jsonArray = jsonObject.optJSONArray(Status.MULTIPLE);
 			List<ContentValues> statues = new ArrayList<ContentValues>(jsonArray.length());
@@ -45,7 +53,7 @@ public class StatusProcessor {
 				json = jsonArray.optJSONObject(i);
 				// 一次持久化微博和作者信息
 				status = statusMetadata.convert(json);
-				status.put(Status.TYPE, Status.HOME); // 标记为主页微博
+				status.put(Status.TYPE, type); // 标记为啥类型的微博
 				statues.add(status);
 				// 如果这条微博包含了原作者信息
 				if (json.has(User.SINGLE)) {

@@ -42,7 +42,7 @@ public class ConfirmBarController {
 	private CharSequence mConfirmMessage;
 
 	public interface ConfirmListener {
-		void onUndo(Bundle args);
+		void onConfirm(Bundle args);
 	}
 
 	public ConfirmBarController(View confirmBarView, ConfirmListener confirmListener) {
@@ -56,7 +56,7 @@ public class ConfirmBarController {
 					@Override
 					public void onClick(View view) {
 						hideConfirmBar(false);
-						mConfirmListener.onUndo(mConfirmArgs);
+						mConfirmListener.onConfirm(mConfirmArgs);
 					}
 				});
 

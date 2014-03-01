@@ -25,6 +25,8 @@
 
 	<integer name="default_fetch_size">20</integer>
 	<integer name="default_tweet_font_size">16</integer>
+
+	<bool name="pref_load_more_from_cloud">true</bool>
 	<!-- cannot use integer array Orz... -->
 	<string-array name="fetch_size_pref_entries">
 		<item>20</item>

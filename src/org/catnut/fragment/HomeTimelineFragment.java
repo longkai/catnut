@@ -5,16 +5,22 @@
  */
 package org.catnut.fragment;
 
-import android.content.CursorLoader;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.ListView;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.Toast;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import org.catnut.R;
 import org.catnut.adapter.TweetAdapter;
 import org.catnut.api.TweetAPI;
@@ -27,128 +33,319 @@ import org.catnut.processor.StatusProcessor;
 import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
- * 当前登录用户及其所关注用户的最新微博时间线
+ * 主页时间线
  *
  * @author longkai
  */
 public class HomeTimelineFragment extends TimelineFragment {
 
-	private static final String TAG = "HomeTimelineFragment";
+	public static final String TAG = "HomeTimelineFragment";
 
-	/** 待检索的列 */
-	private static final String[] COLUMNS = new String[]{
-		"s._id",
-		Status.uid,
-		Status.columnText,
-		Status.thumbnail_pic,
-		Status.bmiddle_pic,
-		Status.comments_count,
-		Status.reposts_count,
-		Status.attitudes_count,
-		Status.source,
-		"s." + Status.created_at,
-		User.screen_name,
-		User.profile_image_url,
-		User.remark,
-		Status.favorited,
-		Status.retweeted_status
+	private static final String[] PROJECTION = new String[]{
+			"s._id",
+			Status.uid,
+			Status.columnText,
+			Status.thumbnail_pic,
+			Status.bmiddle_pic,
+			Status.comments_count,
+			Status.reposts_count,
+			Status.attitudes_count,
+			Status.source,
+			"s." + Status.created_at,
+			User.screen_name,
+			User.profile_image_url,
+			User.remark,
+			Status.favorited,
+			Status.retweeted_status
 	};
+
+	private Handler mHandler = new Handler();
+
+	private RequestQueue mRequestQueue;
+
+	private String mSelection;
+	private int mTotal;
+
+	public static HomeTimelineFragment getFragment() {
+		return new HomeTimelineFragment();
+	}
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		mSelection = new StringBuilder(Status.TYPE)
+				.append("=").append(Status.HOME).toString();
+
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mAdapter = new TweetAdapter(mActivity, null);
+		mRequestQueue = mApp.getRequestQueue();
+		mAdapter = new TweetAdapter(getActivity(), null);
 	}
 
 	@Override
-	public void onStart() {
-		super.onStart();
-		mActivity.getActionBar().setTitle(mPref.getString(User.screen_name, null));
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		// refresh it!
+		mPullToRefreshLayout.setRefreshing(true);
+		String key = getString(R.string.pref_first_run);
+		boolean firstRun = mPreferences.getBoolean(key, true);
+		if (firstRun) {
+			refresh();
+			mPreferences.edit().putBoolean(key, false).commit();
+		} else if (mPreferences.getBoolean(getString(R.string.pref_auto_fetch_on_start), true)) {
+			refresh();
+		} else {
+			initFromLocal();
+		}
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		// 先尝试去新浪抓一把，避免那啥，empty*_*
-		boolean autoFetch = mPref.getBoolean(getString(R.string.pref_auto_fetch_on_start), true);
-		boolean firstRun = mPref.getBoolean(getString(R.string.pref_first_run), true);
-		if (autoFetch || firstRun) {
-			mPullToRefreshLayout.setRefreshing(true);
-			fetchTweetsFromCloud(true, 0);
-			if (firstRun) {
-				mPref.edit().putBoolean(getString(R.string.pref_first_run), false).commit();
-			}
-		}
-		// 接下来办正事
-		getListView().addFooterView(mLoadMore);
-		setEmptyText(mActivity.getString(R.string.no_tweets));
-		setListAdapter(mAdapter);
-		getLoaderManager().initLoader(0, null, this);
+		mListView.setAdapter(mAdapter);
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		getActivity().getActionBar().setTitle(getString(R.string.home_timeline));
 	}
 
 	@Override
 	public void onStop() {
-		mRequestQueue.cancelAll(TAG);
 		super.onStop();
+		mRequestQueue.cancelAll(TAG);
 	}
 
 	@Override
-	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		StringBuilder where = new StringBuilder(Status.TYPE).append("=").append(Status.HOME);
-		int size = super.getDefaultFetchSize();
-		String limit = String.valueOf(size * (mCurPage + 1));
-		// 搜索只能是本地搜索
-		if (!TextUtils.isEmpty(mCurFilter) && mCurFilter.trim().length() != 0) {
-			where.append(" and (")
-					.append(Status.columnText).append(" like ").append(CatnutUtils.like(mCurFilter))
-					.append(" or ")
-					.append(User.screen_name).append(" like ").append(CatnutUtils.like(mCurFilter))
-					.append(")");
-			limit = null;
-			if (!isSearching) {
-				getListView().removeFooterView(mLoadMore);
-			}
-			isSearching = true;
-		} else if (isSearching) {
-			isSearching = false;
-			getListView().addFooterView(mLoadMore);
-		}
-
-		CursorLoader cursorLoader = CatnutUtils.getCursorLoader(
-			mActivity,
-			CatnutProvider.parse(Status.MULTIPLE),
-			COLUMNS,
-			where.toString(),
-			null,
-			Status.TABLE + " as s",
-			"inner join " + User.TABLE + " as u on s.uid=u._id",
-			"s._id desc",
-			limit
-		);
-		return cursorLoader;
-	}
-
-	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		Intent intent = new Intent(getActivity(), TweetActivity.class);
 		intent.putExtra(Constants.ID, id);
 		startActivity(intent);
 	}
 
 	@Override
-	protected void fetchTweetsFromCloud(boolean isRefresh, long offset) {
-		int count = super.getDefaultFetchSize();
-		CatnutAPI api = isRefresh ? TweetAPI.homeTimeline(offset, 0, count, 0, 0, 0, 0)
-			: TweetAPI.homeTimeline(0, offset, count, 0, 0, 0, 0);
+	protected void refresh() {
+		// 检测一下是否网络已经连接，否则从本地加载
+		if (!isNetworkAvailable()) {
+			Toast.makeText(getActivity(), getString(R.string.network_unavailable), Toast.LENGTH_SHORT).show();
+			initFromLocal();
+			return;
+		}
+		// refresh!
+		final int size = getFetchSize();
+		(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// 这里需要注意一点，我们不需要最新的那条，而是需要(最新那条-数目)，否则你拿最新那条去刷新，球都没有返回Orz...
+				String query = CatnutUtils.buildQuery(
+						new String[]{BaseColumns._ID},
+						mSelection,
+						Status.TABLE,
+						null,
+						BaseColumns._ID + " desc",
+						size + ", 1" // limit x, y
+				);
+				Cursor cursor = getActivity().getContentResolver().query(
+						CatnutProvider.parse(Status.MULTIPLE),
+						null, query, null, null
+				);
+				// the cursor never null?
+				final long since_id;
+				if (cursor.moveToNext()) {
+					since_id = cursor.getLong(0);
+				} else {
+					since_id = 0;
+				}
+				cursor.close();
+				final CatnutAPI api = TweetAPI.homeTimeline(since_id, 0, size, 0, 0, 0, 0);
+				// refresh...
+				mHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						mRequestQueue.add(new CatnutRequest(
+								getActivity(),
+								api,
+								new StatusProcessor.TimelineProcessor(Status.HOME),
+								new Response.Listener<JSONObject>() {
+									@Override
+									public void onResponse(JSONObject response) {
+										Log.d(TAG, "refresh done...");
+										mTotal = response.optInt(TOTAL_NUMBER);
+										// 重新置换数据
+										JSONArray jsonArray = response.optJSONArray(Status.MULTIPLE);
+										int newSize = jsonArray.length(); // 刷新，一切从新开始...
+										Bundle args = new Bundle();
+										args.putInt(TAG, newSize);
+										getLoaderManager().restartLoader(0, args, HomeTimelineFragment.this);
+									}
+								},
+								errorListener
+						)).setTag(TAG);
+					}
+				});
+			}
+		})).start();
+	}
+
+	@Override
+	protected void loadMore(long max_id) {
+		// 加载更多，判断一下是从本地加载还是从远程加载
+		// 根据(偏好||是否有网络连接)
+		boolean fromCloud = mPreferences.getBoolean(
+				getString(R.string.pref_load_more_from_cloud),
+				getResources().getBoolean(R.bool.pref_load_more_from_cloud)
+		);
+		if (fromCloud && isNetworkAvailable()) {
+			// 如果用户要求最新的数据并且网络连接ok，那么从网络上加载数据
+			loadFromCloud(max_id);
+		} else {
+			// 从本地拿
+			loadFromLocal();
+			// 顺便更新一下本地的数据总数
+			new Thread(updateLocalCount).start();
+		}
+	}
+
+	private void initFromLocal() {
+		Bundle args = new Bundle();
+		args.putInt(TAG, getFetchSize());
+		getLoaderManager().initLoader(0, args, this);
+		new Thread(updateLocalCount).start();
+	}
+
+	private void loadFromLocal() {
+		Bundle args = new Bundle();
+		args.putInt(TAG, mAdapter.getCount() + getFetchSize());
+		getLoaderManager().restartLoader(0, args, this);
+		mPullToRefreshLayout.setRefreshing(true);
+	}
+
+	private void loadFromCloud(long max_id) {
+		mPullToRefreshLayout.setRefreshing(true);
+		CatnutAPI api = TweetAPI.homeTimeline(0, max_id, getFetchSize(), 0, 0, 0, 0);
 		mRequestQueue.add(new CatnutRequest(
-			mActivity,
-			api,
-			new StatusProcessor.HomeTweetsProcessor(),
-			isRefresh ? refreshSuccessListener : loadMoreSuccessListener,
-			isRefresh ? refreshFailListener : loadMoreFailListener
+				getActivity(),
+				api,
+				new StatusProcessor.TimelineProcessor(),
+				new Response.Listener<JSONObject>() {
+					@Override
+					public void onResponse(JSONObject response) {
+						Log.d(TAG, "load more from cloud done...");
+						mTotal = response.optInt(TOTAL_NUMBER);
+						int newSize = response.optJSONArray(Status.MULTIPLE).length() + mAdapter.getCount();
+						Bundle args = new Bundle();
+						args.putInt(TAG, newSize);
+						getLoaderManager().restartLoader(0, args, HomeTimelineFragment.this);
+					}
+				},
+				errorListener
 		)).setTag(TAG);
+	}
+
+	private Runnable updateLocalCount = new Runnable() {
+		@Override
+		public void run() {
+			String query = CatnutUtils.buildQuery(
+					new String[]{"count(0)"},
+					mSelection,
+					Status.TABLE,
+					null, null, null
+			);
+			Cursor cursor = getActivity().getContentResolver().query(
+					CatnutProvider.parse(Status.MULTIPLE),
+					null,
+					query,
+					null, null
+			);
+			if (cursor.moveToNext()) {
+				mTotal = cursor.getInt(0);
+			}
+			cursor.close();
+		}
+	};
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		String selection = mSelection;
+		boolean search = args.getBoolean(SEARCH_TWEET);
+		if (search) {
+			if (!TextUtils.isEmpty(mCurFilter)) {
+				selection = new StringBuilder(mSelection)
+						.append(" and ").append(Status.columnText)
+						.append(" like ").append(CatnutUtils.like(mCurFilter))
+						.toString();
+			} else {
+				search = false;
+			}
+		}
+		int limit = args.getInt(TAG, getFetchSize());
+		return CatnutUtils.getCursorLoader(
+				getActivity(),
+				CatnutProvider.parse(Status.MULTIPLE),
+				PROJECTION,
+				selection,
+				null,
+				Status.TABLE + " as s",
+				"inner join " + User.TABLE + " as u on s.uid=u._id",
+				"s." + BaseColumns._ID + " desc",
+				search ? null : String.valueOf(limit)
+		);
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		if (mPullToRefreshLayout.isRefreshing()) {
+			mPullToRefreshLayout.setRefreshComplete();
+		}
+		mAdapter.swapCursor(data);
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		mAdapter.swapCursor(null);
+	}
+
+	@Override
+	public boolean onQueryTextChange(String newText) {
+		String newFilter = !TextUtils.isEmpty(newText) ? newText : null;
+		// Don't do anything if the filter hasn't actually changed.
+		// Prevents restarting the loader when restoring state.
+		if (mCurFilter == null && newFilter == null) {
+			return true;
+		}
+		if (mCurFilter != null && mCurFilter.equals(newFilter)) {
+			return true;
+		}
+		Bundle args = new Bundle();
+		args.putBoolean(SEARCH_TWEET, true);
+		mCurFilter = newFilter;
+		getLoaderManager().restartLoader(0, args, this);
+		return true;
+	}
+
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+		if (firstVisibleItem + visibleItemCount >= totalItemCount) {
+			if (mSearchView != null && mSearchView.isSearching()) {
+				Log.d(TAG, "searching... no load need...");
+			} else if (mAdapter.getCount() >= mTotal && totalItemCount > 0) { // 防止一开始还没加载就toast...
+				Log.d(TAG, "load all!");
+				super.loadAllDone();
+			} else if (!mPullToRefreshLayout.isRefreshing() && totalItemCount > visibleItemCount) {
+				Log.d(TAG, "loading....");
+				loadMore(mAdapter.getItemId(totalItemCount - 1)); // 这里需要注意是否有header或者footer!
+			} else {
+				Log.d(TAG, "already loading...");
+			}
+		}
 	}
 
 	@Override
@@ -159,10 +356,15 @@ public class HomeTimelineFragment extends TimelineFragment {
 					|| key.equals(getString(R.string.pref_thumbs_options))) {
 				Log.d(TAG, "pref change, the home timeline fragment needs update!");
 				// 应用新的偏好
+				int size = mAdapter.getCount();
+				int firstVisiblePosition = mListView.getFirstVisiblePosition();
 				mAdapter.swapCursor(null);
-				mAdapter = new TweetAdapter(mActivity, null);
-				setListAdapter(mAdapter);
-				getLoaderManager().restartLoader(0, null, this);
+				mAdapter = new TweetAdapter(getActivity(), null);
+				mListView.setAdapter(mAdapter);
+				Bundle args = new Bundle();
+				args.putInt(TAG, size);
+				getLoaderManager().restartLoader(0, args, this);
+				mListView.setSelection(firstVisiblePosition);
 			}
 		}
 	}

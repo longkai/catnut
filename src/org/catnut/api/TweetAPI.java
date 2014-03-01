@@ -51,6 +51,18 @@ public class TweetAPI {
 	}
 
 	/**
+	 * 返回最新的200条公共微博，返回结果非完全实时
+	 *
+	 * @param count 单页返回的记录条数，最大不超过200，默认为20
+	 * @return api
+	 */
+	public static CatnutAPI public_timeline(int count) {
+		StringBuilder uri = new StringBuilder(BASE_URI);
+		uri.append("public_timeline.json?count=").append(CatnutUtils.optValue(count, 20));
+		return new CatnutAPI(Request.Method.GET, uri.toString(), true, null);
+	}
+
+	/**
 	 * 获取当前登录用户及其所关注用户的最新微博
 	 *
 	 * @param since_id  若指定此参数，则返回ID比since_id大的微博（即比since_id时间晚的微博），默认为0

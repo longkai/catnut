@@ -31,8 +31,10 @@ public final class Status implements CatnutMetadata<JSONObject, ContentValues> {
 	public static final int HOME = 2;
 	/** 本地使用，标记为转发微博 */
 	public static final int RETWEET = 3;
+	/** 本地使用，标记为公共微博 */
+	public static final int PUBLIC = 4;
 	/** 本地使用，标记为评论 */
-	public static final int COMMENT = 4;
+	public static final int COMMENT = 5;
 	/** 本地使用，标记为其它类型的微博 */
 	public static final int OTHERS = 1;
 

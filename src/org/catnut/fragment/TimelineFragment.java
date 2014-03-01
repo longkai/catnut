@@ -6,26 +6,37 @@
 package org.catnut.fragment;
 
 import android.app.Activity;
-import android.app.ListFragment;
+import android.app.Fragment;
 import android.app.LoaderManager;
-import android.content.Loader;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.*;
-import android.widget.*;
-import com.android.volley.RequestQueue;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.SearchView;
+import android.widget.TextView;
+import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import org.json.JSONObject;
 import org.catnut.R;
 import org.catnut.adapter.TweetAdapter;
 import org.catnut.core.CatnutApp;
-import org.catnut.metadata.Status;
-import org.catnut.ui.MainActivity;
+import org.catnut.metadata.WeiboAPIError;
+import org.catnut.support.ConfirmBarController;
+import org.catnut.support.SwipeDismissListViewTouchListener;
+import org.catnut.support.VividSearchView;
 import org.catnut.util.CatnutUtils;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
@@ -36,150 +47,125 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  *
  * @author longkai
  */
-public abstract class TimelineFragment extends ListFragment
-	implements LoaderManager.LoaderCallbacks<Cursor>, OnRefreshListener,
-	AbsListView.OnScrollListener, SearchView.OnQueryTextListener, SearchView.OnCloseListener, SharedPreferences.OnSharedPreferenceChangeListener {
+public abstract class TimelineFragment extends Fragment implements
+		ConfirmBarController.ConfirmListener, OnRefreshListener, AbsListView.OnScrollListener,
+		LoaderManager.LoaderCallbacks<Cursor>, SwipeDismissListViewTouchListener.DismissCallbacks,
+		AdapterView.OnItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener, SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
 	private static final String TAG = "TimelineFragment";
 
-	protected Activity mActivity;
-	protected TweetAdapter mAdapter;
-	protected SharedPreferences mPref;
-	protected RequestQueue mRequestQueue;
+	public static final String SEARCH_TWEET = "search_tweet";
+	public static final String TOTAL_NUMBER = "total_number";
 
+	protected CatnutApp mApp;
+	protected SharedPreferences mPreferences;
 	protected PullToRefreshLayout mPullToRefreshLayout;
-	/** footer view for loading more */
-	protected ProgressBar mLoadMore;
-	/** 当前的页码，每次加载更多就+1 */
-	protected int mCurPage;
-	/** 当前是否在通过web进行加载更多 */
-	protected boolean mLoadingFromCloud;
-	/** 标志位，当前是否是显示搜索列表 */
-	protected boolean isSearching;
 
-	/** 搜索视图 */
-	protected SearchView mSearchView;
-	/** 当前搜索关键字 */
+	protected ListView mListView;
+	protected TweetAdapter mAdapter;
+	protected ConfirmBarController mConfirmBarController;
+	protected SwipeDismissListViewTouchListener mSwipeDismissListViewTouchListener;
+
+	// Only one error listener!
+	protected Response.ErrorListener errorListener = new Response.ErrorListener() {
+		@Override
+		public void onErrorResponse(VolleyError error) {
+			Log.d(TAG, "error loading data from cloud!", error);
+			WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
+			Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_LONG).show();
+			mPullToRefreshLayout.setRefreshComplete();
+		}
+	};
+
+	// 搜索视图
+	protected VividSearchView mSearchView;
+	// 当前搜索关键字
 	protected String mCurFilter;
 
+	// empty text view if the adapter is empty
+	private TextView mEmptyText;
+	private int mFetchSize;
+	private ConnectivityManager mConnectivityManager;
+
+	/** 刷新 */
+	protected abstract void refresh();
+
 	/**
-	 * 去web抓取微博
+	 * 加载更多
 	 *
-	 * @param isRefresh 是否刷新微博，否则加载更多
-	 * @param offset    从那条开始加载或者刷新？ 不知道就0吧*_*
+	 * @param max_id 比max_id更小的条目
 	 */
-	protected abstract void fetchTweetsFromCloud(boolean isRefresh, long offset);
-
-	protected Response.Listener refreshSuccessListener = new Response.Listener() {
-		@Override
-		public void onResponse(Object response) {
-			mPullToRefreshLayout.setRefreshComplete();
-		}
-	};
-
-	protected Response.ErrorListener refreshFailListener = new Response.ErrorListener() {
-		@Override
-		public void onErrorResponse(VolleyError error) {
-			Log.e(TAG, "refresh tweets from cloud error!", error);
-			mPullToRefreshLayout.setRefreshComplete();
-			Toast.makeText(mActivity, error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-		}
-	};
-
-	protected Response.Listener<JSONObject> loadMoreSuccessListener = new Response.Listener<JSONObject>() {
-		@Override
-		public void onResponse(JSONObject response) {
-			// 看看是不是到底了
-			if (response.optInt(Status.total_number) == mAdapter.getCount()) {
-				getListView().removeFooterView(mLoadMore);
-				Toast.makeText(mActivity, R.string.no_tweets, Toast.LENGTH_SHORT).show();
-			}
-			mLoadingFromCloud = false;
-		}
-	};
-
-	protected Response.ErrorListener loadMoreFailListener = new Response.ErrorListener() {
-		@Override
-		public void onErrorResponse(VolleyError error) {
-			Log.e(TAG, "loading data from cloud error!", error);
-			mLoadingFromCloud = false;
-			Toast.makeText(mActivity, error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-		}
-	};
+	protected abstract void loadMore(long max_id);
 
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		this.mActivity = activity;
+		mApp = CatnutApp.getTingtingApp();
+		mPreferences = mApp.getPreferences();
+		mFetchSize = CatnutUtils.resolveListPrefInt(
+				mPreferences,
+				getString(R.string.pref_default_fetch_size),
+				getResources().getInteger(R.integer.default_fetch_size)
+		);
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mPreferences.registerOnSharedPreferenceChangeListener(this);
+		mConnectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
 		setHasOptionsMenu(true);
-		CatnutApp app = CatnutApp.getTingtingApp();
-		this.mPref = app.getPreferences();
-		this.mRequestQueue = app.getRequestQueue();
-		this.mLoadMore = new ProgressBar(mActivity);
-		this.mPref.registerOnSharedPreferenceChangeListener(this);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.confirm_bar, container, false);
+		mListView = (ListView) view.findViewById(android.R.id.list);
+		mConfirmBarController = new ConfirmBarController(view.findViewById(R.id.confirmbar), this);
+		mEmptyText = (TextView) inflater.inflate(R.layout.empty_list, null);
+		mListView.setEmptyView(mEmptyText); // empty text view
+		return view;
 	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
 		ViewGroup viewGroup = (ViewGroup) view;
+		viewGroup.addView(mEmptyText);
+		mSwipeDismissListViewTouchListener = new SwipeDismissListViewTouchListener(mListView, this);
 		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
 		ActionBarPullToRefresh.from(getActivity())
-			.insertLayoutInto(viewGroup)
-			.theseChildrenArePullable(android.R.id.list, android.R.id.empty)
-			.listener(this)
-			.setup(mPullToRefreshLayout);
+				.insertLayoutInto(viewGroup)
+				.theseChildrenArePullable(android.R.id.list, android.R.id.empty)
+				.listener(this)
+				.setup(mPullToRefreshLayout);
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		getListView().setOnScrollListener(this);
+		mListView.setOnTouchListener(mSwipeDismissListViewTouchListener);
+		mListView.setOnScrollListener(this);
+		mListView.setOnItemClickListener(this);
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+//		mPreferences.unregisterOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		menu.add(Menu.NONE, R.id.refresh, Menu.NONE, R.string.refresh)
-			.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-		// 搜索相关
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER); // prefer actionbar refresh
+		// 本地微博搜索
 		MenuItem search = menu.add(android.R.string.search_go);
 		search.setIcon(R.drawable.ic_title_search_default);
 		search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
-			| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-		mSearchView = new SearchView(mActivity);
+				| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+		mSearchView = VividSearchView.getSearchView(getActivity());
 		mSearchView.setOnQueryTextListener(this);
 		mSearchView.setOnCloseListener(this);
-		mSearchView.setIconifiedByDefault(false);
-		mSearchView.setQueryHint(getString(R.string.search_hint));
-		mSearchView.setIconified(true);
-		int searchPlateId = mSearchView.getContext().getResources().getIdentifier("android:id/search_plate", null, null);
-		View searchPlate = mSearchView.findViewById(searchPlateId);
-		if (searchPlate != null) {
-			// 修改搜索文字的颜色
-			int searchTextId = searchPlate.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
-			TextView searchText = (TextView) searchPlate.findViewById(searchTextId);
-			if (searchText != null) {
-				searchText.setTextColor(Color.WHITE);
-				searchText.setHintTextColor(Color.WHITE);
-			}
-		}
-		// 修改搜索hint图标，这里有bug，所以不得已搜索的空间又小了
-		int searchButtonId = mSearchView.getContext().getResources().getIdentifier("android:id/search_mag_icon", null, null);
-		ImageView searchButton = (ImageView) mSearchView.findViewById(searchButtonId);
-		if (searchButton != null) {
-			searchButton.setImageResource(R.drawable.ic_search_hint);
-		}
-		// 修改清除图标
-		int clearId = mSearchView.getContext().getResources().getIdentifier("android:id/search_close_btn", null, null);
-		ImageView closeButton = (ImageView) mSearchView.findViewById(clearId);
-		if (closeButton != null) {
-			closeButton.setImageResource(R.drawable.ic_clear);
-		}
 		search.setActionView(mSearchView);
 	}
 
@@ -187,85 +173,54 @@ public abstract class TimelineFragment extends ListFragment
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.refresh:
-				mPullToRefreshLayout.setRefreshing(true);
-				onRefreshStarted(null);
+				if (!mPullToRefreshLayout.isRefreshing()) {
+					mPullToRefreshLayout.setRefreshing(true);
+					refresh();
+				}
 				break;
 			default:
 				break;
 		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	/**
-	 * 获取抓取微博的条目数
-	 */
-	protected int getDefaultFetchSize() {
-		return CatnutUtils.resolveListPrefInt(
-			mPref,
-			getString(R.string.pref_default_fetch_size),
-			mActivity.getResources().getInteger(R.integer.default_fetch_size)
-		);
-	}
-
-	@Override
-	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		// 为何微博如此之少Orz
-//		if (data.getCount() < 20) {
-//			getListView().removeFooterView(mLoadMore);
-//		}
-		mAdapter.swapCursor(data);
-	}
-
-	@Override
-	public void onLoaderReset(Loader<Cursor> loader) {
-		mAdapter.swapCursor(null);
-	}
-
-	@Override
-	public void onScrollStateChanged(AbsListView view, int scrollState) {
-		if (mLoadMore.isShown() && !mLoadingFromCloud && !isSearching) {
-			mCurPage++;
-			if (mPref.getBoolean(getString(R.string.pref_load_more_from_cloud), true)) {
-				Log.d(TAG, "loading more from cloud!");
-				// 开启worker线程去web抓取数据
-				mLoadingFromCloud = true;
-				this.fetchTweetsFromCloud(false, mAdapter.getItemId(mAdapter.getCount() - 2));
-			} else {
-				Log.d(TAG, "loading more from local!");
-			}
-			getLoaderManager().restartLoader(0, null, this);
-		}
-	}
-
-	@Override
-	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-	}
-
-	@Override
-	public void onRefreshStarted(View view) {
-		fetchTweetsFromCloud(true, 0);
-	}
-
-	@Override
-	public boolean onQueryTextSubmit(String query) {
 		return true;
 	}
 
 	@Override
-	public boolean onQueryTextChange(String newText) {
-		// the search filter, and restart the loader to do a new query
-		// with this filter.
-		String newFilter = !TextUtils.isEmpty(newText) ? newText : null;
-		// Don't do anything if the filter hasn't actually changed.
-		// Prevents restarting the loader when restoring state.
-		if (TextUtils.isEmpty(mCurFilter) && TextUtils.isEmpty(newFilter)) {
-			return true;
-		}
-		if (!TextUtils.isEmpty(mCurFilter) && mCurFilter.equals(newFilter)) {
-			return true;
-		}
-		mCurFilter = newFilter;
-		getLoaderManager().restartLoader(0, null, this);
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+		mSwipeDismissListViewTouchListener.setEnabled(scrollState != AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
+	}
+
+	@Override
+	public void onRefreshStarted(View view) {
+		refresh();
+	}
+
+	@Override
+	public void onConfirm(Bundle args) {
+		// no-op
+	}
+
+	@Override
+	public boolean canDismiss(int position) {
+		return false;
+	}
+
+	@Override
+	public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+		// no-op
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		// sub-class impl it...
+	}
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+		// sub-class impl it...
+	}
+
+	@Override
+	public boolean onQueryTextSubmit(String query) {
 		return true;
 	}
 
@@ -275,5 +230,30 @@ public abstract class TimelineFragment extends ListFragment
 			mSearchView.setQuery(null, true);
 		}
 		return true;
+	}
+
+	public void setEmptyText(CharSequence text) {
+		mEmptyText.setText(text);
+	}
+
+	public int getFetchSize() {
+		return mFetchSize;
+	}
+
+	public boolean isNetworkAvailable() {
+		NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
+		return activeNetwork != null &&
+				activeNetwork.isConnectedOrConnecting();
+	}
+
+	// 显示没有更多了的次数，避免一直toast...
+	private int mShowToastTimes = 0;
+	private static final int MAX_SHOW_TOAST_TIMES = 2;
+
+	public void loadAllDone() {
+		if (mShowToastTimes < MAX_SHOW_TOAST_TIMES) {
+			Toast.makeText(getActivity(), R.string.no_more, Toast.LENGTH_SHORT).show();
+			mShowToastTimes++;
+		}
 	}
 }

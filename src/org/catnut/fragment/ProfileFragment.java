@@ -98,7 +98,7 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 		@Override
 		public void onClick(View v) {
 			ProfileActivity activity = (ProfileActivity) getActivity();
-			activity.flipCard(UserTimeLineFragment.getFragment(mUid, mScreenName), null, true);
+			activity.flipCard(UserTimelineFragment.getFragment(mUid, mScreenName), null, true);
 		}
 	};
 

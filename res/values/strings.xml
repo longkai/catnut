@@ -12,9 +12,9 @@
 	<string name="auth_success">授权成功！</string>
 	<string name="logout">退出</string>
 	<string name="logout_confirm">确定结束应用了嘛?</string>
-	<string name="no_tweets">没有更多微博啦，赶紧学习去吧*_*</string>
+	<string name="no_tweets">没有相关的微博啦，换个关键字搜索或者刷新一下*_*</string>
 	<string name="new_tweet_hint">嗯哼？</string>
-	<string name="search_hint">嗯哼？</string>
+	<string name="search_hint">本地搜索</string>
 	<string name="authing_hint">正在联系新浪微博授权中...</string>
 	<string name="open_drawer">打开抽屉...</string>
 	<string name="close_drawer">关闭抽屉...</string>
@@ -124,7 +124,11 @@
 	<string name="save_at">成功保存在: %1$s</string>
 	<string name="action">Perform action</string>
 	<!--<string name="confirmbar_sample_message">Action performed.</string>-->
-	<string name="confirm">确认？</string>
+	<string name="confirm">确认</string>
+	<string name="confirm_delete">你是认真的吗？</string>
+	<string name="network_unavailable">network unavailable!</string>
+	<string name="his_timeline">%1$s 的时间线</string>
+	<string name="home_timeline">主页时间线</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>微博</item>

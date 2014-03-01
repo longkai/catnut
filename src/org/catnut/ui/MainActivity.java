@@ -42,10 +42,9 @@ import org.catnut.adapter.DrawerNavAdapter;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
 import org.catnut.fragment.FavoriteFragment;
-import org.catnut.fragment.MyFriendsFragment;
 import org.catnut.fragment.HomeTimelineFragment;
-import org.catnut.fragment.PrefFragment;
-import org.catnut.fragment.UserTimeLineFragment;
+import org.catnut.fragment.MyFriendsFragment;
+import org.catnut.fragment.UserTimelineFragment;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.support.TweetImageSpan;
@@ -136,7 +135,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		if (savedInstanceState == null) {
 			getFragmentManager()
 					.beginTransaction()
-					.replace(R.id.fragment_container, new HomeTimelineFragment())
+					.replace(R.id.fragment_container, HomeTimelineFragment.getFragment())
 					.commit();
 		}
 		getFragmentManager().addOnBackStackChangedListener(this);
@@ -309,7 +308,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		String tag = mNick != null && mNick.equals(nick) ? "my_tweets" : "u_tweets";
 		Fragment f = getFragmentManager().findFragmentByTag(tag);
 		if (f == null || !f.isVisible()) {
-			UserTimeLineFragment fragment = new UserTimeLineFragment();
+			UserTimelineFragment fragment = UserTimelineFragment.getFragment(uid, nick);
 			Bundle args = new Bundle();
 			args.putLong(Constants.ID, uid);
 			args.putString(User.screen_name, nick);

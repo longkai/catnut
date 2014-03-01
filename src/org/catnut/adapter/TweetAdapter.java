@@ -57,7 +57,7 @@ public class TweetAdapter extends CursorAdapter {
 	private TweetImageSpan mImageSpan;
 	private String mThumbsOption;
 	private boolean mSmall;
-	private String mUserNick;
+	private String mScreenName;
 
 	/** 自定义字体，用户偏好 */
 	private Typeface mCustomizedFont;
@@ -70,7 +70,7 @@ public class TweetAdapter extends CursorAdapter {
 	public TweetAdapter(Context context, String nick) {
 		super(context, null, 0);
 		mContext = context;
-		this.mUserNick = nick;
+		this.mScreenName = nick;
 		SharedPreferences preferences = CatnutApp.getTingtingApp().getPreferences();
 		mThumbsOption = preferences.getString(
 				context.getString(R.string.pref_thumbs_options),
@@ -128,7 +128,7 @@ public class TweetAdapter extends CursorAdapter {
 		View view = LayoutInflater.from(context).inflate(R.layout.tweet_row, null);
 		holder.nick = (TextView) view.findViewById(R.id.nick);
 		// 如果是某个主页时间线
-		if (mUserNick == null) {
+		if (mScreenName == null) {
 			holder.nickIndex = cursor.getColumnIndex(User.screen_name);
 			holder.avatar = (ImageView) view.findViewById(R.id.avatar);
 			holder.avatarIndex = cursor.getColumnIndex(User.profile_image_url);
@@ -176,7 +176,7 @@ public class TweetAdapter extends CursorAdapter {
 		ViewHolder holder = (ViewHolder) view.getTag();
 		final long id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 		// 用户相关
-		if (mUserNick == null) {
+		if (mScreenName == null) {
 			holder.avatar.setVisibility(View.VISIBLE);
 			Picasso.with(context)
 					.load(cursor.getString(holder.avatarIndex))
@@ -198,7 +198,7 @@ public class TweetAdapter extends CursorAdapter {
 			String remark = cursor.getString(holder.remarkIndex);
 			holder.nick.setText(TextUtils.isEmpty(remark) ? cursor.getString(holder.nickIndex) : remark);
 		} else {
-			holder.nick.setText(mUserNick);
+			holder.nick.setText(mScreenName);
 		}
 		// 微博相关
 		if (mCustomizedFont != null) {
@@ -297,11 +297,17 @@ public class TweetAdapter extends CursorAdapter {
 			}
 			holder.retweetView.setVisibility(View.VISIBLE);
 			JSONObject user = json.optJSONObject(User.SINGLE);
-			String str = user.optString(User.remark);
-			if (TextUtils.isEmpty(str)) {
-				str = user.optString(User.screen_name);
+			if (user == null) { // 有可能trim_user了，这种情况一般是查看某个用户的时间线的
+				if (mScreenName != null) {
+					CatnutUtils.setText(holder.retweetView, R.id.retweet_nick, "@" + mScreenName);
+				}
+			} else {
+				String str = user.optString(User.remark);
+				if (TextUtils.isEmpty(str)) {
+					str = user.optString(User.screen_name);
+				}
+				CatnutUtils.setText(holder.retweetView, R.id.retweet_nick, "@" + str);
 			}
-			CatnutUtils.setText(holder.retweetView, R.id.retweet_nick, "@" + str);
 			TweetTextView text = (TweetTextView) holder.retweetView.findViewById(R.id.retweet_text);
 			long createAt = DateTime.getTimeMills(json.optString(Status.created_at));
 			CatnutUtils.setText(holder.retweetView, R.id.retweet_create_at, DateUtils.getRelativeTimeSpanString(createAt));
