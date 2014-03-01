@@ -368,7 +368,7 @@ public class UserTimelineFragment extends TimelineFragment {
 				super.loadAllDone();
 			} else if (!mPullToRefreshLayout.isRefreshing() && totalItemCount > visibleItemCount) {
 				Log.d(TAG, "loading....");
-				loadMore(mAdapter.getItemId(totalItemCount - 1)); // 这里需要注意是否有header或者footer!
+				loadMore(mAdapter.getItemId(mAdapter.getCount() - 1)); // 这里需要注意是否有header或者footer!
 			} else {
 				Log.d(TAG, "already loading...");
 			}
@@ -403,7 +403,7 @@ public class UserTimelineFragment extends TimelineFragment {
 				// 应用新的偏好
 				int size = mAdapter.getCount();
 				int firstVisiblePosition = mListView.getFirstVisiblePosition();
-				mAdapter.swapCursor(null);
+				mAdapter.changeCursor(null);
 				mAdapter = new TweetAdapter(getActivity(), mScreenName);
 				mListView.setAdapter(mAdapter);
 				Bundle args = new Bundle();

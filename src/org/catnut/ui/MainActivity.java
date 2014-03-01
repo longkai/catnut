@@ -177,7 +177,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					mNick = cursor.getString(cursor.getColumnIndex(User.screen_name));
 					// add it to pref for convenient
 					mApp.getPreferences().edit().putString(User.screen_name, mNick).commit();
-					mActionBar.setTitle(mNick);
+//					mActionBar.setTitle(mNick);
 					mTextNick.setText(mNick);
 					mImageLoader.get(cursor.getString(cursor.getColumnIndex(User.avatar_large)),
 							ImageLoader.getImageListener(
