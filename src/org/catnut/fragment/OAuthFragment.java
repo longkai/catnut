@@ -24,6 +24,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import org.catnut.metadata.User;
 import org.json.JSONObject;
 import org.catnut.R;
 import org.catnut.api.UserAPI;
@@ -96,6 +97,7 @@ public class OAuthFragment extends Fragment {
 									@Override
 									public void onResponse(JSONObject response) {
 										mProgressDialog.dismiss();
+										mApp.getPreferences().edit().putString(User.screen_name, response.optString(User.screen_name));
 										startActivity(new Intent(getActivity(), MainActivity.class));
 									}
 								},

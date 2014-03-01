@@ -175,7 +175,7 @@ public class TweetAdapter extends CursorAdapter {
 	public void bindView(View view, final Context context, Cursor cursor) {
 		ViewHolder holder = (ViewHolder) view.getTag();
 		final long id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
-		// 用户相关
+		// 不是某个用户的时间线
 		if (mScreenName == null) {
 			holder.avatar.setVisibility(View.VISIBLE);
 			Picasso.with(context)

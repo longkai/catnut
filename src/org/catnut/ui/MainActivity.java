@@ -196,7 +196,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					tweetsCount.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							viewTweets(mApp.getAccessToken().uid, null, false);
+							viewTweets(false);
 						}
 					});
 					flowerCount.setOnClickListener(new View.OnClickListener() {
@@ -280,7 +280,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					mTweetLayout.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							viewTweets(mApp.getAccessToken().uid, null, false);
+							viewTweets(false);
 						}
 					});
 				}
@@ -300,19 +300,15 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 	/**
 	 * 查看某个用户的时间线
 	 *
-	 * @param uid            用户id
-	 * @param nick           如果是当前授权用户，请赋null
 	 * @param popupLastTitle actionbar的title是否回滚，用于drawer的点击事件
 	 */
-	public void viewTweets(long uid, String nick, boolean popupLastTitle) {
-		String tag = mNick != null && mNick.equals(nick) ? "my_tweets" : "u_tweets";
+	public void viewTweets(boolean popupLastTitle) {
+		String tag = "my_tweets";
 		Fragment f = getFragmentManager().findFragmentByTag(tag);
 		if (f == null || !f.isVisible()) {
-			UserTimelineFragment fragment = UserTimelineFragment.getFragment(uid, nick);
-			Bundle args = new Bundle();
-			args.putLong(Constants.ID, uid);
-			args.putString(User.screen_name, nick);
-			fragment.setArguments(args);
+			long id = mApp.getAccessToken().uid;
+			String screenName = mApp.getPreferences().getString(User.screen_name, null);
+			UserTimelineFragment fragment = UserTimelineFragment.getFragment(id, screenName);
 			mShouldPopupLastTitle = popupLastTitle;
 			if (mDrawerLayout.isDrawerOpen(mDrawer)) {
 				mDrawerLayout.closeDrawer(mDrawer);
@@ -465,7 +461,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		Intent intent;
 		switch (DRAWER_LIST_ITEMS_IDS[position]) {
 			case R.id.action_my_tweets:
-				viewTweets(mApp.getAccessToken().uid, null, false);
+				viewTweets(false);
 				break;
 			case R.id.action_share_app:
 				intent = new Intent(Intent.ACTION_SEND);
