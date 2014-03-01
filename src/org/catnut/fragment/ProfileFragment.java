@@ -248,6 +248,8 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 						mTweetLayout.setOnClickListener(tweetsOnclickListener);
 						ViewStub viewStub = (ViewStub) mTweetLayout.findViewById(R.id.latest_tweet);
 						View tweet = viewStub.inflate();
+						// todo: retweet layout!
+						tweet.findViewById(R.id.retweet).setVisibility(View.GONE);
 						CatnutUtils.setText(tweet, R.id.nick, getString(R.string.latest_statues))
 								.setTextColor(getResources().getColor(R.color.actionbar_background));
 						String tweetText = cursor.getString(cursor.getColumnIndex(Status.columnText));
