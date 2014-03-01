@@ -157,7 +157,7 @@ public abstract class UsersFragment extends ListFragment implements LoaderManage
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		if (mLoadMore.isShown() && !isLoadingMore && !isSearching) {
 			mCurPage++;
-			if (mPref.getBoolean(getString(R.string.pref_load_more_from_cloud), true)) {
+			if (mPref.getBoolean(getString(R.string.pref_keep_latest), true)) {
 				Log.d(TAG, "loading more from cloud!");
 				// 开启worker线程去web抓取数据
 				isLoadingMore = true;

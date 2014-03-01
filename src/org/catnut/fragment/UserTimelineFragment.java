@@ -222,7 +222,7 @@ public class UserTimelineFragment extends TimelineFragment {
 		// 加载更多，判断一下是从本地加载还是从远程加载
 		// 根据(偏好||是否有网络连接)
 		boolean fromCloud = mPreferences.getBoolean(
-				getString(R.string.pref_load_more_from_cloud),
+				getString(R.string.pref_keep_latest),
 				getResources().getBoolean(R.bool.pref_load_more_from_cloud)
 		);
 		if (fromCloud && isNetworkAvailable()) {

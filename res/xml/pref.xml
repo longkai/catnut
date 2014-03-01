@@ -19,7 +19,7 @@
 			android:entryValues="@array/fetch_size_pref_entries" />
 
 		<CheckBoxPreference
-			android:key="@string/pref_auto_fetch_on_start"
+			android:key="@string/pref_keep_latest"
 			android:defaultValue="true"
 			android:title="@string/auto_fetch_on_start"
 			android:summary="@string/auto_fetch_on_start_summary" />
@@ -29,12 +29,6 @@
 			android:defaultValue="true"
 			android:title="@string/show_latest_tweet"
 			android:summary="@string/show_latest_tweet_summary" />
-
-		<CheckBoxPreference
-			android:key="@string/pref_load_more_from_cloud"
-			android:defaultValue="true"
-			android:title="@string/load_more_from_cloud"
-			android:summary="@string/load_more_from_cloud_summary" />
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/advanced_settings">

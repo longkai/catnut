@@ -9,9 +9,8 @@
 	<string name="camera_cached_dir">/camera/</string>
 
 	<string name="pref_first_run">pref_first_run</string>
-	<string name="pref_auto_fetch_on_start">pref_auto_fetch_on_start</string>
+	<string name="pref_keep_latest">pref_auto_fetch_on_start</string>
 	<string name="pref_default_fetch_size">pref_default_fetch_size</string>
-	<string name="pref_load_more_from_cloud">pref_load_more_from_cloud</string>
 	<string name="pref_tweet_font_size">pref_tweet_font_size</string>
 	<string name="pref_thumbs_options">pref_thumbs_options</string>
 	<string name="pref_customize_tweet_font">pref_customize_tweet_font</string>

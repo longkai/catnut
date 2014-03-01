@@ -165,7 +165,7 @@ public class FavoriteFragment extends ListFragment implements LoaderManager.Load
 				.listener(this)
 				.setup(mPullToRefreshLayout);
 		// 来一发?
-		if (mPref.getBoolean(getString(R.string.pref_auto_fetch_on_start), true)) {
+		if (mPref.getBoolean(getString(R.string.pref_keep_latest), true)) {
 			mPullToRefreshLayout.setRefreshing(true);
 			loadFromCloud(false); // first, every thing is init.
 		}
@@ -247,7 +247,7 @@ public class FavoriteFragment extends ListFragment implements LoaderManager.Load
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		if (mLoadMore.isShown() && !mPullToRefreshLayout.isRefreshing()) {
-			if (mPref.getBoolean(getString(R.string.pref_load_more_from_cloud), true)) {
+			if (mPref.getBoolean(getString(R.string.pref_keep_latest), true)) {
 				loadFromCloud(false);
 			} else {
 				mCurrentPage++;

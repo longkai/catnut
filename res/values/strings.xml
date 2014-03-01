@@ -41,7 +41,7 @@
 	<string name="load_more_from_cloud">联网加载更多微博</string>
 	<string name="load_more_from_cloud_summary">若不勾选则加载本地缓存的微博，但是数据可能不是最新的，建议在wifi下开启</string>
 	<string name="auto_fetch_on_start">保持最新状态</string>
-	<string name="auto_fetch_on_start_summary">启动应用时自动去抓取最新的 主页时间线 微博并缓存到本地</string>
+	<string name="auto_fetch_on_start_summary">优先联网加载数据（推荐），否则倾向于使用本地缓存的数据（非常省流量，但是数据很可能不是最新的）</string>
 	<string name="general_settings">基本设置</string>
 	<string name="source_code">源代码</string>
 	<string name="source_code_summary">本应用开源哦，感兴趣的话戳这里*_*</string>
