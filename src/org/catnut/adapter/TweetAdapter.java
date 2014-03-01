@@ -6,14 +6,12 @@
 package org.catnut.adapter;
 
 import android.app.ProgressDialog;
-import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Handler;
 import android.provider.BaseColumns;
 import android.text.Html;
@@ -26,7 +24,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.android.volley.toolbox.ImageLoader;
+import com.squareup.picasso.Picasso;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
@@ -35,6 +33,7 @@ import org.catnut.metadata.User;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.ui.ProfileActivity;
+import org.catnut.ui.SingleFragmentActivity;
 import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
@@ -54,10 +53,10 @@ public class TweetAdapter extends CursorAdapter {
 	private static final String TAG = "TweetAdapter";
 
 	private Context mContext;
-	private ImageLoader mImageLoader;
 	private Handler mHandler = new Handler();
 	private TweetImageSpan mImageSpan;
-	private boolean mThumbsRequired;
+	private String mThumbsOption;
+	private boolean mSmall;
 	private String mUserNick;
 
 	/** 自定义字体，用户偏好 */
@@ -72,10 +71,11 @@ public class TweetAdapter extends CursorAdapter {
 		super(context, null, 0);
 		mContext = context;
 		this.mUserNick = nick;
-		CatnutApp app = CatnutApp.getTingtingApp();
-		mImageLoader = app.getImageLoader();
-		SharedPreferences preferences = app.getPreferences();
-		mThumbsRequired = preferences.getBoolean(context.getString(R.string.pref_show_tweet_thumbs), true);
+		SharedPreferences preferences = CatnutApp.getTingtingApp().getPreferences();
+		mThumbsOption = preferences.getString(
+				context.getString(R.string.pref_thumbs_options),
+				context.getString(R.string.thumb_small)
+		);
 		mCustomizedFontSize = CatnutUtils.resolveListPrefInt(
 			preferences,
 			context.getString(R.string.pref_tweet_font_size),
@@ -152,6 +152,18 @@ public class TweetAdapter extends CursorAdapter {
 		holder.reply = (ImageView) view.findViewById(R.id.action_reply);
 		holder.retweet = (ImageView) view.findViewById(R.id.action_reteet);
 		holder.favorite = (ImageView) view.findViewById(R.id.action_favorite);
+		if (mThumbsOption.equals(mContext.getString(R.string.thumb_medium))) {
+			// 中型缩略图
+			holder.thumbsIndex = cursor.getColumnIndex(Status.bmiddle_pic);
+			mSmall = false;
+		} else if (mThumbsOption.equals(mContext.getString(R.string.thumb_small))) {
+			// 小型缩略图
+			holder.thumbsIndex = cursor.getColumnIndex(Status.thumbnail_pic);
+			mSmall = true;
+		} else {
+			// ta不要缩略图
+			holder.thumbsIndex = -1;
+		}
 		// 转发
 		holder.retweetView = view.findViewById(R.id.retweet);
 		holder.retweetIndex = cursor.getColumnIndex(Status.retweeted_status);
@@ -166,8 +178,11 @@ public class TweetAdapter extends CursorAdapter {
 		// 用户相关
 		if (mUserNick == null) {
 			holder.avatar.setVisibility(View.VISIBLE);
-			mImageLoader.get(cursor.getString(holder.avatarIndex),
-			ImageLoader.getImageListener(holder.avatar, R.drawable.error, R.drawable.error));
+			Picasso.with(context)
+					.load(cursor.getString(holder.avatarIndex))
+					.placeholder(R.drawable.error)
+					.error(R.drawable.error)
+					.into(holder.avatar);
 			// 跳转到该用户的时间线
 			final String nick = cursor.getString(holder.nickIndex);
 			final long uid = cursor.getLong(cursor.getColumnIndex(Status.uid));
@@ -234,24 +249,38 @@ public class TweetAdapter extends CursorAdapter {
 		String source = cursor.getString(holder.sourceIndex);
 		// remove html tags, maybe we should do this after we load the data from cloud...
 		holder.source.setText(Html.fromHtml(source).toString());
-		// 是否需要缩略图，用户偏好
-		boolean show = false;
-		if (mThumbsRequired) {
-			String thumbsUri = cursor.getString(holder.thumbsIndex);
-			if (!TextUtils.isEmpty(thumbsUri)) {
-				mImageLoader.get(thumbsUri,
-					ImageLoader.getImageListener(holder.thumbs, R.drawable.error, R.drawable.error),
-					holder.thumbs.getMaxWidth(), holder.thumbs.getMaxHeight());
-				holder.thumbs.setVisibility(View.VISIBLE);
-				show = true;
-			}
-		}
-		if (!show) {
-			holder.thumbs.setVisibility(View.GONE);
-		}
 		// 文字处理
 		CatnutUtils.vividTweet(holder.text, mImageSpan);
-
+		// 缩略图，用户偏好
+		if (holder.thumbsIndex == -1) {
+			holder.thumbs.setVisibility(View.GONE);
+		} else {
+			final String thumbsUri = cursor.getString(holder.thumbsIndex);
+			if (!TextUtils.isEmpty(thumbsUri)) {
+				if (!mSmall) {
+					Picasso.with(context)
+							.load(thumbsUri)
+							.resizeDimen(R.dimen.thumb_width, R.dimen.thumb_height) // todo: remove hard code
+							.centerCrop()
+							.into(holder.thumbs);
+				} else {
+					Picasso.with(context)
+							.load(thumbsUri)
+							.into(holder.thumbs);
+				}
+				holder.thumbs.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Intent intent = SingleFragmentActivity.getIntent(context, SingleFragmentActivity.PHOTO_VIEWER);
+						intent.putExtra(Constants.PIC, thumbsUri);
+						mContext.startActivity(intent);
+					}
+				});
+				holder.thumbs.setVisibility(View.VISIBLE);
+			} else {
+				holder.thumbs.setVisibility(View.GONE);
+			}
+		}
 		// 处理转发
 		retweet(cursor.getString(holder.retweetIndex), holder);
 	}

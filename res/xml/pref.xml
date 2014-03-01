@@ -53,11 +53,13 @@
 			android:entries="@array/tweet_font_size_entries"
 			android:entryValues="@array/tweet_font_size_entryValues" />
 
-		<CheckBoxPreference
-			android:key="@string/pref_show_tweet_thumbs"
+		<ListPreference
+			android:key="@string/pref_thumbs_options"
 			android:title="@string/show_thumbs"
-			android:defaultValue="true"
-			android:summary="@string/show_thumbs_summary" />
+			android:defaultValue="@string/thumb_small"
+			android:summary="@string/show_thumbs_summary"
+			android:entries="@array/thumbs_options_entries"
+			android:entryValues="@array/thumbs_options_entryValues" />
 
 		<CheckBoxPreference
 			android:key="@string/pref_enable_analytics"

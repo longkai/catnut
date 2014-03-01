@@ -13,7 +13,7 @@
 	<string name="pref_default_fetch_size">pref_default_fetch_size</string>
 	<string name="pref_load_more_from_cloud">pref_load_more_from_cloud</string>
 	<string name="pref_tweet_font_size">pref_tweet_font_size</string>
-	<string name="pref_show_tweet_thumbs">pref_show_tweet_thumbs</string>
+	<string name="pref_thumbs_options">pref_thumbs_options</string>
 	<string name="pref_customize_tweet_font">pref_customize_tweet_font</string>
 	<string name="pref_about">pref_about</string>
 	<string name="pref_notes">pref_notes</string>
@@ -47,5 +47,19 @@
 		<item>16</item>
 		<item>18</item>
 		<item>20</item>
+	</string-array>
+
+	<string-array name="thumbs_options_entries">
+		<item>不显示</item>
+		<item>显示较小缩略图</item>
+		<item>显示中等缩略图</item>
+	</string-array>
+	<string name="thumb_small">small</string>
+	<string name="thumb_medium">medium</string>
+	<string name="thumb_none">none</string>
+	<string-array name="thumbs_options_entryValues">
+		<item>@string/thumb_none</item>
+		<item>@string/thumb_small</item>
+		<item>@string/thumb_medium</item>
 	</string-array>
 </resources>

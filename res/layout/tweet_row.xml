@@ -74,8 +74,10 @@
 			android:id="@+id/thumbs"
 			android:clickable="true"
 			android:focusable="true"
-			android:background="@drawable/actionbar_item_background_light"
+			android:padding="@dimen/small"
+			android:background="@drawable/avatar_background"
 			android:visibility="gone"
+			android:scaleType="centerCrop"
 			android:layout_marginTop="@dimen/small"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" />

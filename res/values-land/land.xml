@@ -7,4 +7,7 @@
 <resources>
 	<integer name="emotions_columns">8</integer>
 	<dimen name="emotion_window_height">200dp</dimen>
+
+	<dimen name="thumb_width">600dp</dimen>
+	<dimen name="thumb_height">300dp</dimen>
 </resources>

@@ -35,8 +35,8 @@
 	<string name="commit_link">https://github.com/longkai/catnut/commits/master</string>
 	<string name="version">版本</string>
 	<string name="author">作者</string>
-	<string name="show_thumbs">显示缩略图</string>
-	<string name="show_thumbs_summary">若不勾选，则不显示任何缩略图，考虑美观或者省流量，可以取消*_*</string>
+	<string name="show_thumbs">缩略图</string>
+	<string name="show_thumbs_summary">是否显示缩略图（考虑流量），显示多大尺寸的缩略图（若考虑美观的说）</string>
 	<string name="tweets_count_per_fetch_summary">每次刷新需要加载多少条微博咧*_*</string>
 	<string name="load_more_from_cloud">联网加载更多微博</string>
 	<string name="load_more_from_cloud_summary">若不勾选则加载本地缓存的微博，但是数据可能不是最新的，建议在wifi下开启</string>

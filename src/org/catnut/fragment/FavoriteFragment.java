@@ -276,7 +276,7 @@ public class FavoriteFragment extends ListFragment implements LoaderManager.Load
 		if (isAdded()) {
 			if (key.equals(mApp.getString(R.string.pref_tweet_font_size))
 					|| key.equals(mApp.getString(R.string.pref_customize_tweet_font))
-					|| key.equals(mApp.getString(R.string.pref_show_tweet_thumbs))) {
+					|| key.equals(mApp.getString(R.string.pref_thumbs_options))) {
 				Log.d(TAG, "pref change, the home timeline fragment needs update!");
 				// 应用新的偏好
 				mAdapter.swapCursor(null);

@@ -19,4 +19,6 @@
 	<dimen name="image_thumbnail_size">100dp</dimen>
 
 	<dimen name="actionbar_item_width">48dp</dimen>
+	<dimen name="thumb_width">300dp</dimen>
+	<dimen name="thumb_height">150dp</dimen>
 </resources>

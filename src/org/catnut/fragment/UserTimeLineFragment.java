@@ -12,7 +12,6 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
@@ -54,6 +53,7 @@ public class UserTimeLineFragment extends TimelineFragment {
 		BaseColumns._ID,
 		Status.columnText,
 		Status.thumbnail_pic,
+		Status.bmiddle_pic,
 		Status.comments_count,
 		Status.reposts_count,
 		Status.attitudes_count,
@@ -250,7 +250,7 @@ public class UserTimeLineFragment extends TimelineFragment {
 		if (isAdded()) {
 			if (key.equals(getString(R.string.pref_tweet_font_size))
 					|| key.equals(getString(R.string.pref_customize_tweet_font))
-					|| key.equals(getString(R.string.pref_show_tweet_thumbs))) {
+					|| key.equals(getString(R.string.pref_thumbs_options))) {
 				Log.d(TAG, "pref change, the user timeline fragment needs update!");
 				// 应用新的偏好
 				mAdapter.swapCursor(null);

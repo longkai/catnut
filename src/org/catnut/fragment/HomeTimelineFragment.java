@@ -43,6 +43,7 @@ public class HomeTimelineFragment extends TimelineFragment {
 		Status.uid,
 		Status.columnText,
 		Status.thumbnail_pic,
+		Status.bmiddle_pic,
 		Status.comments_count,
 		Status.reposts_count,
 		Status.attitudes_count,
@@ -155,7 +156,7 @@ public class HomeTimelineFragment extends TimelineFragment {
 		if (isAdded()) {
 			if (key.equals(getString(R.string.pref_tweet_font_size))
 					|| key.equals(getString(R.string.pref_customize_tweet_font))
-					|| key.equals(getString(R.string.pref_show_tweet_thumbs))) {
+					|| key.equals(getString(R.string.pref_thumbs_options))) {
 				Log.d(TAG, "pref change, the home timeline fragment needs update!");
 				// 应用新的偏好
 				mAdapter.swapCursor(null);
