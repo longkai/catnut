@@ -9,10 +9,11 @@ import android.app.Activity;
 import android.app.ListFragment;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -28,6 +29,7 @@ import org.catnut.core.CatnutAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutRequest;
 import org.catnut.metadata.User;
+import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.UserProcessor;
 import org.catnut.support.TransientRequest;
 import org.catnut.support.TransientUser;
@@ -35,6 +37,9 @@ import org.catnut.ui.ProfileActivity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -45,42 +50,41 @@ import java.util.List;
  *
  * @author longkai
  */
-public class TransientUsersFragment extends ListFragment implements AbsListView.OnScrollListener {
+public class TransientUsersFragment extends ListFragment implements AbsListView.OnScrollListener, OnRefreshListener {
 
 	private static final String TAG = "TransientUsersFragment";
 
-	private int next_cursor = 0;
-	private int total_number = 0;
+	private int mNext_cursor = 0;
+	private int mTotal_number = 0;
 
 	private RequestQueue mRequestQueue;
+	private PullToRefreshLayout mPullToRefreshLayout;
 
 	private String mScreenName;
 	private boolean mFollowing;
 
-	private ProgressBar mLoadMore;
-	private boolean mLoading = false;
-
 	private ArrayList<TransientUser> mUsers;
 	private TransientUsersAdapter mAdapter;
+
+	private int mLastTotalCount;
 
 	private Response.Listener<List<TransientUser>> listener = new Response.Listener<List<TransientUser>>() {
 		@Override
 		public void onResponse(List<TransientUser> response) {
+			mLastTotalCount = mAdapter.getCount();
 			mUsers.addAll(response);
 			mAdapter.notifyDataSetChanged();
-			if (total_number <= mUsers.size()) {
-				Toast.makeText(getActivity(), R.string.no_more, Toast.LENGTH_SHORT).show();
-				getListView().removeFooterView(mLoadMore);
-			}
-			mLoading = false;
+			mPullToRefreshLayout.setRefreshComplete();
 		}
 	};
 
 	private Response.ErrorListener errorListener = new Response.ErrorListener() {
 		@Override
 		public void onErrorResponse(VolleyError error) {
-			Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-			mLoading = false;
+			Log.e(TAG, "load friends error!", error);
+			WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
+			Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_LONG).show();
+			mPullToRefreshLayout.setRefreshComplete();
 		}
 	};
 
@@ -107,21 +111,28 @@ public class TransientUsersFragment extends ListFragment implements AbsListView.
 		super.onCreate(savedInstanceState);
 		mUsers = new ArrayList<TransientUser>();
 		mAdapter = new TransientUsersAdapter(getActivity(), mUsers);
-		mLoadMore = new ProgressBar(getActivity());
 	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		loadFromCloud();
+		ViewGroup viewGroup = (ViewGroup) view;
+		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+		ActionBarPullToRefresh.from(getActivity())
+				.insertLayoutInto(viewGroup)
+				.theseChildrenArePullable(android.R.id.list, android.R.id.empty)
+				.listener(this)
+				.setup(mPullToRefreshLayout);
+		// go！开始加载数据吧！
+		load(true);
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		getListView().setOnScrollListener(this);
+		setEmptyText(getString(R.string.no_more));
 		setListAdapter(mAdapter);
-		getListView().addFooterView(mLoadMore);
 	}
 
 	@Override
@@ -154,7 +165,9 @@ public class TransientUsersFragment extends ListFragment implements AbsListView.
 					@Override
 					public void onErrorResponse(VolleyError error) {
 						loading.dismiss();
-						Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+						Log.d(TAG, "load user profile error!", error);
+						WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
+						Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_LONG).show();
 					}
 				}
 		));
@@ -162,8 +175,14 @@ public class TransientUsersFragment extends ListFragment implements AbsListView.
 
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
-		if (!mLoading && mLoadMore.isShown() && mUsers.size() != 0) {
-			loadFromCloud();
+		if (SCROLL_STATE_IDLE == scrollState
+				&& getListView().getLastVisiblePosition() == mAdapter.getCount() - 1
+				&& !mPullToRefreshLayout.isRefreshing()) {
+			if (mAdapter.getCount() >= mTotal_number || mLastTotalCount == mAdapter.getCount()) {
+				Toast.makeText(getActivity(), R.string.no_more, Toast.LENGTH_SHORT).show();
+			} else {
+				load(false);
+			}
 		}
 	}
 
@@ -171,11 +190,21 @@ public class TransientUsersFragment extends ListFragment implements AbsListView.
 	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 	}
 
-	private void loadFromCloud() {
-		mLoading = true;
+	@Override
+	public void onRefreshStarted(View view) {
+		load(true);
+	}
+
+	// 加载数据
+	private void load(boolean refresh) {
+		mPullToRefreshLayout.setRefreshing(true);
+		if (refresh) {
+			mUsers.clear(); // 清空现有的列表
+			mNext_cursor = 0;
+		}
 		CatnutAPI api = mFollowing
-				? FriendshipsAPI.friends(mScreenName, 0, next_cursor, 1)
-				: FriendshipsAPI.followers(mScreenName, 0, next_cursor, 1);
+				? FriendshipsAPI.friends(mScreenName, 0, mNext_cursor, 1)
+				: FriendshipsAPI.followers(mScreenName, 0, mNext_cursor, 1);
 		mRequestQueue.add(new TransientRequest<List<TransientUser>>(api, listener, errorListener) {
 			@Override
 			protected Response<List<TransientUser>> parseNetworkResponse(NetworkResponse response) {
@@ -191,8 +220,8 @@ public class TransientUsersFragment extends ListFragment implements AbsListView.
 					new String(response.data, HttpHeaderParser.parseCharset(response.headers));
 			JSONObject result = new JSONObject(jsonString);
 			// set next_cursor
-			next_cursor = result.optInt(User.next_cursor);
-			total_number = result.optInt(User.total_number);
+			mNext_cursor = result.optInt(User.next_cursor);
+			mTotal_number = result.optInt(User.total_number);
 			JSONArray array = result.optJSONArray(User.MULTIPLE);
 			if (array != null) {
 				List<TransientUser> users = new ArrayList<TransientUser>(array.length());
