@@ -8,6 +8,7 @@ package org.catnut.fragment;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -18,6 +19,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.android.volley.RequestQueue;
@@ -34,6 +36,7 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.StatusProcessor;
+import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.json.JSONArray;
@@ -217,6 +220,13 @@ public class UserTimelineFragment extends TimelineFragment {
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
 		mAdapter.swapCursor(null);
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		Intent intent = new Intent(getActivity(), TweetActivity.class);
+		intent.putExtra(Constants.ID, id);
+		startActivity(intent);
 	}
 
 	@Override

@@ -188,9 +188,11 @@ public class CatnutProvider extends ContentProvider {
 
 	@Override
 	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+		SQLiteDatabase db;
 		switch (matcher.match(uri)) {
 			case USER:
-				SQLiteDatabase db = mDb.getWritableDatabase();
+			case STATUSES:
+				db = mDb.getWritableDatabase();
 				db.execSQL(selection);
 				break;
 			default:

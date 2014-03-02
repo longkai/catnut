@@ -13,6 +13,8 @@ import org.catnut.core.CatnutProvider;
 import org.catnut.fragment.FavoriteFragment;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
+import org.catnut.util.CatnutUtils;
+import org.catnut.util.Constants;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -154,13 +156,14 @@ public class StatusProcessor {
 
 		@Override
 		public void asyncProcess(Context context, JSONObject data) throws Exception {
-			ContentValues[] statues = new ContentValues[2];
-			statues[0] = Status.METADATA.convert(data);
-			statues[0].put(Status.TYPE, Status.COMMENT);
-			statues[0].put(Status.TO_WHICH_TWEET, id);
+			ContentValues comment = new ContentValues();
+			comment = Status.METADATA.convert(data);
+			comment.put(Status.TYPE, Status.COMMENT);
+			comment.put(Status.TO_WHICH_TWEET, id);
 
-			statues[1] = Status.METADATA.convert(data.optJSONObject(Status.SINGLE));
-			context.getContentResolver().bulkInsert(CatnutProvider.parse(Status.MULTIPLE), statues);
+			context.getContentResolver().insert(CatnutProvider.parse(Status.MULTIPLE), comment);
+			String increment = CatnutUtils.increment(true, Status.TABLE, Status.comments_count, id);
+			context.getContentResolver().update(CatnutProvider.parse(Status.MULTIPLE), null, increment, null);
 		}
 	}
 
@@ -237,6 +240,12 @@ public class StatusProcessor {
 			ContentValues user = User.METADATA.convert(data.optJSONObject(User.SINGLE));
 			context.getContentResolver().insert(CatnutProvider.parse(Status.MULTIPLE), status);
 			context.getContentResolver().insert(CatnutProvider.parse(User.MULTIPLE), user);
+			// 如果是转发微博的话，自增一下
+			if (type == Status.RETWEET) {
+				long id = data.optJSONObject(Status.retweeted_status).optLong(Constants.ID);
+				String increment = CatnutUtils.increment(true, Status.TABLE, Status.reposts_count, id);
+				context.getContentResolver().update(CatnutProvider.parse(Status.MULTIPLE), null, increment, null);
+			}
 		}
 	}
 }

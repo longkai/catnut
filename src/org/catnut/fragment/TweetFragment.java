@@ -10,12 +10,17 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
-import android.content.CursorLoader;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.BaseColumns;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
@@ -55,6 +60,7 @@ import org.catnut.ui.SingleFragmentActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
@@ -66,8 +72,10 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  *
  * @author longkai
  */
-public class TweetFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
-		OnRefreshListener, AbsListView.OnScrollListener, AdapterView.OnItemClickListener, TextWatcher, OnFragmentBackPressedListener, PopupMenu.OnMenuItemClickListener {
+public class TweetFragment extends Fragment implements
+		TextWatcher, OnFragmentBackPressedListener, PopupMenu.OnMenuItemClickListener,
+		LoaderManager.LoaderCallbacks<Cursor>, OnRefreshListener, AdapterView.OnItemClickListener,
+		AbsListView.OnScrollListener {
 
 	private static final String TAG = "TweetFragment";
 	private static final String RETWEET_INDICATOR = ">"; // 标记转发
@@ -75,8 +83,9 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	private static final int REPLY = 1;
 	private static final int RETWEET = 2;
 
+	private static final int MAX_SHOW_TOAST_TIME = 2;
 
-	private static final int BATCH_SIZE = 50;
+	private Handler mHandler = new Handler();
 
 	/** 回复待检索的列 */
 	private static final String[] PROJECTION = new String[]{
@@ -92,12 +101,11 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	private RequestQueue mRequestQueue;
 	private TweetImageSpan mImageSpan;
-
+	private SharedPreferences mPreferences;
+	private ConnectivityManager mConnectivityManager;
 	private PullToRefreshLayout mPullToRefreshLayout;
-	private int mCurrentPage = -1;
-	private int mTotalSize = 0;
-	private long mMaxId = 0; // 加载更多使用
-	private ProgressBar mLoadMore;
+
+	private String mSelection;
 
 	private ListView mListView;
 	private CommentsAdapter mAdapter;
@@ -109,12 +117,17 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	// tweet id
 	private long mId;
+	// 共有多少条评论
+	private int mTotal; // 注意，这个是时时更新的，很可能出现这样的情况：我已经滑倒低了，但是此时又有新的评论，那么，total增加了，但是我们真的已经到底了...所以还需要另一个变量来控制
+	private int mLastTotalCount; // 两次一样表示，完了...
 	// 是否收藏这条微博
 	private boolean mFavorited = false;
 	// 回复那个评论id
 	private long mReplyTo = 0L;
 	// 转发选项
 	private int mRetweetOption = 0;
+	// 提示没有更多了的次数，
+	private int mShowToastTimes = 0;
 
 	// widgets
 	private View mTweetLayout;
@@ -134,24 +147,13 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	private ShareActionProvider mShareActionProvider;
 	private Intent mShareIntent;
 
-	private Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
-		@Override
-		public void onResponse(JSONObject response) {
-			mTotalSize = response.optInt(Status.total_number);
-			if (mTotalSize == 0) {
-				mListView.removeFooterView(mLoadMore);
-			}
-			mCurrentPage++;
-			getLoaderManager().restartLoader(0, null, TweetFragment.this);
-			mPullToRefreshLayout.setRefreshComplete();
-		}
-	};
-
-	private Response.ErrorListener errorListener = new Response.ErrorListener() {
+	protected Response.ErrorListener errorListener = new Response.ErrorListener() {
 		@Override
 		public void onErrorResponse(VolleyError error) {
+			Log.d(TAG, "error loading data from cloud!", error);
+			WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
+			Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_LONG).show();
 			mPullToRefreshLayout.setRefreshComplete();
-			Toast.makeText(getActivity(), WeiboAPIError.fromVolleyError(error).error, Toast.LENGTH_SHORT).show();
 		}
 	};
 
@@ -163,25 +165,182 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 		return fragment;
 	}
 
+	public int getFetchSize() {
+		return CatnutUtils.resolveListPrefInt(
+				mPreferences,
+				getString(R.string.pref_default_fetch_size),
+				getResources().getInteger(R.integer.default_fetch_size)
+		);
+	}
+
+	protected void refresh() {
+		// 检测一下是否网络已经连接，否则从本地加载
+		if (!isNetworkAvailable()) {
+			Toast.makeText(getActivity(), getString(R.string.network_unavailable), Toast.LENGTH_SHORT).show();
+			initFromLocal();
+			return;
+		}
+		// refresh!
+		final int size = getFetchSize();
+		(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// 这里需要注意一点，我们不需要最新的那条，而是需要(最新那条-数目)，否则你拿最新那条去刷新，球都没有返回Orz...
+				String query = CatnutUtils.buildQuery(
+						new String[]{BaseColumns._ID},
+						mSelection,
+						Status.TABLE,
+						null,
+						BaseColumns._ID + " desc",
+						size + ", 1" // limit x, y
+				);
+				Cursor cursor = getActivity().getContentResolver().query(
+						CatnutProvider.parse(Status.MULTIPLE),
+						null, query, null, null
+				);
+				// the cursor never null?
+				final long since_id;
+				if (cursor.moveToNext()) {
+					since_id = cursor.getLong(0);
+				} else {
+					since_id = 0;
+				}
+				cursor.close();
+				final CatnutAPI api = CommentsAPI.show(mId, since_id, 0, size, 0, 0);
+				// refresh...
+				mHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						mRequestQueue.add(new CatnutRequest(
+								getActivity(),
+								api,
+								new StatusProcessor.CommentTweetsProcessor(mId),
+								new Response.Listener<JSONObject>() {
+									@Override
+									public void onResponse(JSONObject response) {
+										Log.d(TAG, "refresh done...");
+										mTotal = response.optInt(Status.total_number);
+										// 重新置换数据
+										mLastTotalCount = 0;
+										mShowToastTimes = 0;
+										JSONArray jsonArray = response.optJSONArray(Status.COMMENTS);
+										int newSize = jsonArray.length(); // 刷新，一切从新开始...
+										Bundle args = new Bundle();
+										args.putInt(TAG, newSize);
+										getLoaderManager().restartLoader(0, args, TweetFragment.this);
+									}
+								},
+								errorListener
+						)).setTag(TAG);
+					}
+				});
+			}
+		})).start();
+	}
+
+	private void initFromLocal() {
+		Bundle args = new Bundle();
+		args.putInt(TAG, getFetchSize());
+		getLoaderManager().initLoader(0, args, this);
+		new Thread(updateLocalCount).start();
+	}
+
+	private Runnable updateLocalCount = new Runnable() {
+		@Override
+		public void run() {
+			String query = CatnutUtils.buildQuery(
+					new String[]{"count(0)"},
+					mSelection,
+					Status.TABLE,
+					null, null, null
+			);
+			Cursor cursor = getActivity().getContentResolver().query(
+					CatnutProvider.parse(Status.MULTIPLE),
+					null,
+					query,
+					null, null
+			);
+			if (cursor.moveToNext()) {
+				mTotal = cursor.getInt(0);
+			}
+			cursor.close();
+		}
+	};
+
+	protected void loadMore(long max_id) {
+		// 加载更多，判断一下是从本地加载还是从远程加载
+		// 根据(偏好||是否有网络连接)
+		boolean fromCloud = mPreferences.getBoolean(
+				getString(R.string.pref_keep_latest),
+				getResources().getBoolean(R.bool.pref_load_more_from_cloud)
+		);
+		if (fromCloud && isNetworkAvailable()) {
+			// 如果用户要求最新的数据并且网络连接ok，那么从网络上加载数据
+			loadFromCloud(max_id);
+		} else {
+			// 从本地拿
+			loadFromLocal();
+			// 顺便更新一下本地的数据总数
+			new Thread(updateLocalCount).start();
+		}
+	}
+
+	private void loadFromLocal() {
+		Bundle args = new Bundle();
+		mLastTotalCount = mAdapter.getCount(); // 暂存一下
+		args.putInt(TAG, mAdapter.getCount() + getFetchSize());
+		getLoaderManager().restartLoader(0, args, this);
+		mPullToRefreshLayout.setRefreshing(true);
+	}
+
+	private void loadFromCloud(long max_id) {
+		mPullToRefreshLayout.setRefreshing(true);
+		CatnutAPI api = CommentsAPI.show(mId, 0, max_id, getFetchSize(), 0, 0);
+		mRequestQueue.add(new CatnutRequest(
+				getActivity(),
+				api,
+				new StatusProcessor.CommentTweetsProcessor(mId),
+				new Response.Listener<JSONObject>() {
+					@Override
+					public void onResponse(JSONObject response) {
+						Log.d(TAG, "load more from cloud done...");
+						mTotal = response.optInt(Status.total_number);
+						mLastTotalCount = mAdapter.getCount();
+						int newSize = response.optJSONArray(Status.COMMENTS).length() + mAdapter.getCount();
+						Bundle args = new Bundle();
+						args.putInt(TAG, newSize);
+						getLoaderManager().restartLoader(0, args, TweetFragment.this);
+					}
+				},
+				errorListener
+		)).setTag(TAG);
+	}
+
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		CatnutApp app = CatnutApp.getTingtingApp();
-		mRequestQueue = app.getRequestQueue();
-		mImageSpan = new TweetImageSpan(activity);
 		mId = getArguments().getLong(Constants.ID);
+		mSelection = new StringBuilder(Status.TYPE)
+				.append("=").append(Status.COMMENT)
+				.append(" and ").append(Status.TO_WHICH_TWEET)
+				.append("=").append(mId).toString();
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
+		mConnectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+		CatnutApp app = CatnutApp.getTingtingApp();
+		mRequestQueue = app.getRequestQueue();
+		mPreferences = app.getPreferences();
+		mImageSpan = new TweetImageSpan(getActivity());
 		mAdapter = new CommentsAdapter(getActivity());
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.comments, container, false);
+		View view = inflater.inflate(R.layout.comments, null, false);
 		mListView = (ListView) view.findViewById(android.R.id.list);
 		mSendText = (EditText) view.findViewById(R.id.action_reply);
 		mSend = (ImageView) view.findViewById(R.id.action_send);
@@ -207,6 +366,13 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
+		ViewGroup viewGroup = (ViewGroup) view;
+		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+		ActionBarPullToRefresh.from(getActivity())
+				.insertLayoutInto(viewGroup)
+				.theseChildrenArePullable(android.R.id.list, android.R.id.empty)
+				.listener(this)
+				.setup(mPullToRefreshLayout);
 		mSendText.addTextChangedListener(this);
 		mSendText.setTextColor(getResources().getColor(android.R.color.primary_text_light));
 		mSend.setOnClickListener(new View.OnClickListener() {
@@ -224,19 +390,20 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 				mPopupMenu.show();
 			}
 		});
-		mLoadMore = new ProgressBar(getActivity());
-		// set actionbar refresh facility
-		ViewGroup viewGroup = (ViewGroup) view;
-		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
-		ActionBarPullToRefresh.from(getActivity())
-				.insertLayoutInto(viewGroup)
-				.theseChildrenArePullable(android.R.id.list, android.R.id.empty)
-				.listener(this)
-				.setup(mPullToRefreshLayout);
-		// load comment from cloud
+		// 载入评论
 		mPullToRefreshLayout.setRefreshing(true);
-		loadComments(false); // first time call, no need to reinitialize the metadata
-		// load from local...
+		if (mPreferences.getBoolean(getString(R.string.pref_keep_latest), true)) {
+			refresh();
+		} else {
+			initFromLocal();
+		}
+		// 载入微博
+		loadTweet();
+	}
+
+	// 载入那条微博
+	private void loadTweet() {
+		// load tweet from local...
 		String query = CatnutUtils.buildQuery(
 				new String[]{
 						Status.uid,
@@ -370,62 +537,33 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		mListView.addHeaderView(mTweetLayout);
-		mListView.addFooterView(mLoadMore);
-		mListView.setOnScrollListener(this);
 		mListView.setAdapter(mAdapter);
 		mListView.setOnItemClickListener(this);
-		getLoaderManager().initLoader(0, null, this);
-	}
-
-	private void loadComments(boolean refresh) {
-		if (refresh) {
-			// 重置
-			mMaxId = 0;
-			mTotalSize = 0;
-			mCurrentPage = -1;
-			mAdapter.swapCursor(null);
-			mAdapter = new CommentsAdapter(getActivity());
-			mListView.setAdapter(mAdapter);
-			getLoaderManager().restartLoader(0, null, this);
-		}
-		mRequestQueue.add(new CatnutRequest(
-				getActivity(),
-				refresh
-						? CommentsAPI.show(mId, 0, 0, BATCH_SIZE, 0, 0)
-						: CommentsAPI.show(mId, 0, mMaxId, BATCH_SIZE, 0, 0),
-				new StatusProcessor.CommentTweetsProcessor(mId),
-				listener,
-				errorListener
-		)).setTag(TAG);
+		mListView.setOnScrollListener(this);
 	}
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		String limit = String.valueOf(BATCH_SIZE * (mCurrentPage + 1));
-		CursorLoader cursorLoader = CatnutUtils.getCursorLoader(
+		int limit = args.getInt(TAG, getFetchSize());
+		return CatnutUtils.getCursorLoader(
 				getActivity(),
 				CatnutProvider.parse(Status.MULTIPLE),
 				PROJECTION,
-				Status.TYPE + "=" + Status.COMMENT + " and " + Status.TO_WHICH_TWEET + "=" + mId,
+				mSelection,
 				null,
 				Status.TABLE + " as s",
 				"inner join " + User.TABLE + " as u on s.uid=u._id",
-				"s._id desc",
-				limit
+				"s." + BaseColumns._ID + " desc",
+				String.valueOf(limit)
 		);
-		return cursorLoader;
 	}
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		mAdapter.swapCursor(data);
-		// 标记当前评论尾部的id
-		int count = mAdapter.getCount();
-		mMaxId = mAdapter.getItemId(count - 1);
-		// 移除加载更多
-		if (mTotalSize != 0 && count == mTotalSize) {
-			mListView.removeFooterView(mLoadMore);
+		if (mPullToRefreshLayout.isRefreshing()) {
+			mPullToRefreshLayout.setRefreshComplete();
 		}
+		mAdapter.swapCursor(data);
 	}
 
 	@Override
@@ -435,19 +573,35 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 
 	@Override
 	public void onRefreshStarted(View view) {
-		loadComments(true);
+		refresh();
 	}
 
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
-		// todo: shall we need pref?
-		if (mLoadMore.isShown() && !mPullToRefreshLayout.isRefreshing()) {
-			loadComments(false);
+		boolean canLoading = SCROLL_STATE_IDLE == scrollState // 停住了，不滑动了
+				&& (mListView.getLastVisiblePosition() - 1) == (mAdapter.getCount() - 1) // 到底了，这里有一个header！
+				&& !mPullToRefreshLayout.isRefreshing(); // 当前没有处在刷新状态
+//				&& mAdapter.getCount() > 0; // 不是一开始
+		if (canLoading) {
+			// 可以加载更多，但是我们需要判断一下是否加载完了，没有更多了
+			if (mAdapter.getCount() >= mTotal || mLastTotalCount == mAdapter.getCount()) {
+				Log.d(TAG, "load all done...");
+				if (mShowToastTimes < MAX_SHOW_TOAST_TIME) {
+					Toast.makeText(getActivity(), R.string.no_more, Toast.LENGTH_SHORT).show();
+					mShowToastTimes++;
+				}
+			} else {
+				Log.d(TAG, "load...");
+				loadMore(mAdapter.getItemId(mAdapter.getCount() - 1));
+			}
+		} else {
+			Log.d(TAG, "cannot load more!");
 		}
 	}
 
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+		// no-op
 	}
 
 	@Override
@@ -626,14 +780,13 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	// 发送评论
 	private void send() {
 		// 简单的通过hint来判断是啥类型
-		int tmp;
+		final int type;
 		String hint = mSendText.getHint().toString();
 		if (hint.startsWith(RETWEET_INDICATOR)) {
-			tmp = RETWEET;
+			type = RETWEET;
 		} else {
-			tmp = hint.contains("@") ? REPLY : COMMENT;
+			type = hint.contains("@") ? REPLY : COMMENT;
 		}
-		final int type = tmp; // awful...
 		if (type != RETWEET) { // 转发允许啥都不写...
 			if (!CatnutUtils.hasLength(mSendText)) {
 				Toast.makeText(getActivity(), getString(R.string.require_not_empty), Toast.LENGTH_SHORT).show();
@@ -663,6 +816,7 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {
+						mTotal++;
 						String msg;
 						switch (type) {
 							default:
@@ -688,7 +842,13 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 						} else {
 							which.setText(String.valueOf(Integer.parseInt(before) + 1));
 						}
-						// list会自动更新，无需手动！
+						// list会自动更新，但是由于limit的限制，尾部的一条评论会从list中去掉...
+						int pos = mListView.getFirstVisiblePosition();
+						mLastTotalCount = mAdapter.getCount();
+						Bundle args = new Bundle();
+						args.putInt(TAG, mLastTotalCount + 1);
+						getLoaderManager().restartLoader(0, args, TweetFragment.this);
+						mListView.setSelection(pos);
 					}
 				},
 				sendErrorListener
@@ -761,5 +921,11 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 			item.setChecked(true);
 		}
 		return true;
+	}
+
+	public boolean isNetworkAvailable() {
+		NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
+		return activeNetwork != null &&
+				activeNetwork.isConnectedOrConnecting();
 	}
 }

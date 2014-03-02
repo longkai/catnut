@@ -13,6 +13,7 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.BaseColumns;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -277,6 +278,24 @@ public class CatnutUtils {
 			sb.append(" WHERE ").append(where);
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * 对某个字段自增或者自减法，只能通过_id=?来唯一确定哦
+	 * @param increment
+	 * @param table
+	 * @param column
+	 * @param _id
+	 * @return update sql
+	 */
+	public static String increment(boolean increment, String table, String column, long _id) {
+		return new StringBuilder("UPDATE ")
+				.append(table).append(" ").append(" SET ")
+				.append(column).append("=").append(column)
+				.append(increment ? "+1" : "-1")
+				.append(" WHERE ").append(BaseColumns._ID)
+				.append("=").append(_id)
+				.toString();
 	}
 
 	private static String reflectString(Object object) {

@@ -147,6 +147,7 @@ public class MyRelationshipFragment extends TimelineFragment {
 						mTotal = response.optInt(TOTAL_NUMBER);
 						mNextCursor = response.optInt(NEXT_CURSOR);
 						// 重新置换数据
+						mLastTotalNumber = 0;
 						JSONArray jsonArray = response.optJSONArray(User.MULTIPLE);
 						int newSize = jsonArray.length(); // 刷新，一切从新开始...
 						Bundle args = new Bundle();
