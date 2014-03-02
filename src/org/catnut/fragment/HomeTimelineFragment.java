@@ -354,23 +354,6 @@ public class HomeTimelineFragment extends TimelineFragment {
 	}
 
 	@Override
-	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-//		if (firstVisibleItem + visibleItemCount >= totalItemCount) {
-//			if (mSearchView != null && mSearchView.isSearching()) {
-//				Log.d(TAG, "searching... no load need...");
-//			} else if (mAdapter.getCount() >= mTotal && totalItemCount > 0) { // 防止一开始还没加载就toast...
-//				Log.d(TAG, "load all!");
-//				super.loadAllDone();
-//			} else if (!mPullToRefreshLayout.isRefreshing() && totalItemCount > visibleItemCount) {
-//				Log.d(TAG, mListView.getLastVisiblePosition() + ", total: " + (mAdapter.getCount() - 1));
-//				loadMore(mAdapter.getItemId(mAdapter.getCount() - 1)); // 这里需要注意是否有header或者footer!
-//			} else {
-//				Log.d(TAG, "already loading...");
-//			}
-//		}
-	}
-
-	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 		if (isAdded()) {
 			if (key.equals(getString(R.string.pref_tweet_font_size))

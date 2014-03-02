@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -79,6 +80,8 @@ public abstract class TimelineFragment extends Fragment implements
 	protected VividSearchView mSearchView;
 	// 当前搜索关键字
 	protected String mCurFilter;
+
+	protected CursorAdapter mAdapter;
 
 	// empty text view if the adapter is empty
 	private TextView mEmptyText;
@@ -179,6 +182,11 @@ public abstract class TimelineFragment extends Fragment implements
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		mSwipeDismissListViewTouchListener.setEnabled(scrollState != AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
+	}
+
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+		// no-op
 	}
 
 	@Override

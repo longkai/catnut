@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
@@ -35,7 +34,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
+ * 当前登录用户的好友或者关注列表
  *
+ * @author longkai
  */
 public class MyRelationshipFragment extends TimelineFragment {
 
@@ -54,8 +55,6 @@ public class MyRelationshipFragment extends TimelineFragment {
 			User.follow_me
 	};
 
-	private Handler mHandler = new Handler();
-
 	private RequestQueue mRequestQueue;
 
 	private UsersAdapter mAdapter;
@@ -65,8 +64,10 @@ public class MyRelationshipFragment extends TimelineFragment {
 
 	private String mSelection;
 	private int mTotal;
-	private int mNextCusor;
+	private int mNextCursor;
 	private long mUid;
+	// 上一次的列表总数，两次一样就表示load完了
+	private int mLastTotalNumber;
 
 	public static MyRelationshipFragment getFragment(boolean following) {
 		Bundle args = new Bundle();
@@ -143,7 +144,7 @@ public class MyRelationshipFragment extends TimelineFragment {
 					public void onResponse(JSONObject response) {
 						Log.d(TAG, "refresh done...");
 						mTotal = response.optInt(TOTAL_NUMBER);
-						mNextCusor = response.optInt(NEXT_CURSOR);
+						mNextCursor = response.optInt(NEXT_CURSOR);
 						// 重新置换数据
 						JSONArray jsonArray = response.optJSONArray(User.MULTIPLE);
 						int newSize = jsonArray.length(); // 刷新，一切从新开始...
@@ -211,11 +212,12 @@ public class MyRelationshipFragment extends TimelineFragment {
 		mPullToRefreshLayout.setRefreshing(true);
 	}
 
+	// max_id 无用
 	private void loadFromCloud(long max_id) {
 		mPullToRefreshLayout.setRefreshing(true);
 		CatnutAPI api = mIsFollowing
-				? FriendshipsAPI.friends(mUid, getFetchSize(), mNextCusor, 1)
-				: FriendshipsAPI.followers(mUid, getFetchSize(), mNextCusor, 1);
+				? FriendshipsAPI.friends(mUid, getFetchSize(), mNextCursor, 1)
+				: FriendshipsAPI.followers(mUid, getFetchSize(), mNextCursor, 1);
 		mRequestQueue.add(new CatnutRequest(
 				getActivity(),
 				api,
@@ -225,7 +227,8 @@ public class MyRelationshipFragment extends TimelineFragment {
 					public void onResponse(JSONObject response) {
 						Log.d(TAG, "load more from cloud done...");
 						mTotal = response.optInt(TOTAL_NUMBER);
-						mNextCusor = response.optInt(NEXT_CURSOR);
+						mNextCursor = response.optInt(NEXT_CURSOR);
+						mLastTotalNumber = mAdapter.getCount();
 						int newSize = response.optJSONArray(User.MULTIPLE).length() + mAdapter.getCount();
 						Bundle args = new Bundle();
 						args.putInt(TAG, newSize);
@@ -308,8 +311,9 @@ public class MyRelationshipFragment extends TimelineFragment {
 				&& mAdapter.getCount() > 0; // 不是一开始
 		if (canLoading) {
 			// 可以加载更多，但是我们需要判断一下是否加载完了，没有更多了
-			if (mAdapter.getCount() >= mTotal || mNextCusor == 0) {
-				Log.d(TAG, "load all done...");
+			// 返回的数据可能会比实际少，因为新浪会过滤掉一些用户...
+			if (mAdapter.getCount() >= mTotal || mLastTotalNumber == mAdapter.getCount()) {
+				Log.d(TAG, "load all done..." + mAdapter.getCount());
 				super.loadAllDone();
 			} else {
 				Log.d(TAG, "load...");
@@ -318,22 +322,5 @@ public class MyRelationshipFragment extends TimelineFragment {
 		} else {
 			Log.d(TAG, "cannot load more!");
 		}
-	}
-
-	@Override
-	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-//		if (firstVisibleItem + visibleItemCount >= totalItemCount) {
-//			if (mSearchView != null && mSearchView.isSearching()) {
-//				Log.d(TAG, "searching... no load need...");
-//			} else if (mAdapter.getCount() > 0 && mNextCusor == 0) { // 防止一开始还没加载就toast...
-//				Log.d(TAG, "load all!");
-//				super.loadAllDone();
-//			} else if (!mPullToRefreshLayout.isRefreshing() && totalItemCount > visibleItemCount) {
-//				Log.d(TAG, "loading....");
-//				loadMore(mAdapter.getItemId(mAdapter.getCount() - 1)); // 这里需要注意是否有header或者footer!
-//			} else {
-//				Log.d(TAG, "already loading...");
-//			}
-//		}
 	}
 }
