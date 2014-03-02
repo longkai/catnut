@@ -8,7 +8,6 @@ package org.catnut.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,88 +21,83 @@ import android.widget.Toast;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import org.catnut.R;
-import org.catnut.adapter.TweetAdapter;
-import org.catnut.api.TweetAPI;
+import org.catnut.adapter.UsersAdapter;
+import org.catnut.api.FriendshipsAPI;
 import org.catnut.core.CatnutAPI;
 import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
-import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
-import org.catnut.processor.StatusProcessor;
-import org.catnut.ui.TweetActivity;
+import org.catnut.processor.UserProcessor;
+import org.catnut.ui.ProfileActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- * 主页时间线
  *
- * @author longkai
  */
-public class HomeTimelineFragment extends TimelineFragment {
+public class MyRelationshipFragment extends TimelineFragment {
 
-	public static final String TAG = "HomeTimelineFragment";
+	private static final String TAG = "MyRelationshipFragment";
+
+	private static final String NEXT_CURSOR = "next_cursor";
 
 	private static final String[] PROJECTION = new String[]{
-			"s._id",
-			Status.uid,
-			Status.columnText,
-			Status.thumbnail_pic,
-			Status.bmiddle_pic,
-			Status.comments_count,
-			Status.reposts_count,
-			Status.attitudes_count,
-			Status.source,
-			"s." + Status.created_at,
+			BaseColumns._ID,
 			User.screen_name,
 			User.profile_image_url,
-			User.remark,
-			Status.favorited,
-			Status.retweeted_status
+			User.verified,
+			User.location,
+			User.description,
+			User.following,
+			User.follow_me
 	};
 
 	private Handler mHandler = new Handler();
 
-	private TweetAdapter mAdapter;
 	private RequestQueue mRequestQueue;
+
+	private UsersAdapter mAdapter;
+
+	// 是否是我关注的用户
+	private boolean mIsFollowing = false;
 
 	private String mSelection;
 	private int mTotal;
+	private int mNextCusor;
+	private long mUid;
 
-	public static HomeTimelineFragment getFragment() {
-		return new HomeTimelineFragment();
+	public static MyRelationshipFragment getFragment(boolean following) {
+		Bundle args = new Bundle();
+		args.putBoolean(TAG, following);
+		MyRelationshipFragment fragment = new MyRelationshipFragment();
+		fragment.setArguments(args);
+		return fragment;
 	}
 
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		mSelection = new StringBuilder(Status.TYPE)
-				.append("=").append(Status.HOME).toString();
+		mIsFollowing = getArguments().getBoolean(TAG);
+		mRequestQueue = mApp.getRequestQueue();
+		mSelection = (mIsFollowing ? User.following : User.follow_me) + "=1";
+		mUid = mApp.getAccessToken().uid;
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mRequestQueue = mApp.getRequestQueue();
-		mAdapter = new TweetAdapter(getActivity(), null);
+		mAdapter = new UsersAdapter(getActivity());
 	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		// refresh it!
+		// refresh it!
 		mPullToRefreshLayout.setRefreshing(true);
-		String key = getString(R.string.pref_first_run);
-		boolean firstRun = mPreferences.getBoolean(key, true);
-		if (firstRun) {
-			refresh();
-			mPreferences.edit().putBoolean(key, false).commit();
-		} else if (mPreferences.getBoolean(getString(R.string.pref_keep_latest), true)) {
-			refresh();
-		} else {
-			initFromLocal();
-		}
+		refresh();
 	}
 
 	@Override
@@ -115,20 +109,18 @@ public class HomeTimelineFragment extends TimelineFragment {
 	@Override
 	public void onStart() {
 		super.onStart();
-		getActivity().getActionBar().setTitle(getString(R.string.home_timeline));
-	}
-
-	@Override
-	public void onStop() {
-		super.onStop();
-		mRequestQueue.cancelAll(TAG);
+		getActivity().getActionBar().setTitle(
+				getString(mIsFollowing ? R.string.my_followings_title : R.string.follow_me_title)
+		);
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		Intent intent = new Intent(getActivity(), TweetActivity.class);
+		Cursor cursor = (Cursor) mAdapter.getItem(position);
+		Intent intent = new Intent(getActivity(), ProfileActivity.class);
+		intent.putExtra(User.screen_name, cursor.getString(cursor.getColumnIndex(User.screen_name)));
 		intent.putExtra(Constants.ID, id);
-		startActivity(intent);
+		getActivity().startActivity(intent);
 	}
 
 	@Override
@@ -140,60 +132,58 @@ public class HomeTimelineFragment extends TimelineFragment {
 			return;
 		}
 		// refresh!
-		final int size = getFetchSize();
-		(new Thread(new Runnable() {
-			@Override
-			public void run() {
-				// 这里需要注意一点，我们不需要最新的那条，而是需要(最新那条-数目)，否则你拿最新那条去刷新，球都没有返回Orz...
-				String query = CatnutUtils.buildQuery(
-						new String[]{BaseColumns._ID},
-						mSelection,
-						Status.TABLE,
-						null,
-						BaseColumns._ID + " desc",
-						size + ", 1" // limit x, y
-				);
-				Cursor cursor = getActivity().getContentResolver().query(
-						CatnutProvider.parse(Status.MULTIPLE),
-						null, query, null, null
-				);
-				// the cursor never null?
-				final long since_id;
-				if (cursor.moveToNext()) {
-					since_id = cursor.getLong(0);
-				} else {
-					since_id = 0;
-				}
-				cursor.close();
-				final CatnutAPI api = TweetAPI.homeTimeline(since_id, 0, size, 0, 0, 0, 0);
-				// refresh...
-				mHandler.post(new Runnable() {
+		CatnutAPI api = mIsFollowing ? FriendshipsAPI.friends(mUid, getFetchSize(), 0, 1)
+				: FriendshipsAPI.followers(mUid, getFetchSize(), 0, 1);
+		mRequestQueue.add(new CatnutRequest(
+				getActivity(),
+				api,
+				new UserProcessor.UsersProcessor(),
+				new Response.Listener<JSONObject>() {
 					@Override
-					public void run() {
-						mRequestQueue.add(new CatnutRequest(
-								getActivity(),
-								api,
-								new StatusProcessor.TimelineProcessor(Status.HOME, true),
-								new Response.Listener<JSONObject>() {
-									@Override
-									public void onResponse(JSONObject response) {
-										Log.d(TAG, "refresh done...");
-										mTotal = response.optInt(TOTAL_NUMBER);
-										// 重新置换数据
-										JSONArray jsonArray = response.optJSONArray(Status.MULTIPLE);
-										int newSize = jsonArray.length(); // 刷新，一切从新开始...
-										Bundle args = new Bundle();
-										args.putInt(TAG, newSize);
-										getLoaderManager().restartLoader(0, args, HomeTimelineFragment.this);
-									}
-								},
-								errorListener
-						)).setTag(TAG);
+					public void onResponse(JSONObject response) {
+						Log.d(TAG, "refresh done...");
+						mTotal = response.optInt(TOTAL_NUMBER);
+						mNextCusor = response.optInt(NEXT_CURSOR);
+						// 重新置换数据
+						JSONArray jsonArray = response.optJSONArray(User.MULTIPLE);
+						int newSize = jsonArray.length(); // 刷新，一切从新开始...
+						Bundle args = new Bundle();
+						args.putInt(TAG, newSize);
+						getLoaderManager().restartLoader(0, args, MyRelationshipFragment.this);
 					}
-				});
-			}
-		})).start();
+				},
+				errorListener
+		)).setTag(TAG);
 	}
+
+	private void initFromLocal() {
+		Bundle args = new Bundle();
+		args.putInt(TAG, getFetchSize());
+		getLoaderManager().initLoader(0, args, this);
+		new Thread(updateLocalCount).start();
+	}
+
+	private Runnable updateLocalCount = new Runnable() {
+		@Override
+		public void run() {
+			String query = CatnutUtils.buildQuery(
+					new String[]{"count(0)"},
+					mSelection,
+					User.TABLE,
+					null, null, null
+			);
+			Cursor cursor = getActivity().getContentResolver().query(
+					CatnutProvider.parse(User.MULTIPLE),
+					null,
+					query,
+					null, null
+			);
+			if (cursor.moveToNext()) {
+				mTotal = cursor.getInt(0);
+			}
+			cursor.close();
+		}
+	};
 
 	@Override
 	protected void loadMore(long max_id) {
@@ -214,13 +204,6 @@ public class HomeTimelineFragment extends TimelineFragment {
 		}
 	}
 
-	private void initFromLocal() {
-		Bundle args = new Bundle();
-		args.putInt(TAG, getFetchSize());
-		getLoaderManager().initLoader(0, args, this);
-		new Thread(updateLocalCount).start();
-	}
-
 	private void loadFromLocal() {
 		Bundle args = new Bundle();
 		args.putInt(TAG, mAdapter.getCount() + getFetchSize());
@@ -230,47 +213,28 @@ public class HomeTimelineFragment extends TimelineFragment {
 
 	private void loadFromCloud(long max_id) {
 		mPullToRefreshLayout.setRefreshing(true);
-		CatnutAPI api = TweetAPI.homeTimeline(0, max_id, getFetchSize(), 0, 0, 0, 0);
+		CatnutAPI api = mIsFollowing
+				? FriendshipsAPI.friends(mUid, getFetchSize(), mNextCusor, 1)
+				: FriendshipsAPI.followers(mUid, getFetchSize(), mNextCusor, 1);
 		mRequestQueue.add(new CatnutRequest(
 				getActivity(),
 				api,
-				new StatusProcessor.TimelineProcessor(true),
+				new UserProcessor.UsersProcessor(),
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {
 						Log.d(TAG, "load more from cloud done...");
 						mTotal = response.optInt(TOTAL_NUMBER);
-						int newSize = response.optJSONArray(Status.MULTIPLE).length() + mAdapter.getCount();
+						mNextCusor = response.optInt(NEXT_CURSOR);
+						int newSize = response.optJSONArray(User.MULTIPLE).length() + mAdapter.getCount();
 						Bundle args = new Bundle();
 						args.putInt(TAG, newSize);
-						getLoaderManager().restartLoader(0, args, HomeTimelineFragment.this);
+						getLoaderManager().restartLoader(0, args, MyRelationshipFragment.this);
 					}
 				},
 				errorListener
 		)).setTag(TAG);
 	}
-
-	private Runnable updateLocalCount = new Runnable() {
-		@Override
-		public void run() {
-			String query = CatnutUtils.buildQuery(
-					new String[]{"count(0)"},
-					mSelection,
-					Status.TABLE,
-					null, null, null
-			);
-			Cursor cursor = getActivity().getContentResolver().query(
-					CatnutProvider.parse(Status.MULTIPLE),
-					null,
-					query,
-					null, null
-			);
-			if (cursor.moveToNext()) {
-				mTotal = cursor.getInt(0);
-			}
-			cursor.close();
-		}
-	};
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -279,8 +243,11 @@ public class HomeTimelineFragment extends TimelineFragment {
 		if (search) {
 			if (!TextUtils.isEmpty(mCurFilter)) {
 				selection = new StringBuilder(mSelection)
-						.append(" and ").append(Status.columnText)
-						.append(" like ").append(CatnutUtils.like(mCurFilter))
+						.append(" and (")
+						.append(User.remark).append(" like ").append(CatnutUtils.like(mCurFilter))
+						.append(" or ")
+						.append(User.screen_name).append(" like ").append(CatnutUtils.like(mCurFilter))
+						.append(")")
 						.toString();
 			} else {
 				search = false;
@@ -289,13 +256,13 @@ public class HomeTimelineFragment extends TimelineFragment {
 		int limit = args.getInt(TAG, getFetchSize());
 		return CatnutUtils.getCursorLoader(
 				getActivity(),
-				CatnutProvider.parse(Status.MULTIPLE),
+				CatnutProvider.parse(User.MULTIPLE),
 				PROJECTION,
 				selection,
 				null,
-				Status.TABLE + " as s",
-				"inner join " + User.TABLE + " as u on s.uid=u._id",
-				"s." + BaseColumns._ID + " desc",
+				User.TABLE,
+				null,
+				BaseColumns._ID + " desc",
 				search ? null : String.valueOf(limit)
 		);
 	}
@@ -337,11 +304,11 @@ public class HomeTimelineFragment extends TimelineFragment {
 		boolean canLoading = SCROLL_STATE_IDLE == scrollState // 停住了，不滑动了
 				&& mListView.getLastVisiblePosition() == mAdapter.getCount() - 1 // 到底了
 				&& (mSearchView == null || !mSearchView.isSearching()) // 用户没有打开搜索框
-				&& !mPullToRefreshLayout.isRefreshing(); // 当前没有处在刷新状态
-//				&& mAdapter.getCount() > 0; // 不是一开始
+				&& !mPullToRefreshLayout.isRefreshing() // 当前没有处在刷新状态
+				&& mAdapter.getCount() > 0; // 不是一开始
 		if (canLoading) {
 			// 可以加载更多，但是我们需要判断一下是否加载完了，没有更多了
-			if (mAdapter.getCount() >= mTotal) {
+			if (mAdapter.getCount() >= mTotal || mNextCusor == 0) {
 				Log.d(TAG, "load all done...");
 				super.loadAllDone();
 			} else {
@@ -358,36 +325,15 @@ public class HomeTimelineFragment extends TimelineFragment {
 //		if (firstVisibleItem + visibleItemCount >= totalItemCount) {
 //			if (mSearchView != null && mSearchView.isSearching()) {
 //				Log.d(TAG, "searching... no load need...");
-//			} else if (mAdapter.getCount() >= mTotal && totalItemCount > 0) { // 防止一开始还没加载就toast...
+//			} else if (mAdapter.getCount() > 0 && mNextCusor == 0) { // 防止一开始还没加载就toast...
 //				Log.d(TAG, "load all!");
 //				super.loadAllDone();
 //			} else if (!mPullToRefreshLayout.isRefreshing() && totalItemCount > visibleItemCount) {
-//				Log.d(TAG, mListView.getLastVisiblePosition() + ", total: " + (mAdapter.getCount() - 1));
+//				Log.d(TAG, "loading....");
 //				loadMore(mAdapter.getItemId(mAdapter.getCount() - 1)); // 这里需要注意是否有header或者footer!
 //			} else {
 //				Log.d(TAG, "already loading...");
 //			}
 //		}
-	}
-
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		if (isAdded()) {
-			if (key.equals(getString(R.string.pref_tweet_font_size))
-					|| key.equals(getString(R.string.pref_customize_tweet_font))
-					|| key.equals(getString(R.string.pref_thumbs_options))) {
-				Log.d(TAG, "pref change, the home timeline fragment needs update!");
-				// 应用新的偏好
-				int size = mAdapter.getCount();
-				int firstVisiblePosition = mListView.getFirstVisiblePosition();
-				mAdapter.changeCursor(null);
-				mAdapter = new TweetAdapter(getActivity(), null);
-				mListView.setAdapter(mAdapter);
-				Bundle args = new Bundle();
-				args.putInt(TAG, size);
-				getLoaderManager().restartLoader(0, args, this);
-				mListView.setSelection(firstVisiblePosition);
-			}
-		}
 	}
 }

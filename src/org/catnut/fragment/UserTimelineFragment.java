@@ -363,24 +363,40 @@ public class UserTimelineFragment extends TimelineFragment {
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		super.onScrollStateChanged(view, scrollState);
-		Log.d(TAG, scrollState + "");
+		boolean canLoading = SCROLL_STATE_IDLE == scrollState // 停住了，不滑动了
+				&& mListView.getLastVisiblePosition() == mAdapter.getCount() - 1 // 到底了
+				&& (mSearchView == null || !mSearchView.isSearching()) // 用户没有打开搜索框
+				&& !mPullToRefreshLayout.isRefreshing(); // 当前没有处在刷新状态
+//				&& mAdapter.getCount() > 0; // 不是一开始
+		if (canLoading) {
+			// 可以加载更多，但是我们需要判断一下是否加载完了，没有更多了
+			if (mAdapter.getCount() >= mTotal) {
+				Log.d(TAG, "load all done...");
+				super.loadAllDone();
+			} else {
+				Log.d(TAG, "load...");
+				loadMore(mAdapter.getItemId(mAdapter.getCount() - 1));
+			}
+		} else {
+			Log.d(TAG, "cannot load more!");
+		}
 	}
 
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-		if (firstVisibleItem + visibleItemCount >= totalItemCount) {
-			if (mSearchView != null && mSearchView.isSearching()) {
-				Log.d(TAG, "searching... no load need...");
-			} else if (mAdapter.getCount() >= mTotal && totalItemCount > visibleItemCount) { // 防止一开始还没加载就toast...
-				Log.d(TAG, "load all!");
-				super.loadAllDone();
-			} else if (!mPullToRefreshLayout.isRefreshing() && totalItemCount > visibleItemCount) {
-				Log.d(TAG, "loading....");
-				loadMore(mAdapter.getItemId(mAdapter.getCount() - 1)); // 这里需要注意是否有header或者footer!
-			} else {
-				Log.d(TAG, "already loading...");
-			}
-		}
+//		if (firstVisibleItem + visibleItemCount >= totalItemCount) {
+//			if (mSearchView != null && mSearchView.isSearching()) {
+//				Log.d(TAG, "searching... no load need...");
+//			} else if (mAdapter.getCount() >= mTotal && totalItemCount > visibleItemCount) { // 防止一开始还没加载就toast...
+//				Log.d(TAG, "load all!");
+//				super.loadAllDone();
+//			} else if (!mPullToRefreshLayout.isRefreshing() && totalItemCount > visibleItemCount) {
+//				Log.d(TAG, "loading....");
+//				loadMore(mAdapter.getItemId(mAdapter.getCount() - 1)); // 这里需要注意是否有header或者footer!
+//			} else {
+//				Log.d(TAG, "already loading...");
+//			}
+//		}
 	}
 
 	@Override
