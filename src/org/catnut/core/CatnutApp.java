@@ -38,7 +38,6 @@ public class CatnutApp extends Application implements SharedPreferences.OnShared
 	private static Map<String, String> sAuthHeaders;
 
 	private RequestQueue mRequestQueue;
-	private ImageLoader mImageLoader;
 	private SharedPreferences mPreferences;
 	private AccessToken mAccessToken;
 
@@ -49,7 +48,6 @@ public class CatnutApp extends Application implements SharedPreferences.OnShared
 		mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		mPreferences.registerOnSharedPreferenceChangeListener(this);
 		mRequestQueue = Volley.newRequestQueue(this);
-		mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache(1000)); // 1000个缓存条目
 		checkAccessToken();
 	}
 
@@ -136,15 +134,6 @@ public class CatnutApp extends Application implements SharedPreferences.OnShared
 	 */
 	public RequestQueue getRequestQueue() {
 		return mRequestQueue;
-	}
-
-	/**
-	 * 获取异步图片loader
-	 *
-	 * @return {@link com.android.volley.toolbox.ImageLoader}
-	 */
-	public ImageLoader getImageLoader() {
-		return mImageLoader;
 	}
 
 	/**

@@ -13,9 +13,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.android.volley.toolbox.ImageLoader;
+import com.squareup.picasso.Picasso;
 import org.catnut.R;
-import org.catnut.core.CatnutApp;
 import org.catnut.support.TransientUser;
 
 import java.util.List;
@@ -27,11 +26,8 @@ import java.util.List;
  */
 public class TransientUsersAdapter extends ArrayAdapter<TransientUser> {
 
-	private ImageLoader mImageLoader;
-
 	public TransientUsersAdapter(Context context, List<TransientUser> users) {
 		super(context, R.layout.friend_row, users);
-		mImageLoader = CatnutApp.getTingtingApp().getImageLoader();
 	}
 
 	private static class ViewHolder {
@@ -61,9 +57,13 @@ public class TransientUsersAdapter extends ArrayAdapter<TransientUser> {
 		} else {
 			holder = (ViewHolder) view.getTag();
 		}
+
 		TransientUser user = getItem(position);
-		mImageLoader.get(user.avatarUrl, ImageLoader
-				.getImageListener(holder.avatar, R.drawable.error, R.drawable.error));
+		Picasso.with(getContext())
+				.load(user.avatarUrl)
+				.placeholder(R.drawable.error)
+				.error(R.drawable.error)
+				.into(holder.avatar);
 		holder.screenName.setText(user.screenName);
 		// 是否加V
 		if (user.verified) {

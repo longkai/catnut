@@ -35,8 +35,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.android.volley.toolbox.ImageLoader;
 import com.google.analytics.tracking.android.EasyTracker;
+import com.squareup.picasso.Picasso;
 import org.catnut.R;
 import org.catnut.adapter.DrawerNavAdapter;
 import org.catnut.core.CatnutApp;
@@ -85,7 +85,6 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 
 	private CatnutApp mApp;
 	private EasyTracker mTracker;
-	private ImageLoader mImageLoader;
 	private ActionBar mActionBar;
 
 	private View mDrawer;
@@ -103,7 +102,6 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mApp = CatnutApp.getTingtingApp();
-		mImageLoader = mApp.getImageLoader();
 		mActionBar = getActionBar();
 		mActionBar.setIcon(R.drawable.ic_title_home);
 		setContentView(R.layout.main);
@@ -178,10 +176,11 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 					mApp.getPreferences().edit().putString(User.screen_name, mNick).commit();
 //					mActionBar.setTitle(mNick);
 					mTextNick.setText(mNick);
-					mImageLoader.get(cursor.getString(cursor.getColumnIndex(User.avatar_large)),
-							ImageLoader.getImageListener(
-									mProfileCover, R.drawable.error, R.drawable.error
-							));
+					Picasso.with(MainActivity.this)
+							.load(cursor.getString(cursor.getColumnIndex(User.avatar_large)))
+							.placeholder(R.drawable.error)
+							.error(R.drawable.error)
+							.into(mProfileCover);
 					String description = cursor.getString(cursor.getColumnIndex(User.description));
 					mDescription.setText(TextUtils.isEmpty(description) ? getString(R.string.no_description) : description);
 

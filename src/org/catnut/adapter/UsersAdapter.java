@@ -14,9 +14,8 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.android.volley.toolbox.ImageLoader;
+import com.squareup.picasso.Picasso;
 import org.catnut.R;
-import org.catnut.core.CatnutApp;
 import org.catnut.metadata.User;
 import org.catnut.util.CatnutUtils;
 
@@ -27,15 +26,11 @@ import org.catnut.util.CatnutUtils;
  */
 public class UsersAdapter extends CursorAdapter {
 
-	private ImageLoader mImageLoader;
-
 	public UsersAdapter(Context context) {
 		super(context, null, 0);
-		mImageLoader = CatnutApp.getTingtingApp().getImageLoader();
 	}
 
 	private static class ViewHolder {
-
 		ImageView avatar;
 		int avatarIndex;
 		TextView nick;
@@ -76,8 +71,11 @@ public class UsersAdapter extends CursorAdapter {
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 		ViewHolder holder = (ViewHolder) view.getTag();
-		mImageLoader.get(cursor.getString(holder.avatarIndex),
-			ImageLoader.getImageListener(holder.avatar, R.drawable.error, R.drawable.error));
+		Picasso.with(context)
+				.load(cursor.getString(holder.avatarIndex))
+				.placeholder(R.drawable.error)
+				.error(R.drawable.error)
+				.into(holder.avatar);
 		holder.nick.setText(cursor.getString(holder.nickIndex));
 		holder.location.setText(cursor.getString(holder.locationIndex));
 		if (CatnutUtils.getBoolean(cursor, User.verified)) {

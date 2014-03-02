@@ -17,9 +17,8 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.android.volley.toolbox.ImageLoader;
+import com.squareup.picasso.Picasso;
 import org.catnut.R;
-import org.catnut.core.CatnutApp;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.support.TweetImageSpan;
@@ -29,6 +28,7 @@ import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
 
+
 /**
  * 评论界面列表适配器
  *
@@ -36,12 +36,10 @@ import org.catnut.util.DateTime;
  */
 public class CommentsAdapter extends CursorAdapter {
 
-	private ImageLoader mImageLoader;
 	private TweetImageSpan mImageSpan;
 
 	public CommentsAdapter(Context context) {
 		super(context, null, 0);
-		mImageLoader = CatnutApp.getTingtingApp().getImageLoader();
 		mImageSpan = new TweetImageSpan(context);
 	}
 
@@ -77,8 +75,11 @@ public class CommentsAdapter extends CursorAdapter {
 	@Override
 	public void bindView(View view, final Context context, Cursor cursor) {
 		ViewHolder holder = (ViewHolder) view.getTag();
-		mImageLoader.get(cursor.getString(holder.avatarIndex),
-				ImageLoader.getImageListener(holder.avatar, R.drawable.error, R.drawable.error));
+		Picasso.with(context)
+				.load(cursor.getString(holder.avatarIndex))
+				.placeholder(R.drawable.error)
+				.error(R.drawable.error)
+				.into(holder.avatar);
 		// 点击头像查看该用户主页
 		final long id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 		final String screenName = cursor.getString(holder.screenNameIndex);

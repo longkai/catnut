@@ -47,7 +47,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.squareup.picasso.Picasso;
@@ -338,8 +337,11 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 			@Override
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 				if (cursor.moveToNext()) {
-					mApp.getImageLoader().get(cursor.getString(cursor.getColumnIndex(User.avatar_large)),
-							ImageLoader.getImageListener(mAvatar, R.drawable.error, R.drawable.error));
+					Picasso.with(ComposeTweetActivity.this)
+							.load(cursor.getString(cursor.getColumnIndex(User.avatar_large)))
+							.placeholder(R.drawable.error)
+							.error(R.drawable.error)
+							.into(mAvatar);
 					mScreenName.setText("@" + cursor.getString(cursor.getColumnIndex(User.screen_name)));
 				}
 				cursor.close();

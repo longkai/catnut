@@ -9,16 +9,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.LoaderManager;
-import android.app.ProgressDialog;
 import android.content.AsyncQueryHandler;
-import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
@@ -31,12 +28,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.widget.*;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
 import com.squareup.picasso.Picasso;
 import org.catnut.R;
 import org.catnut.adapter.CommentsAdapter;
@@ -57,7 +52,6 @@ import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.ui.ProfileActivity;
 import org.catnut.ui.SingleFragmentActivity;
-import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
@@ -97,7 +91,6 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	};
 
 	private RequestQueue mRequestQueue;
-	private ImageLoader mImageLoader;
 	private TweetImageSpan mImageSpan;
 
 	private PullToRefreshLayout mPullToRefreshLayout;
@@ -174,7 +167,6 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		CatnutApp app = CatnutApp.getTingtingApp();
-		mImageLoader = app.getImageLoader();
 		mRequestQueue = app.getRequestQueue();
 		mImageSpan = new TweetImageSpan(activity);
 		mId = getArguments().getLong(Constants.ID);
@@ -273,8 +265,11 @@ public class TweetFragment extends Fragment implements LoaderManager.LoaderCallb
 			@Override
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 				if (cursor.moveToNext()) {
-					mImageLoader.get(cursor.getString(cursor.getColumnIndex(User.avatar_large)),
-							ImageLoader.getImageListener(mAvatar, R.drawable.error, R.drawable.error));
+					Picasso.with(getActivity())
+							.load(cursor.getString(cursor.getColumnIndex(User.avatar_large)))
+							.placeholder(R.drawable.error)
+							.error(R.drawable.error)
+							.into(mAvatar);
 					final long uid = cursor.getLong(cursor.getColumnIndex(Status.uid));
 					final String screenName = cursor.getString(cursor.getColumnIndex(User.screen_name));
 					mAvatar.setOnClickListener(new View.OnClickListener() {

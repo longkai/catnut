@@ -10,7 +10,9 @@ import android.app.Fragment;
 import android.content.AsyncQueryHandler;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.v4.view.PagerAdapter;
@@ -30,7 +32,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.viewpagerindicator.LinePageIndicator;
 import org.catnut.R;
 import org.catnut.api.FriendshipsAPI;
@@ -118,6 +121,23 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 		}
 	};
 
+	private Target profileTarget = new Target() {
+		@Override
+		public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+			mPlaceHolder.setBackground(new BitmapDrawable(getResources(), bitmap));
+		}
+
+		@Override
+		public void onBitmapFailed(Drawable errorDrawable) {
+			mPlaceHolder.setBackground(errorDrawable);
+		}
+
+		@Override
+		public void onPrepareLoad(Drawable placeHolderDrawable) {
+			//no-op
+		}
+	};
+
 	public static ProfileFragment getFragment(long uid, String screenName) {
 		Bundle args = new Bundle();
 		args.putLong(Constants.ID, uid);
@@ -187,17 +207,14 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 					// menu
 					buildMenu();
 					// load封面图片
-					mApp.getImageLoader().get(mCoverUrl, new ImageLoader.ImageListener() {
-						@Override
-						public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-							mPlaceHolder.setBackground(new BitmapDrawable(getResources(), response.getBitmap()));
-						}
-
-						@Override
-						public void onErrorResponse(VolleyError error) {
-							mPlaceHolder.setBackgroundResource(R.raw.default_cover);
-						}
-					});
+					if (!TextUtils.isEmpty(mCoverUrl)) {
+						Picasso.with(getActivity())
+								.load(mCoverUrl)
+								.error(getResources().getDrawable(R.raw.default_cover))
+								.into(profileTarget);
+					} else {
+						mPlaceHolder.setBackground(getResources().getDrawable(R.raw.default_cover));
+					}
 					// 我的微博
 					mTweetsCount.setOnClickListener(tweetsOnclickListener);
 					CatnutUtils.setText(mTweetsCount, android.R.id.text1,
@@ -389,8 +406,11 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 				case 0:
 					View frontPage = mLayoutInflater.inflate(R.layout.profile_cover, container, false);
 					ImageView avatar = (ImageView) frontPage.findViewById(R.id.avatar);
-					mApp.getImageLoader().get(mAvatarUrl,
-							ImageLoader.getImageListener(avatar, R.drawable.error, R.drawable.error));
+					Picasso.with(getActivity())
+							.load(mAvatarUrl)
+							.placeholder(R.drawable.error)
+							.error(R.drawable.error)
+							.into(avatar);
 					TextView screenName = (TextView) frontPage.findViewById(R.id.screen_name);
 					screenName.setText("@" + mScreenName);
 					TextView remark = (TextView) frontPage.findViewById(R.id.remark);
