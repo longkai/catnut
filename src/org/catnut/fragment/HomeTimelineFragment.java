@@ -65,6 +65,7 @@ public class HomeTimelineFragment extends TimelineFragment {
 
 	private Handler mHandler = new Handler();
 
+	private TweetAdapter mAdapter;
 	private RequestQueue mRequestQueue;
 
 	private String mSelection;
@@ -79,7 +80,6 @@ public class HomeTimelineFragment extends TimelineFragment {
 		super.onAttach(activity);
 		mSelection = new StringBuilder(Status.TYPE)
 				.append("=").append(Status.HOME).toString();
-
 	}
 
 	@Override
@@ -173,7 +173,7 @@ public class HomeTimelineFragment extends TimelineFragment {
 						mRequestQueue.add(new CatnutRequest(
 								getActivity(),
 								api,
-								new StatusProcessor.TimelineProcessor(Status.HOME),
+								new StatusProcessor.TimelineProcessor(Status.HOME, true),
 								new Response.Listener<JSONObject>() {
 									@Override
 									public void onResponse(JSONObject response) {
@@ -234,7 +234,7 @@ public class HomeTimelineFragment extends TimelineFragment {
 		mRequestQueue.add(new CatnutRequest(
 				getActivity(),
 				api,
-				new StatusProcessor.TimelineProcessor(),
+				new StatusProcessor.TimelineProcessor(true),
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {

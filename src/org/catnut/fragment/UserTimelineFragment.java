@@ -65,6 +65,7 @@ public class UserTimelineFragment extends TimelineFragment {
 	private Handler mHandler = new Handler();
 
 	private RequestQueue mRequestQueue;
+	private TweetAdapter mAdapter;
 
 	private long mUid;
 	private String mScreenName;
@@ -93,7 +94,8 @@ public class UserTimelineFragment extends TimelineFragment {
 		where.append(Status.uid).append("=").append(mUid)
 				.append(" and ").append(Status.TYPE).append(" in (")
 				.append(Status.HOME).append(",")
-				.append(Status.RETWEET).append(")");
+				.append(Status.RETWEET).append(",")
+				.append(Status.OTHERS).append(")");
 		mSelection = where.toString();
 		mIsMe = mUid == mApp.getAccessToken().uid;
 	}
@@ -271,7 +273,7 @@ public class UserTimelineFragment extends TimelineFragment {
 		mRequestQueue.add(new CatnutRequest(
 				getActivity(),
 				api,
-				new StatusProcessor.TimelineProcessor(),
+				new StatusProcessor.TimelineProcessor(Status.OTHERS, false),
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {
@@ -336,7 +338,7 @@ public class UserTimelineFragment extends TimelineFragment {
 						mRequestQueue.add(new CatnutRequest(
 								getActivity(),
 								api,
-								new StatusProcessor.TimelineProcessor(Status.HOME),
+								new StatusProcessor.TimelineProcessor(Status.OTHERS, true),
 								new Response.Listener<JSONObject>() {
 									@Override
 									public void onResponse(JSONObject response) {
@@ -356,6 +358,12 @@ public class UserTimelineFragment extends TimelineFragment {
 				});
 			}
 		})).start();
+	}
+
+	@Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+		super.onScrollStateChanged(view, scrollState);
+		Log.d(TAG, scrollState + "");
 	}
 
 	@Override

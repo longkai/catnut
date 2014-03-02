@@ -31,7 +31,6 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import org.catnut.R;
-import org.catnut.adapter.TweetAdapter;
 import org.catnut.core.CatnutApp;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.support.ConfirmBarController;
@@ -62,7 +61,6 @@ public abstract class TimelineFragment extends Fragment implements
 	protected PullToRefreshLayout mPullToRefreshLayout;
 
 	protected ListView mListView;
-	protected TweetAdapter mAdapter;
 	protected ConfirmBarController mConfirmBarController;
 	protected SwipeDismissListViewTouchListener mSwipeDismissListViewTouchListener;
 
@@ -84,7 +82,6 @@ public abstract class TimelineFragment extends Fragment implements
 
 	// empty text view if the adapter is empty
 	private TextView mEmptyText;
-	private int mFetchSize;
 	private ConnectivityManager mConnectivityManager;
 
 	/** 刷新 */
@@ -102,11 +99,6 @@ public abstract class TimelineFragment extends Fragment implements
 		super.onAttach(activity);
 		mApp = CatnutApp.getTingtingApp();
 		mPreferences = mApp.getPreferences();
-		mFetchSize = CatnutUtils.resolveListPrefInt(
-				mPreferences,
-				getString(R.string.pref_default_fetch_size),
-				getResources().getInteger(R.integer.default_fetch_size)
-		);
 	}
 
 	@Override
@@ -237,7 +229,11 @@ public abstract class TimelineFragment extends Fragment implements
 	}
 
 	public int getFetchSize() {
-		return mFetchSize;
+		return CatnutUtils.resolveListPrefInt(
+				mPreferences,
+				getString(R.string.pref_default_fetch_size),
+				getResources().getInteger(R.integer.default_fetch_size)
+		);
 	}
 
 	public boolean isNetworkAvailable() {

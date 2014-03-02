@@ -7,6 +7,7 @@ package org.catnut.processor;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.util.Log;
 import org.catnut.core.CatnutProcessor;
 import org.catnut.core.CatnutProvider;
 import org.catnut.fragment.FavoriteFragment;
@@ -26,6 +27,27 @@ import java.util.List;
 public class StatusProcessor {
 
 	/**
+	 * 判断是不是新浪在时间线中强奸的广告
+	 *
+	 * @param weibo json
+	 * @return if it' s ad. or malformed data true or false
+	 */
+	public static final boolean fuckSina(JSONObject weibo) {
+		if (weibo == null) {
+			return true;
+		}
+		if (weibo.has(User.SINGLE)) {
+			// 如果不是我关注的用户，那么基本上就是新浪的广告了，fuck
+			JSONObject user = weibo.optJSONObject(User.SINGLE);
+			if (user == null || !user.optBoolean(User.following)) {
+				return true;
+			}
+		}
+		// todo: 如果返回的微博是没有user这个字段，只有uid咋整呢?
+		return false;
+	}
+
+	/**
 	 * 持久化时间线
 	 *
 	 * @author longkai
@@ -34,36 +56,47 @@ public class StatusProcessor {
 
 		private int type = Status.HOME;
 
-		public TimelineProcessor() {
+		private boolean hasUser = true;
+
+		public TimelineProcessor(boolean hasUser) {
+			this.hasUser = hasUser;
 		}
 
-		public TimelineProcessor(int type) {
+		public TimelineProcessor(int type, boolean hasUser) {
 			this.type = type;
+			this.hasUser = hasUser;
 		}
 
 		public void asyncProcess(Context context, JSONObject jsonObject) throws Exception {
 			JSONArray jsonArray = jsonObject.optJSONArray(Status.MULTIPLE);
-			List<ContentValues> statues = new ArrayList<ContentValues>(jsonArray.length());
-			List<ContentValues> users = new ArrayList<ContentValues>(jsonArray.length());
+			ContentValues[] statuses = new ContentValues[jsonArray.length()];
+			ContentValues[] users = null;
+			if (hasUser) {
+				users = new ContentValues[statuses.length];
+			}
 			User userMetadata = User.METADATA;
 			Status statusMetadata = Status.METADATA;
 			JSONObject json;
 			ContentValues status;
 			for (int i = 0; i < jsonArray.length(); i++) {
 				json = jsonArray.optJSONObject(i);
+				// 过滤一下不要的微博
+				if (type == Status.HOME && fuckSina(json)) {
+					continue;
+				}
 				// 一次持久化微博和作者信息
 				status = statusMetadata.convert(json);
 				status.put(Status.TYPE, type); // 标记为啥类型的微博
-				statues.add(status);
+				statuses[i] = status;
 				// 如果这条微博包含了原作者信息
-				if (json.has(User.SINGLE)) {
-					users.add(userMetadata.convert(json.optJSONObject(User.SINGLE)));
+				if (hasUser && json.has(User.SINGLE)) {
+					users[i] = userMetadata.convert(json.optJSONObject(User.SINGLE));
 				}
 			}
-			ContentValues[] _statuses = statues.toArray(new ContentValues[statues.size()]);
-			context.getContentResolver().bulkInsert(CatnutProvider.parse(Status.MULTIPLE), _statuses);
-			ContentValues[] _users = users.toArray(new ContentValues[users.size()]);
-			context.getContentResolver().bulkInsert(CatnutProvider.parse(User.MULTIPLE), _users);
+			context.getContentResolver().bulkInsert(CatnutProvider.parse(Status.MULTIPLE), statuses);
+			if (hasUser) {
+				context.getContentResolver().bulkInsert(CatnutProvider.parse(User.MULTIPLE), users);
+			}
 		}
 	}
 

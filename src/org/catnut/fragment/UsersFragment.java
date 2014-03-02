@@ -19,6 +19,7 @@ import android.widget.*;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import org.catnut.support.VividSearchView;
 import org.json.JSONObject;
 import org.catnut.R;
 import org.catnut.adapter.UsersAdapter;
@@ -53,7 +54,7 @@ public abstract class UsersFragment extends ListFragment implements LoaderManage
 	protected boolean isSearching;
 
 	/** 搜索视图 */
-	protected SearchView mSearchView;
+	protected VividSearchView mSearchView;
 	/** 当前搜索关键字 */
 	protected String mCurFilter;
 
@@ -118,36 +119,10 @@ public abstract class UsersFragment extends ListFragment implements LoaderManage
 		MenuItem search = menu.add(android.R.string.search_go);
 		search.setIcon(R.drawable.ic_title_search_default);
 		search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
-			| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-		mSearchView = new SearchView(mActivity);
+				| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+		mSearchView = VividSearchView.getSearchView(getActivity());
 		mSearchView.setOnQueryTextListener(this);
 		mSearchView.setOnCloseListener(this);
-		mSearchView.setIconifiedByDefault(false);
-		mSearchView.setQueryHint(getString(R.string.search_hint));
-		mSearchView.setIconified(true);
-		int searchPlateId = mSearchView.getContext().getResources().getIdentifier("android:id/search_plate", null, null);
-		View searchPlate = mSearchView.findViewById(searchPlateId);
-		if (searchPlate != null) {
-			// 修改搜索文字的颜色
-			int searchTextId = searchPlate.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
-			TextView searchText = (TextView) searchPlate.findViewById(searchTextId);
-			if (searchText != null) {
-				searchText.setTextColor(Color.WHITE);
-				searchText.setHintTextColor(Color.WHITE);
-			}
-		}
-		// 修改搜索hint图标，这里有bug，所以不得已搜索的空间又小了
-		int searchButtonId = mSearchView.getContext().getResources().getIdentifier("android:id/search_mag_icon", null, null);
-		ImageView searchButton = (ImageView) mSearchView.findViewById(searchButtonId);
-		if (searchButton != null) {
-			searchButton.setImageResource(R.drawable.ic_search_hint);
-		}
-		// 修改清除图标
-		int clearId = mSearchView.getContext().getResources().getIdentifier("android:id/search_close_btn", null, null);
-		ImageView closeButton = (ImageView) mSearchView.findViewById(clearId);
-		if (closeButton != null) {
-			closeButton.setImageResource(R.drawable.ic_clear);
-		}
 		search.setActionView(mSearchView);
 	}
 

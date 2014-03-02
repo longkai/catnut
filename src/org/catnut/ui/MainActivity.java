@@ -43,14 +43,13 @@ import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
 import org.catnut.fragment.FavoriteFragment;
 import org.catnut.fragment.HomeTimelineFragment;
-import org.catnut.fragment.MyFriendsFragment;
+import org.catnut.fragment.MyRelationshipFragment;
 import org.catnut.fragment.UserTimelineFragment;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.util.CatnutUtils;
-import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
 
 /**
@@ -328,7 +327,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			if (mDrawerLayout.isDrawerOpen(mDrawer)) {
 				mDrawerLayout.closeDrawer(mDrawer);
 			}
-			flipCard(MyFriendsFragment.getInstance(true), tag);
+			flipCard(MyRelationshipFragment.getFragment(true), tag);
 		}
 	}
 
@@ -343,7 +342,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			if (mDrawerLayout.isDrawerOpen(mDrawer)) {
 				mDrawerLayout.closeDrawer(mDrawer);
 			}
-			flipCard(MyFriendsFragment.getInstance(false), tag);
+			flipCard(MyRelationshipFragment.getFragment(false), tag);
 		}
 	}
 
