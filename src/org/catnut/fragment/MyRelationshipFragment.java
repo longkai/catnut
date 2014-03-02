@@ -47,6 +47,7 @@ public class MyRelationshipFragment extends TimelineFragment {
 	private static final String[] PROJECTION = new String[]{
 			BaseColumns._ID,
 			User.screen_name,
+			User.remark,
 			User.profile_image_url,
 			User.verified,
 			User.location,

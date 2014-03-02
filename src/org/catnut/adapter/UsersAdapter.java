@@ -33,8 +33,9 @@ public class UsersAdapter extends CursorAdapter {
 	private static class ViewHolder {
 		ImageView avatar;
 		int avatarIndex;
-		TextView nick;
-		int nickIndex;
+		TextView screenName;
+		int screenNameIndex;
+		int remarkIndex;
 		TextView location;
 		int locationIndex;
 		TextView description;
@@ -53,8 +54,9 @@ public class UsersAdapter extends CursorAdapter {
 		View view = LayoutInflater.from(context).inflate(R.layout.friend_row , parent, false);
 		holder.avatar = (ImageView) view.findViewById(R.id.avatar);
 		holder.avatarIndex = cursor.getColumnIndex(User.profile_image_url);
-		holder.nick = (TextView) view.findViewById(R.id.nick);
-		holder.nickIndex = cursor.getColumnIndex(User.screen_name);
+		holder.screenName = (TextView) view.findViewById(R.id.nick);
+		holder.screenNameIndex = cursor.getColumnIndex(User.screen_name);
+		holder.remarkIndex = cursor.getColumnIndex(User.remark);
 		holder.location = (TextView) view.findViewById(R.id.location);
 		holder.locationIndex = cursor.getColumnIndex(User.location);
 		holder.description = (TextView) view.findViewById(R.id.description);
@@ -76,7 +78,8 @@ public class UsersAdapter extends CursorAdapter {
 				.placeholder(R.drawable.error)
 				.error(R.drawable.error)
 				.into(holder.avatar);
-		holder.nick.setText(cursor.getString(holder.nickIndex));
+		String remark = cursor.getString(holder.remarkIndex);
+		holder.screenName.setText(TextUtils.isEmpty(remark)?cursor.getString(holder.screenNameIndex): remark);
 		holder.location.setText(cursor.getString(holder.locationIndex));
 		if (CatnutUtils.getBoolean(cursor, User.verified)) {
 			holder.verified.setVisibility(View.VISIBLE);
