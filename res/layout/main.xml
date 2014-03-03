@@ -137,6 +137,11 @@
 						android:layout_height="1dp" />
 
 					<TextView
+						android:id="@+id/fantasy"
+						android:text="@string/fantasy"
+						style="@style/Profile_Action" />
+
+					<TextView
 						android:id="@+id/action_share_app"
 						android:text="@string/share_app"
 						style="@style/Profile_Action" />

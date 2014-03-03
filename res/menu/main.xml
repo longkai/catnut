@@ -20,6 +20,10 @@
 		android:title="@string/logout"
 		android:showAsAction="never" />
 	<item
+		android:id="@+id/fantasy"
+		android:title="@string/fantasy"
+		android:showAsAction="never" />
+	<item
 		android:id="@id/pref"
 		android:title="@string/pref"
 		android:showAsAction="never" />

@@ -55,6 +55,7 @@ import org.catnut.processor.StatusProcessor;
 import org.catnut.support.OnFragmentBackPressedListener;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
+import org.catnut.ui.HelloActivity;
 import org.catnut.ui.ProfileActivity;
 import org.catnut.ui.SingleFragmentActivity;
 import org.catnut.util.CatnutUtils;
@@ -707,6 +708,9 @@ public class TweetFragment extends Fragment implements
 				} else {
 					resetEditor(RETWEET_INDICATOR + getString(R.string.retweet), true);
 				}
+				break;
+			case R.id.fantasy:
+				startActivity(new Intent(getActivity(), HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG));
 				break;
 			default:
 				break;

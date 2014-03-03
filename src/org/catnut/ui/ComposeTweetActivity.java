@@ -251,6 +251,9 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 					Toast.makeText(this, getString(R.string.device_not_support), Toast.LENGTH_SHORT).show();
 				}
 				break;
+			case R.id.fantasy:
+				startActivity(new Intent(this, HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG));
+				break;
 			default:
 				break;
 		}

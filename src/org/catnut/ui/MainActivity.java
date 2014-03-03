@@ -219,6 +219,7 @@ public class MainActivity extends Activity implements
 		findViewById(R.id.action_my_drafts).setOnClickListener(this);
 		findViewById(R.id.action_share_app).setOnClickListener(this);
 		findViewById(R.id.action_view_source_code).setOnClickListener(this);
+		findViewById(R.id.fantasy).setOnClickListener(this);
 	}
 
 	@Override
@@ -269,6 +270,9 @@ public class MainActivity extends Activity implements
 				break;
 			case R.id.action_compose:
 				startActivity(new Intent(this, ComposeTweetActivity.class));
+				break;
+			case R.id.fantasy:
+				startActivity(new Intent(this, HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG));
 				break;
 			default:
 				break;
@@ -353,6 +357,9 @@ public class MainActivity extends Activity implements
 				break;
 			case R.id.action_view_source_code:
 				intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.github_link)));
+				break;
+			case R.id.fantasy:
+				intent = new Intent(this, HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG);
 				break;
 			case R.id.action_my_list:
 			default:
