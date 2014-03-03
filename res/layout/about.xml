@@ -48,7 +48,6 @@
 		<!--app' s version-->
 		<TextView
 			android:id="@+id/app_version"
-			android:text="v1.0.1"
 			android:layout_marginTop="@dimen/medium"
 			android:textColor="@android:color/white"
 			android:textSize="18sp"

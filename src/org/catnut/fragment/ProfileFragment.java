@@ -210,10 +210,10 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 					if (!TextUtils.isEmpty(mCoverUrl)) {
 						Picasso.with(getActivity())
 								.load(mCoverUrl)
-								.error(getResources().getDrawable(R.raw.default_cover))
+								.error(R.drawable.defaul_fantasy)
 								.into(profileTarget);
 					} else {
-						mPlaceHolder.setBackground(getResources().getDrawable(R.raw.default_cover));
+						mPlaceHolder.setBackground(getResources().getDrawable(R.drawable.defaul_fantasy));
 					}
 					// 我的微博
 					mTweetsCount.setOnClickListener(tweetsOnclickListener);

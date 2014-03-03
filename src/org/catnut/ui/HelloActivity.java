@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -98,9 +99,12 @@ public class HelloActivity extends Activity {
 		mAbout = findViewById(R.id.about);
 		mFantasy = (ImageView) findViewById(R.id.fantasy);
 		ActionBar bar = getActionBar();
-		bar.setTitle("fantasy");
+		bar.setTitle(R.string.fantasy);
 		TextView about = (TextView) findViewById(R.id.about_body);
+		TextView version = (TextView) findViewById(R.id.app_version);
+		version.setText(getString(R.string.about_version_template, R.string.version_name));
 		about.setText(Html.fromHtml(getString(R.string.about_body)));
+		about.setMovementMethod(LinkMovementMethod.getInstance());
 		loadImage();
 
 		if (mApp.getPreferences().getBoolean(getString(R.string.enable_analytics), true)) {
