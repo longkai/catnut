@@ -26,6 +26,7 @@
 		android:name=".core.CatnutApp">
 		<activity
 			android:name=".ui.HelloActivity"
+			android:theme="@style/Theme.About"
 			android:noHistory="true">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />

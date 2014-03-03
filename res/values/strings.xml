@@ -157,4 +157,32 @@
 		<item>评论给原微博</item>
 		<item>都评论</item>
 	</string-array>
+
+	<string name="about_body"><![CDATA[
+        <b>{ }</b> with <b>♥</b> by <b><a href="mailto:im.longkai@gmail.com">longkai</a></b> in <b>Guilin</b>.
+        <i>Catnut</i> is a compound word of cat and nut, which made by one of my friends.
+        Whatever it means, hope you like it!
+        <br><br>
+
+        Copyright 2014 longkai<br>
+        All Rights Reserved.<br><br>
+
+		This software shall be used for good, not evil.<br><br>
+
+        Many thanks to these open source projects:<br><br>
+
+        <b><a href="http://square.github.io/picasso/">Picasso</a>&nbsp;</b><br>
+        <i>by Square</i><br><br>
+
+        <b><a href="https://github.com/chrisbanes/ActionBar-PullToRefresh">ActionBar-PullToRefresh</a>&nbsp;</b><br>
+        <i>by Chris Banes</i><br><br>
+
+        <b><a href="http://viewpagerindicator.com/">ViewPagerIndicator</a>&nbsp;</b><br>
+        <i>by Jake Wharton, Patrik Åkerfeldt, and Francisco Figueiredo Jr.</i><br><br>
+    ]]></string>
+	<string name="about_version_template">v%1$s</string>
+	<string name="change_fantasy">换一张</string>
+	<string name="show_fantasy_only">图片/说明 切换</string>
+	<string name="app_desc">让微博 简洁&amp;流畅</string>
+	<string name="default_art">默认</string>
 </resources>

@@ -10,7 +10,6 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.Window;
@@ -20,6 +19,7 @@ import org.catnut.core.CatnutApp;
 import org.catnut.fragment.DraftFragment;
 import org.catnut.fragment.FavoriteFragment;
 import org.catnut.fragment.MyRelationshipFragment;
+import org.catnut.fragment.OAuthFragment;
 import org.catnut.fragment.PhotoViewerFragment;
 import org.catnut.fragment.PrefFragment;
 import org.catnut.fragment.UserTimelineFragment;
@@ -40,6 +40,7 @@ public class SingleFragmentActivity extends Activity {
 	public static final int USER_TWEETS = 3;
 	public static final int FRIENDS = 4; // 可以为关注或者粉丝
 	public static final int FAVORITES = 5;
+	public static final int AUTH = 6;
 
 	private EasyTracker mTracker;
 
@@ -72,6 +73,9 @@ public class SingleFragmentActivity extends Activity {
 					long id = getIntent().getLongExtra(Constants.ID, 0L);
 					String screenName = getIntent().getStringExtra(User.screen_name);
 					fragment = UserTimelineFragment.getFragment(id, screenName);
+					break;
+				case AUTH:
+					fragment = new OAuthFragment();
 					break;
 				default:
 					// get out!

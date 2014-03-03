@@ -12,11 +12,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.util.Log;
 import org.catnut.metadata.Draft;
+import org.catnut.metadata.Photo;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 
 import static org.catnut.core.CatnutProvider.DRAFT;
 import static org.catnut.core.CatnutProvider.DRAFTS;
+import static org.catnut.core.CatnutProvider.PHOTOS;
 import static org.catnut.core.CatnutProvider.STATUSES;
 import static org.catnut.core.CatnutProvider.USERS;
 
@@ -41,6 +43,8 @@ public class CatnutProvider extends ContentProvider {
 	public static final int STATUSES = 3;
 	public static final int DRAFT = 4;
 	public static final int DRAFTS = 5;
+	public static final int PHOTO = 6;
+	public static final int PHOTOS = 7;
 
 	private static UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -51,6 +55,8 @@ public class CatnutProvider extends ContentProvider {
 		matcher.addURI(AUTHORITY, Status.MULTIPLE, STATUSES);
 		matcher.addURI(AUTHORITY, Draft.SINGLE, DRAFT);
 		matcher.addURI(AUTHORITY, Draft.MULTIPLE, DRAFTS);
+		matcher.addURI(AUTHORITY, Photo.SINGLE, PHOTO);
+		matcher.addURI(AUTHORITY, Photo.MULTIPLE, PHOTOS);
 	}
 
 	/**
@@ -107,6 +113,12 @@ public class CatnutProvider extends ContentProvider {
 			case DRAFTS:
 				type = MULTIPLE_RECORDS_MIME_TYPE + Draft.MULTIPLE;
 				break;
+			case PHOTO:
+				type = SINGLE_RECORD_MIME_TYPE + Photo.SINGLE;
+				break;
+			case PHOTOS:
+				type = MULTIPLE_RECORDS_MIME_TYPE + Photo.MULTIPLE;
+				break;
 			default:
 				Log.wtf(TAG, "unknown uri: " + uri);
 		}
@@ -136,6 +148,10 @@ public class CatnutProvider extends ContentProvider {
 			case DRAFTS:
 				cursor = db.query(Draft.TABLE, projection, selection, selectionArgs, selection, null, sortOrder);
 				break;
+			case PHOTO:
+			case PHOTOS:
+				cursor = db.rawQuery(selection, selectionArgs);
+				break;
 			default:
 				Log.wtf(TAG, "unknown uri: " + uri);
 				return null;
@@ -157,6 +173,9 @@ public class CatnutProvider extends ContentProvider {
 			case DRAFTS:
 				table = Draft.TABLE;
 				break;
+			case PHOTOS:
+				table = Photo.TABLE;
+				break;
 			default:
 				throw new RuntimeException("unknown uri: " + uri);
 		}
@@ -175,6 +194,9 @@ public class CatnutProvider extends ContentProvider {
 				break;
 			case STATUSES:
 				table = Status.TABLE;
+				break;
+			case PHOTOS:
+				table = Photo.TABLE;
 				break;
 			default:
 				throw new RuntimeException("unknown uri: " + uri);
@@ -202,6 +224,9 @@ public class CatnutProvider extends ContentProvider {
 				break;
 			case DRAFTS:
 				count = mDb.getWritableDatabase().delete(Draft.TABLE, selection, selectionArgs);
+				break;
+			case PHOTOS:
+				count = mDb.getWritableDatabase().delete(Photo.TABLE, selection, selectionArgs);
 				break;
 			default:
 				throw new UnsupportedOperationException("not supported for now!");
@@ -254,6 +279,7 @@ public class CatnutProvider extends ContentProvider {
 			db.execSQL(User.METADATA.ddl());
 			db.execSQL(Status.METADATA.ddl());
 			db.execSQL(Draft.METADATA.ddl());
+			db.execSQL(Photo.METADATA.ddl());
 			Log.i(TAG, "finish create tables...");
 		}
 
@@ -262,6 +288,7 @@ public class CatnutProvider extends ContentProvider {
 			db.execSQL("DROP TABLE " + User.TABLE);
 			db.execSQL("DROP TABLE " + Status.TABLE);
 			db.execSQL("DROP TABLE " + Draft.TABLE);
+			db.execSQL("DROP TABLE " + Photo.TABLE);
 			Log.i(TAG, "finish upgrade table...");
 		}
 	}

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<item
+		android:title="@string/app_name"
+		android:icon="@drawable/ic_title_overflow_default"
+		android:showAsAction="always">
+		<menu>
+			<item
+				android:id="@+id/toggle_fantasy"
+				android:title="@string/show_fantasy_only" />
+			<item
+				android:id="@+id/change_fantasy"
+				android:title="@string/change_fantasy" />
+			<item
+				android:id="@+id/check_default"
+				android:title="@string/default_art" />
+			<item
+				android:id="@+id/pref"
+				android:title="@string/pref" />
+		</menu>
+	</item>
+</menu>

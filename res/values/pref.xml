@@ -21,11 +21,13 @@
 	<string name="pref_open_source_license">pref_open_source_license</string>
 	<string name="pref_enable_analytics">pref_enable_analytics</string>
 	<string name="pref_show_latest_tweet">pref_show_latest_tweet</string>
+	<string name="pref_enable_fantasy">pref_enable_fantasy</string>
 
 	<integer name="default_fetch_size">20</integer>
 	<integer name="default_tweet_font_size">16</integer>
 
 	<bool name="pref_load_more_from_cloud">true</bool>
+	<bool name="pref_enable_fantasy">true</bool>
 	<!-- cannot use integer array Orz... -->
 	<string-array name="fetch_size_pref_entries">
 		<item>20</item>

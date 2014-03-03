@@ -1,0 +1,87 @@
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="match_parent"
+	android:layout_width="match_parent">
+
+	<ImageView
+		android:id="@+id/fantasy"
+		android:src="@drawable/defaul_fantasy"
+		android:scaleType="fitXY"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" />
+
+	<LinearLayout
+		android:id="@+id/about"
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:fitsSystemWindows="true"
+		android:gravity="center">
+
+		<!--app' s name-->
+		<TextView
+			android:text="Catnut"
+			android:textSize="60sp"
+			android:textStyle="bold"
+			android:textColor="@android:color/white"
+			android:paddingTop="@dimen/large"
+			android:gravity="center_horizontal|clip_horizontal"
+			android:layout_gravity="center_horizontal|center_vertical"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
+		<!--app' s desc-->
+		<TextView
+			android:text="@string/app_desc"
+			android:textColor="@android:color/white"
+			android:textSize="20sp"
+			android:gravity="center_horizontal"
+			android:layout_marginTop="@dimen/medium"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
+		<!--app' s version-->
+		<TextView
+			android:id="@+id/app_version"
+			android:text="v1.0.1"
+			android:layout_marginTop="@dimen/medium"
+			android:textColor="@android:color/white"
+			android:textSize="18sp"
+			android:gravity="center_horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
+		<View
+			android:layout_width="match_parent"
+			android:layout_height="2dp"
+			android:layout_marginTop="16dp"
+			android:layout_marginLeft="32dp"
+			android:layout_marginRight="32dp"
+			android:background="#1fff" />
+
+		<ScrollView
+			android:layout_width="match_parent"
+			android:layout_height="0dp"
+			android:layout_weight="1"
+			android:paddingLeft="32dp"
+			android:paddingRight="32dp"
+			android:paddingTop="16dp"
+			android:paddingBottom="16dp"
+			android:clipToPadding="false">
+
+			<TextView
+				android:id="@+id/about_body"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:textColor="#afff"
+				android:textColorLink="#fff"
+				android:textSize="18sp"
+				android:lineSpacingMultiplier="1.1" />
+		</ScrollView>
+	</LinearLayout>
+</FrameLayout>
