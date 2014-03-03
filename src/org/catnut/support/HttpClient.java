@@ -1,8 +1,3 @@
-/*
- * The MIT License (MIT)
- * Copyright (c) 2014 longkai
- * The software shall be used for good, not evil.
- */
 package org.catnut.support;
 
 /*
@@ -21,14 +16,12 @@ package org.catnut.support;
  * limitations under the License.
  */
 
-import android.util.Log;
-import org.catnut.core.CatnutApp;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * 文件上传
@@ -45,14 +38,13 @@ public class HttpClient {
 		this.url = url;
 	}
 
-	public void connectForMultipart() throws Exception {
+	public void connectForMultipart(Map<String, String> headers) throws Exception {
 		httpURLConnection = (HttpURLConnection) (new URL(url)).openConnection();
 		httpURLConnection.setRequestMethod("POST");
 		httpURLConnection.setDoInput(true);
 		httpURLConnection.setDoOutput(true);
-		Map<String, String> authHeaders = CatnutApp.getAuthHeaders();
-		for (String key : authHeaders.keySet()) {
-			httpURLConnection.setRequestProperty(key, authHeaders.get(key));
+		for (String key : headers.keySet()) {
+			httpURLConnection.setRequestProperty(key, headers.get(key));
 		}
 		httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
 		httpURLConnection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
@@ -88,16 +80,14 @@ public class HttpClient {
 		} else {
 			is = httpURLConnection.getErrorStream();
 		}
-		byte[] bytes = new byte[1024];
-		StringBuilder buffer = new StringBuilder();
 
-		while (is.read(bytes) != -1)
-			buffer.append(new String(bytes));
+		Scanner in = new Scanner(is).useDelimiter("\\A");
+		String response = in.hasNext() ? in.next() : "error";
 
 		httpURLConnection.disconnect();
-		is.close();
+		in.close();
 
-		return new UploadResponse(responseCode, buffer.toString());
+		return new UploadResponse(responseCode, response);
 	}
 
 	private void writeParamData(String paramName, String value) throws Exception {

@@ -17,6 +17,7 @@ import android.view.Window;
 import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
+import org.catnut.fragment.DraftFragment;
 import org.catnut.fragment.PhotoViewerFragment;
 import org.catnut.fragment.PrefFragment;
 import org.catnut.util.Constants;
@@ -31,6 +32,7 @@ public class SingleFragmentActivity extends Activity {
 	public static final String TAG = "SingleFragmentActivity";
 	public static final int PREF = 0;
 	public static final int PHOTO_VIEWER = 1;
+	public static final int DRAFT = 2;
 
 	private EasyTracker mTracker;
 
@@ -49,6 +51,9 @@ public class SingleFragmentActivity extends Activity {
 					getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 					String picUrl = getIntent().getStringExtra(Constants.PIC);
 					fragment = PhotoViewerFragment.getFragment(picUrl);
+					break;
+				case DRAFT:
+					fragment = DraftFragment.getFragment();
 					break;
 				default:
 					// get out!

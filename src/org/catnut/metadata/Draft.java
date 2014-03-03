@@ -34,9 +34,11 @@ public class Draft implements CatnutMetadata<Draft, ContentValues>, Parcelable {
 	public static final String RIP = "rip";
 	public static final String PIC = "pic";
 
+	public static final String CREATE_AT = "create_at";
+
 	public static final Draft METADATA = new Draft();
 
-//	private Draft(){}
+	public long id = Integer.MIN_VALUE; // 如果id不是这数，那么实际上是已经保存了的草稿
 
 	public String status;
 	public int visible = 0;
@@ -45,6 +47,7 @@ public class Draft implements CatnutMetadata<Draft, ContentValues>, Parcelable {
 	public float _long = 0.f;
 	public String annotations;
 	public String rip;
+	public long createAt;
 	public Uri pic;
 
 	@Override
@@ -54,6 +57,7 @@ public class Draft implements CatnutMetadata<Draft, ContentValues>, Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeLong(id);
 		dest.writeString(status);
 		dest.writeInt(visible);
 		dest.writeString(list_id);
@@ -61,6 +65,7 @@ public class Draft implements CatnutMetadata<Draft, ContentValues>, Parcelable {
 		dest.writeFloat(_long);
 		dest.writeString(annotations);
 		dest.writeString(rip);
+		dest.writeLong(createAt);
 		dest.writeParcelable(pic, flags);
 	}
 
@@ -68,6 +73,7 @@ public class Draft implements CatnutMetadata<Draft, ContentValues>, Parcelable {
 		@Override
 		public Draft createFromParcel(Parcel source) {
 			Draft weibo = new Draft();
+			weibo.id = source.readLong();
 			weibo.status = source.readString();
 			weibo.visible = source.readInt();
 			weibo.list_id = source.readString();
@@ -75,6 +81,7 @@ public class Draft implements CatnutMetadata<Draft, ContentValues>, Parcelable {
 			weibo._long = source.readFloat();
 			weibo.annotations = source.readString();
 			weibo.rip = source.readString();
+			weibo.createAt = source.readLong();
 			weibo.pic = source.readParcelable(Thread.currentThread().getContextClassLoader());
 			return weibo;
 		}
@@ -99,7 +106,8 @@ public class Draft implements CatnutMetadata<Draft, ContentValues>, Parcelable {
 				.append(VISIBLE).append(" int,")
 				.append(LIST_ID).append(" text,")
 				.append(RIP).append(" text,")
-				.append(PIC).append(" text")
+				.append(PIC).append(" text,")
+				.append(CREATE_AT).append(" int")
 				.append(")");
 		return ddl.toString();
 	}
@@ -107,6 +115,7 @@ public class Draft implements CatnutMetadata<Draft, ContentValues>, Parcelable {
 	@Override
 	public ContentValues convert(Draft data) {
 		ContentValues draft = new ContentValues();
+		draft.put(BaseColumns._ID, System.currentTimeMillis());
 		draft.put(STATUS, data.status);
 		draft.put(_LONG, data._long);
 		draft.put(LAT, data.lat);
@@ -115,6 +124,7 @@ public class Draft implements CatnutMetadata<Draft, ContentValues>, Parcelable {
 		draft.put(LIST_ID, data.list_id);
 		draft.put(RIP, data.rip);
 		draft.put(PIC, data.pic.toString());
+		draft.put(CREATE_AT, System.currentTimeMillis());
 		return draft;
 	}
 }

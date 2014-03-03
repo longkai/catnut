@@ -18,7 +18,6 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.BaseColumns;
@@ -55,28 +54,20 @@ import org.catnut.R;
 import org.catnut.adapter.EmotionsAdapter;
 import org.catnut.adapter.MentionSearchAdapter;
 import org.catnut.api.StuffAPI;
-import org.catnut.api.TweetAPI;
 import org.catnut.core.CatnutAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
-import org.catnut.core.CatnutRequest;
 import org.catnut.metadata.Draft;
-import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
-import org.catnut.processor.StatusProcessor;
-import org.catnut.service.MultipartService;
-import org.catnut.support.HttpClient;
+import org.catnut.service.ComposeTweetService;
 import org.catnut.support.LocationSupport;
-import org.catnut.support.MultiPartRequest;
-import org.catnut.support.MultipartAPI;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.util.CatnutUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -509,20 +500,19 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 			Toast.makeText(this, R.string.require_not_empty, Toast.LENGTH_SHORT).show();
 			return; // stop here
 		}
-		Intent intent = new Intent(this, MultipartService.class);
+		Toast.makeText(this, getString(R.string.background_sending), Toast.LENGTH_SHORT).show();
+		Intent intent = new Intent(this, ComposeTweetService.class);
 		Draft draft = new Draft();
 		draft.status = mText.getText().toString();
 		draft._long = (float) mLongitude;
 		draft.lat = (float) mLatitude;
 		if (mUris != null && mUris.size() > 0) { // 有图片的
 			draft.pic = mUris.get(0);
+			// 清除现有的数据
+			mUris.clear();
+			mAdapter.notifyDataSetChanged();
 		}
 		intent.putExtra(Draft.DRAFT, draft);
-		// 清除现有的数据
-		if (mUris != null) {
-			mUris.clear();
-			mPhotos.deferNotifyDataSetChanged();
-		}
 		mText.setText(null);
 		invalidateLocation();
 		// 开启服务

@@ -41,6 +41,7 @@ import org.catnut.R;
 import org.catnut.adapter.DrawerNavAdapter;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
+import org.catnut.fragment.DraftFragment;
 import org.catnut.fragment.FavoriteFragment;
 import org.catnut.fragment.HomeTimelineFragment;
 import org.catnut.fragment.MyRelationshipFragment;
@@ -360,6 +361,21 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		}
 	}
 
+	/**
+	 * 查看我的草稿
+	 */
+	private void viewDrafts() {
+		String tag = "draft";
+		Fragment favoriteFragment = getFragmentManager().findFragmentByTag(tag);
+		if (favoriteFragment == null || !favoriteFragment.isVisible()) {
+			mShouldPopupLastTitle = false;
+			if (mDrawerLayout.isDrawerOpen(mDrawer)) {
+				mDrawerLayout.closeDrawer(mDrawer);
+			}
+			flipCard(DraftFragment.getFragment(), tag);
+		}
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
@@ -482,6 +498,9 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				break;
 			case R.id.action_my_favorites:
 				viewFavorites();
+				break;
+			case R.id.action_my_drafts:
+				viewDrafts();
 				break;
 			default:
 				Toast.makeText(MainActivity.this, position + " click! not yet implement for now:-(", Toast.LENGTH_SHORT).show();

@@ -13,6 +13,7 @@ import android.app.TaskStackBuilder;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.provider.BaseColumns;
 import android.util.Log;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -28,6 +29,7 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.support.HttpClient;
+import org.catnut.ui.SingleFragmentActivity;
 import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
@@ -43,20 +45,21 @@ import java.io.InputStream;
  *
  * @author longkai
  */
-public class MultipartService extends IntentService {
+public class ComposeTweetService extends IntentService {
 
 	public static final String UPLOAD = CatnutAPI.API_DOMAIN + "/2/statuses/upload.json";
-	public static final String UPDATE = CatnutAPI.API_DOMAIN + "/2/statuses/update.json";
 
-	public static final String TAG = "MultipartService";
+	public static final String TAG = "ComposeTweetService";
 
 	private CatnutApp mApp;
 	private NotificationManager mNotifyManager;
 	private Notification.Builder mBuilder;
 
-	private static final int ID = 1;
+	private SendWeiboProcessor mSendWeiboProcessor;
 
-	public MultipartService() {
+	private final int ID = (int) (System.currentTimeMillis() / 10000);
+
+	public ComposeTweetService() {
 		super(TAG);
 	}
 
@@ -76,7 +79,7 @@ public class MultipartService extends IntentService {
 		mApp.getRequestQueue().add(new CatnutRequest(
 				this,
 				TweetAPI.update(draft.status, draft.visible, draft.list_id, draft.lat, draft._long, null, draft.rip),
-				sendWeiboProcessor,
+				mSendWeiboProcessor,
 				null,
 				new Response.ErrorListener() {
 					@Override
@@ -93,7 +96,7 @@ public class MultipartService extends IntentService {
 		HttpClient client = new HttpClient(UPLOAD);
 		InputStream inputStream = null;
 		try {
-			client.connectForMultipart();
+			client.connectForMultipart(mApp.getAuthHeaders());
 			client.addFormPart(Draft.STATUS, draft.status);
 			client.addFormPart(Draft.LAT, String.valueOf(CatnutUtils.scaleNumber(draft.lat, 1)));
 			client.addFormPart(Draft._LONG, String.valueOf(CatnutUtils.scaleNumber(draft._long, 1)));
@@ -123,7 +126,7 @@ public class MultipartService extends IntentService {
 
 			// 获取结果
 			HttpClient.UploadResponse response = client.getResponse();
-			Log.e(TAG, response.statusCode + " " + response.response);
+			Log.d(TAG, response.statusCode + " " + response.response);
 			// 解析结果
 			parseNetworkResponse(response, draft);
 		} catch (Exception e) {
@@ -143,6 +146,7 @@ public class MultipartService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		Draft weibo = intent.getExtras().getParcelable(Draft.DRAFT);
+		mSendWeiboProcessor = new SendWeiboProcessor(weibo);
 		if (weibo.pic == null) {
 			update(weibo);
 		} else {
@@ -160,7 +164,7 @@ public class MultipartService extends IntentService {
 		if (response.statusCode == 200) {
 			// 更新本地数据
 			JSONObject json = new JSONObject(response.response);
-			sendWeiboProcessor.asyncProcess(this, json);
+			mSendWeiboProcessor.asyncProcess(this, json);
 		} else {
 			JSONObject error = new JSONObject(response.response);
 			fallback(draft, error.optString(WeiboAPIError.ERROR));
@@ -169,15 +173,38 @@ public class MultipartService extends IntentService {
 
 	// 上传失败，那么就把草稿保存在本地
 	private void fallback(Draft draft, String error) {
+		draft.createAt = System.currentTimeMillis();
 		getContentResolver().insert(CatnutProvider.parse(Draft.MULTIPLE), Draft.METADATA.convert(draft));
 		mBuilder.setContentTitle(getString(R.string.post_fail))
 				.setContentText(error)
+				.setTicker(getText(R.string.post_fail))
 				.setProgress(0, 0, false);
+
+		// 添加fallback跳转
+		Intent resultIntent = SingleFragmentActivity.getIntent(this, SingleFragmentActivity.DRAFT);
+
+		TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(this);
+		taskStackBuilder.addParentStack(SingleFragmentActivity.class);
+		taskStackBuilder.addNextIntent(resultIntent);
+		PendingIntent resultPendingIntent =
+				taskStackBuilder.getPendingIntent(
+						ID,
+						PendingIntent.FLAG_UPDATE_CURRENT
+				);
+		mBuilder.setContentIntent(resultPendingIntent)
+				.setAutoCancel(true);
 		mNotifyManager.notify(ID, mBuilder.build());
 	}
 
 	// 解析数据并持久化
-	private CatnutProcessor<JSONObject> sendWeiboProcessor = new CatnutProcessor<JSONObject>() {
+	private class SendWeiboProcessor implements CatnutProcessor<JSONObject> {
+
+		private Draft draft;
+
+		private SendWeiboProcessor(Draft draft) {
+			this.draft = draft;
+		}
+
 		@Override
 		public void asyncProcess(Context context, JSONObject json) throws Exception {
 			// 本地持久化
@@ -188,17 +215,25 @@ public class MultipartService extends IntentService {
 			getContentResolver().update(CatnutProvider.parse(User.MULTIPLE), null, update, null);
 			// 更新status bar
 			mBuilder.setContentText(getText(R.string.post_success))
+					.setTicker(getText(R.string.post_success))
 					.setProgress(0, 0, false);
-			Intent resultIntent = new Intent(context, TweetActivity.class);
+
+			// 设置点击后的跳转
+			Intent resultIntent = new Intent(ComposeTweetService.this, TweetActivity.class);
 			resultIntent.putExtra(Constants.ID, json.optLong(Constants.ID));
-			TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(context);
+
+			TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(ComposeTweetService.this);
 			taskStackBuilder.addParentStack(TweetActivity.class);
 			taskStackBuilder.addNextIntent(resultIntent);
 			PendingIntent resultPendingIntent =
 					taskStackBuilder.getPendingIntent(
-							0,
+							ID,
 							PendingIntent.FLAG_UPDATE_CURRENT
 					);
+			// 判断一下是否是已经保存的草稿
+			if (draft.id != Integer.MIN_VALUE) {
+				getContentResolver().delete(CatnutProvider.parse(Draft.MULTIPLE), BaseColumns._ID + "=" + draft.id, null);
+			}
 			mBuilder.setContentIntent(resultPendingIntent);
 			mBuilder.setAutoCancel(true);
 			mNotifyManager.notify(ID, mBuilder.build());
