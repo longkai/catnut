@@ -7,7 +7,6 @@ package org.catnut.processor;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.util.Log;
 import org.catnut.core.CatnutProcessor;
 import org.catnut.core.CatnutProvider;
 import org.catnut.fragment.FavoriteFragment;
@@ -17,9 +16,6 @@ import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 微博相关处理器
@@ -194,7 +190,7 @@ public class StatusProcessor {
 		@Override
 		public void asyncProcess(Context context, JSONObject data) throws Exception {
 			int delete = 0;
-			JSONArray array = data.optJSONArray("favorites");
+			JSONArray array = data.optJSONArray(Status.FAVORITES);
 			ContentValues[] favorites = new ContentValues[array.length()];
 			ContentValues[] users = new ContentValues[favorites.length];
 			JSONObject json;

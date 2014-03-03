@@ -44,6 +44,7 @@ public final class Status implements CatnutMetadata<JSONObject, ContentValues> {
 	public static final String MULTIPLE = "statuses";
 
 	public static final String COMMENTS = "comments";
+	public static final String FAVORITES = "favorites";
 	public static final String total_number = "total_number";
 
 	// singleton
