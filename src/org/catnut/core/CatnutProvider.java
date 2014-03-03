@@ -11,9 +11,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.util.Log;
+import org.catnut.metadata.Draft;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 
+import static org.catnut.core.CatnutProvider.DRAFT;
+import static org.catnut.core.CatnutProvider.DRAFTS;
 import static org.catnut.core.CatnutProvider.STATUSES;
 import static org.catnut.core.CatnutProvider.USERS;
 
@@ -36,6 +39,8 @@ public class CatnutProvider extends ContentProvider {
 	public static final int USERS = 1;
 	public static final int STATUS = 2;
 	public static final int STATUSES = 3;
+	public static final int DRAFT = 4;
+	public static final int DRAFTS = 5;
 
 	private static UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -44,6 +49,8 @@ public class CatnutProvider extends ContentProvider {
 		matcher.addURI(AUTHORITY, User.MULTIPLE, USERS);
 		matcher.addURI(AUTHORITY, Status.MULTIPLE + "/#", STATUS);
 		matcher.addURI(AUTHORITY, Status.MULTIPLE, STATUSES);
+		matcher.addURI(AUTHORITY, Draft.SINGLE, DRAFT);
+		matcher.addURI(AUTHORITY, Draft.MULTIPLE, DRAFTS);
 	}
 
 	/**
@@ -94,6 +101,12 @@ public class CatnutProvider extends ContentProvider {
 			case STATUSES:
 				type = MULTIPLE_RECORDS_MIME_TYPE + Status.MULTIPLE;
 				break;
+			case DRAFT:
+				type = SINGLE_RECORD_MIME_TYPE + Draft.SINGLE;
+				break;
+			case DRAFTS:
+				type = MULTIPLE_RECORDS_MIME_TYPE + Draft.MULTIPLE;
+				break;
 			default:
 				Log.wtf(TAG, "unknown uri: " + uri);
 		}
@@ -119,6 +132,10 @@ public class CatnutProvider extends ContentProvider {
 				// 这里，比较特殊，直接在selection中写sql，可以包含占位符
 				cursor = db.rawQuery(selection, selectionArgs);
 				break;
+			case DRAFT:
+			case DRAFTS:
+				cursor = db.query(Draft.TABLE, projection, selection, selectionArgs, selection, null, sortOrder);
+				break;
 			default:
 				Log.wtf(TAG, "unknown uri: " + uri);
 				return null;
@@ -136,6 +153,9 @@ public class CatnutProvider extends ContentProvider {
 				break;
 			case STATUSES:
 				table = Status.TABLE;
+				break;
+			case DRAFTS:
+				table = Draft.TABLE;
 				break;
 			default:
 				throw new RuntimeException("unknown uri: " + uri);
@@ -179,6 +199,9 @@ public class CatnutProvider extends ContentProvider {
 		switch (matcher.match(uri)) {
 			case STATUSES:
 				count = mDb.getWritableDatabase().delete(Status.TABLE, selection, selectionArgs);
+				break;
+			case DRAFTS:
+				count = mDb.getWritableDatabase().delete(Draft.TABLE, selection, selectionArgs);
 				break;
 			default:
 				throw new UnsupportedOperationException("not supported for now!");
@@ -230,6 +253,7 @@ public class CatnutProvider extends ContentProvider {
 		public void onCreate(SQLiteDatabase db) {
 			db.execSQL(User.METADATA.ddl());
 			db.execSQL(Status.METADATA.ddl());
+			db.execSQL(Draft.METADATA.ddl());
 			Log.i(TAG, "finish create tables...");
 		}
 
@@ -237,6 +261,7 @@ public class CatnutProvider extends ContentProvider {
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			db.execSQL("DROP TABLE " + User.TABLE);
 			db.execSQL("DROP TABLE " + Status.TABLE);
+			db.execSQL("DROP TABLE " + Draft.TABLE);
 			Log.i(TAG, "finish upgrade table...");
 		}
 	}
