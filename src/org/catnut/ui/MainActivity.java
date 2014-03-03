@@ -18,6 +18,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.os.Process;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -30,6 +31,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -48,6 +50,7 @@ import org.catnut.fragment.MyRelationshipFragment;
 import org.catnut.fragment.UserTimelineFragment;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
+import org.catnut.support.QuickReturnScrollView;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.util.CatnutUtils;
@@ -58,8 +61,9 @@ import org.catnut.util.DateTime;
  *
  * @author longkai
  */
-public class MainActivity extends Activity implements DrawerLayout.DrawerListener, ListView.OnItemClickListener,
-		FragmentManager.OnBackStackChangedListener {
+public class MainActivity extends Activity implements
+		DrawerLayout.DrawerListener, ListView.OnItemClickListener,
+		FragmentManager.OnBackStackChangedListener, QuickReturnScrollView.Callbacks {
 
 	private static final String TAG = "MainActivity";
 
@@ -82,16 +86,23 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 	private boolean mShouldPopupLastTitle = true;
 
 	// for card flip animation
-	private Handler mHandler = new Handler();
+	private ScrollSettleHandler mScrollSettleHandler = new ScrollSettleHandler();
+//	private Handler mHandler = new Handler();
 
 	private CatnutApp mApp;
 	private EasyTracker mTracker;
 	private ActionBar mActionBar;
 
-	private View mDrawer;
-	private ListView mListView;
 	private DrawerLayout mDrawerLayout;
+	private View mPlaceholderView;
+	private View mQuickReturnView;
+	private QuickReturnScrollView mQuickReturnDrawer;
 	private ActionBarDrawerToggle mDrawerToggle;
+
+	private int mMinRawY = 0;
+	private int mState = STATE_ON_SCREEN;
+	private int mQuickReturnHeight;
+	private int mMaxScrollY;
 
 	private String mNick;
 	private ImageView mProfileCover;
@@ -115,11 +126,22 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				R.drawable.ic_drawer, R.string.open_drawer, R.string.close_drawer);
 
 		// the whole left drawer
-		mDrawer = findViewById(R.id.drawer);
+		mQuickReturnDrawer = (QuickReturnScrollView) findViewById(R.id.drawer);
+		mQuickReturnDrawer.setCallbacks(this);
+		mQuickReturnView = findViewById(R.id.quick_return);
+		mPlaceholderView = findViewById(R.id.place_holder);
 
-		mListView = (ListView) findViewById(android.R.id.list);
-		mListView.setAdapter(new DrawerNavAdapter(this, R.array.drawer_list, R.array.drawer_list_header_indexes));
-		mListView.setOnItemClickListener(this);
+		mQuickReturnDrawer.getViewTreeObserver().addOnGlobalLayoutListener(
+				new ViewTreeObserver.OnGlobalLayoutListener() {
+					@Override
+					public void onGlobalLayout() {
+						onScrollChanged(mQuickReturnDrawer.getScrollY());
+						mMaxScrollY = mQuickReturnDrawer.computeVerticalScrollRange()
+								- mQuickReturnDrawer.getHeight();
+						mQuickReturnHeight = mQuickReturnView.getHeight();
+					}
+				}
+		);
 
 		// drawer customized view
 		mProfileCover = (ImageView) findViewById(R.id.avatar_profile);
@@ -128,7 +150,6 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		mTweetLayout = findViewById(R.id.tweet_layout);
 
 		prepareActionBar();
-//			fetchLatestTweet();
 
 		if (savedInstanceState == null) {
 			getFragmentManager()
@@ -171,11 +192,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			@Override
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 				if (cursor.moveToNext()) {
-//					mActionBar.setDisplayUseLogoEnabled(true);
 					mNick = cursor.getString(cursor.getColumnIndex(User.screen_name));
-					// add it to pref for convenient
-					mApp.getPreferences().edit().putString(User.screen_name, mNick).commit();
-//					mActionBar.setTitle(mNick);
 					mTextNick.setText(mNick);
 					Picasso.with(MainActivity.this)
 							.load(cursor.getString(cursor.getColumnIndex(User.avatar_large)))
@@ -234,68 +251,6 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		);
 	}
 
-	private void fetchLatestTweet() {
-		String query = CatnutUtils.buildQuery(
-				new String[]{
-						Status.columnText,
-						Status.thumbnail_pic,
-						Status.comments_count,
-						Status.reposts_count,
-						Status.attitudes_count,
-						Status.source,
-						Status.created_at,
-				},
-				"_id=(select max(s._id) from " + Status.TABLE + " as s where s.uid=" + mApp.getAccessToken().uid + ")",
-				Status.TABLE,
-				null,
-				null,
-				null
-		);
-		new AsyncQueryHandler(getContentResolver()) {
-			@Override
-			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-				if (cursor.moveToNext()) {
-					ViewStub viewStub = (ViewStub) mTweetLayout.findViewById(R.id.latest_tweet);
-					View tweet = viewStub.inflate();
-					String tweetText = cursor.getString(cursor.getColumnIndex(Status.columnText));
-					TweetTextView text = (TweetTextView) CatnutUtils.setText(tweet, R.id.text, new TweetImageSpan(MainActivity.this).getImageSpan(tweetText));
-					// 不处理链接，直接跳转到自己所有的微博
-//					Linkify.addLinks(text, TweetTextView.MENTION_PATTERN, null, null, null);
-//					Linkify.addLinks(text, TweetTextView.TOPIC_PATTERN, null, null, null);
-					Linkify.addLinks(text, TweetTextView.WEB_URL, null, null, null);
-					CatnutUtils.removeLinkUnderline(text);
-
-					int replyCount = cursor.getInt(cursor.getColumnIndex(Status.comments_count));
-					CatnutUtils.setText(tweet, R.id.reply_count, CatnutUtils.approximate(replyCount));
-					int retweetCount = cursor.getInt(cursor.getColumnIndex(Status.reposts_count));
-					CatnutUtils.setText(tweet, R.id.reteet_count, CatnutUtils.approximate(retweetCount));
-					int favoriteCount = cursor.getInt(cursor.getColumnIndex(Status.attitudes_count));
-					CatnutUtils.setText(tweet, R.id.favorite_count, CatnutUtils.approximate(favoriteCount));
-					String source = cursor.getString(cursor.getColumnIndex(Status.source));
-					CatnutUtils.setText(tweet, R.id.source, Html.fromHtml(source).toString());
-					String create_at = cursor.getString(cursor.getColumnIndex(Status.created_at));
-					CatnutUtils.setText(tweet, R.id.create_at, DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(create_at)));
-					CatnutUtils.setText(tweet, R.id.nick, "@" + mActionBar.getTitle()).setTextColor(R.color.actionbar_background);
-					mTweetLayout.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							viewTweets(false);
-						}
-					});
-				}
-				cursor.close();
-			}
-		}.startQuery(
-				0,
-				null,
-				CatnutProvider.parse(Status.MULTIPLE),
-				null,
-				query,
-				null,
-				null
-		);
-	}
-
 	/**
 	 * 查看某个用户的时间线
 	 *
@@ -309,8 +264,8 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 			String screenName = mApp.getPreferences().getString(User.screen_name, null);
 			UserTimelineFragment fragment = UserTimelineFragment.getFragment(id, screenName);
 			mShouldPopupLastTitle = popupLastTitle;
-			if (mDrawerLayout.isDrawerOpen(mDrawer)) {
-				mDrawerLayout.closeDrawer(mDrawer);
+			if (mDrawerLayout.isDrawerOpen(mQuickReturnDrawer)) {
+				mDrawerLayout.closeDrawer(mQuickReturnDrawer);
 			}
 			flipCard(fragment, tag);
 		}
@@ -324,8 +279,8 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		Fragment usersFragment = getFragmentManager().findFragmentByTag(tag);
 		if (usersFragment == null || !usersFragment.isVisible()) {
 			mShouldPopupLastTitle = false;
-			if (mDrawerLayout.isDrawerOpen(mDrawer)) {
-				mDrawerLayout.closeDrawer(mDrawer);
+			if (mDrawerLayout.isDrawerOpen(mQuickReturnDrawer)) {
+				mDrawerLayout.closeDrawer(mQuickReturnDrawer);
 			}
 			flipCard(MyRelationshipFragment.getFragment(true), tag);
 		}
@@ -339,8 +294,8 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		Fragment usersFragment = getFragmentManager().findFragmentByTag(tag);
 		if (usersFragment == null || !usersFragment.isVisible()) {
 			mShouldPopupLastTitle = false;
-			if (mDrawerLayout.isDrawerOpen(mDrawer)) {
-				mDrawerLayout.closeDrawer(mDrawer);
+			if (mDrawerLayout.isDrawerOpen(mQuickReturnDrawer)) {
+				mDrawerLayout.closeDrawer(mQuickReturnDrawer);
 			}
 			flipCard(MyRelationshipFragment.getFragment(false), tag);
 		}
@@ -354,8 +309,8 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		Fragment favoriteFragment = getFragmentManager().findFragmentByTag(tag);
 		if (favoriteFragment == null || !favoriteFragment.isVisible()) {
 			mShouldPopupLastTitle = false;
-			if (mDrawerLayout.isDrawerOpen(mDrawer)) {
-				mDrawerLayout.closeDrawer(mDrawer);
+			if (mDrawerLayout.isDrawerOpen(mQuickReturnDrawer)) {
+				mDrawerLayout.closeDrawer(mQuickReturnDrawer);
 			}
 			flipCard(FavoriteFragment.getFragment(), tag);
 		}
@@ -369,8 +324,8 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 		Fragment favoriteFragment = getFragmentManager().findFragmentByTag(tag);
 		if (favoriteFragment == null || !favoriteFragment.isVisible()) {
 			mShouldPopupLastTitle = false;
-			if (mDrawerLayout.isDrawerOpen(mDrawer)) {
-				mDrawerLayout.closeDrawer(mDrawer);
+			if (mDrawerLayout.isDrawerOpen(mQuickReturnDrawer)) {
+				mDrawerLayout.closeDrawer(mQuickReturnDrawer);
 			}
 			flipCard(DraftFragment.getFragment(), tag);
 		}
@@ -506,7 +461,7 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				Toast.makeText(MainActivity.this, position + " click! not yet implement for now:-(", Toast.LENGTH_SHORT).show();
 				break;
 		}
-		mDrawerLayout.closeDrawer(mDrawer);
+		mDrawerLayout.closeDrawer(mQuickReturnDrawer);
 	}
 
 	@Override
@@ -529,11 +484,112 @@ public class MainActivity extends Activity implements DrawerLayout.DrawerListene
 				.replace(R.id.fragment_container, fragment, tag)
 				.addToBackStack(null)
 				.commit();
-		mHandler.post(new Runnable() {
+		mScrollSettleHandler.post(new Runnable() {
 			@Override
 			public void run() {
 				invalidateOptionsMenu();
 			}
 		});
+	}
+
+	@Override
+	public void onScrollChanged(int scrollY) {
+		scrollY = Math.min(mMaxScrollY, scrollY);
+
+		mScrollSettleHandler.onScroll(scrollY);
+
+		int rawY = mPlaceholderView.getTop() - scrollY;
+		int translationY = 0;
+
+		switch (mState) {
+			case STATE_OFF_SCREEN:
+				if (rawY <= mMinRawY) {
+					mMinRawY = rawY;
+				} else {
+					mState = STATE_RETURNING;
+				}
+				translationY = rawY;
+				break;
+
+			case STATE_ON_SCREEN:
+				if (rawY < -mQuickReturnHeight) {
+					mState = STATE_OFF_SCREEN;
+					mMinRawY = rawY;
+				}
+				translationY = rawY;
+				break;
+
+			case STATE_RETURNING:
+				translationY = (rawY - mMinRawY) - mQuickReturnHeight;
+				if (translationY > 0) {
+					translationY = 0;
+					mMinRawY = rawY - mQuickReturnHeight;
+				}
+
+				if (rawY > 0) {
+					mState = STATE_ON_SCREEN;
+					translationY = rawY;
+				}
+
+				if (translationY < -mQuickReturnHeight) {
+					mState = STATE_OFF_SCREEN;
+					mMinRawY = rawY;
+				}
+				break;
+		}
+		mQuickReturnView.animate().cancel();
+		mQuickReturnView.setTranslationY(translationY + scrollY);
+	}
+
+	@Override
+	public void onDownMotionEvent() {
+		mScrollSettleHandler.setSettleEnabled(false);
+	}
+
+	@Override
+	public void onUpOrCancelMotionEvent() {
+		mScrollSettleHandler.setSettleEnabled(true);
+		mScrollSettleHandler.onScroll(mQuickReturnDrawer.getScrollY());
+	}
+
+	// quick return animation
+	private class ScrollSettleHandler extends Handler {
+		private static final int SETTLE_DELAY_MILLIS = 100;
+
+		private int mSettledScrollY = Integer.MIN_VALUE;
+		private boolean mSettleEnabled;
+
+		public void onScroll(int scrollY) {
+			if (mSettledScrollY != scrollY) {
+				// Clear any pending messages and post delayed
+				removeMessages(0);
+				sendEmptyMessageDelayed(0, SETTLE_DELAY_MILLIS);
+				mSettledScrollY = scrollY;
+			}
+		}
+
+		public void setSettleEnabled(boolean settleEnabled) {
+			mSettleEnabled = settleEnabled;
+		}
+
+		@Override
+		public void handleMessage(Message msg) {
+			// Handle the scroll settling.
+			if (STATE_RETURNING == mState && mSettleEnabled) {
+				int mDestTranslationY;
+				if (mSettledScrollY - mQuickReturnView.getTranslationY() > mQuickReturnHeight / 2) {
+					mState = STATE_OFF_SCREEN;
+					mDestTranslationY = Math.max(
+							mSettledScrollY - mQuickReturnHeight,
+							mPlaceholderView.getTop());
+				} else {
+					mDestTranslationY = mSettledScrollY;
+				}
+
+				mMinRawY = mPlaceholderView.getTop() - mQuickReturnHeight - mDestTranslationY;
+				mQuickReturnView.animate().translationY(mDestTranslationY);
+			}
+			mSettledScrollY = Integer.MIN_VALUE; // reset
+		}
 	}
 }

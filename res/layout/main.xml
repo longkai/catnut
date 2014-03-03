@@ -16,7 +16,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent" />
 
-	<RelativeLayout
+	<org.catnut.support.QuickReturnScrollView
 		android:id="@id/drawer"
 		android:padding="@dimen/medium"
 		android:layout_gravity="start"
@@ -24,102 +24,179 @@
 		android:layout_height="match_parent"
 		android:background="@android:color/white">
 
-		<ImageView
-			android:id="@id/avatar_profile"
-			android:layout_alignParentLeft="true"
-			android:layout_marginRight="@dimen/medium"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
-
-		<TextView
-			android:id="@id/nick"
-			android:layout_toRightOf="@id/avatar_profile"
-			android:textAppearance="@android:style/TextAppearance.Large"
-			android:textColor="@color/actionbar_background"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
-
-		<ImageView
-			android:id="@id/verified"
-			android:visibility="gone"
-			android:src="@drawable/ic_verified"
-			android:layout_toRightOf="@id/nick"
-			android:layout_alignTop="@id/nick"
-			android:layout_alignBottom="@id/nick"
-			android:layout_marginLeft="@dimen/small"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
-
-		<ScrollView
-			android:layout_marginTop="@dimen/medium"
-			android:layout_alignLeft="@id/nick"
-			android:layout_alignBottom="@id/avatar_profile"
-			android:layout_below="@id/nick"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content">
-
-			<TextView
-				android:id="@id/description"
-				android:textColor="@android:color/darker_gray"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content" />
-		</ScrollView>
-
-		<LinearLayout
-			android:id="@id/statics"
-			android:layout_marginTop="@dimen/medium"
-			android:orientation="horizontal"
-			android:showDividers="middle"
-			android:divider="?android:dividerVertical"
-			android:layout_below="@id/avatar_profile"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content">
-
-			<include
-				android:id="@id/tweets_count"
-				android:layout_weight="1"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				layout="@layout/two_line_text" />
-
-			<include
-				android:id="@id/following_count"
-				android:layout_weight="1"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				layout="@layout/two_line_text" />
-
-			<include
-				android:id="@id/followers_count"
-				android:layout_weight="1"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				layout="@layout/two_line_text" />
-		</LinearLayout>
-
-		<!-- 显示最新的一条微博，防止下面list的布局错乱，故加frame layout -->
 		<FrameLayout
-			android:id="@id/tweet_layout"
-			android:clickable="true"
-			android:focusable="true"
-			android:background="?android:attr/selectableItemBackground"
-			android:layout_below="@id/statics"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content">
+			android:layout_height="match_parent">
 
-			<ViewStub
-				android:id="@+id/latest_tweet"
-				android:layout="@layout/tweet_row"
-				android:padding="@null"
-				android:layout_below="@id/statics"
+			<LinearLayout
+				android:orientation="vertical"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content" />
-		</FrameLayout>
+				android:layout_height="match_parent">
 
-		<ListView
-			android:id="@android:id/list"
-			android:layout_below="@id/tweet_layout"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" />
-	</RelativeLayout>
+				<!--place holder view-->
+				<View
+					android:id="@id/place_holder"
+					android:layout_width="match_parent"
+					android:layout_height="100dp" />
+
+				<LinearLayout
+					android:id="@id/statics"
+					android:layout_marginTop="@dimen/medium"
+					android:orientation="horizontal"
+					android:showDividers="middle"
+					android:divider="?android:dividerVertical"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content">
+
+					<include
+						android:id="@id/tweets_count"
+						android:layout_weight="1"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						layout="@layout/two_line_text" />
+
+					<include
+						android:id="@id/following_count"
+						android:layout_weight="1"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						layout="@layout/two_line_text" />
+
+					<include
+						android:id="@id/followers_count"
+						android:layout_weight="1"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						layout="@layout/two_line_text" />
+				</LinearLayout>
+
+				<LinearLayout
+					android:orientation="vertical"
+					android:showDividers="middle"
+					android:padding="@dimen/medium"
+					android:divider="?android:attr/listDivider"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content">
+
+					<TextView
+						android:text="我的"
+						android:textColor="@android:color/holo_blue_bright"
+						android:layout_marginTop="@dimen/medium"
+						android:layout_marginBottom="@dimen/medium"
+						android:textAppearance="?android:attr/textAppearanceMedium"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content" />
+
+					<View
+						android:background="@android:color/holo_blue_bright"
+						android:layout_width="match_parent"
+						android:layout_height="1dp" />
+
+					<TextView
+						android:id="@+id/action_my_tweets"
+						android:text="@string/tweets"
+						style="@style/Profile_Action" />
+
+					<TextView
+						android:id="@+id/action_my_followings"
+						android:text="@string/followings"
+						style="@style/Profile_Action" />
+
+					<TextView
+						android:id="@+id/action_my_followers"
+						android:text="@string/followers"
+						style="@style/Profile_Action" />
+
+					<TextView
+						android:id="@+id/action_my_list"
+						android:text="分组"
+						style="@style/Profile_Action" />
+
+					<TextView
+						android:id="@+id/action_my_favorites"
+						android:text="@string/my_favorites"
+						style="@style/Profile_Action" />
+
+					<TextView
+						android:id="@+id/action_my_drafts"
+						android:text="@string/my_drafts"
+						style="@style/Profile_Action" />
+
+
+					<TextView
+						android:text="其它"
+						android:textColor="@android:color/holo_blue_bright"
+						android:layout_marginTop="@dimen/medium"
+						android:layout_marginBottom="@dimen/medium"
+						android:textAppearance="?android:attr/textAppearanceMedium"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content" />
+
+					<View
+						android:background="@android:color/holo_blue_bright"
+						android:layout_width="match_parent"
+						android:layout_height="1dp" />
+
+					<TextView
+						android:id="@+id/action_share_app"
+						android:text="@string/share_app"
+						style="@style/Profile_Action" />
+
+					<TextView
+						android:id="@+id/action_view_source_code"
+						android:text="@string/source_code"
+						style="@style/Profile_Action" />
+				</LinearLayout>
+			</LinearLayout>
+
+			<!--sticky view-->
+			<RelativeLayout
+				android:id="@+id/quick_return"
+				android:orientation="horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="100dp">
+
+				<ImageView
+					android:id="@id/avatar_profile"
+					android:layout_alignParentLeft="true"
+					android:layout_marginRight="@dimen/medium"
+					android:layout_width="100dp"
+					android:layout_height="100dp" />
+
+				<TextView
+					android:id="@id/nick"
+					android:layout_toRightOf="@id/avatar_profile"
+					android:textAppearance="@android:style/TextAppearance.Large"
+					android:textColor="@color/actionbar_background"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content" />
+
+				<ImageView
+					android:id="@id/verified"
+					android:visibility="gone"
+					android:src="@drawable/ic_verified"
+					android:layout_toRightOf="@id/nick"
+					android:layout_alignTop="@id/nick"
+					android:layout_alignBottom="@id/nick"
+					android:layout_marginLeft="@dimen/small"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content" />
+
+				<ScrollView
+					android:layout_marginTop="@dimen/medium"
+					android:layout_alignLeft="@id/nick"
+					android:layout_alignBottom="@id/avatar_profile"
+					android:layout_below="@id/nick"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content">
+
+					<TextView
+						android:id="@id/description"
+						android:textColor="@android:color/darker_gray"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content" />
+				</ScrollView>
+			</RelativeLayout>
+		</FrameLayout>
+	</org.catnut.support.QuickReturnScrollView>
 </android.support.v4.widget.DrawerLayout>
