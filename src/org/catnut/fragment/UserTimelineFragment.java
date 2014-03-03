@@ -153,6 +153,9 @@ public class UserTimelineFragment extends TimelineFragment {
 								CatnutProvider.parse(Status.MULTIPLE),
 								BaseColumns._ID + "=" + id, null
 						);
+						// 更新用户数据 -1
+						String update = CatnutUtils.increment(false, User.TABLE, User.statuses_count, mUid);
+						context.getContentResolver().delete(CatnutProvider.parse(User.MULTIPLE), update, null);
 					}
 				},
 				null,
