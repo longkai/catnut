@@ -13,9 +13,6 @@ import android.app.TaskStackBuilder;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -26,6 +23,7 @@ import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProcessor;
 import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
+import org.catnut.metadata.Draft;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
@@ -74,36 +72,33 @@ public class MultipartService extends IntentService {
 	}
 
 	// 发送文字
-	private void update(Weibo weibo) {
+	private void update(final Draft draft) {
 		mApp.getRequestQueue().add(new CatnutRequest(
 				this,
-				TweetAPI.update(weibo.status, weibo.visible, weibo.list_id, weibo.lat, weibo._long, null, weibo.rip),
+				TweetAPI.update(draft.status, draft.visible, draft.list_id, draft.lat, draft._long, null, draft.rip),
 				sendWeiboProcessor,
 				null,
 				new Response.ErrorListener() {
 					@Override
 					public void onErrorResponse(VolleyError error) {
 						WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
-						mBuilder.setContentTitle(getString(R.string.post_fail))
-								.setContentText(weiboAPIError.error)
-								.setProgress(0, 0, false);
-						mNotifyManager.notify(ID, mBuilder.build());
+						fallback(draft, weiboAPIError.error);
 					}
 				}
 		)).setTag(TAG);
 	}
 
 	// 发送图片&文字
-	private void upload(Weibo weibo) {
-		HttpClient client = new HttpClient(weibo.pic == null ? UPDATE : UPLOAD);
+	private void upload(Draft draft) {
+		HttpClient client = new HttpClient(UPLOAD);
 		InputStream inputStream = null;
 		try {
 			client.connectForMultipart();
-			client.addFormPart("status", weibo.status);
-			client.addFormPart("lat", String.valueOf(CatnutUtils.scaleNumber(weibo.lat, 1)));
-			client.addFormPart("long", String.valueOf(CatnutUtils.scaleNumber(weibo._long, 1)));
+			client.addFormPart(Draft.STATUS, draft.status);
+			client.addFormPart(Draft.LAT, String.valueOf(CatnutUtils.scaleNumber(draft.lat, 1)));
+			client.addFormPart(Draft._LONG, String.valueOf(CatnutUtils.scaleNumber(draft._long, 1)));
 			// todo: 其它的参数，有需要的时候再加了
-			inputStream = getContentResolver().openInputStream(weibo.pic);
+			inputStream = getContentResolver().openInputStream(draft.pic);
 
 			// 显示发送进度条
 			int total = inputStream.available();
@@ -120,20 +115,20 @@ public class MultipartService extends IntentService {
 				mBuilder.setProgress(100, (int) progress, false);
 				mNotifyManager.notify(ID, mBuilder.build());
 			}
+			client.addFilePart(Draft.PIC, draft.pic.getLastPathSegment(), byteBuffer.toByteArray());
+			client.finishMultipart();
+
 			mBuilder.setContentText(getString(R.string.notify_waiting_result));
 			mNotifyManager.notify(ID, mBuilder.build());
 
-			client.addFilePart("pic", weibo.pic.getLastPathSegment(), byteBuffer.toByteArray());
-			client.finishMultipart();
 			// 获取结果
 			HttpClient.UploadResponse response = client.getResponse();
+			Log.e(TAG, response.statusCode + " " + response.response);
 			// 解析结果
-			parseNetworkResponse(response);
+			parseNetworkResponse(response, draft);
 		} catch (Exception e) {
 			Log.e(TAG, "upload error!", e);
-			mBuilder.setContentTitle(getString(R.string.post_fail))
-					.setContentText(e.getLocalizedMessage())
-					.setProgress(0, 0, false);
+			fallback(draft, e.getLocalizedMessage());
 		} finally {
 			if (inputStream != null) {
 				try {
@@ -147,7 +142,7 @@ public class MultipartService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Weibo weibo = intent.getExtras().getParcelable(Weibo.WEIBO);
+		Draft weibo = intent.getExtras().getParcelable(Draft.DRAFT);
 		if (weibo.pic == null) {
 			update(weibo);
 		} else {
@@ -161,17 +156,24 @@ public class MultipartService extends IntentService {
 	 * @param response
 	 * @throws JSONException
 	 */
-	private void parseNetworkResponse(HttpClient.UploadResponse response) throws Exception {
+	private void parseNetworkResponse(HttpClient.UploadResponse response, Draft draft) throws Exception {
 		if (response.statusCode == 200) {
 			// 更新本地数据
 			JSONObject json = new JSONObject(response.response);
 			sendWeiboProcessor.asyncProcess(this, json);
 		} else {
-			mBuilder.setContentTitle(getString(R.string.post_fail))
-					.setContentText(response.response)
-					.setProgress(0, 0, false);
-			mNotifyManager.notify(ID, mBuilder.build());
+			JSONObject error = new JSONObject(response.response);
+			fallback(draft, error.optString(WeiboAPIError.ERROR));
 		}
+	}
+
+	// 上传失败，那么就把草稿保存在本地
+	private void fallback(Draft draft, String error) {
+		getContentResolver().insert(CatnutProvider.parse(Draft.MULTIPLE), Draft.METADATA.convert(draft));
+		mBuilder.setContentTitle(getString(R.string.post_fail))
+				.setContentText(error)
+				.setProgress(0, 0, false);
+		mNotifyManager.notify(ID, mBuilder.build());
 	}
 
 	// 解析数据并持久化
@@ -202,63 +204,4 @@ public class MultipartService extends IntentService {
 			mNotifyManager.notify(ID, mBuilder.build());
 		}
 	};
-
-
-	/**
-	 * 待发送的微博
-	 *
-	 * @author longkai
-	 */
-	public static class Weibo implements Parcelable {
-
-		public static final String WEIBO = "weibo";
-
-		public String status;
-		public int visible = 0;
-		public String list_id;
-		public float lat = 0.f;
-		public float _long = 0.f;
-		public String annotations;
-		public String rip;
-		public Uri pic;
-
-		@Override
-		public int describeContents() {
-			return 0;
-		}
-
-		@Override
-		public void writeToParcel(Parcel dest, int flags) {
-			dest.writeString(status);
-			dest.writeInt(visible);
-			dest.writeString(list_id);
-			dest.writeFloat(lat);
-			dest.writeFloat(_long);
-			dest.writeString(annotations);
-			dest.writeString(rip);
-			dest.writeParcelable(pic, flags);
-		}
-
-		public static final Creator<Weibo> CREATOR = new Creator<Weibo>() {
-			@Override
-			public Weibo createFromParcel(Parcel source) {
-				Weibo weibo = new Weibo();
-				weibo.status = source.readString();
-				weibo.visible = source.readInt();
-				weibo.list_id = source.readString();
-				weibo.lat = source.readFloat();
-				weibo._long = source.readFloat();
-				weibo.annotations = source.readString();
-				weibo.rip = source.readString();
-				weibo.pic = source.readParcelable(Thread.currentThread().getContextClassLoader());
-				return weibo;
-			}
-
-			@Override
-			public Weibo[] newArray(int size) {
-				return new Weibo[size];
-			}
-		};
-	}
-
 }

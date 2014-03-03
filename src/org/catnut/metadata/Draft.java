@@ -5,6 +5,7 @@
  */
 package org.catnut.metadata;
 
+import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -15,9 +16,9 @@ import org.catnut.core.CatnutMetadata;
 /**
  * 草稿
  *
- * @author longkai 
+ * @author longkai
  */
-public class Draft implements CatnutMetadata<Void, Void>, Parcelable {
+public class Draft implements CatnutMetadata<Draft, ContentValues>, Parcelable {
 
 	public static final String DRAFT = "Draft";
 	public static final String TABLE = "drafts";
@@ -35,7 +36,7 @@ public class Draft implements CatnutMetadata<Void, Void>, Parcelable {
 
 	public static final Draft METADATA = new Draft();
 
-	private Draft(){}
+//	private Draft(){}
 
 	public String status;
 	public int visible = 0;
@@ -86,7 +87,7 @@ public class Draft implements CatnutMetadata<Void, Void>, Parcelable {
 
 	@Override
 	public String ddl() {
-		Log.i(TABLE, "create table [statuses]...");
+		Log.i(TABLE, "create table [drafts]...");
 
 		StringBuilder ddl = new StringBuilder("CREATE TABLE ");
 		ddl.append(TABLE).append("(")
@@ -104,7 +105,16 @@ public class Draft implements CatnutMetadata<Void, Void>, Parcelable {
 	}
 
 	@Override
-	public Void convert(Void data) {
-		return null;
+	public ContentValues convert(Draft data) {
+		ContentValues draft = new ContentValues();
+		draft.put(STATUS, data.status);
+		draft.put(_LONG, data._long);
+		draft.put(LAT, data.lat);
+		draft.put(ANNOTATIONS, data.annotations);
+		draft.put(VISIBLE, data.visible);
+		draft.put(LIST_ID, data.list_id);
+		draft.put(RIP, data.rip);
+		draft.put(PIC, data.pic.toString());
+		return draft;
 	}
 }
