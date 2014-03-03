@@ -73,19 +73,23 @@ public class HelloActivity extends Activity {
 		if (mApp.getAccessToken() == null) {
 			startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.AUTH));
 		} else {
-//			startActivity(new Intent(HelloActivity.this, MainActivity.class));
-			setContentView(R.layout.about);
-			fetch500px();
-			mAbout = findViewById(R.id.about);
-			mFantasy = (ImageView) findViewById(R.id.fantasy);
-			ActionBar bar = getActionBar();
-			bar.setTitle("fantasy");
-			TextView about = (TextView) findViewById(R.id.about_body);
-			about.setText(Html.fromHtml(getString(R.string.about_body)));
-			loadImage();
-		}
-		if (mApp.getPreferences().getBoolean(getString(R.string.enable_analytics), true)) {
-			mTracker = EasyTracker.getInstance(this);
+			if (mPreferences.getBoolean(getString(R.string.pref_enter_home_directly), getResources().getBoolean(R.bool.pref_enter_home_directly))) {
+				startActivity(new Intent(HelloActivity.this, MainActivity.class));
+			} else {
+				setContentView(R.layout.about);
+				fetch500px();
+				mAbout = findViewById(R.id.about);
+				mFantasy = (ImageView) findViewById(R.id.fantasy);
+				ActionBar bar = getActionBar();
+				bar.setTitle("fantasy");
+				TextView about = (TextView) findViewById(R.id.about_body);
+				about.setText(Html.fromHtml(getString(R.string.about_body)));
+				loadImage();
+
+				if (mApp.getPreferences().getBoolean(getString(R.string.enable_analytics), true)) {
+					mTracker = EasyTracker.getInstance(this);
+				}
+			}
 		}
 	}
 
@@ -93,11 +97,6 @@ public class HelloActivity extends Activity {
 	private void fetch500px() {
 		if (mPreferences.getBoolean(getString(R.string.pref_enable_fantasy),
 				getResources().getBoolean(R.bool.pref_enable_fantasy))) {
-//			long now = System.currentTimeMillis();
-//			long last = mPreferences.getLong(TAG, now);
-//			if (now != last || (now - last) < (1000 * 24 * 60 * 60)) { // less than 1 day... no try
-//				return; // stop here...
-//			}
 			mApp.getRequestQueue().add(new CatnutRequest(
 					this,
 					_500pxAPI.photos("popular"),
@@ -111,8 +110,6 @@ public class HelloActivity extends Activity {
 								photos[i] = Photo.METADATA.convert(array.optJSONObject(i));
 							}
 							context.getContentResolver().bulkInsert(CatnutProvider.parse(Photo.MULTIPLE), photos);
-							SharedPreferences.Editor edit = mPreferences.edit();
-							edit.putLong(TAG, System.currentTimeMillis()).commit();
 						}
 					},
 					null,

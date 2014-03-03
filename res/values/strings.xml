@@ -185,4 +185,8 @@
 	<string name="show_fantasy_only">图片/说明 切换</string>
 	<string name="app_desc">让微博 简洁&amp;流畅</string>
 	<string name="default_art">默认</string>
+	<string name="enable_fantasy">启用fantasy</string>
+	<string name="enable_fantasy_summary">启用后，你可以发现意象不到的精彩瞬间:-)，建议在wifi下开启</string>
+	<string name="enter_home_directly">直接进入主页</string>
+	<string name="enter_home_directly_summary">启动应用后直接进入主页时间线，不显示fantasy</string>
 </resources>
