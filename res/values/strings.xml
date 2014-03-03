@@ -160,7 +160,7 @@
 
 	<string name="about_body"><![CDATA[
         <b>{ }</b> with <b>♥</b> by <b><a href="mailto:im.longkai@gmail.com">longkai</a></b> in <b>Guilin</b>.
-        <i>Catnut</i> is a compound word of cat and nut, which made by one of my friends.
+        <i>Catnut</i> is a compound word of cat and nut, which was made by one of my friends.
         Whatever it means, hope you like it!
         <br><br>
 
@@ -179,6 +179,15 @@
 
         <b><a href="http://viewpagerindicator.com/">ViewPagerIndicator</a>&nbsp;</b><br>
         <i>by Jake Wharton, Patrik Åkerfeldt, and Francisco Figueiredo Jr.</i><br><br>
+
+		<b><a href="http://www.google.com/events/io/2010/sessions/developing-RESTful-android-apps.htm.com/">Code inspired</a>&nbsp;</b><br>
+        <i>from Google I/O 2010</i><br><br>
+
+        <b><a href="https://about.twitter.com/zh-hans/products/android/">Design inspired</a>&nbsp;</b><br>
+        <i>from Twitter for Android</i><br><br>
+
+        <b>Some icons &nbsp;</b><br>
+        <i>from Twitter for Android</i><br><br>
     ]]></string>
 	<string name="about_version_template">v%1$s</string>
 	<string name="change_fantasy">换一张</string>
