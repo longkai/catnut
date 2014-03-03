@@ -77,7 +77,7 @@
 	<PreferenceCategory android:title="@string/about">
 
 		<Preference
-			android:key="@string/pref_about"
+			android:key="@string/pref_version"
 			android:title="@string/version"
 			android:summary="@string/version_name" />
 
@@ -89,7 +89,7 @@
 		<Preference
 			android:key="@string/pref_author"
 			android:title="@string/author"
-			android:summary="龙凯 im.longkai@gmail.com" />
+			android:summary="{ } with ♥ by longkai in Guilin" />
 
 		<Preference
 			android:key="@string/pref_source_code"

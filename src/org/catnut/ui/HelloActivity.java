@@ -48,10 +48,12 @@ import org.json.JSONObject;
  */
 public class HelloActivity extends Activity {
 
-	private static final String TAG = "HelloActivity";
+	public static final String TAG = "HelloActivity";
 
 	/** 欢迎界面默认的播放时间 */
 	private static final long DEFAULT_SPLASH_TIME_MILLS = 3000L;
+
+//	private static final int MIN_FANTASY_RUN_TIMES = 3;
 
 	// only use for auth!
 	private EasyTracker mTracker;
@@ -73,23 +75,36 @@ public class HelloActivity extends Activity {
 		if (mApp.getAccessToken() == null) {
 			startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.AUTH));
 		} else {
-			if (mPreferences.getBoolean(getString(R.string.pref_enter_home_directly), getResources().getBoolean(R.bool.pref_enter_home_directly))) {
-				startActivity(new Intent(HelloActivity.this, MainActivity.class));
+			// 根据情况跳转
+			if (getIntent().hasExtra(TAG)) {
+				init();
+			} /*else if (mPreferences.getInt(getString(R.string.pref_run_times), 0) < MIN_FANTASY_RUN_TIMES) {
+				init();
+				String key = getString(R.string.pref_run_times);
+				int before = mPreferences.getInt(key, 0);
+				mPreferences.edit().putInt(key, before++);
+			} */else if (mPreferences.getBoolean(getString(R.string.pref_enter_home_directly),
+					getResources().getBoolean(R.bool.pref_enter_home_directly))) {
+				startActivity(new Intent(this, MainActivity.class));
 			} else {
-				setContentView(R.layout.about);
-				fetch500px();
-				mAbout = findViewById(R.id.about);
-				mFantasy = (ImageView) findViewById(R.id.fantasy);
-				ActionBar bar = getActionBar();
-				bar.setTitle("fantasy");
-				TextView about = (TextView) findViewById(R.id.about_body);
-				about.setText(Html.fromHtml(getString(R.string.about_body)));
-				loadImage();
-
-				if (mApp.getPreferences().getBoolean(getString(R.string.enable_analytics), true)) {
-					mTracker = EasyTracker.getInstance(this);
-				}
+				init();
 			}
+		}
+	}
+
+	private void init() {
+		setContentView(R.layout.about);
+		fetch500px();
+		mAbout = findViewById(R.id.about);
+		mFantasy = (ImageView) findViewById(R.id.fantasy);
+		ActionBar bar = getActionBar();
+		bar.setTitle("fantasy");
+		TextView about = (TextView) findViewById(R.id.about_body);
+		about.setText(Html.fromHtml(getString(R.string.about_body)));
+		loadImage();
+
+		if (mApp.getPreferences().getBoolean(getString(R.string.enable_analytics), true)) {
+			mTracker = EasyTracker.getInstance(this);
 		}
 	}
 

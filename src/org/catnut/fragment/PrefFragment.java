@@ -16,13 +16,11 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.webkit.WebView;
-import android.widget.TextView;
 import android.widget.Toast;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
+import org.catnut.ui.HelloActivity;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,8 +69,8 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 			} else if (key.equals(getString(R.string.pref_author))) {
 				intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "im.longkai@gmail.com", null));
 				intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
-			} else if (key.equals(getString(R.string.pref_about))) {
-				intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.commit_link)));
+			} else if (key.equals(getString(R.string.pref_version))) {
+				intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/longkai/catnut/commits/master"));
 			} else if (key.equals(getString(R.string.pref_open_source_license))) {
 				InputStream inputStream = null;
 				try {
@@ -105,28 +103,7 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 					.show();
 				return true;
 			} else if (key.equals(getString(R.string.pref_notes))) {
-				InputStream inputStream = null;
-				try {
-					inputStream = getActivity().getAssets().open("notes.txt");
-					View v = LayoutInflater.from(getActivity()).inflate(R.layout.scroll_text, null);
-					TextView tv = (TextView) v.findViewById(android.R.id.text1);
-					tv.setText(new Scanner(inputStream).useDelimiter("\\A").next());
-					new AlertDialog.Builder(getActivity())
-						.setTitle("Notes")
-						.setView(v)
-						.setNeutralButton(android.R.string.ok, null)
-						.show();
-				} catch (IOException e) {
-					Log.e(TAG, "error open notes from assets!", e);
-				} finally {
-					if (inputStream != null) {
-						try {
-							inputStream.close();
-						} catch (IOException e) {
-						}
-					}
-				}
-				return true;
+				intent = new Intent(getActivity(), HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG);
 			}
 			if (intent != null) {
 				startActivity(intent);
