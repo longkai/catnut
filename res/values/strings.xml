@@ -95,7 +95,7 @@
 	<string name="require_not_empty">码几个字先嘛*_*</string>
 	<string name="compose">发微博</string>
 	<string name="action_send">发送</string>
-	<string name="post_success">发表成功！</string>
+	<string name="post_success">发送成功！</string>
 	<string name="abort_existing_tweet_alert">确定牺牲正在编织的微博？</string>
 	<string name="retweet_success">转发成功！</string>
 	<string name="retweet_option_hint">转发同时评论?</string>
@@ -129,6 +129,10 @@
 	<string name="network_unavailable">network unavailable!</string>
 	<string name="his_timeline">%1$s 的时间线</string>
 	<string name="home_timeline">主页时间线</string>
+	<string name="notify_send_tweet">发送微博</string>
+	<string name="notify_send_tweet_text">微博正在发送中...</string>
+	<string name="notify_waiting_result">等待新浪返回结果...</string>
+	<string name="post_fail">发送失败！</string>
 	<string-array name="drawer_list">
 		<item>我的</item>
 		<item>微博</item>

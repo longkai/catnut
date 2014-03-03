@@ -24,7 +24,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import org.catnut.R;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.support.TweetURLSpan;
@@ -34,7 +33,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import static org.catnut.support.TweetTextView.MENTION_FILTER;
@@ -418,7 +416,7 @@ public class CatnutUtils {
 	 */
 	public static byte[] getBytes(InputStream inputStream) throws IOException {
 		ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-		int bufferSize = 2048;
+		int bufferSize = 2048 * 10; // 2m
 		byte[] buffer = new byte[bufferSize];
 
 		int len;

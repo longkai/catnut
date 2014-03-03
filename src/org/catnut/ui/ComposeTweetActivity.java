@@ -18,6 +18,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.BaseColumns;
@@ -63,14 +64,18 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.StatusProcessor;
+import org.catnut.service.MultipartService;
+import org.catnut.support.HttpClient;
 import org.catnut.support.LocationSupport;
 import org.catnut.support.MultiPartRequest;
+import org.catnut.support.MultipartAPI;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.util.CatnutUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -98,7 +103,6 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 	private View mCustomizedBar;
 	private TextView mTextCounter;
 	private View mSender; // 发送触发按钮
-	private View mProgressor; // 发送进度条
 
 	// widgets
 	private SlidingPaneLayout mSlidingPaneLayout;
@@ -358,7 +362,6 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 		mCustomizedBar = LayoutInflater.from(this).inflate(R.layout.customized_actionbar, null);
 		mTextCounter = (TextView) mCustomizedBar.findViewById(R.id.text_counter);
 		mSender = mCustomizedBar.findViewById(R.id.action_send);
-		mProgressor = mCustomizedBar.findViewById(android.R.id.progress);
 		mActionBar.setCustomView(mCustomizedBar, new ActionBar.LayoutParams(
 				ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.MATCH_PARENT, Gravity.END));
@@ -368,8 +371,6 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 		listener = new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
-				mSender.setVisibility(View.VISIBLE);
-				mProgressor.setVisibility(View.GONE);
 				// delete posted text and thumbs
 				mText.setText(null);
 				if (mUris != null) {
@@ -382,8 +383,6 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 		errorListener = new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				mSender.setVisibility(View.VISIBLE);
-				mProgressor.setVisibility(View.GONE);
 				Log.e(TAG, "post tweet error!", error);
 				WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
 				Toast.makeText(ComposeTweetActivity.this, weiboAPIError.error, Toast.LENGTH_LONG).show();
@@ -510,25 +509,16 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 			return; // stop here
 		}
 		// 防止多次提交
-		mSender.setVisibility(View.GONE);
-		mProgressor.setVisibility(View.VISIBLE);
+		Intent intent = new Intent(this, MultipartService.class);
+		MultipartService.Weibo weibo = new MultipartService.Weibo();
+		weibo.status = mText.getText().toString();
+		weibo._long = (float) mLongitude;
+		weibo.lat = (float) mLatitude;
 		if (mUris != null && mUris.size() > 0) { // 有图片的
-			mApp.getRequestQueue().add(new MultiPartRequest(
-					this,
-					TweetAPI.upload(mText.getText().toString(), 0, null, mUris, (float) mLatitude, (float) mLongitude, null, null),
-					new StatusProcessor.SingleTweetProcessor(Status.HOME),
-					listener,
-					errorListener
-			)).setTag(TAG);
-		} else {
-			mApp.getRequestQueue().add(new CatnutRequest(
-					this,
-					TweetAPI.update(mText.getText().toString(), 0, null, (float) mLatitude, (float) mLongitude, null, null),
-					new StatusProcessor.SingleTweetProcessor(Status.HOME),
-					listener,
-					errorListener
-			)).setTag(TAG);
+			weibo.pic = mUris.get(0);
 		}
+		intent.putExtra(MultipartService.Weibo.WEIBO, weibo);
+		startService(intent);
 	}
 
 	@Override

@@ -61,5 +61,6 @@
 		<provider
 			android:authorities="org.catnut"
 			android:name=".core.CatnutProvider" />
+		<service android:name=".service.MultipartService" />
 	</application>
 </manifest>

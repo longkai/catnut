@@ -15,6 +15,7 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 
 import static org.catnut.core.CatnutProvider.STATUSES;
+import static org.catnut.core.CatnutProvider.USERS;
 
 /**
  * 应用程序数据源。
@@ -190,7 +191,7 @@ public class CatnutProvider extends ContentProvider {
 	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
 		SQLiteDatabase db;
 		switch (matcher.match(uri)) {
-			case USER:
+			case USERS:
 			case STATUSES:
 				db = mDb.getWritableDatabase();
 				db.execSQL(selection);

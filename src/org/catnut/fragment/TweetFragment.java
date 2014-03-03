@@ -92,7 +92,7 @@ public class TweetFragment extends Fragment implements
 			"s._id",
 			Status.uid,
 			Status.columnText,
-//			Status.source,
+//			Weibo.source,
 			"s." + Status.created_at,
 			User.screen_name,
 			User.profile_image_url,
