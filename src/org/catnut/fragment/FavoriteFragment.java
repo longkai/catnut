@@ -5,6 +5,7 @@
  */
 package org.catnut.fragment;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.Loader;
@@ -222,7 +223,9 @@ public class FavoriteFragment extends TimelineFragment {
 	@Override
 	public void onStart() {
 		super.onStart();
-		getActivity().getActionBar().setTitle(getString(R.string.my_favorites));
+		ActionBar actionBar = getActivity().getActionBar();
+		actionBar.setTitle(getString(R.string.my_favorites));
+		actionBar.setDisplayShowHomeEnabled(false);
 	}
 
 	@Override

@@ -5,6 +5,7 @@
  */
 package org.catnut.fragment;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.Loader;
@@ -111,7 +112,9 @@ public class MyRelationshipFragment extends TimelineFragment {
 	@Override
 	public void onStart() {
 		super.onStart();
-		getActivity().getActionBar().setTitle(
+		ActionBar bar = getActivity().getActionBar();
+		bar.setDisplayShowHomeEnabled(false);
+		bar.setTitle(
 				getString(mIsFollowing ? R.string.my_followings_title : R.string.follow_me_title)
 		);
 	}

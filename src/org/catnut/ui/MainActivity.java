@@ -22,39 +22,25 @@ import android.os.Message;
 import android.os.Process;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
-import android.text.Html;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
-import android.text.util.Linkify;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewStub;
 import android.view.ViewTreeObserver;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.squareup.picasso.Picasso;
 import org.catnut.R;
-import org.catnut.adapter.DrawerNavAdapter;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
-import org.catnut.fragment.DraftFragment;
-import org.catnut.fragment.FavoriteFragment;
 import org.catnut.fragment.HomeTimelineFragment;
-import org.catnut.fragment.MyRelationshipFragment;
-import org.catnut.fragment.UserTimelineFragment;
-import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.support.QuickReturnScrollView;
-import org.catnut.support.TweetImageSpan;
-import org.catnut.support.TweetTextView;
 import org.catnut.util.CatnutUtils;
-import org.catnut.util.DateTime;
+import org.catnut.util.Constants;
 
 /**
  * 应用程序主界面。
@@ -62,7 +48,7 @@ import org.catnut.util.DateTime;
  * @author longkai
  */
 public class MainActivity extends Activity implements
-		DrawerLayout.DrawerListener, ListView.OnItemClickListener,
+		DrawerLayout.DrawerListener, View.OnClickListener,
 		FragmentManager.OnBackStackChangedListener, QuickReturnScrollView.Callbacks {
 
 	private static final String TAG = "MainActivity";
@@ -80,14 +66,8 @@ public class MainActivity extends Activity implements
 			R.id.action_view_source_code,
 	};
 
-	/** the last title before drawer open */
-	private transient CharSequence mTitleBeforeDrawerClosed;
-	/** should we go back to the last title before the drawer open? */
-	private boolean mShouldPopupLastTitle = true;
-
 	// for card flip animation
 	private ScrollSettleHandler mScrollSettleHandler = new ScrollSettleHandler();
-//	private Handler mHandler = new Handler();
 
 	private CatnutApp mApp;
 	private EasyTracker mTracker;
@@ -108,7 +88,6 @@ public class MainActivity extends Activity implements
 	private ImageView mProfileCover;
 	private TextView mTextNick;
 	private TextView mDescription;
-	private View mTweetLayout;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -147,9 +126,9 @@ public class MainActivity extends Activity implements
 		mProfileCover = (ImageView) findViewById(R.id.avatar_profile);
 		mTextNick = (TextView) findViewById(R.id.nick);
 		mDescription = (TextView) findViewById(R.id.description);
-		mTweetLayout = findViewById(R.id.tweet_layout);
 
-		prepareActionBar();
+		prepareDrawer();
+		injectListeners();
 
 		if (savedInstanceState == null) {
 			getFragmentManager()
@@ -157,8 +136,8 @@ public class MainActivity extends Activity implements
 					.replace(R.id.fragment_container, HomeTimelineFragment.getFragment())
 					.commit();
 		}
-		getFragmentManager().addOnBackStackChangedListener(this);
 
+		getFragmentManager().addOnBackStackChangedListener(this);
 		if (mApp.getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
 			mTracker = EasyTracker.getInstance(this);
 		}
@@ -180,10 +159,7 @@ public class MainActivity extends Activity implements
 		}
 	}
 
-	/**
-	 * 设置顶部，关联用户的头像和昵称
-	 */
-	private void prepareActionBar() {
+	private void prepareDrawer() {
 		// for drawer
 		mActionBar.setDisplayHomeAsUpEnabled(true);
 		mActionBar.setHomeButtonEnabled(true);
@@ -209,32 +185,17 @@ public class MainActivity extends Activity implements
 					CatnutUtils.setText(flowerCount, android.R.id.text1, cursor.getString(cursor.getColumnIndex(User.followers_count)));
 					CatnutUtils.setText(flowerCount, android.R.id.text2, getString(R.string.followers));
 					View tweetsCount = findViewById(R.id.tweets_count);
-					tweetsCount.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							viewTweets(false);
-						}
-					});
-					flowerCount.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							viewFollowers();
-						}
-					});
-					flowingCount.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							viewFollowings();
-						}
-					});
+
+					tweetsCount.setOnClickListener(MainActivity.this);
+					flowingCount.setOnClickListener(MainActivity.this);
+					flowerCount.setOnClickListener(MainActivity.this);
 					CatnutUtils.setText(tweetsCount, android.R.id.text1, cursor.getString(cursor.getColumnIndex(User.statuses_count)));
 					CatnutUtils.setText(tweetsCount, android.R.id.text2, getString(R.string.tweets));
 				}
 				cursor.close();
 			}
 		}.startQuery(
-				0,
-				null,
+				0, null,
 				CatnutProvider.parse(User.MULTIPLE, mApp.getAccessToken().uid),
 				new String[]{
 						User.screen_name,
@@ -245,90 +206,19 @@ public class MainActivity extends Activity implements
 						User.friends_count,
 						User.verified
 				},
-				null,
-				null,
-				null
+				null, null, null
 		);
 	}
 
-	/**
-	 * 查看某个用户的时间线
-	 *
-	 * @param popupLastTitle actionbar的title是否回滚，用于drawer的点击事件
-	 */
-	public void viewTweets(boolean popupLastTitle) {
-		String tag = "my_tweets";
-		Fragment f = getFragmentManager().findFragmentByTag(tag);
-		if (f == null || !f.isVisible()) {
-			long id = mApp.getAccessToken().uid;
-			String screenName = mApp.getPreferences().getString(User.screen_name, null);
-			UserTimelineFragment fragment = UserTimelineFragment.getFragment(id, screenName);
-			mShouldPopupLastTitle = popupLastTitle;
-			if (mDrawerLayout.isDrawerOpen(mQuickReturnDrawer)) {
-				mDrawerLayout.closeDrawer(mQuickReturnDrawer);
-			}
-			flipCard(fragment, tag);
-		}
-	}
-
-	/**
-	 * 查看某个用户关注的用户
-	 */
-	public void viewFollowings() {
-		String tag = "following";
-		Fragment usersFragment = getFragmentManager().findFragmentByTag(tag);
-		if (usersFragment == null || !usersFragment.isVisible()) {
-			mShouldPopupLastTitle = false;
-			if (mDrawerLayout.isDrawerOpen(mQuickReturnDrawer)) {
-				mDrawerLayout.closeDrawer(mQuickReturnDrawer);
-			}
-			flipCard(MyRelationshipFragment.getFragment(true), tag);
-		}
-	}
-
-	/**
-	 * 查看某个用户关注的用户
-	 */
-	public void viewFollowers() {
-		String tag = "follower";
-		Fragment usersFragment = getFragmentManager().findFragmentByTag(tag);
-		if (usersFragment == null || !usersFragment.isVisible()) {
-			mShouldPopupLastTitle = false;
-			if (mDrawerLayout.isDrawerOpen(mQuickReturnDrawer)) {
-				mDrawerLayout.closeDrawer(mQuickReturnDrawer);
-			}
-			flipCard(MyRelationshipFragment.getFragment(false), tag);
-		}
-	}
-
-	/**
-	 * 查看我的收藏
-	 */
-	private void viewFavorites() {
-		String tag = "fav";
-		Fragment favoriteFragment = getFragmentManager().findFragmentByTag(tag);
-		if (favoriteFragment == null || !favoriteFragment.isVisible()) {
-			mShouldPopupLastTitle = false;
-			if (mDrawerLayout.isDrawerOpen(mQuickReturnDrawer)) {
-				mDrawerLayout.closeDrawer(mQuickReturnDrawer);
-			}
-			flipCard(FavoriteFragment.getFragment(), tag);
-		}
-	}
-
-	/**
-	 * 查看我的草稿
-	 */
-	private void viewDrafts() {
-		String tag = "draft";
-		Fragment favoriteFragment = getFragmentManager().findFragmentByTag(tag);
-		if (favoriteFragment == null || !favoriteFragment.isVisible()) {
-			mShouldPopupLastTitle = false;
-			if (mDrawerLayout.isDrawerOpen(mQuickReturnDrawer)) {
-				mDrawerLayout.closeDrawer(mQuickReturnDrawer);
-			}
-			flipCard(DraftFragment.getFragment(), tag);
-		}
+	private void injectListeners() {
+		findViewById(R.id.action_my_tweets).setOnClickListener(this);
+		findViewById(R.id.action_my_followings).setOnClickListener(this);
+		findViewById(R.id.action_my_followers).setOnClickListener(this);
+		findViewById(R.id.action_my_list).setOnClickListener(this);
+		findViewById(R.id.action_my_favorites).setOnClickListener(this);
+		findViewById(R.id.action_my_drafts).setOnClickListener(this);
+		findViewById(R.id.action_share_app).setOnClickListener(this);
+		findViewById(R.id.action_view_source_code).setOnClickListener(this);
 	}
 
 	@Override
@@ -402,17 +292,13 @@ public class MainActivity extends Activity implements
 	@Override
 	public void onDrawerOpened(View drawerView) {
 		mDrawerToggle.onDrawerOpened(drawerView);
-		mTitleBeforeDrawerClosed = mActionBar.getTitle();
 		mActionBar.setTitle(getString(R.string.my_profile));
 	}
 
 	@Override
 	public void onDrawerClosed(View drawerView) {
 		mDrawerToggle.onDrawerClosed(drawerView);
-		if (mShouldPopupLastTitle) {
-			mActionBar.setTitle(mTitleBeforeDrawerClosed);
-		}
-		mShouldPopupLastTitle = true;
+		mActionBar.setTitle(getString(R.string.home_timeline));
 	}
 
 	@Override
@@ -425,12 +311,37 @@ public class MainActivity extends Activity implements
 		mDrawerToggle.onDrawerStateChanged(newState);
 	}
 
+
 	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		Intent intent;
-		switch (DRAWER_LIST_ITEMS_IDS[position]) {
+	public void onBackStackChanged() {
+		invalidateOptionsMenu();
+	}
+
+	@Override
+	public void onClick(View v) {
+		Intent intent = null;
+		switch (v.getId()) {
+			case R.id.tweets_count:
 			case R.id.action_my_tweets:
-				viewTweets(false);
+				intent = SingleFragmentActivity.getIntent(this, SingleFragmentActivity.USER_TWEETS);
+				intent.putExtra(Constants.ID, mApp.getAccessToken().uid);
+				intent.putExtra(User.screen_name, mApp.getPreferences().getString(User.screen_name, null));
+				break;
+			case R.id.following_count:
+			case R.id.action_my_followings:
+				intent = SingleFragmentActivity.getIntent(this, SingleFragmentActivity.FRIENDS);
+				intent.putExtra(User.following, true);
+				break;
+			case R.id.followers_count:
+			case R.id.action_my_followers:
+				intent = SingleFragmentActivity.getIntent(this, SingleFragmentActivity.FRIENDS);
+				intent.putExtra(User.following, false);
+				break;
+			case R.id.action_my_favorites:
+				intent = SingleFragmentActivity.getIntent(this, SingleFragmentActivity.FAVORITES);
+				break;
+			case R.id.action_my_drafts:
+				intent = SingleFragmentActivity.getIntent(this, SingleFragmentActivity.DRAFT);
 				break;
 			case R.id.action_share_app:
 				intent = new Intent(Intent.ACTION_SEND);
@@ -439,34 +350,17 @@ public class MainActivity extends Activity implements
 				intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text));
 				intent.putExtra(Intent.EXTRA_STREAM,
 						Uri.parse("android.resource://org.catnut/drawable/ic_launcher"));
-				startActivity(intent);
 				break;
 			case R.id.action_view_source_code:
 				intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.github_link)));
-				startActivity(intent);
 				break;
-			case R.id.action_my_followings:
-				viewFollowings();
-				break;
-			case R.id.action_my_followers:
-				viewFollowers();
-				break;
-			case R.id.action_my_favorites:
-				viewFavorites();
-				break;
-			case R.id.action_my_drafts:
-				viewDrafts();
-				break;
+			case R.id.action_my_list:
 			default:
-				Toast.makeText(MainActivity.this, position + " click! not yet implement for now:-(", Toast.LENGTH_SHORT).show();
-				break;
+				Toast.makeText(this, "sorry, not yet implemented =.=", Toast.LENGTH_SHORT).show();
+				return;
 		}
+		startActivity(intent);
 		mDrawerLayout.closeDrawer(mQuickReturnDrawer);
-	}
-
-	@Override
-	public void onBackStackChanged() {
-		invalidateOptionsMenu();
 	}
 
 	/**

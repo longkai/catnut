@@ -5,6 +5,7 @@
  */
 package org.catnut.fragment;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ListFragment;
 import android.app.LoaderManager;
@@ -61,7 +62,9 @@ public class DraftFragment extends ListFragment implements LoaderManager.LoaderC
 	@Override
 	public void onStart() {
 		super.onStart();
-		getActivity().getActionBar().setTitle(getString(R.string.my_drafts));
+		ActionBar actionBar = getActivity().getActionBar();
+		actionBar.setDisplayShowHomeEnabled(false);
+		actionBar.setTitle(getString(R.string.my_drafts));
 	}
 
 	@Override

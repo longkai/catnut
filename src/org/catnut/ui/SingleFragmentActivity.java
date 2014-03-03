@@ -18,8 +18,12 @@ import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.fragment.DraftFragment;
+import org.catnut.fragment.FavoriteFragment;
+import org.catnut.fragment.MyRelationshipFragment;
 import org.catnut.fragment.PhotoViewerFragment;
 import org.catnut.fragment.PrefFragment;
+import org.catnut.fragment.UserTimelineFragment;
+import org.catnut.metadata.User;
 import org.catnut.util.Constants;
 
 /**
@@ -33,6 +37,9 @@ public class SingleFragmentActivity extends Activity {
 	public static final int PREF = 0;
 	public static final int PHOTO_VIEWER = 1;
 	public static final int DRAFT = 2;
+	public static final int USER_TWEETS = 3;
+	public static final int FRIENDS = 4; // 可以为关注或者粉丝
+	public static final int FAVORITES = 5;
 
 	private EasyTracker mTracker;
 
@@ -54,6 +61,17 @@ public class SingleFragmentActivity extends Activity {
 					break;
 				case DRAFT:
 					fragment = DraftFragment.getFragment();
+					break;
+				case FAVORITES:
+					fragment = FavoriteFragment.getFragment();
+					break;
+				case FRIENDS:
+					fragment = MyRelationshipFragment.getFragment(getIntent().getBooleanExtra(User.following, true));
+					break;
+				case USER_TWEETS:
+					long id = getIntent().getLongExtra(Constants.ID, 0L);
+					String screenName = getIntent().getStringExtra(User.screen_name);
+					fragment = UserTimelineFragment.getFragment(id, screenName);
 					break;
 				default:
 					// get out!

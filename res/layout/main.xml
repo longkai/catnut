@@ -109,22 +109,21 @@
 
 					<TextView
 						android:id="@+id/action_my_list"
-						android:text="分组"
+						android:text="@string/list"
 						style="@style/Profile_Action" />
 
 					<TextView
 						android:id="@+id/action_my_favorites"
-						android:text="@string/my_favorites"
+						android:text="@string/favorite"
 						style="@style/Profile_Action" />
 
 					<TextView
 						android:id="@+id/action_my_drafts"
-						android:text="@string/my_drafts"
+						android:text="@string/draft"
 						style="@style/Profile_Action" />
 
-
 					<TextView
-						android:text="其它"
+						android:text="@string/others"
 						android:textColor="@android:color/holo_blue_bright"
 						android:layout_marginTop="@dimen/medium"
 						android:layout_marginBottom="@dimen/medium"
