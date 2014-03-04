@@ -7,7 +7,7 @@
 
 个人学习时作品，目前有空或者有新的想法就写写，持续构建中:-)，欢迎感兴趣的朋友交流，fork，clone，bug issue啥的!
 
-> 项目主页请见[这里][project-host]
+项目主页请见[这里][project-host], app安装包[下载][download]，目前需要Android 4.1+
 
 > ![about][]
 
@@ -78,3 +78,4 @@ last update: 2014-03-04
 
 [about]: https://farm8.staticflickr.com/7417/12923931494_b40944bdcd_o.png "about"
 [project-host]: http://longkai.github.io/catnut/ "project-host"
+[download]: https://dl.dropboxusercontent.com/u/96034496/apps/catnut-latest.apk "下载apk文件"
