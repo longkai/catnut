@@ -44,4 +44,5 @@
 
 	<item name="action_share_app" type="id" />
 	<item name="action_view_source_code" type="id" />
+	<item name="fantasy" type="id" />
 </resources>

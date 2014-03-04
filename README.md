@@ -7,7 +7,9 @@
 
 个人学习时作品，目前有空或者有新的想法就写写，持续构建中:-)，欢迎感兴趣的朋友交流，fork，clone，bug issue啥的!
 
-> ![show][]
+> 项目主页请见[这里][project-host]
+
+> ![about][]
 
 ## 环境需求
 1. Android SDK >= 4.1.x（API Level >= 16），*建议设置ANDROID_HOME环境变量*
@@ -61,7 +63,6 @@ last update: 2014-03-04
 
 [developing-RESTful-android-apps]: http://www.google.com/events/io/2010/sessions/developing-RESTful-android-apps.html "developing-RESTful-android-apps"
 [Twitter for Android]: https://about.twitter.com/zh-hans/products/android "twitter for android"
-[show]: http://farm4.staticflickr.com/3824/12456581065_a01628cf23_o.png "效果图"
 [Intellij IDEA Community]: http://www.jetbrains.com/idea/ "Intellij IDEA"
 [ADT Bundle]: http://developer.android.com/sdk/index.html "ADT Bundle"
 [ProGuard]: http://proguard.sourceforge.net/index.html "ProGuard"
@@ -74,3 +75,6 @@ last update: 2014-03-04
 [@longkai_1991]: https://twitter.com/longkai_1991 "twitter"
 [creative commons icon]: http://i.creativecommons.org/l/by-nc/4.0/88x31.png "creative commons icon"
 [creative commons license]: http://creativecommons.org/licenses/by-nc/4.0/deed.zh "creative commons license"
+
+[about]: https://farm8.staticflickr.com/7417/12923931494_b40944bdcd_o.png "about"
+[project-host]: http://longkai.github.io/catnut/ "project-host"

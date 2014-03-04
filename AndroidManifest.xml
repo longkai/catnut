@@ -10,7 +10,7 @@
 	android:versionName="@string/version_name">
 
 	<uses-sdk
-		android:minSdkVersion="14"
+		android:minSdkVersion="16"
 		android:targetSdkVersion="19" />
 
 	<uses-permission android:name="android.permission.INTERNET" />
