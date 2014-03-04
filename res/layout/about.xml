@@ -10,7 +10,7 @@
 
 	<ImageView
 		android:id="@+id/fantasy"
-		android:src="@drawable/defaul_fantasy"
+		android:src="@drawable/default_fantasy"
 		android:scaleType="fitXY"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent" />

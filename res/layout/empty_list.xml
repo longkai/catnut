@@ -6,9 +6,10 @@
   ~ The software shall be used for good, not evil.
   -->
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:background="@drawable/default_fantasy"
 	android:padding="@dimen/medium"
 	android:text="@string/no_tweets"
-	android:textColor="@android:color/secondary_text_light"
+	android:textColor="@android:color/white"
 	android:layout_gravity="center_vertical|center_horizontal"
 	android:textAppearance="?android:attr/textAppearanceMedium"
 	android:gravity="center_vertical|center_horizontal"

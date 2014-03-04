@@ -191,7 +191,7 @@ public class HelloActivity extends Activity {
 				startActivity(new Intent(this, MainActivity.class));
 				break;
 			case R.id.check_default:
-				mFantasy.setImageResource(R.drawable.defaul_fantasy);
+				mFantasy.setImageResource(R.drawable.default_fantasy);
 				break;
 			default:
 				break;
