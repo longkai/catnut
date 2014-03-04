@@ -102,7 +102,7 @@ public class HelloActivity extends Activity {
 		bar.setTitle(R.string.fantasy);
 		TextView about = (TextView) findViewById(R.id.about_body);
 		TextView version = (TextView) findViewById(R.id.app_version);
-		version.setText(getString(R.string.about_version_template, R.string.version_name));
+		version.setText(getString(R.string.about_version_template, getString(R.string.version_name)));
 		about.setText(Html.fromHtml(getString(R.string.about_body)));
 		about.setMovementMethod(LinkMovementMethod.getInstance());
 		loadImage();
@@ -122,7 +122,7 @@ public class HelloActivity extends Activity {
 					new CatnutProcessor<JSONObject>() {
 						@Override
 						public void asyncProcess(Context context, JSONObject data) throws Exception {
-							Log.d(TAG, String.valueOf(data));
+							Log.d(TAG, "load 500px done...");
 							JSONArray array = data.optJSONArray(Photo.MULTIPLE);
 							ContentValues[] photos = new ContentValues[array.length()];
 							for (int i = 0; i < array.length(); i++) {

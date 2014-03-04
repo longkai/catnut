@@ -56,7 +56,8 @@ public class SingleFragmentActivity extends Activity {
 					fragment = PrefFragment.getFragment();
 					break;
 				case PHOTO_VIEWER:
-					getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+//					getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+					setTheme(R.style.Theme_About);
 					String picUrl = getIntent().getStringExtra(Constants.PIC);
 					fragment = PhotoViewerFragment.getFragment(picUrl);
 					break;

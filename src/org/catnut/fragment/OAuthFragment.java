@@ -97,7 +97,7 @@ public class OAuthFragment extends Fragment {
 									@Override
 									public void onResponse(JSONObject response) {
 										mProgressDialog.dismiss();
-										mApp.getPreferences().edit().putString(User.screen_name, response.optString(User.screen_name));
+										mApp.getPreferences().edit().putString(User.screen_name, response.optString(User.screen_name)).commit();
 										Intent intent = new Intent(getActivity(), MainActivity.class);
 										intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 										startActivity(intent);

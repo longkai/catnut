@@ -126,7 +126,7 @@ public class PhotoViewerFragment extends Fragment {
 		super.onAttach(activity);
 		ActionBar bar = activity.getActionBar();
 		bar.setTitle(activity.getString(R.string.view_photos));
-		bar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.actionbar_overlay)));
+		bar.setDisplayShowHomeEnabled(true);
 		bar.setIcon(R.drawable.ic_title_content_picture_dark);
 		mUri = getArguments().getString(TAG);
 		setHasOptionsMenu(true);

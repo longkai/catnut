@@ -83,6 +83,7 @@
 		<item name="android:windowActionBarOverlay">true</item>
 		<item name="android:windowBackground">@android:color/transparent</item>
 		<item name="android:titleTextStyle">@style/ActionBar_Light_TextStyle</item>
+		<item name="android:actionOverflowButtonStyle">@style/OverflowButtonStyle_Light</item>
 	</style>
 
 	<style name="About.ActionBar" parent="android:Widget.Holo.Light.ActionBar">
