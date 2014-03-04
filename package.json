@@ -1,6 +1,5 @@
 {
 	"name": "Catnut",
-	"title": "爱猫的坚果",
 	"decription": "新浪微博Android Rest Client",
 	"author": {
 		"name": "longkai",
@@ -20,7 +19,9 @@
 		"support-v13",
 		"android-volley",
 		"ActionBar-PullToRefresh",
-		"Google Analytics"
+		"Google Analytics",
+		"Picasso",
+		"ViewPagerIndicator",
 	],
 	"license": {
 		"type": "MIT",

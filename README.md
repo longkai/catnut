@@ -1,6 +1,8 @@
 新浪微博Android REST Client
 =====================
 ## 说明
+简洁，流畅的微博app，并且fantasy每天都会带你发现地球上的精彩瞬间:-)
+
 程序架构启发自Google IO 2010 - [developing-RESTful-android-apps][]，界面设计启发自[Twitter for Android][]（需翻墙）
 
 个人学习时作品，目前有空或者有新的想法就写写，持续构建中:-)，欢迎感兴趣的朋友交流，fork，clone，bug issue啥的!
@@ -20,9 +22,11 @@
 ## 依赖（在``build.gradle``里``dependencies {}``申明）
 1. support-v4，注意版本号，为什么我们的项目要求那么高的API却还需要兼容库呢？因为兼容库不仅仅提供兼容类，还有其它的功能。并且没有用到的类可以在编译期间被删除掉[?][ProGuard]
 2. support-v13，for native fragment api
-3. android-volley，异步http请求框架，需要自行[下载][volley]并引入
+3. android-volley，异步http请求框架，需要自行[下载][volley]或者通过Android Studio引引入
 4. ActionBar-PullToRefresh，刷新控件，需自行[下载][pull2refresh]或者通过Android Studio引入
 5. Google Analytics，匿名统计使用信息，需自行[下载][Google Analytics]并引入
+6. Picasso，图片缓存框架，需自行[下载][Picasso]或者通过Android Studio引入
+7. ViewPagerIndicator, 页面切换指示器，需自行[下载][ViewPagerIndicator]或者通过Android Studio引入
 
 ## 如何构建
 1. 通过IDE
@@ -53,7 +57,7 @@ document license
 4. 新浪微博：[@龙凯Orz][]
 
 ---
-2014-01-18
+last update: 2014-03-04
 
 [developing-RESTful-android-apps]: http://www.google.com/events/io/2010/sessions/developing-RESTful-android-apps.html "developing-RESTful-android-apps"
 [Twitter for Android]: https://about.twitter.com/zh-hans/products/android "twitter for android"
@@ -64,6 +68,8 @@ document license
 [volley]: https://android.googlesource.com/platform/frameworks/volley "android-volley"
 [pull2refresh]: https://github.com/chrisbanes/ActionBar-PullToRefresh "ActionBar-PullToRefresh"
 [Google Analytics]: https://developers.google.com/analytics/devguides/collection/android/v3/ "Google Analytics v3"
+[Picasso]: http://square.github.io/picasso/ "Picasso"
+[ViewPagerIndicator]: http://viewpagerindicator.com/ "ViewPagerIndicator"
 [@龙凯Orz]: http://weibo.com/coding4fun "sina weibo"
 [@longkai_1991]: https://twitter.com/longkai_1991 "twitter"
 [creative commons icon]: http://i.creativecommons.org/l/by-nc/4.0/88x31.png "creative commons icon"
