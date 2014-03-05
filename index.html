@@ -1,146 +1,188 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+<head>
+	<meta charset='utf-8'>
+	<meta http-equiv="X-UA-Compatible" content="chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen"/>
+	<link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen"/>
+	<link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print"/>
 
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
 
-    <title>Catnut by longkai</title>
-  </head>
+	<title>Catnut by longkai</title>
+</head>
 
-  <body>
-    <header>
-      <div class="inner">
-        <h1>Catnut</h1>
-        <h2>新浪微博Android REST Client</h2>
-        <a href="https://github.com/longkai/catnut" class="button"><small>View project on</small>GitHub</a>
-      </div>
-    </header>
+<body>
+<header>
+	<div class="inner">
+		<h1>Catnut</h1>
 
-    <div id="content-wrapper">
-      <div class="inner clearfix">
-        <section id="main-content">
-          <h1>
-<a name="%E6%96%B0%E6%B5%AA%E5%BE%AE%E5%8D%9Aandroid-rest-client" class="anchor" href="#%E6%96%B0%E6%B5%AA%E5%BE%AE%E5%8D%9Aandroid-rest-client"><span class="octicon octicon-link"></span></a>新浪微博Android REST Client</h1>
+		<h2>新浪微博Android REST Client</h2>
+		<a href="https://github.com/longkai/catnut" class="button">
+			<small>View project on</small>
+			GitHub</a>
+	</div>
+</header>
 
-<h2>
-<a name="%E8%AF%B4%E6%98%8E" class="anchor" href="#%E8%AF%B4%E6%98%8E"><span class="octicon octicon-link"></span></a>说明</h2>
-<p>简洁，流畅的微博app，并且fantasy每天都会带你发现地球上的精彩瞬间:-)</p>
+<div id="content-wrapper">
+	<div class="inner clearfix">
+		<section id="main-content">
+			<h1>
+				<a name="%E6%96%B0%E6%B5%AA%E5%BE%AE%E5%8D%9Aandroid-rest-client" class="anchor"
+				   href="#%E6%96%B0%E6%B5%AA%E5%BE%AE%E5%8D%9Aandroid-rest-client"><span
+						class="octicon octicon-link"></span></a>新浪微博Android REST Client</h1>
 
-<p>程序架构启发自Google IO 2010 - <a href="http://www.google.com/events/io/2010/sessions/developing-RESTful-android-apps.html" title="developing-RESTful-android-apps">developing-RESTful-android-apps</a>，界面设计启发自<a href="https://about.twitter.com/zh-hans/products/android" title="twitter for android">Twitter for Android</a>（需翻墙）</p>
+			<h2>
+				<a class="anchor" href=""><span class="octicon octicon-link"></span></a>说明</h2>
 
-<p>个人学习时作品，目前有空或者有新的想法就写写，持续构建中:-)，欢迎感兴趣的朋友交流，fork，clone，bug issue啥的!</p>
+			<p>很高兴的告诉大家，今天Catnut的第一个公开版本发布了，这还不是正式版，毕竟版本号还没到1.0嘛，新鲜出炉，我敢保证，肯定会有些fc啊，崩溃什么的，请大家见谅，并给我反馈，我有时间一定会改进的。</p>
 
-<blockquote>
-	<p><img src="https://farm8.staticflickr.com/7417/12923931494_b40944bdcd_o.png" alt="show" title="fantasy"></p>
-</blockquote>			
+			<p>
+				经过29，30，31号这几天的尝试和重构，微博的核心功能基本上都ok了，当然，也只是包含核心功能哈，美其名曰，简洁。不过老实说，这个app感觉像是自己对微博的理解，对我来说这些功能基本上都是刚需了。有的人真的就只是需要快速的获取自己感兴趣最新的信息，发发微博，评论一下，查看自己的或者感兴趣的人的时间线，诸如此类，仅此而已。对于那些臃肿的东西，大杂烩似的，从来都不会感冒。</p>
 
-<blockquote>
-<p><img src="https://farm8.staticflickr.com/7379/12923889494_7e27f1d17e_o.png" alt="show" title="tweet"></p>
-</blockquote>
+			<p>说说这个app的特点吧，简洁，流畅，去广告，省流量，支持离线查看，并且附带了一个每天更新的发现精彩瞬间的福利~</p>
 
-<blockquote>
-	<p><img src="https://v4s1.yimg.com/sj/2848/12923956025_8a9c6dea00_o.png" alt="show" title="compose"></p>
-</blockquote>
+			<h2>
+				<a class="anchor" href=""><span class="octicon octicon-link"></span></a>程序设计</h2>
 
-<blockquote>
-	<p><img src="https://v4s2.yimg.com/so/7366/12924066943_0e6125cc8a_o.png" alt="show" title="emotions"></p>
-</blockquote>
+			<p>程序的架构我觉得还是非常不错的（个人卖瓜)，参考了Google I/O 2010的一篇论文，写的一个RESTFUL风格的app，整体来说，整个层次都挺清晰的，从界面，api封装，发送请求，解析请求，本地缓存，即时显示数据诸如此类。所有的耗费时间的操作（除了显示表情和打开uri吧）都放在了异步线程处理，基本上应该不会出现程序卡死（我从来没遇到过）的情况了，当然，fc（闪退）还是有可能的，不过这不是一码事Orz
 
-<blockquote>
-	<p><img src="https://farm8.staticflickr.com/7444/12923475885_a83a91a37b_o.png" alt="show" title="profile"></p>
-</blockquote>
 
-<blockquote>
-	<p><img src="https://farm8.staticflickr.com/7444/12923591503_735247e636_o.png" alt="show" title="pref"></p>
-</blockquote>
+				整个操作还是挺流畅的吧，刷新还是加载更多都挺快的，把时间线一直拉长，拉到1000+的微博还是很流畅的Orz 我的机器是1G的内存，相信能跑的起Android 4.1+的机器基本上不会低于1G的内存。（测试环境为wifi， Android4.4.2&art）
 
-<blockquote>
-	<p><img src="https://farm4.staticflickr.com/3691/12923486775_931aafc43b_o.png" alt="show" title="timeline"></p>
-</blockquote>
 
-<blockquote>
-	<p><img src="https://farm4.staticflickr.com/3773/12923604283_deed35bea1_o.png" alt="show" title="drawer"></p>
-</blockquote>
+				此外，这app挺省流量的，尽可能的通过少的请求获取尽可能多的数据。app支持离线功能，尽可能的会把得到的数据缓存起来，这些数据可以在没有网络的情况下或者你自己设置是否优先选择本地数据加载哈~</p>
 
-<blockquote>
-	<p><img src="https://farm8.staticflickr.com/7407/12923493415_1fa0fe12dc_o.png" alt="show" title="home"></p>
-</blockquote>
+			<h2>
+				<a class="anchor" href=""><span class="octicon octicon-link"></span></a>界面设计</h2>
+			<p>这个应该是很朴素的Android Design了，参考（也可以说是模仿，那话咋说，模仿是最好的恭维嘛）了Twitter的界面，不少图标也是从Twitter那里拿到的，说得我都不好意思了，反正估计大多数人也不知道有Twitter这个存在吧Orz
 
-<blockquote>
-	<p><img src="https://farm8.staticflickr.com/7308/12923911674_5d1b0337e5_o.png" alt="show" title="friends"></p>
-</blockquote>
 
-<p>code license</p>
+				用微信的朋友们可能发现微信5.2的界面变了，和以前大不一样了，也许爱玩app的你也发现了其实市面上存在不少类似微信界面设计的应用，不过更多的是类似之前微信界面的应用，比如现在的官方微博，什么什么的，那不是Android的风格，那个是水果IOS的风格。至于这两个平台的设计理念我也不想讨论了，其实我也不太懂哈！不过可以预见，会有越来越多的app会的界面会转向微信那种界面，大家应该会逐渐接受的，我说的是Android平台哦Orz</p>
 
-<blockquote>
+			<blockquote>
+				<p><img src="https://farm8.staticflickr.com/7417/12923931494_b40944bdcd_o.png" alt="show"
+						title="fantasy"></p>
+			</blockquote>
+
+			<blockquote>
+				<p><img src="https://farm8.staticflickr.com/7379/12923889494_7e27f1d17e_o.png" alt="show" title="tweet">
+				</p>
+			</blockquote>
+
+			<blockquote>
+				<p><img src="https://v4s1.yimg.com/sj/2848/12923956025_8a9c6dea00_o.png" alt="show" title="compose"></p>
+			</blockquote>
+
+			<blockquote>
+				<p><img src="https://v4s2.yimg.com/so/7366/12924066943_0e6125cc8a_o.png" alt="show" title="emotions">
+				</p>
+			</blockquote>
+
+			<blockquote>
+				<p><img src="https://farm8.staticflickr.com/7444/12923475885_a83a91a37b_o.png" alt="show"
+						title="profile"></p>
+			</blockquote>
+
+			<blockquote>
+				<p><img src="https://farm8.staticflickr.com/7444/12923591503_735247e636_o.png" alt="show" title="pref">
+				</p>
+			</blockquote>
+
+			<blockquote>
+				<p><img src="https://farm4.staticflickr.com/3691/12923486775_931aafc43b_o.png" alt="show"
+						title="timeline"></p>
+			</blockquote>
+
+			<blockquote>
+				<p><img src="https://farm4.staticflickr.com/3773/12923604283_deed35bea1_o.png" alt="show"
+						title="drawer"></p>
+			</blockquote>
+
+			<blockquote>
+				<p><img src="https://farm8.staticflickr.com/7407/12923493415_1fa0fe12dc_o.png" alt="show" title="home">
+				</p>
+			</blockquote>
+
+			<blockquote>
+				<p><img src="https://farm8.staticflickr.com/7308/12923911674_5d1b0337e5_o.png" alt="show"
+						title="friends"></p>
+			</blockquote>
+
+			<p>code license</p>
+
+			<blockquote>
 <pre><code>The MIT License (MIT)
-Copyright (c) 2014 longkai
-The software shall be used for good, not evil.
+	Copyright (c) 2014 longkai
+	The software shall be used for good, not evil.
 </code></pre>
-</blockquote>
+			</blockquote>
 
-<p>document license</p>
+			<p>document license</p>
 
-<blockquote>
-<p>本作品采用<a href="http://creativecommons.org/licenses/by-nc/4.0/deed.zh" title="creative commons license">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可。</p>
+			<blockquote>
+				<p>本作品采用<a href="http://creativecommons.org/licenses/by-nc/4.0/deed.zh"
+						   title="creative commons license">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可。</p>
 
-<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" alt="" title="creative commons icon"></p>
-</blockquote>
+				<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" alt="" title="creative commons icon">
+				</p>
+			</blockquote>
 
-<h2>
-<a name="%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85" class="anchor" href="#%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85"><span class="octicon octicon-link"></span></a>联系作者</h2>
+			<h2>
+				<a name="%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85" class="anchor"
+				   href="#%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85"><span class="octicon octicon-link"></span></a>联系作者</h2>
 
-<ol>
-<li>邮箱：<a href="mailto:im.longkai@gmail.com">im.longkai@gmail.com</a>
-</li>
-<li>微信：longkai_1991</li>
-<li>Twitter: <a href="https://twitter.com/longkai_1991" title="twitter">@longkai_1991</a>
-</li>
-<li>新浪微博：<a href="http://weibo.com/coding4fun" title="sina weibo">@龙凯Orz</a>
-</li>
-</ol><hr><p>2014-02-14</p>
-        </section>
+			<ol>
+				<li>邮箱：<a href="mailto:im.longkai@gmail.com">im.longkai@gmail.com</a>
+				</li>
+				<li>微信：longkai_1991</li>
+				<li>Twitter: <a href="https://twitter.com/longkai_1991" title="twitter">@longkai_1991</a>
+				</li>
+				<li>新浪微博：<a href="http://weibo.com/coding4fun" title="sina weibo">@龙凯Orz</a>
+				</li>
+			</ol>
+			<hr>
+			<p>2014-02-14</p>
+		</section>
 
-        <aside id="sidebar">
-          <a href="https://dl.dropboxusercontent.com/u/96034496/apps/catnut-latest.apk" class="button">
-            <small>Download</small>
-            .apk file
-          </a>
-          <a href="https://github.com/longkai/catnut/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/longkai/catnut/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
+		<aside id="sidebar">
+			<a href="https://dl.dropboxusercontent.com/u/96034496/apps/catnut-latest.apk" class="button">
+				<small>Download</small>
+				.apk file
+			</a>
+			<a href="https://github.com/longkai/catnut/zipball/master" class="button">
+				<small>Download</small>
+				.zip file
+			</a>
+			<a href="https://github.com/longkai/catnut/tarball/master" class="button">
+				<small>Download</small>
+				.tar.gz file
+			</a>
 
-          <p class="repo-owner"><a href="https://github.com/longkai/catnut"></a> is maintained by <a href="https://github.com/longkai">longkai</a>.</p>
+			<p class="repo-owner"><a href="https://github.com/longkai/catnut"></a> is maintained by <a
+					href="https://github.com/longkai">longkai</a>.</p>
 
-          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
-        </aside>
-      </div>
-    </div>
+			<p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme
+				by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+		</aside>
+	</div>
+</div>
 
-            <script type="text/javascript">
-            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-          </script>
-          <script type="text/javascript">
-            try {
-              var pageTracker = _gat._getTracker("UA-48110501-1");
-            pageTracker._trackPageview();
-            } catch(err) {}
-          </script>
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+	try {
+		var pageTracker = _gat._getTracker("UA-48110501-1");
+		pageTracker._trackPageview();
+	} catch (err) {
+	}
+</script>
 
-  </body>
+</body>
 </html>
