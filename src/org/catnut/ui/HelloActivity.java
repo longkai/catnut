@@ -12,6 +12,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
@@ -28,6 +30,7 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import org.catnut.R;
 import org.catnut.api._500pxAPI;
 import org.catnut.core.CatnutApp;
@@ -157,11 +160,31 @@ public class HelloActivity extends Activity {
 					public void run() {
 						Picasso.with(HelloActivity.this)
 								.load(cursor.getString(cursor.getColumnIndex(Photo.image_url)))
-								.into(mFantasy);
+								.into(target);
 						cursor.close();
 					}
 				});
+			} else {
+				cursor.close();
 			}
+		}
+	};
+
+	private Target target = new Target() {
+		@Override
+		public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+			mFantasy.setImageBitmap(bitmap);
+			mFantasy.setScaleType(ImageView.ScaleType.FIT_XY);
+		}
+
+		@Override
+		public void onBitmapFailed(Drawable errorDrawable) {
+
+		}
+
+		@Override
+		public void onPrepareLoad(Drawable placeHolderDrawable) {
+
 		}
 	};
 

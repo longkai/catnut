@@ -23,10 +23,12 @@ import android.os.Process;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -41,6 +43,8 @@ import org.catnut.metadata.User;
 import org.catnut.support.QuickReturnScrollView;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
+
+import java.lang.reflect.Field;
 
 /**
  * 应用程序主界面。
@@ -93,6 +97,7 @@ public class MainActivity extends Activity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mApp = CatnutApp.getTingtingApp();
+		forceOverflow();
 		mActionBar = getActionBar();
 		mActionBar.setIcon(R.drawable.ic_title_home);
 		setContentView(R.layout.main);
@@ -140,6 +145,19 @@ public class MainActivity extends Activity implements
 		getFragmentManager().addOnBackStackChangedListener(this);
 		if (mApp.getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
 			mTracker = EasyTracker.getInstance(this);
+		}
+	}
+
+	private void forceOverflow() {
+		ViewConfiguration viewConfig = ViewConfiguration.get(this);
+		try {
+			Field menuKey = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+			if (menuKey != null) {
+				menuKey.setAccessible(true);
+				menuKey.setBoolean(viewConfig, true);
+			}
+		} catch (Exception e) {
+			Log.e(TAG, "force to show overflow error!", e);
 		}
 	}
 

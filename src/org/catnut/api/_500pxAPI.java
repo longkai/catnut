@@ -22,6 +22,7 @@ public class _500pxAPI {
 		StringBuilder uri = new StringBuilder(DOMAIN);
 		uri.append("/photos")
 				.append("?feature=").append(feature)
+				.append("&image_size=4")
 				.append("&consumer_key=").append(KEY);
 		return new CatnutAPI(Request.Method.GET, uri.toString(), false, null);
 	}
