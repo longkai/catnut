@@ -7,19 +7,25 @@ package org.catnut.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.AsyncQueryHandler;
+import android.content.ContentValues;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.BaseColumns;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,9 +52,11 @@ import org.catnut.processor.UserProcessor;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.ui.ProfileActivity;
+import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -96,6 +104,7 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 	private View mFollowingsCount;
 	private View mFollowersCount;
 	private View mTweetLayout;
+	private View mRetweetLayout;
 
 	private View.OnClickListener tweetsOnclickListener = new View.OnClickListener() {
 		@Override
@@ -247,6 +256,7 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 							Status.thumbnail_pic,
 							Status.comments_count,
 							Status.reposts_count,
+							Status.retweeted_status,
 							Status.attitudes_count,
 							Status.source,
 							Status.created_at,
@@ -265,13 +275,13 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 						mTweetLayout.setOnClickListener(tweetsOnclickListener);
 						ViewStub viewStub = (ViewStub) mTweetLayout.findViewById(R.id.latest_tweet);
 						View tweet = viewStub.inflate();
-						// todo: retweet layout!
-						tweet.findViewById(R.id.retweet).setVisibility(View.GONE);
+						mRetweetLayout = tweet.findViewById(R.id.retweet);
 						CatnutUtils.setText(tweet, R.id.nick, getString(R.string.latest_statues))
 								.setTextColor(getResources().getColor(R.color.actionbar_background));
 						String tweetText = cursor.getString(cursor.getColumnIndex(Status.columnText));
+						TweetImageSpan tweetImageSpan = new TweetImageSpan(getActivity());
 						TweetTextView text = (TweetTextView) CatnutUtils.setText(tweet, R.id.text,
-								new TweetImageSpan(getActivity()).getImageSpan(tweetText));
+								tweetImageSpan.getImageSpan(tweetText));
 						CatnutUtils.vividTweet(text, null);
 
 						int replyCount = cursor.getInt(cursor.getColumnIndex(Status.comments_count));
@@ -284,6 +294,53 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 						CatnutUtils.setText(tweet, R.id.source, Html.fromHtml(source).toString());
 						String create_at = cursor.getString(cursor.getColumnIndex(Status.created_at));
 						CatnutUtils.setText(tweet, R.id.create_at, DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(create_at)));
+						// retweet
+						String jsonString = cursor.getString(cursor.getColumnIndex(Status.retweeted_status));
+						try {
+							final JSONObject jsonObject = new JSONObject(jsonString);
+							TweetTextView retweet = (TweetTextView) mRetweetLayout.findViewById(R.id.retweet_text);
+							retweet.setText(jsonObject.optString(Status.text));
+							CatnutUtils.vividTweet(retweet, tweetImageSpan);
+							long mills = DateTime.getTimeMills(jsonObject.optString(Status.created_at));
+							TextView tv = (TextView) mRetweetLayout.findViewById(R.id.retweet_create_at);
+							tv.setText(DateUtils.getRelativeTimeSpanString(mills));
+							TextView retweetUserScreenName = (TextView) mRetweetLayout.findViewById(R.id.retweet_nick);
+							JSONObject user = jsonObject.optJSONObject(User.SINGLE);
+							if (user == null) {
+								retweetUserScreenName.setText(getString(R.string.unknown_user));
+							} else {
+								retweetUserScreenName.setText(user.optString(User.screen_name));
+								mRetweetLayout.setOnClickListener(new View.OnClickListener() {
+									@Override
+									public void onClick(View v) {
+										// 先存入本地sqlite，再跳转
+										final ProgressDialog dialog = ProgressDialog.show(getActivity(), null, getString(R.string.loading));
+										// thread go!
+										(new Thread(new Runnable() {
+											@Override
+											public void run() {
+												ContentValues status = Status.METADATA.convert(jsonObject);
+												status.put(Status.TYPE, Status.RETWEET);
+												ContentValues user = User.METADATA.convert(jsonObject.optJSONObject(User.SINGLE));
+												getActivity().getContentResolver().insert(CatnutProvider.parse(Status.MULTIPLE), status);
+												getActivity().getContentResolver().insert(CatnutProvider.parse(User.MULTIPLE), user);
+												new Handler(Looper.getMainLooper()).post(new Runnable() {
+													@Override
+													public void run() {
+														dialog.dismiss();
+														Intent intent = new Intent(getActivity(), TweetActivity.class);
+														intent.putExtra(Constants.ID, jsonObject.optLong(Constants.ID));
+														startActivity(intent);
+													}
+												});
+											}
+										})).start();
+									}
+								});
+							}
+						} catch (JSONException e) {
+							mRetweetLayout.setVisibility(View.GONE);
+						}
 					}
 					cursor.close();
 				}
