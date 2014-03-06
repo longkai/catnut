@@ -9,4 +9,6 @@
 	<color name="actionbar_overlay">#8055acee</color>
 	<color name="black_background">#ff333333</color>
 	<color name="menuitem_background">#83c7f8</color>
+	<color name="snowColor">#fffafa</color>
+	<color name="seashellColor">#fff5ee</color>
 </resources>

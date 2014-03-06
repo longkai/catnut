@@ -22,7 +22,7 @@
 		android:layout_gravity="start"
 		android:layout_width="300dp"
 		android:layout_height="match_parent"
-		android:background="@android:color/white">
+		android:background="@color/seashellColor">
 
 		<FrameLayout
 			android:layout_width="match_parent"

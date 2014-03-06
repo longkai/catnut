@@ -9,13 +9,14 @@
 	android:id="@+id/retweet"
 	android:clickable="true"
 	android:focusable="true"
-	android:padding="@dimen/small"
+	android:padding="@dimen/medium"
 	android:orientation="vertical"
-	android:background="@drawable/bg_retweet"
+	android:background="@drawable/retweet_background"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content">
 
 	<LinearLayout
+		android:layout_marginTop="@dimen/small"
 		android:orientation="horizontal"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
