@@ -51,6 +51,8 @@ public class FavoriteFragment extends TimelineFragment {
 			Status.uid,
 			Status.columnText,
 			Status.thumbnail_pic,
+			Status.bmiddle_pic,
+			Status.original_pic,
 			Status.comments_count,
 			Status.reposts_count,
 			Status.attitudes_count,

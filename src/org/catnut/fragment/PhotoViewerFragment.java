@@ -64,7 +64,13 @@ public class PhotoViewerFragment extends Fragment {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					File dir = new File(getActivity().getExternalCacheDir().getPath() + "/" + Constants.IMAGE_DIR);
+					// 注意，这里用户有可能吧sk卡连接到电脑上了...
+					File dir;
+					try {
+						dir = new File(getActivity().getExternalCacheDir().getPath() + "/" + Constants.IMAGE_DIR);
+					} catch (Exception e) {
+						return;
+					}
 					if (!dir.exists() && !dir.mkdirs()) {
 						return;
 					}
