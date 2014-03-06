@@ -282,7 +282,7 @@ public class UserTimelineFragment extends TimelineFragment {
 
 	private void loadFromCloud(long max_id) {
 		mPullToRefreshLayout.setRefreshing(true);
-		CatnutAPI api = TweetAPI.myTimeline(mUid, 0, max_id, getFetchSize(), 0, 0, 0, 1);
+		CatnutAPI api = TweetAPI.myTimeline(mUid, 0, max_id, getFetchSize(), 0, 0, 0, 0);
 		mRequestQueue.add(new CatnutRequest(
 				getActivity(),
 				api,
@@ -343,7 +343,7 @@ public class UserTimelineFragment extends TimelineFragment {
 					since_id = 0;
 				}
 				cursor.close();
-				final CatnutAPI api = TweetAPI.myTimeline(mUid, since_id, 0, getFetchSize(), 0, 0, 0, 1);
+				final CatnutAPI api = TweetAPI.myTimeline(mUid, since_id, 0, getFetchSize(), 0, 0, 0, 0);
 				// refresh...
 				mHandler.post(new Runnable() {
 					@Override

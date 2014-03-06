@@ -199,4 +199,5 @@
 	<string name="enter_home_directly">直接进入主页</string>
 	<string name="enter_home_directly_summary">启动应用后直接进入主页时间线，不显示fantasy</string>
 	<string name="fantasy">fantasy</string>
+	<string name="unknown_user">\@微博用户</string>
 </resources>
