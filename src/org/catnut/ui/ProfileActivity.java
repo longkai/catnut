@@ -91,7 +91,7 @@ public class ProfileActivity extends Activity implements FragmentManager.OnBackS
 				mTracker = EasyTracker.getInstance(this);
 			}
 			ActionBar bar = getActionBar();
-			bar.setDisplayShowHomeEnabled(false);
+			bar.setIcon(R.drawable.ic_title_profile_default);
 			bar.setDisplayHomeAsUpEnabled(true);
 		}
 	}

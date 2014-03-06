@@ -338,7 +338,7 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 									}
 								});
 							}
-						} catch (JSONException e) {
+						} catch (Exception e) {
 							mRetweetLayout.setVisibility(View.GONE);
 						}
 					}

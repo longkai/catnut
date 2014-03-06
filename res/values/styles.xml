@@ -40,7 +40,7 @@
 		<item name="android:titleTextStyle">@style/ActionBar_Light_TextStyle</item>
 		<item name="android:background">@color/actionbar_background</item>
 		<item name="android:backgroundSplit">@color/actionbar_background</item>
-		<item name="android:displayOptions">homeAsUp|showTitle</item>
+		<item name="android:displayOptions">homeAsUp|showTitle|showHome</item>
 	</style>
 
 	<style name="ActionBar_Light_TextStyle" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
