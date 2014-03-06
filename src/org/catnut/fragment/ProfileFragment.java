@@ -19,13 +19,13 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.provider.BaseColumns;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,6 +33,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +50,7 @@ import org.catnut.core.CatnutRequest;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.processor.UserProcessor;
+import org.catnut.support.QuickReturnScrollView;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.ui.ProfileActivity;
@@ -56,7 +58,6 @@ import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -64,7 +65,8 @@ import org.json.JSONObject;
  *
  * @author longkai
  */
-public class ProfileFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class ProfileFragment extends Fragment implements
+		SharedPreferences.OnSharedPreferenceChangeListener, QuickReturnScrollView.Callbacks {
 
 	private static final String[] PROJECTION = new String[]{
 			BaseColumns._ID,
@@ -85,6 +87,15 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 
 	private CatnutApp mApp;
 	private Menu mMenu;
+
+	private ScrollSettleHandler mScrollSettleHandler = new ScrollSettleHandler();
+	private QuickReturnScrollView mQuickReturnScrollView;
+	private View mQuickReturnView;
+	private View mQuickReturnPlaceHolderView;
+	private int mMinRawY = 0;
+	private int mState = STATE_ON_SCREEN;
+	private int mQuickReturnHeight;
+	private int mMaxScrollY;
 
 	private long mUid;
 	private String mScreenName;
@@ -180,6 +191,9 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.profile, container, false);
+		mQuickReturnScrollView = (QuickReturnScrollView) view;
+		mQuickReturnScrollView.setCallbacks(this);
+
 		mViewPager = (ViewPager) view.findViewById(R.id.pager);
 		mIndicator = (LinePageIndicator) view.findViewById(R.id.indicator);
 		mPlaceHolder = view.findViewById(R.id.place_holder);
@@ -190,6 +204,19 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 		view.findViewById(R.id.action_tweets).setOnClickListener(tweetsOnclickListener);
 		view.findViewById(R.id.action_followers).setOnClickListener(followersOnclickListener);
 		view.findViewById(R.id.action_followings).setOnClickListener(followingsOnClickListener);
+
+		mQuickReturnPlaceHolderView = view.findViewById(R.id.quick_return_place_holder);
+		mQuickReturnView = view.findViewById(R.id.place_holder);
+		mQuickReturnScrollView.getViewTreeObserver()
+				.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+					@Override
+					public void onGlobalLayout() {
+						onScrollChanged(mQuickReturnScrollView.getScrollY());
+						mMaxScrollY = mQuickReturnScrollView.computeVerticalScrollRange()
+								- mQuickReturnScrollView.getHeight();
+						mQuickReturnHeight = mQuickReturnView.getHeight();
+					}
+				});
 		return view;
 	}
 
@@ -324,7 +351,7 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 												ContentValues user = User.METADATA.convert(jsonObject.optJSONObject(User.SINGLE));
 												getActivity().getContentResolver().insert(CatnutProvider.parse(Status.MULTIPLE), status);
 												getActivity().getContentResolver().insert(CatnutProvider.parse(User.MULTIPLE), user);
-												new Handler(Looper.getMainLooper()).post(new Runnable() {
+												mScrollSettleHandler.post(new Runnable() {
 													@Override
 													public void run() {
 														dialog.dismiss();
@@ -502,6 +529,107 @@ public class ProfileFragment extends Fragment implements SharedPreferences.OnSha
 			} else {
 				mTweetLayout.setVisibility(View.GONE);
 			}
+		}
+	}
+
+	@Override
+	public void onScrollChanged(int scrollY) {
+		scrollY = Math.min(mMaxScrollY, scrollY);
+
+		mScrollSettleHandler.onScroll(scrollY);
+
+		int rawY = mQuickReturnPlaceHolderView.getTop() - scrollY;
+		int translationY = 0;
+
+		switch (mState) {
+			case STATE_OFF_SCREEN:
+				if (rawY <= mMinRawY) {
+					mMinRawY = rawY;
+				} else {
+					mState = STATE_RETURNING;
+				}
+				translationY = rawY;
+				break;
+
+			case STATE_ON_SCREEN:
+				if (rawY < -mQuickReturnHeight) {
+					mState = STATE_OFF_SCREEN;
+					mMinRawY = rawY;
+				}
+				translationY = rawY;
+				break;
+
+			case STATE_RETURNING:
+				translationY = (rawY - mMinRawY) - mQuickReturnHeight;
+				if (translationY > 0) {
+					translationY = 0;
+					mMinRawY = rawY - mQuickReturnHeight;
+				}
+
+				if (rawY > 0) {
+					mState = STATE_ON_SCREEN;
+					translationY = rawY;
+				}
+
+				if (translationY < -mQuickReturnHeight) {
+					mState = STATE_OFF_SCREEN;
+					mMinRawY = rawY;
+				}
+				break;
+		}
+		mQuickReturnView.animate().cancel();
+		mQuickReturnView.setTranslationY(translationY + scrollY);
+	}
+
+	@Override
+	public void onDownMotionEvent() {
+		mScrollSettleHandler.setSettleEnabled(false);
+	}
+
+	@Override
+	public void onUpOrCancelMotionEvent() {
+		mScrollSettleHandler.setSettleEnabled(true);
+		mScrollSettleHandler.onScroll(mQuickReturnScrollView.getScrollY());
+	}
+
+
+	private class ScrollSettleHandler extends Handler {
+		private static final int SETTLE_DELAY_MILLIS = 100;
+
+		private int mSettledScrollY = Integer.MIN_VALUE;
+		private boolean mSettleEnabled;
+
+		public void onScroll(int scrollY) {
+			if (mSettledScrollY != scrollY) {
+				// Clear any pending messages and post delayed
+				removeMessages(0);
+				sendEmptyMessageDelayed(0, SETTLE_DELAY_MILLIS);
+				mSettledScrollY = scrollY;
+			}
+		}
+
+		public void setSettleEnabled(boolean settleEnabled) {
+			mSettleEnabled = settleEnabled;
+		}
+
+		@Override
+		public void handleMessage(Message msg) {
+			// Handle the scroll settling.
+			if (STATE_RETURNING == mState && mSettleEnabled) {
+				int mDestTranslationY;
+				if (mSettledScrollY - mQuickReturnView.getTranslationY() > mQuickReturnHeight / 2) {
+					mState = STATE_OFF_SCREEN;
+					mDestTranslationY = Math.max(
+							mSettledScrollY - mQuickReturnHeight,
+							mQuickReturnPlaceHolderView.getTop());
+				} else {
+					mDestTranslationY = mSettledScrollY;
+				}
+
+				mMinRawY = mQuickReturnPlaceHolderView.getTop() - mQuickReturnHeight - mDestTranslationY;
+				mQuickReturnView.animate().translationY(mDestTranslationY);
+			}
+			mSettledScrollY = Integer.MIN_VALUE; // reset
 		}
 	}
 }

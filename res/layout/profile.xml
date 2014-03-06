@@ -5,15 +5,108 @@
   ~ Copyright (c) 2014 longkai
   ~ The software shall be used for good, not evil.
   -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<org.catnut.support.QuickReturnScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent">
 
-	<LinearLayout
-		android:orientation="vertical"
+	<FrameLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent">
 
+		<LinearLayout
+			android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+
+			<!--place holder view-->
+			<View
+				android:id="@+id/quick_return_place_holder"
+				android:layout_width="match_parent"
+				android:layout_height="180dp" />
+
+			<LinearLayout
+				android:id="@id/statics"
+				android:layout_marginTop="@dimen/medium"
+				android:orientation="horizontal"
+				android:showDividers="middle"
+				android:divider="?android:dividerVertical"
+				android:layout_width="match_parent"
+				android:layout_height="50dp">
+
+				<include
+					android:id="@id/tweets_count"
+					android:layout_weight="1"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					layout="@layout/two_line_text" />
+
+				<include
+					android:id="@id/following_count"
+					android:layout_weight="1"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					layout="@layout/two_line_text" />
+
+				<include
+					android:id="@id/followers_count"
+					android:layout_weight="1"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					layout="@layout/two_line_text" />
+			</LinearLayout>
+
+			<FrameLayout
+				android:id="@id/tweet_layout"
+				android:clickable="true"
+				android:focusable="true"
+				android:background="?android:attr/selectableItemBackground"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<ViewStub
+					android:id="@+id/latest_tweet"
+					android:layout="@layout/tweet_row"
+					android:padding="@null"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content" />
+			</FrameLayout>
+
+			<LinearLayout
+				android:orientation="vertical"
+				android:showDividers="middle"
+				android:padding="@dimen/medium"
+				android:divider="?android:attr/listDivider"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<TextView
+					android:id="@+id/action_tweets"
+					android:text="@string/tweets"
+					style="@style/Profile_Action" />
+
+				<TextView
+					android:id="@+id/action_followings"
+					android:text="@string/followings"
+					style="@style/Profile_Action" />
+
+				<TextView
+					android:id="@+id/action_followers"
+					android:text="@string/followers"
+					style="@style/Profile_Action" />
+
+				<TextView
+					android:id="@+id/action_likes"
+					android:text="@string/like"
+					style="@style/Profile_Action" />
+
+				<TextView
+					android:id="@+id/action_photos"
+					android:text="@string/photos"
+					style="@style/Profile_Action" />
+			</LinearLayout>
+		</LinearLayout>
+
+		<!--quick return view-->
 		<LinearLayout
 			android:id="@+id/place_holder"
 			android:orientation="vertical"
@@ -32,86 +125,5 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content" />
 		</LinearLayout>
-
-		<LinearLayout
-			android:id="@id/statics"
-			android:layout_marginTop="@dimen/medium"
-			android:orientation="horizontal"
-			android:showDividers="middle"
-			android:divider="?android:dividerVertical"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content">
-
-			<include
-				android:id="@id/tweets_count"
-				android:layout_weight="1"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				layout="@layout/two_line_text" />
-
-			<include
-				android:id="@id/following_count"
-				android:layout_weight="1"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				layout="@layout/two_line_text" />
-
-			<include
-				android:id="@id/followers_count"
-				android:layout_weight="1"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				layout="@layout/two_line_text" />
-		</LinearLayout>
-
-		<FrameLayout
-			android:id="@id/tweet_layout"
-			android:clickable="true"
-			android:focusable="true"
-			android:background="?android:attr/selectableItemBackground"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content">
-
-			<ViewStub
-				android:id="@+id/latest_tweet"
-				android:layout="@layout/tweet_row"
-				android:padding="@null"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content" />
-		</FrameLayout>
-
-		<LinearLayout
-			android:orientation="vertical"
-			android:showDividers="middle"
-			android:padding="@dimen/medium"
-			android:divider="?android:attr/listDivider"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content">
-
-			<TextView
-				android:id="@+id/action_tweets"
-				android:text="@string/tweets"
-				style="@style/Profile_Action" />
-
-			<TextView
-				android:id="@+id/action_followings"
-				android:text="@string/followings"
-				style="@style/Profile_Action" />
-
-			<TextView
-				android:id="@+id/action_followers"
-				android:text="@string/followers"
-				style="@style/Profile_Action" />
-
-			<TextView
-				android:id="@+id/action_likes"
-				android:text="@string/like"
-				style="@style/Profile_Action" />
-
-			<TextView
-				android:id="@+id/action_photos"
-				android:text="@string/photos"
-				style="@style/Profile_Action" />
-		</LinearLayout>
-	</LinearLayout>
-</ScrollView>
+	</FrameLayout>
+</org.catnut.support.QuickReturnScrollView>

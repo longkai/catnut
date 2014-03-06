@@ -5,7 +5,7 @@
   ~ The software shall be used for good, not evil.
   -->
 <resources>
-	<string name="version_name">0.7</string>
+	<string name="version_name">0.7.1 for girl\' s day</string>
 	<string name="camera_cached_dir">/camera/</string>
 
 	<string name="pref_first_run">pref_first_run</string>
