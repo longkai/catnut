@@ -289,8 +289,13 @@ public class ProfileFragment extends Fragment implements
 							Status.source,
 							Status.created_at,
 					},
-					"uid=(select _id from " + User.TABLE + " where " + User.screen_name
-							+ "=" + CatnutUtils.quote(mScreenName) + ")",
+					new StringBuilder("uid=(select _id from ")
+							.append(User.TABLE).append(" where ").append(User.screen_name)
+							.append("=").append(CatnutUtils.quote(mScreenName)).append(")")
+							.append(" and ").append(Status.TYPE)
+							.append(" in(").append(Status.HOME).append(",").append(Status.RETWEET)
+							.append(",").append(Status.OTHERS).append(")")
+							.toString(),
 					Status.TABLE,
 					null,
 					BaseColumns._ID + " desc",
