@@ -19,6 +19,7 @@ import android.os.Handler;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,6 +43,8 @@ import org.catnut.util.CatnutUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Calendar;
+
 /**
  * 欢迎界面，可以在这里放一些更新说明，pager，或者进行一些初始化（检测网络状态，是否通过了新浪的授权）等等，
  * 设置好播放的时间后自动跳转到main-ui，或者用户自己触发某个控件跳转
@@ -57,7 +60,7 @@ public class HelloActivity extends Activity {
 	/** 欢迎界面默认的播放时间 */
 	private static final long DEFAULT_SPLASH_TIME_MILLS = 3000L;
 
-//	private static final int MIN_FANTASY_RUN_TIMES = 3;
+	private static final int MIN_FANTASY_RUN_TIMES = 3;
 
 	// only use for auth!
 	private EasyTracker mTracker;
@@ -69,6 +72,7 @@ public class HelloActivity extends Activity {
 
 	private View mAbout;
 	private ImageView mFantasy;
+	private int mRuntimes;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -79,19 +83,23 @@ public class HelloActivity extends Activity {
 		if (mApp.getAccessToken() == null) {
 			startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.AUTH));
 		} else {
+			mRuntimes = mPreferences.getInt(getString(R.string.pref_run_times), 0);
+			mPreferences.edit().putInt(getString(R.string.pref_run_times), mRuntimes + 1).commit();
 			// 根据情况跳转
 			if (getIntent().hasExtra(TAG)) {
 				init();
-			} /*else if (mPreferences.getInt(getString(R.string.pref_run_times), 0) < MIN_FANTASY_RUN_TIMES) {
-				init();
-				String key = getString(R.string.pref_run_times);
-				int before = mPreferences.getInt(key, 0);
-				mPreferences.edit().putInt(key, before++);
-			} */else if (mPreferences.getBoolean(getString(R.string.pref_enter_home_directly),
-					getResources().getBoolean(R.bool.pref_enter_home_directly))) {
-				startActivity(new Intent(this, MainActivity.class));
 			} else {
-				init();
+				/*if (runtimes < MIN_FANTASY_RUN_TIMES) {
+					init();
+					String key = getString(R.string.pref_run_times);
+					int before = mPreferences.getInt(key, 0);
+					mPreferences.edit().putInt(key, before++);
+				} else*/ if (mPreferences.getBoolean(getString(R.string.pref_enter_home_directly),
+						getResources().getBoolean(R.bool.pref_enter_home_directly))) {
+					startActivity(new Intent(this, MainActivity.class));
+				} else {
+					init();
+				}
 			}
 		}
 	}
@@ -106,8 +114,20 @@ public class HelloActivity extends Activity {
 		TextView about = (TextView) findViewById(R.id.about_body);
 		TextView version = (TextView) findViewById(R.id.app_version);
 		version.setText(getString(R.string.about_version_template, getString(R.string.version_name)));
-		about.setText(Html.fromHtml(getString(R.string.about_body)));
-		about.setMovementMethod(LinkMovementMethod.getInstance());
+		if (mRuntimes < MIN_FANTASY_RUN_TIMES) {
+			about.setText(Html.fromHtml(getString(R.string.about_body)));
+			about.setMovementMethod(LinkMovementMethod.getInstance());
+		} else {
+			// for girl' s day only, in march 7-21
+			Calendar now = Calendar.getInstance();
+			boolean girl = now.get(Calendar.MONTH) == Calendar.MARCH
+					&& now.get(Calendar.DAY_OF_MONTH) >= 7
+					&& now.get(Calendar.DAY_OF_MONTH) <= 21;
+			if (girl) {
+				about.setText(Html.fromHtml(getString(R.string.girls_day)));
+				about.setGravity(Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL);
+			}
+		}
 		loadImage();
 
 		if (mApp.getPreferences().getBoolean(getString(R.string.enable_analytics), true)) {

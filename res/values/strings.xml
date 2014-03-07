@@ -189,6 +189,11 @@
         <b>Some icons &nbsp;</b><br>
         <i>from Twitter for Android and my friends:-)</i><br><br>
     ]]></string>
+	<string name="girls_day"><![CDATA[
+		<b>女生节快乐，愿你每天都有一个好心情！</b><br><br>
+		<b>无论以后你会成为谁的女人，你永远是我们的高中女生^_^<b><br><br>
+		<b>在路上，我们一起走向远方，只是不要忘了来时的路，还有你我的梦想</b><br><br>
+	]]></string>
 	<string name="about_version_template">v%1$s</string>
 	<string name="change_fantasy">换一张</string>
 	<string name="show_fantasy_only">图片/说明 切换</string>
