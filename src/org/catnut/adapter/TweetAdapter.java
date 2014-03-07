@@ -303,18 +303,18 @@ public class TweetAdapter extends CursorAdapter {
 			JSONObject user = json.optJSONObject(User.SINGLE);
 			if (user == null) { // 有可能trim_user了，这种情况一般是查看某个用户的时间线的或者那条微博已被删除
 				CatnutUtils.setText(holder.retweetView, R.id.retweet_nick, mContext.getString(R.string.unknown_user));
-				holder.retweetView.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						injectRetweetListener(json);
-					}
-				});
 			} else {
 				String str = user.optString(User.remark);
 				if (TextUtils.isEmpty(str)) {
 					str = user.optString(User.screen_name);
 				}
 				CatnutUtils.setText(holder.retweetView, R.id.retweet_nick, "@" + str);
+				holder.retweetView.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						injectRetweetListener(json);
+					}
+				});
 			}
 			TweetTextView text = (TweetTextView) holder.retweetView.findViewById(R.id.retweet_text);
 			long createAt = DateTime.getTimeMills(json.optString(Status.created_at));

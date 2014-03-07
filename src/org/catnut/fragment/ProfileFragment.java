@@ -280,7 +280,8 @@ public class ProfileFragment extends Fragment implements
 			String queryLatestTweet = CatnutUtils.buildQuery(
 					new String[]{
 							Status.columnText,
-							Status.thumbnail_pic,
+//							Status.thumbnail_pic,
+							Status.bmiddle_pic,
 							Status.comments_count,
 							Status.reposts_count,
 							Status.retweeted_status,
@@ -310,6 +311,17 @@ public class ProfileFragment extends Fragment implements
 						TweetTextView text = (TweetTextView) CatnutUtils.setText(tweet, R.id.text,
 								tweetImageSpan.getImageSpan(tweetText));
 						CatnutUtils.vividTweet(text, null);
+
+						String thumbsUrl = cursor.getString(cursor.getColumnIndex(Status.bmiddle_pic));
+						if (!TextUtils.isEmpty(thumbsUrl)) {
+							View thumbs = tweet.findViewById(R.id.thumbs);
+							Picasso.with(getActivity())
+									.load(thumbsUrl)
+									.placeholder(R.drawable.error)
+									.error(R.drawable.error)
+									.into((ImageView) thumbs);
+							thumbs.setVisibility(View.VISIBLE);
+						}
 
 						int replyCount = cursor.getInt(cursor.getColumnIndex(Status.comments_count));
 						CatnutUtils.setText(tweet, R.id.reply_count, CatnutUtils.approximate(replyCount));
