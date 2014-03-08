@@ -25,6 +25,7 @@
 	<string name="pref_enter_home_directly">pref_enter_home_directly</string>
 	<string name="pref_enter_fantasy_times">pref_enter_fantasy_times</string>
 	<string name="pref_run_times">pref_run_times</string>
+	<string name="pref_check_upgrade">pref_check_upgrade</string>
 
 	<integer name="default_fetch_size">20</integer>
 	<integer name="default_tweet_font_size">16</integer>

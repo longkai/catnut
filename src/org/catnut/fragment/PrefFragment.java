@@ -20,7 +20,9 @@ import android.webkit.WebView;
 import android.widget.Toast;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
+import org.catnut.service.UpgradeService;
 import org.catnut.ui.HelloActivity;
+import org.catnut.util.CatnutUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,7 +72,9 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 				intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "im.longkai@gmail.com", null));
 				intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name));
 			} else if (key.equals(getString(R.string.pref_version))) {
-				intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/longkai/catnut/commits/master"));
+				Toast.makeText(getActivity(), getString(R.string.check_now), Toast.LENGTH_SHORT).show();
+				CatnutUtils.checkout(true, getActivity(), mPref);
+				return true;
 			} else if (key.equals(getString(R.string.pref_open_source_license))) {
 				InputStream inputStream = null;
 				try {
@@ -79,10 +83,10 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 					WebView html = new WebView(getActivity());
 					html.loadDataWithBaseURL(null, in.next(), "text/html", "utf-8", null);
 					new AlertDialog.Builder(getActivity())
-						.setTitle("Open Source Licenses")
-						.setView(html)
-						.setNeutralButton(android.R.string.ok, null)
-						.show();
+							.setTitle("Open Source Licenses")
+							.setView(html)
+							.setNeutralButton(android.R.string.ok, null)
+							.show();
 				} catch (IOException e) {
 					Log.e(TAG, "error open license file from assets!", e);
 				} finally {
@@ -96,11 +100,11 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 				return true;
 			} else if (key.equals(getString(R.string.pref_customize_tweet_font))) {
 				new AlertDialog.Builder(getActivity())
-					.setMessage(getString(R.string.customized_font_message))
-					.setNegativeButton(getString(R.string.keep_current_font), this)
-					.setNeutralButton(getString(R.string.use_default_font), this)
-					.setPositiveButton(getString(R.string.customize_font), this)
-					.show();
+						.setMessage(getString(R.string.customized_font_message))
+						.setNegativeButton(getString(R.string.keep_current_font), this)
+						.setNeutralButton(getString(R.string.use_default_font), this)
+						.setPositiveButton(getString(R.string.customize_font), this)
+						.show();
 				return true;
 			} else if (key.equals(getString(R.string.pref_notes))) {
 				intent = new Intent(getActivity(), HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG);

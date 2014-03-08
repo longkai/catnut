@@ -8,6 +8,7 @@ package org.catnut.util;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
@@ -24,6 +25,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import org.catnut.R;
+import org.catnut.core.CatnutApp;
+import org.catnut.service.UpgradeService;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.support.TweetURLSpan;
@@ -444,5 +448,22 @@ public class CatnutUtils {
 			return null;
 		}
 		return Uri.fromFile(image);
+	}
+
+	// 是否需要更新
+	public static void checkout(boolean required, Context context, SharedPreferences preferences) {
+		long now = System.currentTimeMillis();
+		String key = context.getString(R.string.pref_check_upgrade);
+		if (required) {
+			context.startService(new Intent(context, UpgradeService.class));
+			preferences.edit().putLong(key, now).commit();
+		} else {
+			long last = preferences.getLong(key, now);
+			if (now - last > (7 * 24 * 60 * 60 * 1000)) { // 每周更新一次
+				Log.d(TAG, "need upgrade...");
+				preferences.edit().putLong(key, now).commit();
+				context.startService(new Intent(context, UpgradeService.class));
+			}
+		}
 	}
 }

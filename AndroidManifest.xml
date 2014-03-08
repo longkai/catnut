@@ -63,5 +63,6 @@
 			android:authorities="org.catnut"
 			android:name=".core.CatnutProvider" />
 		<service android:name=".service.ComposeTweetService" />
+		<service android:name=".service.UpgradeService" />
 	</application>
 </manifest>

@@ -83,6 +83,8 @@ public class HelloActivity extends Activity {
 		if (mApp.getAccessToken() == null) {
 			startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.AUTH));
 		} else {
+			// 检查一次更新，每周一次
+			CatnutUtils.checkout(false, this, mPreferences);
 			mRuntimes = mPreferences.getInt(getString(R.string.pref_run_times), 0);
 			mPreferences.edit().putInt(getString(R.string.pref_run_times), mRuntimes + 1).commit();
 			// 根据情况跳转
