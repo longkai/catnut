@@ -17,7 +17,6 @@ import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.fragment.DraftFragment;
-import org.catnut.fragment.FantasiesFragment;
 import org.catnut.fragment.FavoriteFragment;
 import org.catnut.fragment.MyRelationshipFragment;
 import org.catnut.fragment.OAuthFragment;
@@ -42,7 +41,6 @@ public class SingleFragmentActivity extends Activity {
 	public static final int FRIENDS = 4; // 可以为关注或者粉丝
 	public static final int FAVORITES = 5;
 	public static final int AUTH = 6;
-	public static final int GALLERY = 7;
 
 	private EasyTracker mTracker;
 
@@ -78,12 +76,6 @@ public class SingleFragmentActivity extends Activity {
 					break;
 				case AUTH:
 					fragment = new OAuthFragment();
-					break;
-				case GALLERY:
-					setTheme(R.style.Theme_About);
-					String[] pics = getIntent().getStringArrayExtra(FantasiesFragment.PICS);
-					String[] descs = getIntent().getStringArrayExtra(FantasiesFragment.DESCS);
-					fragment = FantasiesFragment.getFragment(pics, descs);
 					break;
 				default:
 					// get out!

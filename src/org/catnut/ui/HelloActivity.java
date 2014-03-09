@@ -7,15 +7,16 @@ package org.catnut.ui;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v13.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -23,28 +24,28 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import org.catnut.R;
 import org.catnut.api._500pxAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProcessor;
 import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
-import org.catnut.fragment.FantasiesFragment;
+import org.catnut.fragment.FantasyFragment;
 import org.catnut.metadata.Photo;
 import org.catnut.util.CatnutUtils;
+import org.catnut.util.Constants;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * 欢迎界面，可以在这里放一些更新说明，pager，或者进行一些初始化（检测网络状态，是否通过了新浪的授权）等等，
@@ -71,13 +72,13 @@ public class HelloActivity extends Activity {
 
 	private Handler mHandler = new Handler();
 
+	private List<Image> mImages;
+	private ViewPager mViewPager;
+	private FragmentStatePagerAdapter mPagerAdapter;
 	private View mAbout;
-	private ImageView mFantasy;
 	private int mRuntimes;
 
-	private String mCurrentTitle;
-	private String mCurrentFantasy;
-	private String mCurrentDesc;
+	private TextView mFantasyDesc;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -114,8 +115,14 @@ public class HelloActivity extends Activity {
 	private void init() {
 		setContentView(R.layout.about);
 		fetch500px();
+		mImages = new ArrayList<Image>();
+		mViewPager = (ViewPager) findViewById(R.id.pager);
+		mViewPager.setOnPageChangeListener(new PagerListener());
+		mPagerAdapter = new Gallery();
+		mViewPager.setAdapter(mPagerAdapter);
 		mAbout = findViewById(R.id.about);
-		mFantasy = (ImageView) findViewById(R.id.fantasy);
+		mFantasyDesc = (TextView) findViewById(R.id.description);
+		mFantasyDesc.setMovementMethod(LinkMovementMethod.getInstance());
 		ActionBar bar = getActionBar();
 		bar.setTitle(R.string.fantasy);
 		TextView about = (TextView) findViewById(R.id.about_body);
@@ -179,42 +186,24 @@ public class HelloActivity extends Activity {
 	private Runnable mLoadImage = new Runnable() {
 		@Override
 		public void run() {
-			String query = CatnutUtils.buildQuery(null, null, Photo.TABLE, null, "RANDOM()", "1");
+			String query = CatnutUtils.buildQuery(null, null, Photo.TABLE, null, "RANDOM()", "10");
 			final Cursor cursor = getContentResolver().query(CatnutProvider.parse(Photo.MULTIPLE), null, query, null, null);
 			if (cursor.moveToNext()) {
 				mHandler.post(new Runnable() {
 					@Override
 					public void run() {
-						mCurrentFantasy = cursor.getString(cursor.getColumnIndex(Photo.image_url));
-						mCurrentDesc = cursor.getString(cursor.getColumnIndex(Photo.description));
-						mCurrentTitle = cursor.getString(cursor.getColumnIndex(Photo.name));
-						Picasso.with(HelloActivity.this)
-								.load(mCurrentFantasy)
-								.into(target);
+						Image image = new Image();
+						image.desc = cursor.getString(cursor.getColumnIndex(Photo.description));
+						image.url = cursor.getString(cursor.getColumnIndex(Photo.image_url));
+						mImages.add(image);
+						mImages.add(image);
+						mPagerAdapter.notifyDataSetChanged();
 						cursor.close();
 					}
 				});
 			} else {
 				cursor.close();
 			}
-		}
-	};
-
-	private Target target = new Target() {
-		@Override
-		public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-			mFantasy.setImageBitmap(bitmap);
-			mFantasy.setScaleType(ImageView.ScaleType.FIT_XY);
-		}
-
-		@Override
-		public void onBitmapFailed(Drawable errorDrawable) {
-
-		}
-
-		@Override
-		public void onPrepareLoad(Drawable placeHolderDrawable) {
-
 		}
 	};
 
@@ -228,29 +217,26 @@ public class HelloActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.toggle_fantasy:
-				if (mAbout.getVisibility() == View.VISIBLE) {
-					mAbout.setVisibility(View.GONE);
+				int i = mViewPager.getCurrentItem();
+				if (i == 0) {
+					if (mAbout.getVisibility() == View.VISIBLE) {
+						mAbout.setVisibility(View.GONE);
+					} else {
+						mAbout.setVisibility(View.VISIBLE);
+					}
 				} else {
-					mAbout.setVisibility(View.VISIBLE);
+					if (mFantasyDesc.getVisibility() == View.VISIBLE) {
+						mFantasyDesc.setVisibility(View.GONE);
+					} else {
+						mFantasyDesc.setVisibility(View.VISIBLE);
+					}
 				}
-				break;
-			case R.id.change_fantasy:
-				loadImage();
 				break;
 			case R.id.pref:
 				startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.PREF));
 				break;
 			case android.R.id.home:
 				startActivity(new Intent(this, MainActivity.class));
-				break;
-			case R.id.check_default:
-				mFantasy.setImageResource(R.drawable.default_fantasy);
-				break;
-			case R.id.gallery:
-				Intent intent = SingleFragmentActivity.getIntent(this, SingleFragmentActivity.GALLERY);
-				intent.putExtra(FantasiesFragment.PICS, new String[]{mCurrentFantasy});
-				intent.putExtra(FantasiesFragment.DESCS, new String[]{mCurrentDesc});
-				startActivity(intent);
 				break;
 			default:
 				break;
@@ -273,5 +259,80 @@ public class HelloActivity extends Activity {
 		if (mTracker != null) {
 			mTracker.activityStop(this);
 		}
+	}
+
+	private class PagerListener extends ViewPager.SimpleOnPageChangeListener {
+		@Override
+		public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+			if (mImages.size() - position <= 3) {
+				new Thread(expand).start();
+			}
+		}
+
+		@Override
+		public void onPageSelected(int position) {
+			if (position != 0) {
+				mAbout.setVisibility(View.GONE);
+				mFantasyDesc.setVisibility(View.VISIBLE);
+				String desc = mImages.get(position).desc;
+				if (!Constants.NULL.equals(desc)) {
+					mFantasyDesc.setText(Html.fromHtml(desc));
+				}
+			} else {
+				mAbout.setVisibility(View.VISIBLE);
+				mFantasyDesc.setVisibility(View.GONE);
+			}
+		}
+	}
+
+	private static final String[] PROJECTION = new String[] {
+			Photo.image_url,
+			Photo.description,
+	};
+
+	private Runnable expand = new Runnable() {
+		@Override
+		public void run() {
+			String query = CatnutUtils.buildQuery(PROJECTION, null, Photo.TABLE, null, "RANDOM()", String.valueOf(mImages.size() + 10));
+			final Cursor cursor = getContentResolver()
+					.query(CatnutProvider.parse(Photo.MULTIPLE), null, query, null, null);
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					Image image;
+					while (cursor.moveToNext()) {
+						image = new Image();
+						image.url = cursor.getString(0);
+						image.desc = cursor.getString(1);
+						mImages.add(image);
+					}
+					cursor.close();
+					mPagerAdapter.notifyDataSetChanged();
+				}
+			});
+		}
+	};
+
+	private class Gallery extends FragmentStatePagerAdapter {
+
+		public Gallery() {
+			super(getFragmentManager());
+		}
+
+		@Override
+		public Fragment getItem(int position) {
+			Image image = mImages.get(position);
+			return FantasyFragment.getFragment(image.url, image.desc, position == 0);
+		}
+
+		@Override
+		public int getCount() {
+			return mImages.size();
+		}
+	}
+
+	private static class Image {
+		String url;
+		String desc;
 	}
 }

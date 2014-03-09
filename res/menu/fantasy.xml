@@ -15,18 +15,12 @@
 			<item
 				android:id="@+id/toggle_fantasy"
 				android:title="@string/show_fantasy_only" />
-			<item
-				android:id="@+id/change_fantasy"
-				android:title="@string/change_fantasy" />
-			<item
-				android:id="@+id/check_default"
-				android:title="@string/default_art" />
+			<!--<item-->
+				<!--android:id="@+id/check_default"-->
+				<!--android:title="@string/default_art" />-->
 			<item
 				android:id="@+id/pref"
 				android:title="@string/pref" />
-			<item
-				android:id="@+id/gallery"
-				android:title="幻灯片" />
 		</menu>
 	</item>
 </menu>

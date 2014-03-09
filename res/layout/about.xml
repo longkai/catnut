@@ -8,12 +8,7 @@
 	android:layout_height="match_parent"
 	android:layout_width="match_parent">
 
-	<ImageView
-		android:id="@+id/fantasy"
-		android:src="@drawable/default_fantasy"
-		android:scaleType="fitXY"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent" />
+	<include layout="@layout/pager" />
 
 	<LinearLayout
 		android:id="@+id/about"
@@ -83,4 +78,22 @@
 				android:lineSpacingMultiplier="1.1" />
 		</ScrollView>
 	</LinearLayout>
+
+	<ScrollView
+		android:layout_gravity="bottom"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/gallery_desc_height">
+
+		<TextView
+			android:id="@+id/description"
+			android:visibility="gone"
+			android:padding="@dimen/small"
+			android:gravity="center"
+			android:textColorLink="#fff"
+			android:textColor="#afff"
+			android:lineSpacingMultiplier="1.1"
+			android:textSize="18sp"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+	</ScrollView>
 </FrameLayout>
