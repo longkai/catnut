@@ -18,6 +18,7 @@ public class Constants {
 	public static final String ID = "id";
 	public static final String PIC = "pic";
 	public static final String IMAGE_DIR = "images/"; // 保持在用户外部存储上的，并非cache的
+	public static final String NULL = "null";
 
 	// for error dialog box
 	public static final String TITLE = "title";

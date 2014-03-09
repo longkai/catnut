@@ -214,4 +214,5 @@
 	<string name="download_apk">下载安装包</string>
 	<string name="downloading">正在下载中...</string>
 	<string name="check_now">检查更新中...</string>
+	<string name="toggle_desc">打开/隐藏 介绍</string>
 </resources>

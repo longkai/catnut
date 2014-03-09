@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:background="@color/black_background"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<org.catnut.support.TouchImageView
+		android:id="@+id/fantasy"
+		android:src="@drawable/default_fantasy"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" />
+
+	<ScrollView
+		android:layout_gravity="bottom"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/gallery_desc_height">
+
+		<TextView
+			android:id="@+id/description"
+			android:padding="@dimen/small"
+			android:gravity="center"
+			android:textColorLink="#fff"
+			android:textColor="#afff"
+			android:lineSpacingMultiplier="1.1"
+			android:textSize="18sp"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+	</ScrollView>
+</FrameLayout>

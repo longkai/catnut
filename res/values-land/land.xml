@@ -10,4 +10,6 @@
 
 	<dimen name="thumb_width">600dp</dimen>
 	<dimen name="thumb_height">300dp</dimen>
+
+	<dimen name="gallery_desc_height">50dp</dimen>
 </resources>

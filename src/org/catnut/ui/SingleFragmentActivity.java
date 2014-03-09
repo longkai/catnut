@@ -11,14 +11,13 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
 import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.fragment.DraftFragment;
+import org.catnut.fragment.FantasiesFragment;
 import org.catnut.fragment.FavoriteFragment;
 import org.catnut.fragment.MyRelationshipFragment;
 import org.catnut.fragment.OAuthFragment;
@@ -43,6 +42,7 @@ public class SingleFragmentActivity extends Activity {
 	public static final int FRIENDS = 4; // 可以为关注或者粉丝
 	public static final int FAVORITES = 5;
 	public static final int AUTH = 6;
+	public static final int GALLERY = 7;
 
 	private EasyTracker mTracker;
 
@@ -58,7 +58,6 @@ public class SingleFragmentActivity extends Activity {
 					fragment = PrefFragment.getFragment();
 					break;
 				case PHOTO_VIEWER:
-//					getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 					setTheme(R.style.Theme_About);
 					String picUrl = getIntent().getStringExtra(Constants.PIC);
 					fragment = PhotoViewerFragment.getFragment(picUrl);
@@ -79,6 +78,12 @@ public class SingleFragmentActivity extends Activity {
 					break;
 				case AUTH:
 					fragment = new OAuthFragment();
+					break;
+				case GALLERY:
+					setTheme(R.style.Theme_About);
+					String[] pics = getIntent().getStringArrayExtra(FantasiesFragment.PICS);
+					String[] descs = getIntent().getStringArrayExtra(FantasiesFragment.DESCS);
+					fragment = FantasiesFragment.getFragment(pics, descs);
 					break;
 				default:
 					// get out!

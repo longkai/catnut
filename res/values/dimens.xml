@@ -21,4 +21,5 @@
 	<dimen name="actionbar_item_width">48dp</dimen>
 	<dimen name="thumb_width">300dp</dimen>
 	<dimen name="thumb_height">150dp</dimen>
+	<dimen name="gallery_desc_height">100dp</dimen>
 </resources>

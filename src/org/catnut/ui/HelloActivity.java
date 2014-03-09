@@ -38,6 +38,7 @@ import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProcessor;
 import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
+import org.catnut.fragment.FantasiesFragment;
 import org.catnut.metadata.Photo;
 import org.catnut.util.CatnutUtils;
 import org.json.JSONArray;
@@ -73,6 +74,10 @@ public class HelloActivity extends Activity {
 	private View mAbout;
 	private ImageView mFantasy;
 	private int mRuntimes;
+
+	private String mCurrentTitle;
+	private String mCurrentFantasy;
+	private String mCurrentDesc;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -180,8 +185,11 @@ public class HelloActivity extends Activity {
 				mHandler.post(new Runnable() {
 					@Override
 					public void run() {
+						mCurrentFantasy = cursor.getString(cursor.getColumnIndex(Photo.image_url));
+						mCurrentDesc = cursor.getString(cursor.getColumnIndex(Photo.description));
+						mCurrentTitle = cursor.getString(cursor.getColumnIndex(Photo.name));
 						Picasso.with(HelloActivity.this)
-								.load(cursor.getString(cursor.getColumnIndex(Photo.image_url)))
+								.load(mCurrentFantasy)
 								.into(target);
 						cursor.close();
 					}
@@ -237,6 +245,12 @@ public class HelloActivity extends Activity {
 				break;
 			case R.id.check_default:
 				mFantasy.setImageResource(R.drawable.default_fantasy);
+				break;
+			case R.id.gallery:
+				Intent intent = SingleFragmentActivity.getIntent(this, SingleFragmentActivity.GALLERY);
+				intent.putExtra(FantasiesFragment.PICS, new String[]{mCurrentFantasy});
+				intent.putExtra(FantasiesFragment.DESCS, new String[]{mCurrentDesc});
+				startActivity(intent);
 				break;
 			default:
 				break;
