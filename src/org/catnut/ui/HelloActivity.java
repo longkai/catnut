@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.analytics.tracking.android.EasyTracker;
@@ -37,6 +38,7 @@ import org.catnut.core.CatnutProcessor;
 import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
 import org.catnut.fragment.FantasyFragment;
+import org.catnut.metadata.AccessToken;
 import org.catnut.metadata.Photo;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
@@ -85,8 +87,11 @@ public class HelloActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		mApp = CatnutApp.getTingtingApp();
 		mPreferences = mApp.getPreferences();
-		// 根据是否已经授权，切换不同的界面
-		if (mApp.getAccessToken() == null) {
+		// 根据是否已经授权或者授权过期，切换不同的界面
+		AccessToken accessToken = mApp.getAccessToken();
+		if (accessToken == null || System.currentTimeMillis() > accessToken.expires_in) {
+			mApp.invalidateAccessToken();
+			Toast.makeText(this, getString(R.string.not_yet_auth), Toast.LENGTH_SHORT).show();
 			startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.AUTH));
 		} else {
 			// 检查一次更新，每周一次
@@ -102,7 +107,8 @@ public class HelloActivity extends Activity {
 					String key = getString(R.string.pref_run_times);
 					int before = mPreferences.getInt(key, 0);
 					mPreferences.edit().putInt(key, before++);
-				} else*/ if (mPreferences.getBoolean(getString(R.string.pref_enter_home_directly),
+				} else*/
+				if (mPreferences.getBoolean(getString(R.string.pref_enter_home_directly),
 						getResources().getBoolean(R.bool.pref_enter_home_directly))) {
 					startActivity(new Intent(this, MainActivity.class));
 				} else {
