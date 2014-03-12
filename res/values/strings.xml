@@ -125,7 +125,7 @@
 	<string name="action">Perform action</string>
 	<!--<string name="confirmbar_sample_message">Action performed.</string>-->
 	<string name="confirm">确认</string>
-	<string name="confirm_delete">你是认真的吗？</string>
+	<string name="confirm_delete">你是认真的麽？</string>
 	<string name="network_unavailable">network unavailable!</string>
 	<string name="his_timeline">%1$s 的时间线</string>
 	<string name="home_timeline">主页时间线</string>
@@ -139,18 +139,6 @@
 	<string name="list">分组</string>
 	<string name="draft">草稿</string>
 	<string name="others">其它</string>
-	<string-array name="drawer_list">
-		<item>我的</item>
-		<item>微博</item>
-		<item>关注</item>
-		<item>粉丝</item>
-		<item>分组</item>
-		<item>收藏</item>
-		<item>草稿</item>
-		<item>分享</item>
-		<item>分享</item>
-		<item>源代码</item>
-	</string-array>
 	<string-array name="reteet_options">
 		<item>否</item>
 		<item>评论给当前微博</item>
@@ -195,7 +183,7 @@
 		<b>在路上，我们一起走向远方，只是不要忘了来时的路，还有你我的梦想</b><br><br>
 	]]></string>
 	<string name="about_version_template">v%1$s</string>
-	<string name="show_fantasy_only">隐藏/显示 说明</string>
+	<string name="show_fantasy_only">隐藏/显示 文字</string>
 	<string name="app_desc">让微博 简洁&amp;流畅</string>
 	<string name="default_art">默认</string>
 	<string name="enable_fantasy">启用fantasy</string>

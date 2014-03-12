@@ -199,7 +199,7 @@ public class HelloActivity extends Activity {
 					@Override
 					public void run() {
 						Image image = new Image();
-						image.desc = cursor.getString(cursor.getColumnIndex(Photo.description));
+						image.name = cursor.getString(cursor.getColumnIndex(Photo.name));
 						image.url = cursor.getString(cursor.getColumnIndex(Photo.image_url));
 						mImages.add(image);
 						mImages.add(image);
@@ -280,7 +280,7 @@ public class HelloActivity extends Activity {
 			if (position != 0) {
 				mAbout.setVisibility(View.GONE);
 				mFantasyDesc.setVisibility(View.VISIBLE);
-				String desc = mImages.get(position).desc;
+				String desc = mImages.get(position).name;
 				if (!Constants.NULL.equals(desc)) {
 					mFantasyDesc.setText(Html.fromHtml(desc));
 				}
@@ -293,7 +293,7 @@ public class HelloActivity extends Activity {
 
 	private static final String[] PROJECTION = new String[] {
 			Photo.image_url,
-			Photo.description,
+			Photo.name,
 	};
 
 	private Runnable expand = new Runnable() {
@@ -309,7 +309,7 @@ public class HelloActivity extends Activity {
 					while (cursor.moveToNext()) {
 						image = new Image();
 						image.url = cursor.getString(0);
-						image.desc = cursor.getString(1);
+						image.name = cursor.getString(1);
 						mImages.add(image);
 					}
 					cursor.close();
@@ -328,7 +328,7 @@ public class HelloActivity extends Activity {
 		@Override
 		public Fragment getItem(int position) {
 			Image image = mImages.get(position);
-			return FantasyFragment.getFragment(image.url, image.desc, position == 0);
+			return FantasyFragment.getFragment(image.url, image.name, position == 0);
 		}
 
 		@Override
@@ -339,6 +339,6 @@ public class HelloActivity extends Activity {
 
 	private static class Image {
 		String url;
-		String desc;
+		String name;
 	}
 }

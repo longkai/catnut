@@ -56,7 +56,7 @@ public class SingleFragmentActivity extends Activity {
 					fragment = PrefFragment.getFragment();
 					break;
 				case PHOTO_VIEWER:
-					setTheme(R.style.Theme_About);
+					setTheme(R.style.Theme_Fantasy);
 					String picUrl = getIntent().getStringExtra(Constants.PIC);
 					fragment = PhotoViewerFragment.getFragment(picUrl);
 					break;

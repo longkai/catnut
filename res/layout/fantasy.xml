@@ -12,7 +12,6 @@
 
 	<org.catnut.support.TouchImageView
 		android:id="@+id/fantasy"
-		android:src="@drawable/default_fantasy"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent" />
 
