@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -143,6 +144,8 @@ public class TweetFragment extends Fragment implements
 	private TextView mCreateAt;
 	private ImageView mThumbs;
 	private View mRetweetLayout;
+
+	private Typeface mTypeface;
 
 	// others
 	private ShareActionProvider mShareActionProvider;
@@ -335,6 +338,7 @@ public class TweetFragment extends Fragment implements
 		CatnutApp app = CatnutApp.getTingtingApp();
 		mRequestQueue = app.getRequestQueue();
 		mPreferences = app.getPreferences();
+		mTypeface = CatnutUtils.getTypeface(mPreferences, getString(R.string.pref_customize_tweet_font));
 		mImageSpan = new TweetImageSpan(getActivity());
 		mAdapter = new CommentsAdapter(getActivity());
 	}
@@ -455,6 +459,7 @@ public class TweetFragment extends Fragment implements
 					String text = cursor.getString(cursor.getColumnIndex(Status.columnText));
 					mText.setText(text);
 					CatnutUtils.vividTweet(mText, mImageSpan);
+					CatnutUtils.setTypeface(mText, mTypeface);
 					int replyCount = cursor.getInt(cursor.getColumnIndex(Status.comments_count));
 					mReplayCount.setText(CatnutUtils.approximate(replyCount));
 					int retweetCount = cursor.getInt(cursor.getColumnIndex(Status.reposts_count));
@@ -500,6 +505,7 @@ public class TweetFragment extends Fragment implements
 							CatnutUtils.setText(mRetweetLayout, R.id.retweet_create_at, DateUtils.getRelativeTimeSpanString(mills));
 							TweetTextView retweetText = (TweetTextView) CatnutUtils.setText(mRetweetLayout, R.id.retweet_text, json.optString(Status.text));
 							CatnutUtils.vividTweet(retweetText, mImageSpan);
+							CatnutUtils.setTypeface(retweetText, mTypeface);
 							mRetweetLayout.setVisibility(View.VISIBLE);
 						} catch (JSONException e) {
 							Log.e(TAG, "convert text to string error!", e);

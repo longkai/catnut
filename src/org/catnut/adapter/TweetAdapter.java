@@ -41,8 +41,6 @@ import org.catnut.util.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-
 /**
  * 微博列表适配器
  *
@@ -77,18 +75,11 @@ public class TweetAdapter extends CursorAdapter {
 				context.getString(R.string.thumb_small)
 		);
 		mCustomizedFontSize = CatnutUtils.resolveListPrefInt(
-			preferences,
-			context.getString(R.string.pref_tweet_font_size),
-			context.getResources().getInteger(R.integer.default_tweet_font_size)
+				preferences,
+				context.getString(R.string.pref_tweet_font_size),
+				context.getResources().getInteger(R.integer.default_tweet_font_size)
 		);
-		String fontPath = preferences.getString(context.getString(R.string.pref_customize_tweet_font), null);
-		if (fontPath != null) {
-			try {
-				mCustomizedFont = Typeface.createFromFile(new File(fontPath));
-			} catch (Exception e) {
-				Log.e(TAG, "load customized font fail!", e);
-			}
-		}
+		mCustomizedFont = CatnutUtils.getTypeface(preferences, context.getString(R.string.pref_customize_tweet_font));
 		mImageSpan = new TweetImageSpan(mContext);
 	}
 
@@ -204,10 +195,7 @@ public class TweetAdapter extends CursorAdapter {
 			holder.nick.setText(mScreenName);
 		}
 		// 微博相关
-		if (mCustomizedFont != null) {
-			// 用户自定义字体
-			holder.text.setTypeface(mCustomizedFont);
-		}
+		CatnutUtils.setTypeface(holder.text, mCustomizedFont);
 		holder.reply.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -321,6 +309,7 @@ public class TweetAdapter extends CursorAdapter {
 			CatnutUtils.setText(holder.retweetView, R.id.retweet_create_at, DateUtils.getRelativeTimeSpanString(createAt));
 			text.setText(json.optString(Status.text));
 			CatnutUtils.vividTweet(text, mImageSpan);
+			CatnutUtils.setTypeface(text, mCustomizedFont);
 		} else {
 			holder.retweetView.setVisibility(View.GONE);
 		}

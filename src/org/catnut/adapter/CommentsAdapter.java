@@ -8,6 +8,7 @@ package org.catnut.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -19,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import org.catnut.R;
+import org.catnut.core.CatnutApp;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.support.TweetImageSpan;
@@ -37,10 +39,13 @@ import org.catnut.util.DateTime;
 public class CommentsAdapter extends CursorAdapter {
 
 	private TweetImageSpan mImageSpan;
+	private Typeface mTypeface;
 
 	public CommentsAdapter(Context context) {
 		super(context, null, 0);
 		mImageSpan = new TweetImageSpan(context);
+		mTypeface = CatnutUtils.getTypeface(CatnutApp.getTingtingApp().getPreferences(),
+				context.getString(R.string.pref_customize_tweet_font));
 	}
 
 	private static class ViewHolder {
@@ -98,5 +103,6 @@ public class CommentsAdapter extends CursorAdapter {
 		holder.createAt.setText(DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(date)));
 		holder.text.setText(cursor.getString(holder.textIndex));
 		CatnutUtils.vividTweet(holder.text, mImageSpan);
+		CatnutUtils.setTypeface(holder.text, mTypeface);
 	}
 }

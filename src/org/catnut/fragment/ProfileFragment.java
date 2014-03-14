@@ -14,11 +14,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.provider.BaseColumns;
 import android.support.v4.view.PagerAdapter;
@@ -117,6 +117,8 @@ public class ProfileFragment extends Fragment implements
 	private View mTweetLayout;
 	private View mRetweetLayout;
 
+	private Typeface mTypeface;
+
 	private View.OnClickListener tweetsOnclickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -180,6 +182,8 @@ public class ProfileFragment extends Fragment implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
+		SharedPreferences preferences = mApp.getPreferences();
+		mTypeface = CatnutUtils.getTypeface(preferences, getString(R.string.pref_customize_tweet_font));
 	}
 
 	@Override
@@ -316,6 +320,7 @@ public class ProfileFragment extends Fragment implements
 						TweetTextView text = (TweetTextView) CatnutUtils.setText(tweet, R.id.text,
 								tweetImageSpan.getImageSpan(tweetText));
 						CatnutUtils.vividTweet(text, null);
+						CatnutUtils.setTypeface(text, mTypeface);
 
 						String thumbsUrl = cursor.getString(cursor.getColumnIndex(Status.bmiddle_pic));
 						if (!TextUtils.isEmpty(thumbsUrl)) {
@@ -345,6 +350,7 @@ public class ProfileFragment extends Fragment implements
 							TweetTextView retweet = (TweetTextView) mRetweetLayout.findViewById(R.id.retweet_text);
 							retweet.setText(jsonObject.optString(Status.text));
 							CatnutUtils.vividTweet(retweet, tweetImageSpan);
+							CatnutUtils.setTypeface(retweet, mTypeface);
 							long mills = DateTime.getTimeMills(jsonObject.optString(Status.created_at));
 							TextView tv = (TextView) mRetweetLayout.findViewById(R.id.retweet_create_at);
 							tv.setText(DateUtils.getRelativeTimeSpanString(mills));

@@ -11,6 +11,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
@@ -284,6 +285,7 @@ public class CatnutUtils {
 
 	/**
 	 * 对某个字段自增或者自减法，只能通过_id=?来唯一确定哦
+	 *
 	 * @param increment
 	 * @param table
 	 * @param column
@@ -464,6 +466,37 @@ public class CatnutUtils {
 				preferences.edit().putLong(key, now).commit();
 				context.startService(new Intent(context, UpgradeService.class));
 			}
+		}
+	}
+
+	/**
+	 * 根据偏好中保存的文件路径获取自定义字体
+	 *
+	 * @param pref
+	 * @param key
+	 * @return 若发生任何异常则返回null
+	 */
+	public static Typeface getTypeface(SharedPreferences pref, String key) {
+		Typeface typeface = null;
+		String fontPath = pref.getString(key, null);
+		if (fontPath != null) {
+			try {
+				typeface = Typeface.createFromFile(new File(fontPath));
+			} catch (Exception e) {
+			}
+		}
+		return typeface;
+	}
+
+	/**
+	 * helper method to check whether the typeface is null or not.
+	 *
+	 * @param textView
+	 * @param typeface
+	 */
+	public static void setTypeface(TextView textView, Typeface typeface) {
+		if (typeface != null) {
+			textView.setTypeface(typeface);
 		}
 	}
 }
