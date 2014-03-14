@@ -216,7 +216,6 @@ public class CatnutProvider extends ContentProvider {
 
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
-		Log.e(TAG, selection);
 		int count;
 		switch (matcher.match(uri)) {
 			case STATUSES:

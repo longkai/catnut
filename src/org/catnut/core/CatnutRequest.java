@@ -66,6 +66,7 @@ public class CatnutRequest extends Request<JSONObject> {
 		} catch (JSONException je) {
 			return Response.error(new ParseError(je));
 		} catch (Exception ex) {
+			Log.e(TAG, "process error!", ex);
 			return Response.error(new VolleyError(response));
 		}
 	}

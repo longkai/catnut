@@ -94,7 +94,6 @@ public class TweetFragment extends Fragment implements
 			"s._id",
 			Status.uid,
 			Status.columnText,
-//			Weibo.source,
 			"s." + Status.created_at,
 			User.screen_name,
 			User.profile_image_url,
@@ -729,6 +728,7 @@ public class TweetFragment extends Fragment implements
 		mSendText.setHint(hint);
 		mSendText.requestFocus();
 		mSend.setImageResource(sendEnabled ? R.drawable.ic_dm_send_default : R.drawable.ic_dm_send_disabled);
+		mSend.setClickable(sendEnabled);
 	}
 
 	private void toggleFavorite() {
@@ -826,6 +826,8 @@ public class TweetFragment extends Fragment implements
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {
+						// 删除刚才编辑的内容
+						mSendText.setText(null);
 						mTotal++;
 						String msg;
 						switch (type) {
@@ -838,11 +840,11 @@ public class TweetFragment extends Fragment implements
 								break;
 							case RETWEET:
 								msg = getString(R.string.retweet_success);
+								mSend.setImageResource(R.drawable.ic_dm_send_default);
+								mSend.setClickable(true);
 								break;
 						}
 						Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
-						// 删除刚才编辑的内容
-						mSendText.setText(null);
 						// 更新ui
 						TextView which =
 								type == RETWEET ? mReteetCount : mReplayCount;
