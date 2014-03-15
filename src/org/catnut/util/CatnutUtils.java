@@ -510,4 +510,14 @@ public class CatnutUtils {
 	public static float getLineSpacing(SharedPreferences preferences, String key, String defaultValue) {
 		return Float.parseFloat(preferences.getString(key, defaultValue));
 	}
+
+	public static String createFantasyDir(Context context) throws Exception {
+		// 注意，这里用户有可能吧sk卡连接到电脑上了...
+		File dir = new File(context.getExternalCacheDir().getPath()
+				+ File.separator + Constants.FANTASY_DIR);
+		if (!dir.exists() && !dir.mkdirs()) {
+			throw new RuntimeException(context.getString(R.string.cannot_create_dir));
+		}
+		return dir.getPath();
+	}
 }

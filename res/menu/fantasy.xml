@@ -8,6 +8,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<item
+		android:orderInCategory="1"
 		android:title="@string/app_name"
 		android:icon="@drawable/ic_title_overflow_default"
 		android:showAsAction="always">

@@ -87,6 +87,7 @@ public class HelloActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		mApp = CatnutApp.getTingtingApp();
 		mPreferences = mApp.getPreferences();
+		fetch500px();
 		// 根据是否已经授权或者授权过期，切换不同的界面
 		AccessToken accessToken = mApp.getAccessToken();
 		if (accessToken == null || System.currentTimeMillis() > accessToken.expires_in) {
@@ -120,7 +121,6 @@ public class HelloActivity extends Activity {
 
 	private void init() {
 		setContentView(R.layout.about);
-		fetch500px();
 		mImages = new ArrayList<Image>();
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setOnPageChangeListener(new PagerListener());

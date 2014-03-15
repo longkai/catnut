@@ -88,7 +88,7 @@ public class PhotoViewerFragment extends Fragment {
 						mHandler.post(new Runnable() {
 							@Override
 							public void run() {
-								Intent intent = new Intent(Intent.ACTION_SEND).setType("image/*");
+								Intent intent = new Intent(Intent.ACTION_SEND).setType(getString(R.string.mime_image));
 								intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(image));
 								mShareActionProvider.setShareIntent(intent);
 							}

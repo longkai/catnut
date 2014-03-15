@@ -11,17 +11,17 @@ import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
-import org.json.JSONObject;
 import org.catnut.metadata.AccessToken;
-import org.catnut.util.BitmapLruCache;
+import org.json.JSONObject;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.catnut.metadata.AccessToken.*;
+import static org.catnut.metadata.AccessToken.ACCESS_TOKEN;
+import static org.catnut.metadata.AccessToken.EXPIRES_IN;
+import static org.catnut.metadata.AccessToken.UID;
 
 /**
  * 应用程序对象
@@ -31,6 +31,9 @@ import static org.catnut.metadata.AccessToken.*;
 public class CatnutApp extends Application implements SharedPreferences.OnSharedPreferenceChangeListener {
 
 	public static final String TAG = "CatnutApp";
+
+	private static int DISK_IMAGE_CACHE_SIZE = 1024 * 1024 * 10;
+	private static int DISK_IMAGE_CACHE_QUALITY = 100;
 
 	/** singleton */
 	private static CatnutApp sApp;
@@ -86,10 +89,10 @@ public class CatnutApp extends Application implements SharedPreferences.OnShared
 	public void saveAccessToken(JSONObject json) {
 		Log.d(TAG, "save access token...");
 		mPreferences.edit()
-			.putLong(UID, json.optLong(UID))
-			.putString(ACCESS_TOKEN, json.optString(ACCESS_TOKEN))
-			.putLong(EXPIRES_IN, json.optLong(EXPIRES_IN) * 1000 + System.currentTimeMillis())
-			.commit();
+				.putLong(UID, json.optLong(UID))
+				.putString(ACCESS_TOKEN, json.optString(ACCESS_TOKEN))
+				.putLong(EXPIRES_IN, json.optLong(EXPIRES_IN) * 1000 + System.currentTimeMillis())
+				.commit();
 	}
 
 	/**
@@ -98,10 +101,10 @@ public class CatnutApp extends Application implements SharedPreferences.OnShared
 	public void invalidateAccessToken() {
 		Log.d(TAG, "invalidate access token...");
 		mPreferences.edit()
-			.remove(UID)
-			.remove(EXPIRES_IN)
-			.remove(ACCESS_TOKEN)
-			.commit();
+				.remove(UID)
+				.remove(EXPIRES_IN)
+				.remove(ACCESS_TOKEN)
+				.commit();
 		mAccessToken = null;
 		if (sAuthHeaders != null) {
 			sAuthHeaders.clear();

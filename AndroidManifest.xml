@@ -26,8 +26,7 @@
 		android:name=".core.CatnutApp">
 		<activity
 			android:name=".ui.HelloActivity"
-			android:theme="@style/Theme.Fantasy"
-			android:noHistory="true">
+			android:theme="@style/Theme.Fantasy">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
@@ -50,12 +49,12 @@
 			<intent-filter>
 				<category android:name="android.intent.category.DEFAULT" />
 				<action android:name="android.intent.action.SEND" />
-				<data android:mimeType="text/plain" />
+				<data android:mimeType="@string/mime_text_plain" />
 			</intent-filter>
 			<intent-filter>
 				<category android:name="android.intent.category.DEFAULT" />
 				<action android:name="android.intent.action.SEND" />
-				<data android:mimeType="image/*" />
+				<data android:mimeType="@string/mime_image" />
 			</intent-filter>
 		</activity>
 

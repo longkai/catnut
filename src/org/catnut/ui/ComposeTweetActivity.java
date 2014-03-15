@@ -168,10 +168,10 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 		String mimeType = intent.getType();
 		if (!TextUtils.isEmpty(action)) {
 			if (!TextUtils.isEmpty(mimeType)) {
-				if (mimeType.equals("text/plain")) {
+				if (mimeType.equals(getString(R.string.mime_text_plain))) {
 					mText.setText(intent.getStringExtra(Intent.EXTRA_TEXT));
 					setResult(RESULT_OK); // no result return back
-				} else if (mimeType.startsWith("image/")) {
+				} else if (mimeType.startsWith(getString(R.string.mime_image))) {
 					mText.setText(intent.getStringExtra(Intent.EXTRA_TEXT));
 					if (mUris == null) {
 						initGallery();
