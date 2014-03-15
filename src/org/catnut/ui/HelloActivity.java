@@ -93,7 +93,9 @@ public class HelloActivity extends Activity {
 		if (accessToken == null || System.currentTimeMillis() > accessToken.expires_in) {
 			mApp.invalidateAccessToken();
 			Toast.makeText(this, getString(R.string.not_yet_auth), Toast.LENGTH_SHORT).show();
-			startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.AUTH));
+			Intent intent = SingleFragmentActivity.getIntent(this, SingleFragmentActivity.AUTH);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+			startActivity(intent);
 		} else {
 			// 检查一次更新，每周一次
 			CatnutUtils.checkout(false, this, mPreferences);
@@ -242,7 +244,13 @@ public class HelloActivity extends Activity {
 				startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.PREF));
 				break;
 			case android.R.id.home:
-				startActivity(new Intent(this, MainActivity.class));
+				Intent intent = getIntent();
+				if (Intent.ACTION_MAIN.equals(intent.getAction())) {
+					startActivity(new Intent(this, MainActivity.class)
+							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+				} else {
+					navigateUpTo(intent);
+				}
 				break;
 			default:
 				break;
