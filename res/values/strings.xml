@@ -203,4 +203,6 @@
 	<string name="check_now">检查更新中...</string>
 	<string name="toggle_desc">打开/隐藏 介绍</string>
 	<string name="not_yet_auth">您没有授权或者授权过期，请重新登陆新浪微博!</string>
+	<string name="line_spacing">字体行距</string>
+	<string name="line_spacing_summary">调整微博字体的行距</string>
 </resources>

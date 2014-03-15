@@ -499,4 +499,15 @@ public class CatnutUtils {
 			textView.setTypeface(typeface);
 		}
 	}
+
+	/**
+	 * 设置行间距
+	 *
+	 * @param preferences
+	 * @param key
+	 * @param defaultValue
+	 */
+	public static float getLineSpacing(SharedPreferences preferences, String key, String defaultValue) {
+		return Float.parseFloat(preferences.getString(key, defaultValue));
+	}
 }

@@ -118,6 +118,7 @@ public class ProfileFragment extends Fragment implements
 	private View mRetweetLayout;
 
 	private Typeface mTypeface;
+	private float mLineSpacing = 1.0f;
 
 	private View.OnClickListener tweetsOnclickListener = new View.OnClickListener() {
 		@Override
@@ -184,6 +185,8 @@ public class ProfileFragment extends Fragment implements
 		setHasOptionsMenu(true);
 		SharedPreferences preferences = mApp.getPreferences();
 		mTypeface = CatnutUtils.getTypeface(preferences, getString(R.string.pref_customize_tweet_font));
+		mLineSpacing = CatnutUtils.getLineSpacing(preferences,
+				getString(R.string.pref_line_spacing), getString(R.string.default_line_spacing));
 	}
 
 	@Override
@@ -321,6 +324,7 @@ public class ProfileFragment extends Fragment implements
 								tweetImageSpan.getImageSpan(tweetText));
 						CatnutUtils.vividTweet(text, null);
 						CatnutUtils.setTypeface(text, mTypeface);
+						text.setLineSpacing(0, mLineSpacing);
 
 						String thumbsUrl = cursor.getString(cursor.getColumnIndex(Status.bmiddle_pic));
 						if (!TextUtils.isEmpty(thumbsUrl)) {
@@ -351,6 +355,7 @@ public class ProfileFragment extends Fragment implements
 							retweet.setText(jsonObject.optString(Status.text));
 							CatnutUtils.vividTweet(retweet, tweetImageSpan);
 							CatnutUtils.setTypeface(retweet, mTypeface);
+							retweet.setLineSpacing(0, mLineSpacing);
 							long mills = DateTime.getTimeMills(jsonObject.optString(Status.created_at));
 							TextView tv = (TextView) mRetweetLayout.findViewById(R.id.retweet_create_at);
 							tv.setText(DateUtils.getRelativeTimeSpanString(mills));

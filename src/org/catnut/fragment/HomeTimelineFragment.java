@@ -358,6 +358,7 @@ public class HomeTimelineFragment extends TimelineFragment {
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 		if (isAdded()) {
 			if (key.equals(getString(R.string.pref_tweet_font_size))
+					|| key.equals(getString(R.string.pref_line_spacing))
 					|| key.equals(getString(R.string.pref_customize_tweet_font))
 					|| key.equals(getString(R.string.pref_thumbs_options))) {
 				Log.d(TAG, "pref change, the home timeline fragment needs update!");

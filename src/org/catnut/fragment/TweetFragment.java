@@ -145,6 +145,7 @@ public class TweetFragment extends Fragment implements
 	private View mRetweetLayout;
 
 	private Typeface mTypeface;
+	private float mLineSpacing = 1.0f;
 
 	// others
 	private ShareActionProvider mShareActionProvider;
@@ -338,6 +339,8 @@ public class TweetFragment extends Fragment implements
 		mRequestQueue = app.getRequestQueue();
 		mPreferences = app.getPreferences();
 		mTypeface = CatnutUtils.getTypeface(mPreferences, getString(R.string.pref_customize_tweet_font));
+		mLineSpacing = CatnutUtils.getLineSpacing(mPreferences,
+				getString(R.string.pref_line_spacing), getString(R.string.default_line_spacing));
 		mImageSpan = new TweetImageSpan(getActivity());
 		mAdapter = new CommentsAdapter(getActivity());
 	}
@@ -459,6 +462,7 @@ public class TweetFragment extends Fragment implements
 					mText.setText(text);
 					CatnutUtils.vividTweet(mText, mImageSpan);
 					CatnutUtils.setTypeface(mText, mTypeface);
+					mText.setLineSpacing(0, mLineSpacing);
 					int replyCount = cursor.getInt(cursor.getColumnIndex(Status.comments_count));
 					mReplayCount.setText(CatnutUtils.approximate(replyCount));
 					int retweetCount = cursor.getInt(cursor.getColumnIndex(Status.reposts_count));
@@ -505,6 +509,7 @@ public class TweetFragment extends Fragment implements
 							TweetTextView retweetText = (TweetTextView) CatnutUtils.setText(mRetweetLayout, R.id.retweet_text, json.optString(Status.text));
 							CatnutUtils.vividTweet(retweetText, mImageSpan);
 							CatnutUtils.setTypeface(retweetText, mTypeface);
+							retweetText.setLineSpacing(0, mLineSpacing);
 							mRetweetLayout.setVisibility(View.VISIBLE);
 						} catch (JSONException e) {
 							Log.e(TAG, "convert text to string error!", e);
@@ -803,6 +808,8 @@ public class TweetFragment extends Fragment implements
 				return; // 提前结束
 			}
 		}
+		mSend.setBackgroundResource(R.drawable.ic_dm_send_disabled);
+		mSend.setClickable(false);
 		String text = mSendText.getText().toString();
 		CatnutAPI api;
 		switch (type) {

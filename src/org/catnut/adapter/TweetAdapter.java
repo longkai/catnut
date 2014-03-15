@@ -60,6 +60,7 @@ public class TweetAdapter extends CursorAdapter {
 	/** 自定义字体，用户偏好 */
 	private Typeface mCustomizedFont;
 	private int mCustomizedFontSize;
+	private float mCostomizedLineSpacing = 1.0f;
 
 	/**
 	 * @param context
@@ -81,6 +82,9 @@ public class TweetAdapter extends CursorAdapter {
 		);
 		mCustomizedFont = CatnutUtils.getTypeface(preferences, context.getString(R.string.pref_customize_tweet_font));
 		mImageSpan = new TweetImageSpan(mContext);
+		mCostomizedLineSpacing = CatnutUtils.getLineSpacing(preferences,
+				context.getString(R.string.pref_line_spacing),
+				context.getString(R.string.default_line_spacing));
 	}
 
 	private static class ViewHolder {
@@ -196,6 +200,7 @@ public class TweetAdapter extends CursorAdapter {
 		}
 		// 微博相关
 		CatnutUtils.setTypeface(holder.text, mCustomizedFont);
+		holder.text.setLineSpacing(0, mCostomizedLineSpacing);
 		holder.reply.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -310,6 +315,7 @@ public class TweetAdapter extends CursorAdapter {
 			text.setText(json.optString(Status.text));
 			CatnutUtils.vividTweet(text, mImageSpan);
 			CatnutUtils.setTypeface(text, mCustomizedFont);
+			text.setLineSpacing(0, mCostomizedLineSpacing);
 		} else {
 			holder.retweetView.setVisibility(View.GONE);
 		}

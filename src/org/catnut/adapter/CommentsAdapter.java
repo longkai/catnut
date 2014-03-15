@@ -7,6 +7,7 @@ package org.catnut.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.provider.BaseColumns;
@@ -40,12 +41,19 @@ public class CommentsAdapter extends CursorAdapter {
 
 	private TweetImageSpan mImageSpan;
 	private Typeface mTypeface;
+	private float mLineSpacing = 1.0f;
 
 	public CommentsAdapter(Context context) {
 		super(context, null, 0);
 		mImageSpan = new TweetImageSpan(context);
-		mTypeface = CatnutUtils.getTypeface(CatnutApp.getTingtingApp().getPreferences(),
+		SharedPreferences preferences = CatnutApp.getTingtingApp().getPreferences();
+		mTypeface = CatnutUtils.getTypeface(preferences,
 				context.getString(R.string.pref_customize_tweet_font));
+		mLineSpacing = CatnutUtils.getLineSpacing(
+				preferences,
+				context.getString(R.string.pref_line_spacing),
+				context.getString(R.string.default_line_spacing)
+		);
 	}
 
 	private static class ViewHolder {
@@ -104,5 +112,6 @@ public class CommentsAdapter extends CursorAdapter {
 		holder.text.setText(cursor.getString(holder.textIndex));
 		CatnutUtils.vividTweet(holder.text, mImageSpan);
 		CatnutUtils.setTypeface(holder.text, mTypeface);
+		holder.text.setLineSpacing(0, mLineSpacing);
 	}
 }

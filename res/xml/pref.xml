@@ -60,6 +60,14 @@
 			android:entryValues="@array/tweet_font_size_entryValues" />
 
 		<ListPreference
+			android:key="@string/pref_line_spacing"
+			android:defaultValue="@string/default_line_spacing"
+			android:title="@string/line_spacing"
+			android:summary="@string/line_spacing_summary"
+			android:entries="@array/line_spacing_entries"
+			android:entryValues="@array/line_spacing_entries" />
+
+		<ListPreference
 			android:key="@string/pref_thumbs_options"
 			android:title="@string/show_thumbs"
 			android:defaultValue="@string/thumb_small"
