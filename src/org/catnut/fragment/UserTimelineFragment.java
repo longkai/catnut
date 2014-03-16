@@ -129,7 +129,7 @@ public class UserTimelineFragment extends TimelineFragment {
 	public void onStart() {
 		super.onStart();
 		ActionBar bar = getActivity().getActionBar();
-		bar.setDisplayShowHomeEnabled(false);
+		bar.setIcon(R.drawable.ic_title_list);
 		bar.setTitle(mIsMe
 				? getString(R.string.my_timeline)
 				: getString(R.string.his_timeline, mScreenName));

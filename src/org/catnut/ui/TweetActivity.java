@@ -36,7 +36,7 @@ public class TweetActivity extends Activity {
 			mTracker = EasyTracker.getInstance(this);
 		}
 		ActionBar bar = getActionBar();
-		bar.setDisplayShowHomeEnabled(false);
+		bar.setIcon(R.drawable.ic_title_view_tweet);
 		bar.setDisplayHomeAsUpEnabled(true);
 
 		long id = getIntent().getLongExtra(Constants.ID, 0L);

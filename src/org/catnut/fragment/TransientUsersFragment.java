@@ -5,6 +5,7 @@
  */
 package org.catnut.fragment;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.ProgressDialog;
@@ -138,7 +139,9 @@ public class TransientUsersFragment extends ListFragment implements AbsListView.
 	@Override
 	public void onStart() {
 		super.onStart();
-		getActivity().getActionBar().setTitle(getString(
+		ActionBar bar = getActivity().getActionBar();
+		bar.setIcon(R.drawable.ic_title_people);
+		bar.setTitle(getString(
 				mFollowing ? R.string.his_followings : R.string.his_followers, mScreenName)
 		);
 	}

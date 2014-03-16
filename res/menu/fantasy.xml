@@ -14,7 +14,7 @@
 		<menu>
 			<item
 				android:id="@+id/pref"
-				android:icon="@drawable/ico_title_pref"
+				android:icon="@drawable/ic_title_pref"
 				android:title="@string/pref" />
 			<item
 				android:id="@id/action_share"

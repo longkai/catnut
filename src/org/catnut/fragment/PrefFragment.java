@@ -20,7 +20,6 @@ import android.webkit.WebView;
 import android.widget.Toast;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
-import org.catnut.service.UpgradeService;
 import org.catnut.ui.HelloActivity;
 import org.catnut.util.CatnutUtils;
 
@@ -58,7 +57,7 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 		super.onStart();
 		ActionBar bar = getActivity().getActionBar();
 		bar.setTitle(getText(R.string.pref));
-		bar.setIcon(R.drawable.ico_title_pref);
+		bar.setIcon(R.drawable.ic_title_pref);
 	}
 
 	@Override

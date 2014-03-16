@@ -63,7 +63,7 @@ public class DraftFragment extends ListFragment implements LoaderManager.LoaderC
 	public void onStart() {
 		super.onStart();
 		ActionBar actionBar = getActivity().getActionBar();
-		actionBar.setDisplayShowHomeEnabled(false);
+		actionBar.setIcon(R.drawable.ic_title_list);
 		actionBar.setTitle(getString(R.string.my_drafts));
 	}
 

@@ -113,7 +113,7 @@ public class MyRelationshipFragment extends TimelineFragment {
 	public void onStart() {
 		super.onStart();
 		ActionBar bar = getActivity().getActionBar();
-		bar.setDisplayShowHomeEnabled(false);
+		bar.setIcon(R.drawable.ic_title_people);
 		bar.setTitle(
 				getString(mIsFollowing ? R.string.my_followings_title : R.string.follow_me_title)
 		);

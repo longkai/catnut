@@ -156,7 +156,7 @@ public abstract class TimelineFragment extends Fragment implements ConfirmBarCon
 		// 本地微博搜索
 		MenuItem search = menu.add(android.R.string.search_go);
 		search.setIcon(R.drawable.ic_title_search_default);
-		search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
+		search.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER
 				| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
 		mSearchView = VividSearchView.getSearchView(getActivity());
 		mSearchView.setOnQueryTextListener(this);

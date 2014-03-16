@@ -227,7 +227,7 @@ public class FavoriteFragment extends TimelineFragment {
 		super.onStart();
 		ActionBar actionBar = getActivity().getActionBar();
 		actionBar.setTitle(getString(R.string.my_favorites));
-		actionBar.setDisplayShowHomeEnabled(false);
+		actionBar.setIcon(R.drawable.ic_title_favorite);
 	}
 
 	@Override
