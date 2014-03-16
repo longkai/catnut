@@ -79,7 +79,7 @@
 					android:layout_height="wrap_content">
 
 					<TextView
-						android:text="我的"
+						android:text="@string/mine"
 						android:textColor="@android:color/holo_blue_bright"
 						android:layout_marginTop="@dimen/medium"
 						android:layout_marginBottom="@dimen/medium"
