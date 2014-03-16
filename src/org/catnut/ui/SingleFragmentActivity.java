@@ -11,6 +11,8 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
@@ -45,6 +47,7 @@ public class SingleFragmentActivity extends Activity {
 
 	private EasyTracker mTracker;
 
+	private int mWhich = Integer.MIN_VALUE;
 	private ConfirmBarController.Callbacks mCallbacks;
 
 	@Override
@@ -52,9 +55,9 @@ public class SingleFragmentActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		if (savedInstanceState == null) {
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
-			int which = getIntent().getIntExtra(TAG, PREF);
+			mWhich = getIntent().getIntExtra(TAG, PREF);
 			Fragment fragment = null;
-			switch (which) {
+			switch (mWhich) {
 				case PREF:
 					fragment = PrefFragment.getFragment();
 					break;
@@ -98,10 +101,26 @@ public class SingleFragmentActivity extends Activity {
 	}
 
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		if (mWhich != PREF) {
+			menu.add(Menu.NONE, R.id.pref, Menu.NONE, R.string.pref)
+					.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+		}
+		return true;
+	}
+
+	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
-				navigateUpTo(getIntent());
+				if (mWhich == PREF) {
+					onBackPressed();
+				} else {
+					navigateUpTo(getIntent());
+				}
+				break;
+			case R.id.pref:
+				startActivity(getIntent(this, PREF));
 				break;
 			default:
 				break;
