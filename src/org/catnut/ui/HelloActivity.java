@@ -112,7 +112,11 @@ public class HelloActivity extends Activity {
 				} else*/
 				if (mPreferences.getBoolean(getString(R.string.pref_enter_home_directly),
 						getResources().getBoolean(R.bool.pref_enter_home_directly))) {
-					startActivity(new Intent(this, MainActivity.class));
+					startActivity(new Intent(this, MainActivity.class)
+						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
+								| Intent.FLAG_ACTIVITY_NEW_TASK
+								| Intent.FLAG_ACTIVITY_NO_ANIMATION)
+					);
 				} else {
 					init();
 				}
