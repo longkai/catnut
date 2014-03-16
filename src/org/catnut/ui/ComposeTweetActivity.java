@@ -171,7 +171,7 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 				if (mimeType.equals(getString(R.string.mime_text_plain))) {
 					mText.setText(intent.getStringExtra(Intent.EXTRA_TEXT));
 					setResult(RESULT_OK); // no result return back
-				} else if (mimeType.startsWith(getString(R.string.mime_image))) {
+				} else if (mimeType.startsWith("image/")) {
 					mText.setText(intent.getStringExtra(Intent.EXTRA_TEXT));
 					if (mUris == null) {
 						initGallery();
@@ -469,7 +469,9 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 		mPhotos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				startActivity(new Intent(Intent.ACTION_VIEW, mUris.get(position)));
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				intent.setDataAndType(mUris.get(0), getString(R.string.mime_image));
+				startActivity(intent);
 			}
 		});
 	}

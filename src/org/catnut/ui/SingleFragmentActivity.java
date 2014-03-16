@@ -17,6 +17,7 @@ import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.fragment.DraftFragment;
+import org.catnut.fragment.FantasyFragment;
 import org.catnut.fragment.FavoriteFragment;
 import org.catnut.fragment.MyRelationshipFragment;
 import org.catnut.fragment.OAuthFragment;

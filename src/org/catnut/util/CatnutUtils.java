@@ -11,6 +11,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -35,6 +36,8 @@ import org.catnut.support.TweetURLSpan;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -511,10 +514,10 @@ public class CatnutUtils {
 		return Float.parseFloat(preferences.getString(key, defaultValue));
 	}
 
-	public static String createFantasyDir(Context context) throws Exception {
+	public static String mkdir(Context context, String location) throws Exception {
 		// 注意，这里用户有可能吧sk卡连接到电脑上了...
 		File dir = new File(context.getExternalCacheDir().getPath()
-				+ File.separator + Constants.FANTASY_DIR);
+				+ File.separator + location);
 		if (!dir.exists() && !dir.mkdirs()) {
 			throw new RuntimeException(context.getString(R.string.cannot_create_dir));
 		}

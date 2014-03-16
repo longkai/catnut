@@ -215,16 +215,11 @@ public class HelloActivity extends Activity {
 		}
 	};
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.fantasy, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
+	public void onOptionsItemSelected(int id) {
+		switch (id) {
 			case R.id.toggle_fantasy:
+				Log.d(TAG, "toggle");
+
 				int i = mViewPager.getCurrentItem();
 				if (i == 0) {
 					if (mAbout.getVisibility() == View.VISIBLE) {
@@ -255,7 +250,6 @@ public class HelloActivity extends Activity {
 			default:
 				break;
 		}
-		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
@@ -336,7 +330,7 @@ public class HelloActivity extends Activity {
 		@Override
 		public Fragment getItem(int position) {
 			Image image = mImages.get(position);
-			return FantasyFragment.getFragment(image.url, image.name, position == 0);
+			return FantasyFragment.getFragment(image.url, position == 0);
 		}
 
 		@Override
