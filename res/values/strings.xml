@@ -216,4 +216,5 @@
 	<string name="clear_cache_summary">清除缓存的图片和微博等</string>
 	<string name="clear_cache_success">清除成功</string>
 	<string name="clearing">清除中...</string>
+	<string name="fantasy_share">「%1$s」 分享自Catnut - fantasy</string>
 </resources>

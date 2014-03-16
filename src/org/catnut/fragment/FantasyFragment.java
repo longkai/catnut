@@ -43,6 +43,7 @@ import java.io.IOException;
 public class FantasyFragment extends Fragment {
 
 	private static final String TAG = "FantasyFragment";
+	private static final String NAME = "name";
 	private static final String FIT_XY = "fit_xy";
 
 	private String mUrl;
@@ -114,7 +115,10 @@ public class FantasyFragment extends Fragment {
 		super.onAttach(activity);
 		Bundle args = getArguments();
 		mUrl = args.getString(TAG);
-		mIntent = new Intent(Intent.ACTION_SEND).setType(getString(R.string.mime_image));
+		mIntent = new Intent(Intent.ACTION_SEND)
+				.setType(getString(R.string.mime_image))
+				.putExtra(Intent.EXTRA_TITLE, args.getString(NAME))
+				.putExtra(Intent.EXTRA_TEXT, activity.getString(R.string.fantasy_share, args.getString(NAME)));
 	}
 
 	@Override
@@ -123,9 +127,10 @@ public class FantasyFragment extends Fragment {
 		setHasOptionsMenu(true);
 	}
 
-	public static FantasyFragment getFragment(String url, boolean fitXY) {
+	public static FantasyFragment getFragment(String url, String name, boolean fitXY) {
 		Bundle args = new Bundle();
 		args.putString(TAG, url);
+		args.putString(NAME, name);
 		args.putBoolean(FIT_XY, fitXY);
 		FantasyFragment fantasyFragment = new FantasyFragment();
 		fantasyFragment.setArguments(args);

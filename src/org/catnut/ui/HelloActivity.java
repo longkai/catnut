@@ -344,7 +344,7 @@ public class HelloActivity extends Activity {
 		@Override
 		public Fragment getItem(int position) {
 			Image image = mImages.get(position);
-			return FantasyFragment.getFragment(image.url, position == 0);
+			return FantasyFragment.getFragment(image.url, image.name, position == 0);
 		}
 
 		@Override
