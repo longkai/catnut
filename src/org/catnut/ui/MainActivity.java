@@ -40,6 +40,7 @@ import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
 import org.catnut.fragment.HomeTimelineFragment;
 import org.catnut.metadata.User;
+import org.catnut.support.ConfirmBarController;
 import org.catnut.support.QuickReturnScrollView;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
@@ -93,6 +94,8 @@ public class MainActivity extends Activity implements
 	private TextView mTextNick;
 	private TextView mDescription;
 
+	private ConfirmBarController.Callbacks mCallbacks;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -136,9 +139,11 @@ public class MainActivity extends Activity implements
 		injectListeners();
 
 		if (savedInstanceState == null) {
+			HomeTimelineFragment fragment = HomeTimelineFragment.getFragment();
+			mCallbacks = fragment;
 			getFragmentManager()
 					.beginTransaction()
-					.replace(R.id.fragment_container, HomeTimelineFragment.getFragment())
+					.replace(R.id.fragment_container, fragment)
 					.commit();
 		}
 
@@ -174,6 +179,22 @@ public class MainActivity extends Activity implements
 		super.onStop();
 		if (mTracker != null) {
 			mTracker.activityStop(this);
+		}
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		if (mCallbacks != null) {
+			mCallbacks.onActivitySaveInstanceState(outState);
+		}
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		if (mCallbacks != null) {
+			mCallbacks.onActivityRestoreInstanceState(savedInstanceState);
 		}
 	}
 

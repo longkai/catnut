@@ -132,5 +132,16 @@ public class ConfirmBarController {
 			hideConfirmBar(false);
 		}
 	};
+
+	/**
+	 * callback for use in fragment
+	 *
+	 * @author longkai
+	 */
+	public interface Callbacks {
+		void onActivityRestoreInstanceState(Bundle savedInstanceState);
+
+		void onActivitySaveInstanceState(Bundle outState);
+	}
 }
 

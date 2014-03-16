@@ -47,7 +47,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  *
  * @author longkai
  */
-public abstract class TimelineFragment extends Fragment implements
+public abstract class TimelineFragment extends Fragment implements ConfirmBarController.Callbacks,
 		ConfirmBarController.ConfirmListener, OnRefreshListener, AbsListView.OnScrollListener,
 		LoaderManager.LoaderCallbacks<Cursor>, SwipeDismissListViewTouchListener.DismissCallbacks,
 		AdapterView.OnItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener, SearchView.OnQueryTextListener, SearchView.OnCloseListener {
@@ -187,6 +187,16 @@ public abstract class TimelineFragment extends Fragment implements
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 		// no-op
+	}
+
+	@Override
+	public void onActivityRestoreInstanceState(Bundle savedInstanceState) {
+		mConfirmBarController.onRestoreInstanceState(savedInstanceState);
+	}
+
+	@Override
+	public void onActivitySaveInstanceState(Bundle outState) {
+		mConfirmBarController.onSaveInstanceState(outState);
 	}
 
 	@Override

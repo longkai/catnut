@@ -11,20 +11,20 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.fragment.DraftFragment;
-import org.catnut.fragment.FantasyFragment;
 import org.catnut.fragment.FavoriteFragment;
 import org.catnut.fragment.MyRelationshipFragment;
 import org.catnut.fragment.OAuthFragment;
 import org.catnut.fragment.PhotoViewerFragment;
 import org.catnut.fragment.PrefFragment;
+import org.catnut.fragment.TimelineFragment;
 import org.catnut.fragment.UserTimelineFragment;
 import org.catnut.metadata.User;
+import org.catnut.support.ConfirmBarController;
 import org.catnut.util.Constants;
 
 /**
@@ -44,6 +44,8 @@ public class SingleFragmentActivity extends Activity {
 	public static final int AUTH = 6;
 
 	private EasyTracker mTracker;
+
+	private ConfirmBarController.Callbacks mCallbacks;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -82,6 +84,9 @@ public class SingleFragmentActivity extends Activity {
 					// get out!
 					navigateUpTo(getIntent());
 					break;
+			}
+			if (fragment instanceof TimelineFragment) {
+				mCallbacks = (ConfirmBarController.Callbacks) fragment;
 			}
 			ft.replace(android.R.id.content, fragment).commit();
 		}
@@ -126,6 +131,22 @@ public class SingleFragmentActivity extends Activity {
 		super.onStop();
 		if (mTracker != null) {
 			mTracker.activityStop(this);
+		}
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		if (mCallbacks != null) {
+			mCallbacks.onActivitySaveInstanceState(outState);
+		}
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		if (mCallbacks != null) {
+			mCallbacks.onActivityRestoreInstanceState(savedInstanceState);
 		}
 	}
 }

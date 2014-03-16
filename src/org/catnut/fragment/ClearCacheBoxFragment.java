@@ -28,7 +28,7 @@ import java.io.File;
 /**
  * 清除缓存
  *
- * @author longkai 
+ * @author longkai
  */
 public class ClearCacheBoxFragment extends DialogFragment {
 

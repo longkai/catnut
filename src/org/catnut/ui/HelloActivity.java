@@ -21,7 +21,6 @@ import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -64,7 +63,7 @@ public class HelloActivity extends Activity {
 	/** 欢迎界面默认的播放时间 */
 	private static final long DEFAULT_SPLASH_TIME_MILLS = 3000L;
 
-	private static final int MIN_FANTASY_RUN_TIMES = 3;
+	private static final String LAST_FANTASY_MILLIS = "LAST_FANTASY_MILLIS";
 
 	// only use for auth!
 	private EasyTracker mTracker;
@@ -78,7 +77,6 @@ public class HelloActivity extends Activity {
 	private ViewPager mViewPager;
 	private FragmentStatePagerAdapter mPagerAdapter;
 	private View mAbout;
-	private int mRuntimes;
 
 	private TextView mFantasyDesc;
 
@@ -99,18 +97,10 @@ public class HelloActivity extends Activity {
 		} else {
 			// 检查一次更新，每周一次
 			CatnutUtils.checkout(false, this, mPreferences);
-			mRuntimes = mPreferences.getInt(getString(R.string.pref_run_times), 0);
-			mPreferences.edit().putInt(getString(R.string.pref_run_times), mRuntimes + 1).commit();
 			// 根据情况跳转
 			if (getIntent().hasExtra(TAG)) {
 				init();
 			} else {
-				/*if (runtimes < MIN_FANTASY_RUN_TIMES) {
-					init();
-					String key = getString(R.string.pref_run_times);
-					int before = mPreferences.getInt(key, 0);
-					mPreferences.edit().putInt(key, before++);
-				} else*/
 				if (mPreferences.getBoolean(getString(R.string.pref_enter_home_directly),
 						getResources().getBoolean(R.bool.pref_enter_home_directly))) {
 					startActivity(new Intent(this, MainActivity.class)
@@ -140,22 +130,21 @@ public class HelloActivity extends Activity {
 		TextView about = (TextView) findViewById(R.id.about_body);
 		TextView version = (TextView) findViewById(R.id.app_version);
 		version.setText(getString(R.string.about_version_template, getString(R.string.version_name)));
-		if (mRuntimes < MIN_FANTASY_RUN_TIMES) {
+
+		// for girl' s day only, in march 7-21
+		Calendar now = Calendar.getInstance();
+		boolean girl = now.get(Calendar.MONTH) == Calendar.MARCH
+				&& now.get(Calendar.DAY_OF_MONTH) >= 7
+				&& now.get(Calendar.DAY_OF_MONTH) <= 21;
+		if (girl) {
+			about.setText(Html.fromHtml(getString(R.string.girls_day)));
+			about.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+		} else {
 			about.setText(Html.fromHtml(getString(R.string.about_body)));
 			about.setMovementMethod(LinkMovementMethod.getInstance());
-		} else {
-			// for girl' s day only, in march 7-21
-			Calendar now = Calendar.getInstance();
-			boolean girl = now.get(Calendar.MONTH) == Calendar.MARCH
-					&& now.get(Calendar.DAY_OF_MONTH) >= 7
-					&& now.get(Calendar.DAY_OF_MONTH) <= 21;
-			if (girl) {
-				about.setText(Html.fromHtml(getString(R.string.girls_day)));
-				about.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-			}
 		}
-		loadImage();
 
+		loadImage();
 		if (mApp.getPreferences().getBoolean(getString(R.string.enable_analytics), true)) {
 			mTracker = EasyTracker.getInstance(this);
 		}
@@ -165,6 +154,11 @@ public class HelloActivity extends Activity {
 	private void fetch500px() {
 		if (mPreferences.getBoolean(getString(R.string.pref_enable_fantasy),
 				getResources().getBoolean(R.bool.pref_enable_fantasy))) {
+			final long now = System.currentTimeMillis();
+			if (now - mPreferences.getLong(LAST_FANTASY_MILLIS, 0L) < 24 * 60 * 60 * 1000) {
+				// 一天一次而已
+				return;
+			}
 			mApp.getRequestQueue().add(new CatnutRequest(
 					this,
 					_500pxAPI.photos("popular"),
@@ -178,6 +172,7 @@ public class HelloActivity extends Activity {
 								photos[i] = Photo.METADATA.convert(array.optJSONObject(i));
 							}
 							context.getContentResolver().bulkInsert(CatnutProvider.parse(Photo.MULTIPLE), photos);
+							mPreferences.edit().putLong(LAST_FANTASY_MILLIS, now).commit(); // 记录上次更新的日期
 						}
 					},
 					null,
