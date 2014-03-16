@@ -108,6 +108,10 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 				return true;
 			} else if (key.equals(getString(R.string.pref_notes))) {
 				intent = new Intent(getActivity(), HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG);
+			} else if (key.equals(getString(R.string.pref_clear_cache))) {
+				ClearCacheBoxFragment fragment = new ClearCacheBoxFragment();
+				fragment.show(getFragmentManager(), null);
+				return true;
 			}
 			if (intent != null) {
 				startActivity(intent);

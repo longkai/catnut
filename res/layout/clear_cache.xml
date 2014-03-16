@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:padding="@dimen/medium"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content">
+
+	<CheckBox
+		android:id="@+id/clear_images"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:textColor="@android:color/secondary_text_light"
+		android:button="@null"
+		android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+
+	<CheckBox
+		android:id="@+id/clear_fantasies"
+		android:button="@null"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:textColor="@android:color/secondary_text_light"
+		android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+
+	<CheckBox
+		android:id="@+id/clear_sqlite"
+		android:text="@string/clear_sqlite"
+		android:button="@null"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:textColor="@android:color/secondary_text_light"
+		android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+</LinearLayout>

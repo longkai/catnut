@@ -209,4 +209,11 @@
 	<string name="mime_text_plain">text/plain</string>
 	<string name="mime_image">image/*</string>
 	<string name="cannot_create_dir">无法建立目录！</string>
+	<string name="clear_cache">清除缓存</string>
+	<string name="clear_images">微博配图 %1$s</string>
+	<string name="clear_fantasies">fantasy %1$s</string>
+	<string name="clear_sqlite">清除微博缓存</string>
+	<string name="clear_cache_summary">清除缓存的图片和微博等</string>
+	<string name="clear_cache_success">清除成功</string>
+	<string name="clearing">清除中...</string>
 </resources>

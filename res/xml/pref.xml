@@ -41,6 +41,11 @@
 			android:defaultValue="@bool/pref_enable_fantasy"
 			android:title="@string/enable_fantasy"
 			android:summary="@string/enable_fantasy_summary" />
+
+		<Preference
+			android:key="@string/pref_clear_cache"
+			android:summary="@string/clear_cache_summary"
+			android:title="@string/clear_cache" />
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/advanced_settings">

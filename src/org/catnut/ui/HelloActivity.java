@@ -40,6 +40,7 @@ import org.catnut.core.CatnutRequest;
 import org.catnut.fragment.FantasyFragment;
 import org.catnut.metadata.AccessToken;
 import org.catnut.metadata.Photo;
+import org.catnut.metadata.WeiboAPIError;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.json.JSONArray;
@@ -184,6 +185,13 @@ public class HelloActivity extends Activity {
 						@Override
 						public void onErrorResponse(VolleyError error) {
 							Log.e(TAG, "fetch 500px error", error);
+							final WeiboAPIError volleyError = WeiboAPIError.fromVolleyError(error);
+							mHandler.post(new Runnable() {
+								@Override
+								public void run() {
+									Toast.makeText(HelloActivity.this, volleyError.error, Toast.LENGTH_LONG).show();
+								}
+							});
 						}
 					}
 			));

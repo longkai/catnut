@@ -10,17 +10,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.provider.BaseColumns;
 import android.util.Log;
 import org.catnut.metadata.Draft;
 import org.catnut.metadata.Photo;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 
-import static org.catnut.core.CatnutProvider.DRAFT;
-import static org.catnut.core.CatnutProvider.DRAFTS;
-import static org.catnut.core.CatnutProvider.PHOTOS;
-import static org.catnut.core.CatnutProvider.STATUSES;
-import static org.catnut.core.CatnutProvider.USERS;
+import java.io.File;
 
 /**
  * 应用程序数据源。
@@ -30,6 +27,7 @@ import static org.catnut.core.CatnutProvider.USERS;
 public class CatnutProvider extends ContentProvider {
 
 	public static final String TAG = "CatnutProvider";
+	private static final String CLEAR_DATA = "clear";
 
 	public static final String AUTHORITY = "org.catnut";
 	public static final String BASE_URI = "content://" + AUTHORITY;
@@ -45,6 +43,7 @@ public class CatnutProvider extends ContentProvider {
 	public static final int DRAFTS = 5;
 	public static final int PHOTO = 6;
 	public static final int PHOTOS = 7;
+	public static final int CLEAR = 100;
 
 	private static UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -57,6 +56,7 @@ public class CatnutProvider extends ContentProvider {
 		matcher.addURI(AUTHORITY, Draft.MULTIPLE, DRAFTS);
 		matcher.addURI(AUTHORITY, Photo.SINGLE, PHOTO);
 		matcher.addURI(AUTHORITY, Photo.MULTIPLE, PHOTOS);
+		matcher.addURI(AUTHORITY, CLEAR_DATA, CLEAR);
 	}
 
 	/**
@@ -78,6 +78,15 @@ public class CatnutProvider extends ContentProvider {
 	 */
 	public static Uri parse(String path, long id) {
 		return Uri.parse(BASE_URI + "/" + path + "/" + id);
+	}
+
+	/**
+	 * 清除缓存数据
+	 *
+	 * @return uri
+	 */
+	public static Uri clear() {
+		return Uri.parse(BASE_URI + File.separator + CLEAR_DATA);
 	}
 
 	/**
@@ -226,6 +235,17 @@ public class CatnutProvider extends ContentProvider {
 				break;
 			case PHOTOS:
 				count = mDb.getWritableDatabase().delete(Photo.TABLE, selection, selectionArgs);
+				break;
+			case CLEAR:
+				SQLiteDatabase db = mDb.getWritableDatabase();
+				db.beginTransaction();
+				db.execSQL("delete from " + Photo.TABLE);
+				db.execSQL("delete from " + User.TABLE + " where "
+						+ BaseColumns._ID + " != " + CatnutApp.getTingtingApp().getAccessToken().uid);
+				db.execSQL("delete from " + Status.TABLE);
+				db.setTransactionSuccessful();
+				db.endTransaction();
+				count = Integer.MAX_VALUE;
 				break;
 			default:
 				throw new UnsupportedOperationException("not supported for now!");
