@@ -7,6 +7,19 @@
   -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item
+		android:title="通知"
+		android:icon="@drawable/ic_title_notifications"
+		android:showAsAction="always">
+		<menu>
+			<item
+				android:id="@+id/mention_me_tweet"
+				android:title="\@我的微博" />
+			<item
+				android:id="@+id/mention_me_tweet"
+				android:title="\@我的评论" />
+		</menu>
+	</item>
+	<item
 		android:id="@+id/action_compose"
 		android:title="@string/compose"
 		android:icon="@drawable/ic_title_compose"

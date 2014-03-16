@@ -14,14 +14,21 @@
 		<menu>
 			<item
 				android:id="@+id/pref"
+				android:icon="@drawable/ico_title_pref"
 				android:title="@string/pref" />
 			<item
 				android:id="@id/action_share"
 				android:title="@string/share"
+				android:icon="@drawable/ic_action_share"
 				android:actionProviderClass="android.widget.ShareActionProvider" />
 			<item
 				android:id="@+id/toggle_fantasy"
-				android:title="@string/show_fantasy_only" />
+				android:icon="@drawable/ic_av_full_screen_dark"
+				android:title="@string/hide_fantasy_words" />
+			<item
+				android:id="@+id/home"
+				android:title="@string/home_timeline"
+				android:icon="@drawable/ic_title_home" />
 		</menu>
 	</item>
 </menu>

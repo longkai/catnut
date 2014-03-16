@@ -93,25 +93,10 @@ public class SingleFragmentActivity extends Activity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(Menu.NONE, R.id.fantasy, Menu.NONE, R.string.fantasy)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-		menu.add(Menu.NONE, R.id.pref, Menu.NONE, R.string.pref)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-		return true;
-	}
-
-	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
 				navigateUpTo(getIntent());
-				break;
-			case R.id.fantasy:
-				startActivity(new Intent(this, HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG));
-				break;
-			case R.id.pref:
-				startActivity(SingleFragmentActivity.getIntent(this, PREF));
 				break;
 			default:
 				break;

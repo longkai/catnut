@@ -170,7 +170,7 @@ public class FantasyFragment extends Fragment {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (getActivity() instanceof HelloActivity) {
-			((HelloActivity) getActivity()).onOptionsItemSelected(item.getItemId());
+			((HelloActivity) getActivity()).onMenuItemSelected(item);
 		}
 		return true;
 	}

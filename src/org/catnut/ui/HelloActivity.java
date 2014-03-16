@@ -53,7 +53,6 @@ import java.util.List;
  * 欢迎界面，可以在这里放一些更新说明，pager，或者进行一些初始化（检测网络状态，是否通过了新浪的授权）等等，
  * 设置好播放的时间后自动跳转到main-ui，或者用户自己触发某个控件跳转
  * <p/>
- * no history in android-manifest!
  *
  * @author longkai
  */
@@ -147,7 +146,7 @@ public class HelloActivity extends Activity {
 					&& now.get(Calendar.DAY_OF_MONTH) <= 21;
 			if (girl) {
 				about.setText(Html.fromHtml(getString(R.string.girls_day)));
-				about.setGravity(Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL);
+				about.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
 			}
 		}
 		loadImage();
@@ -215,23 +214,29 @@ public class HelloActivity extends Activity {
 		}
 	};
 
-	public void onOptionsItemSelected(int id) {
-		switch (id) {
+	public void onMenuItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
 			case R.id.toggle_fantasy:
-				Log.d(TAG, "toggle");
-
 				int i = mViewPager.getCurrentItem();
 				if (i == 0) {
 					if (mAbout.getVisibility() == View.VISIBLE) {
 						mAbout.setVisibility(View.GONE);
+						item.setTitle(R.string.show_fantasy_words)
+								.setIcon(R.drawable.ic_av_return_from_full_screen_dark);
 					} else {
 						mAbout.setVisibility(View.VISIBLE);
+						item.setTitle(R.string.hide_fantasy_words)
+								.setIcon(R.drawable.ic_av_full_screen_dark);
 					}
 				} else {
 					if (mFantasyDesc.getVisibility() == View.VISIBLE) {
 						mFantasyDesc.setVisibility(View.GONE);
+						item.setTitle(R.string.show_fantasy_words)
+								.setIcon(R.drawable.ic_av_return_from_full_screen_dark);
 					} else {
 						mFantasyDesc.setVisibility(View.VISIBLE);
+						item.setTitle(R.string.hide_fantasy_words)
+								.setIcon(R.drawable.ic_av_full_screen_dark);
 					}
 				}
 				break;
@@ -241,11 +246,13 @@ public class HelloActivity extends Activity {
 			case android.R.id.home:
 				Intent intent = getIntent();
 				if (Intent.ACTION_MAIN.equals(intent.getAction())) {
-					startActivity(new Intent(this, MainActivity.class)
-							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+					startActivity(new Intent(this, MainActivity.class));
 				} else {
 					navigateUpTo(intent);
 				}
+				break;
+			case R.id.home:
+				startActivity(new Intent(this, MainActivity.class));
 				break;
 			default:
 				break;
@@ -293,7 +300,7 @@ public class HelloActivity extends Activity {
 		}
 	}
 
-	private static final String[] PROJECTION = new String[] {
+	private static final String[] PROJECTION = new String[]{
 			Photo.image_url,
 			Photo.name,
 	};

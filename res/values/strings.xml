@@ -183,7 +183,8 @@
 		<b>在路上，我们一起走向远方，只是不要忘了来时的路，还有你我的梦想</b><br><br>
 	]]></string>
 	<string name="about_version_template">v%1$s</string>
-	<string name="show_fantasy_only">隐藏/显示 文字</string>
+	<string name="hide_fantasy_words">隐藏文字</string>
+	<string name="show_fantasy_words">显示文字</string>
 	<string name="app_desc">让微博 简洁&amp;流畅</string>
 	<string name="default_art">默认</string>
 	<string name="enable_fantasy">启用fantasy</string>
