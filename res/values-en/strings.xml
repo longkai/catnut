@@ -91,7 +91,7 @@
 	<string name="abort_existing_reply_alert">Are u sure to give up what u have edited?</string>
 	<string name="comment_tweet">Comment weibo</string>
 	<string name="require_not_empty">Please write some words...</string>
-	<string name="compose">Compose weibo</string>
+	<string name="compose">Compose</string>
 	<string name="action_send">Post</string>
 	<string name="post_success">Post successfully!</string>
 	<string name="abort_existing_tweet_alert">Are u sure to give up what u have composed?</string>
@@ -116,7 +116,7 @@
 	<string name="mention_text">\@%1$s&#160;</string>
 	<string name="no_links_hint">no links to convert, remember links must start with \'http/https\'</string>
 	<string name="converting">converting...</string>
-	<string name="shorten">shorten links</string>
+	<string name="shorten">Shorten links</string>
 	<string name="view_photos">Viewing photo</string>
 	<string name="action">Perform action</string>
 	<!--<string name="confirmbar_sample_message">Action performed.</string>-->
@@ -168,4 +168,5 @@
 	<string name="clearing">Clearing...</string>
 	<string name="fantasy_share">「%1$s」 from Catnut - fantasy</string>
 	<string name="mine">My</string>
+	<string name="discovery">Discovery</string>
 </resources>

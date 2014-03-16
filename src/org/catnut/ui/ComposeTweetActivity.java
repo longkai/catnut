@@ -251,8 +251,11 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 					Toast.makeText(this, getString(R.string.device_not_support), Toast.LENGTH_SHORT).show();
 				}
 				break;
-			case R.id.fantasy:
-				startActivity(new Intent(this, HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG));
+			case R.id.action_discovery:
+				int cursor = mText.getSelectionStart();
+				mText.getText().append("##");
+				mText.setSelection(cursor + 1);
+				mText.requestFocus();
 				break;
 			default:
 				break;
@@ -265,12 +268,6 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 		switch (v.getId()) {
 			case R.id.action_send:
 				sendTweet();
-				break;
-			case R.id.action_discovery:
-				int cursor = mText.getSelectionStart();
-				mText.getText().append("##");
-				mText.setSelection(cursor + 1);
-				mText.requestFocus();
 				break;
 			case R.id.action_geo:
 				if (mLocationMarker.getVisibility() == View.VISIBLE) {
@@ -383,7 +380,6 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 				Toast.makeText(ComposeTweetActivity.this, weiboAPIError.error, Toast.LENGTH_LONG).show();
 			}
 		};
-		mCustomizedBar.findViewById(R.id.action_discovery).setOnClickListener(this);
 		mCustomizedBar.findViewById(R.id.action_geo).setOnClickListener(this);
 		mCustomizedBar.findViewById(R.id.action_send).setOnClickListener(this);
 		mLocationMarker.setOnClickListener(this);

@@ -229,21 +229,21 @@ public class HelloActivity extends Activity {
 					if (mAbout.getVisibility() == View.VISIBLE) {
 						mAbout.setVisibility(View.GONE);
 						item.setTitle(R.string.show_fantasy_words)
-								.setIcon(R.drawable.ic_av_return_from_full_screen_dark);
+								.setIcon(R.drawable.ic_action_fullscreen_off);
 					} else {
 						mAbout.setVisibility(View.VISIBLE);
 						item.setTitle(R.string.hide_fantasy_words)
-								.setIcon(R.drawable.ic_av_full_screen_dark);
+								.setIcon(R.drawable.ic_action_fullscreen_on);
 					}
 				} else {
 					if (mFantasyDesc.getVisibility() == View.VISIBLE) {
 						mFantasyDesc.setVisibility(View.GONE);
 						item.setTitle(R.string.show_fantasy_words)
-								.setIcon(R.drawable.ic_av_return_from_full_screen_dark);
+								.setIcon(R.drawable.ic_action_fullscreen_off);
 					} else {
 						mFantasyDesc.setVisibility(View.VISIBLE);
 						item.setTitle(R.string.hide_fantasy_words)
-								.setIcon(R.drawable.ic_av_full_screen_dark);
+								.setIcon(R.drawable.ic_action_fullscreen_on);
 					}
 				}
 				break;

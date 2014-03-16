@@ -12,7 +12,7 @@
 
 	<dimen name="list_view_header_height">45dp</dimen>
 	
-	<dimen name="counter_width">48dp</dimen>
+	<dimen name="counter_width">40dp</dimen>
 	<dimen name="text_size_small">11sp</dimen>
 
 	<dimen name="emotion_window_height">400dp</dimen>

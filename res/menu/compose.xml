@@ -16,7 +16,13 @@
 	<item
 		android:id="@+id/action_camera"
 		android:title="@string/take_a_photo"
-		android:icon="@drawable/ic_title_camera"
+		android:icon="@drawable/ic_action_camera"
+		android:showAsAction="always" />
+
+	<item
+		android:id="@+id/action_discovery"
+		android:title="@string/discovery"
+		android:icon="@drawable/ic_title_discover"
 		android:showAsAction="always" />
 
 	<item
@@ -29,11 +35,6 @@
 	<item
 		android:id="@+id/action_shorten"
 		android:title="@string/shorten"
-		android:showAsAction="never" />
-
-	<item
-		android:id="@+id/fantasy"
-		android:title="@string/fantasy"
 		android:showAsAction="never" />
 
 	<item

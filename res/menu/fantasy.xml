@@ -13,17 +13,17 @@
 		android:showAsAction="always">
 		<menu>
 			<item
-				android:id="@+id/pref"
-				android:icon="@drawable/ic_title_pref"
-				android:title="@string/pref" />
-			<item
 				android:id="@id/action_share"
 				android:title="@string/share"
 				android:icon="@drawable/ic_action_share"
 				android:actionProviderClass="android.widget.ShareActionProvider" />
 			<item
+				android:id="@+id/pref"
+				android:icon="@drawable/ic_title_pref"
+				android:title="@string/pref" />
+			<item
 				android:id="@+id/toggle_fantasy"
-				android:icon="@drawable/ic_av_full_screen_dark"
+				android:icon="@drawable/ic_action_fullscreen_on"
 				android:title="@string/hide_fantasy_words" />
 			<item
 				android:id="@+id/home"

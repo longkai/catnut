@@ -11,22 +11,6 @@
 	android:layout_height="wrap_content">
 
 	<FrameLayout
-		android:id="@+id/action_discovery"
-		android:clickable="true"
-		android:focusable="true"
-		android:background="@drawable/actionbar_item_background_light"
-		android:layout_width="@dimen/actionbar_item_width"
-		android:layout_height="match_parent">
-
-		<ImageView
-			android:src="@drawable/ic_title_discover"
-			android:adjustViewBounds="true"
-			android:layout_gravity="center_horizontal|center_vertical"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
-	</FrameLayout>
-
-	<FrameLayout
 		android:id="@+id/action_geo"
 		android:clickable="true"
 		android:focusable="true"
@@ -35,7 +19,7 @@
 		android:layout_height="match_parent">
 
 		<ImageView
-			android:src="@drawable/ic_title_geo"
+			android:src="@drawable/ic_action_location"
 			android:adjustViewBounds="true"
 			android:layout_gravity="center_horizontal|center_vertical"
 			android:layout_width="wrap_content"
