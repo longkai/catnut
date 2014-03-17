@@ -661,13 +661,6 @@ public class TweetFragment extends Fragment implements
 		inflater.inflate(R.menu.tweet, menu);
 		MenuItem share = menu.findItem(R.id.share);
 		mShareActionProvider = (ShareActionProvider) share.getActionProvider();
-		mShareActionProvider.setOnShareTargetSelectedListener(new ShareActionProvider.OnShareTargetSelectedListener() {
-			@Override
-			public boolean onShareTargetSelected(ShareActionProvider source, Intent intent) {
-				startActivity(intent);
-				return true;
-			}
-		});
 		mShareActionProvider.setShareIntent(mShareIntent);
 	}
 
