@@ -23,12 +23,10 @@ import android.os.Process;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -38,14 +36,15 @@ import com.squareup.picasso.Picasso;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
+import org.catnut.fragment.DraftFragment;
+import org.catnut.fragment.FavoriteFragment;
 import org.catnut.fragment.HomeTimelineFragment;
+import org.catnut.fragment.MyRelationshipFragment;
+import org.catnut.fragment.UserTimelineFragment;
 import org.catnut.metadata.User;
 import org.catnut.support.ConfirmBarController;
 import org.catnut.support.QuickReturnScrollView;
 import org.catnut.util.CatnutUtils;
-import org.catnut.util.Constants;
-
-import java.lang.reflect.Field;
 
 /**
  * 应用程序主界面。
@@ -58,20 +57,6 @@ public class MainActivity extends Activity implements
 
 	private static final String TAG = "MainActivity";
 
-	private static final int[] DRAWER_LIST_ITEMS_IDS = {
-			0, // 我的
-			R.id.action_my_tweets,
-			R.id.action_my_followings,
-			R.id.action_my_followers,
-			R.id.action_my_list,
-			R.id.action_my_favorites,
-			R.id.action_my_drafts,
-			0, // 分享
-			R.id.action_share_app,
-			R.id.action_view_source_code,
-	};
-
-	// for card flip animation
 	private ScrollSettleHandler mScrollSettleHandler = new ScrollSettleHandler();
 
 	private CatnutApp mApp;
@@ -100,7 +85,6 @@ public class MainActivity extends Activity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mApp = CatnutApp.getTingtingApp();
-		forceOverflow();
 		mActionBar = getActionBar();
 		mActionBar.setIcon(R.drawable.ic_title_home);
 		setContentView(R.layout.main);
@@ -150,19 +134,6 @@ public class MainActivity extends Activity implements
 		getFragmentManager().addOnBackStackChangedListener(this);
 		if (mApp.getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
 			mTracker = EasyTracker.getInstance(this);
-		}
-	}
-
-	private void forceOverflow() {
-		ViewConfiguration viewConfig = ViewConfiguration.get(this);
-		try {
-			Field menuKey = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-			if (menuKey != null) {
-				menuKey.setAccessible(true);
-				menuKey.setBoolean(viewConfig, true);
-			}
-		} catch (Exception e) {
-			Log.e(TAG, "force to show overflow error!", e);
 		}
 	}
 
@@ -335,13 +306,11 @@ public class MainActivity extends Activity implements
 	@Override
 	public void onDrawerOpened(View drawerView) {
 		mDrawerToggle.onDrawerOpened(drawerView);
-		mActionBar.setTitle(getString(R.string.my_profile));
 	}
 
 	@Override
 	public void onDrawerClosed(View drawerView) {
 		mDrawerToggle.onDrawerClosed(drawerView);
-		mActionBar.setTitle(getString(R.string.home_timeline));
 	}
 
 	@Override
@@ -362,74 +331,84 @@ public class MainActivity extends Activity implements
 
 	@Override
 	public void onClick(View v) {
-		Intent intent = null;
+		mDrawerLayout.closeDrawer(mQuickReturnDrawer);
+		Fragment fragment;
+		String tag;
 		switch (v.getId()) {
 			case R.id.tweets_count:
 			case R.id.action_my_tweets:
-				intent = SingleFragmentActivity.getIntent(this, SingleFragmentActivity.USER_TWEETS);
-				intent.putExtra(Constants.ID, mApp.getAccessToken().uid);
-				intent.putExtra(User.screen_name, mApp.getPreferences().getString(User.screen_name, null));
+				fragment = UserTimelineFragment.getFragment(mApp.getAccessToken().uid, mApp.getPreferences().getString(User.screen_name, null));
+				tag = UserTimelineFragment.TAG;
 				break;
 			case R.id.following_count:
 			case R.id.action_my_followings:
-				intent = SingleFragmentActivity.getIntent(this, SingleFragmentActivity.FRIENDS);
-				intent.putExtra(User.following, true);
+				fragment = MyRelationshipFragment.getFragment(true);
+				tag = "true";
 				break;
 			case R.id.followers_count:
 			case R.id.action_my_followers:
-				intent = SingleFragmentActivity.getIntent(this, SingleFragmentActivity.FRIENDS);
-				intent.putExtra(User.following, false);
+				fragment = MyRelationshipFragment.getFragment(false);
+				tag = "false";
 				break;
 			case R.id.action_my_favorites:
-				intent = SingleFragmentActivity.getIntent(this, SingleFragmentActivity.FAVORITES);
+				fragment = FavoriteFragment.getFragment();
+				tag = FavoriteFragment.TAG;
 				break;
 			case R.id.action_my_drafts:
-				intent = SingleFragmentActivity.getIntent(this, SingleFragmentActivity.DRAFT);
+				fragment = DraftFragment.getFragment();
+				tag = DraftFragment.TAG;
 				break;
 			case R.id.action_share_app:
-				intent = new Intent(Intent.ACTION_SEND);
+				Intent intent = new Intent(Intent.ACTION_SEND);
 				intent.setType("image/*");
 				intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_app));
 				intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text));
 				intent.putExtra(Intent.EXTRA_STREAM,
 						Uri.parse("android.resource://org.catnut/drawable/ic_launcher"));
-				break;
+				startActivity(intent);
+				return;
 			case R.id.action_view_source_code:
-				intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.github_link)));
-				break;
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.github_link))));
+				return;
 			case R.id.fantasy:
-				intent = new Intent(this, HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG);
-				break;
+				startActivity(new Intent(this, HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG));
+				return;
 			case R.id.action_my_list:
 			default:
 				Toast.makeText(this, "sorry, not yet implemented =.=", Toast.LENGTH_SHORT).show();
 				return;
 		}
-		startActivity(intent);
-		mDrawerLayout.closeDrawer(mQuickReturnDrawer);
+		pendingFragment(fragment, tag);
 	}
 
 	/**
-	 * 切换fragment时卡片翻转的效果
+	 * 切换fragment，附带一个动画效果
 	 *
 	 * @param fragment
 	 * @param tag      没有赋null即可
 	 */
-	private void flipCard(Fragment fragment, String tag) {
-		getFragmentManager()
-				.beginTransaction()
-				.setCustomAnimations(
-						R.animator.card_flip_right_in, R.animator.card_flip_right_out,
-						R.animator.card_flip_left_in, R.animator.card_flip_left_out)
-				.replace(R.id.fragment_container, fragment, tag)
-				.addToBackStack(null)
-				.commit();
-		mScrollSettleHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				invalidateOptionsMenu();
-			}
-		});
+	private void pendingFragment(Fragment fragment, String tag) {
+		FragmentManager fragmentManager = getFragmentManager();
+		Fragment tmp = fragmentManager.findFragmentByTag(tag);
+		if (tmp == null || !tmp.isVisible()) {
+			fragmentManager
+					.beginTransaction()
+					.setCustomAnimations(
+							R.animator.fragment_slide_left_enter,
+							R.animator.fragment_slide_left_exit,
+							R.animator.fragment_slide_right_enter,
+							R.animator.fragment_slide_right_exit
+					)
+					.replace(R.id.fragment_container, fragment, tag)
+					.addToBackStack(null)
+					.commit();
+			mScrollSettleHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					invalidateOptionsMenu();
+				}
+			});
+		}
 	}
 
 	@Override

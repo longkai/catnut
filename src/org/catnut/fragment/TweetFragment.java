@@ -57,6 +57,7 @@ import org.catnut.processor.StatusProcessor;
 import org.catnut.support.OnFragmentBackPressedListener;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
+import org.catnut.ui.ComposeTweetActivity;
 import org.catnut.ui.HelloActivity;
 import org.catnut.ui.ProfileActivity;
 import org.catnut.ui.SingleFragmentActivity;
@@ -785,6 +786,9 @@ public class TweetFragment extends Fragment implements
 				break;
 			case R.id.pref:
 				startActivity(SingleFragmentActivity.getIntent(getActivity(), SingleFragmentActivity.PREF));
+				break;
+			case R.id.action_compose:
+				startActivity(new Intent(getActivity(), ComposeTweetActivity.class));
 				break;
 			case R.id.action_comment:
 				// 确认放弃修改

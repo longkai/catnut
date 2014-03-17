@@ -439,24 +439,4 @@ public class UserTimelineFragment extends TimelineFragment {
 			}
 		}
 	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-		menu.add(Menu.NONE, R.id.action_compose, Menu.NONE, R.string.compose)
-				.setIcon(R.drawable.ic_title_compose)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.action_compose:
-				startActivity(new Intent(getActivity(), ComposeTweetActivity.class));
-				return true;
-			default:
-				break;
-		}
-		return super.onOptionsItemSelected(item);
-	}
 }

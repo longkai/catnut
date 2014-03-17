@@ -71,7 +71,11 @@ public abstract class TimelineFragment extends Fragment implements ConfirmBarCon
 		public void onErrorResponse(VolleyError error) {
 			Log.d(TAG, "error loading data from cloud!", error);
 			WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
-			Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_LONG).show();
+			try {
+				Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_LONG).show();
+			} catch (Exception e) {
+				// 有些时候，比如没有网络连接的时候，超时什么的，fragment会detach...
+			}
 			mPullToRefreshLayout.setRefreshComplete();
 		}
 	};
@@ -156,7 +160,7 @@ public abstract class TimelineFragment extends Fragment implements ConfirmBarCon
 		// 本地微博搜索
 		MenuItem search = menu.add(android.R.string.search_go);
 		search.setIcon(R.drawable.ic_title_search_default);
-		search.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER
+		search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
 				| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
 		mSearchView = VividSearchView.getSearchView(getActivity());
 		mSearchView.setOnQueryTextListener(this);

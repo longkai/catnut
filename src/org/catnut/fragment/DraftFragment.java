@@ -17,9 +17,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -28,7 +25,6 @@ import org.catnut.adapter.DraftsAdapter;
 import org.catnut.core.CatnutProvider;
 import org.catnut.metadata.Draft;
 import org.catnut.service.ComposeTweetService;
-import org.catnut.ui.ComposeTweetActivity;
 
 /**
  * 我的草稿
@@ -37,7 +33,7 @@ import org.catnut.ui.ComposeTweetActivity;
  */
 public class DraftFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-	private static final String TAG = "DraftFragment";
+	public static final String TAG = "DraftFragment";
 
 	public static DraftFragment getFragment() {
 		DraftFragment fragment = new DraftFragment();
@@ -112,24 +108,5 @@ public class DraftFragment extends ListFragment implements LoaderManager.LoaderC
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
 		mAdapter.swapCursor(null);
-	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		menu.add(Menu.NONE, R.id.action_compose, Menu.NONE, R.string.compose)
-				.setIcon(R.drawable.ic_title_compose)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.action_compose:
-				startActivity(new Intent(getActivity(), ComposeTweetActivity.class));
-				return true;
-			default:
-				break;
-		}
-		return super.onOptionsItemSelected(item);
 	}
 }

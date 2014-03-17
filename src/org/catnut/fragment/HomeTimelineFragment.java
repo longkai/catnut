@@ -5,6 +5,7 @@
  */
 package org.catnut.fragment;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.Loader;
@@ -116,7 +117,9 @@ public class HomeTimelineFragment extends TimelineFragment {
 	@Override
 	public void onStart() {
 		super.onStart();
-		getActivity().getActionBar().setTitle(getString(R.string.home_timeline));
+		ActionBar bar = getActivity().getActionBar();
+		bar.setIcon(R.drawable.ic_title_home);
+		bar.setTitle(getString(R.string.home_timeline));
 	}
 
 	@Override

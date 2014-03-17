@@ -15,9 +15,6 @@ import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -33,7 +30,6 @@ import org.catnut.core.CatnutRequest;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.processor.StatusProcessor;
-import org.catnut.ui.ComposeTweetActivity;
 import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
@@ -345,25 +341,5 @@ public class FavoriteFragment extends TimelineFragment {
 				mListView.setSelection(firstVisiblePosition); // 保持现场~
 			}
 		}
-	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-		menu.add(Menu.NONE, R.id.action_compose, Menu.NONE, R.string.compose)
-				.setIcon(R.drawable.ic_title_compose)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.action_compose:
-				startActivity(new Intent(getActivity(), ComposeTweetActivity.class));
-				return true;
-			default:
-				break;
-		}
-		return super.onOptionsItemSelected(item);
 	}
 }

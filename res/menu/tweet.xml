@@ -20,6 +20,12 @@
 		android:icon="@drawable/ic_title_retweet" />
 
 	<item
+		android:id="@id/action_compose"
+		android:title="@string/compose"
+		android:showAsAction="ifRoom"
+		android:icon="@drawable/ic_title_compose" />
+
+	<item
 		android:id="@+id/action_toggle_favorite"
 		android:title="@string/favorite"
 		android:showAsAction="never"
