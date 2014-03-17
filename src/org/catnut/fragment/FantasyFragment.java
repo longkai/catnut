@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ShareActionProvider;
+import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Target;
@@ -149,8 +150,18 @@ public class FantasyFragment extends Fragment {
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
+		boolean fitXY = getArguments().getBoolean(FIT_XY);
+		if (getActivity() instanceof HelloActivity) {
+			if (!((HelloActivity) getActivity()).isNetworkAvailable()) {
+				if (fitXY) {
+					Toast.makeText(getActivity(), R.string.network_unavailable, Toast.LENGTH_SHORT).show();
+					mFantasy.setImageResource(R.drawable.default_fantasy);
+					return; // 没有网络，直接结束第一张fantasy
+				}
+			}
+		}
 		RequestCreator creator = Picasso.with(getActivity()).load(mUrl);
-		if (getArguments().getBoolean(FIT_XY)) {
+		if (fitXY) {
 			creator.placeholder(R.drawable.default_fantasy);
 		}
 		creator.error(R.drawable.error)

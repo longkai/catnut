@@ -122,7 +122,7 @@
 	<!--<string name="confirmbar_sample_message">Action performed.</string>-->
 	<string name="confirm">Confirm</string>
 	<string name="confirm_delete">Are u serious?</string>
-	<string name="network_unavailable">network unavailable!</string>
+	<string name="network_unavailable">network unavailable! Please try again later.</string>
 	<string name="his_timeline">%1$s\' s Timeline</string>
 	<string name="home_timeline">Home Timeline</string>
 	<string name="notify_send_tweet">Post weibo</string>

@@ -13,6 +13,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v13.app.FragmentStatePagerAdapter;
@@ -72,6 +74,7 @@ public class HelloActivity extends Activity {
 	private SharedPreferences mPreferences;
 
 	private Handler mHandler = new Handler();
+	private ConnectivityManager mConnectivityManager;
 
 	private List<Image> mImages;
 	private ViewPager mViewPager;
@@ -145,9 +148,16 @@ public class HelloActivity extends Activity {
 		}
 
 		loadImage();
+		mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		if (mApp.getPreferences().getBoolean(getString(R.string.enable_analytics), true)) {
 			mTracker = EasyTracker.getInstance(this);
 		}
+	}
+
+	public boolean isNetworkAvailable() {
+		NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
+		return activeNetwork != null &&
+				activeNetwork.isConnectedOrConnecting();
 	}
 
 	// save image urls locally

@@ -122,7 +122,7 @@
 	<!--<string name="confirmbar_sample_message">Action performed.</string>-->
 	<string name="confirm">确认</string>
 	<string name="confirm_delete">你是认真的麽？</string>
-	<string name="network_unavailable">network unavailable!</string>
+	<string name="network_unavailable">亲，你的网络貌似出了点状况...</string>
 	<string name="his_timeline">%1$s 的时间线</string>
 	<string name="home_timeline">主页时间线</string>
 	<string name="notify_send_tweet">发送微博</string>
