@@ -39,7 +39,7 @@
 	<string name="show_thumbs_summary">Show thumbs or not(for network traffic), how large the thumbs(for beauty)</string>
 	<string name="tweets_count_per_fetch_summary">How many weibos load each time?</string>
 	<string name="auto_fetch_on_start">Stay in latest</string>
-	<string name="auto_fetch_on_start_summary">Prefer loading data from network(recommend), or prefer using data cached locally(eagerlly save network usage, but the data is very likely not latest).</string>
+	<string name="auto_fetch_on_start_summary">Prefer loading data from network(recommend), or prefer using data cached locally(save network usage eagerly, but the data is very likely not latest).</string>
 	<string name="general_settings">Basic settings</string>
 	<string name="source_code">Source code</string>
 	<string name="source_code_summary">This app is an open source, if interested please have a go here*_*</string>

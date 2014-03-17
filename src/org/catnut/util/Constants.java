@@ -23,6 +23,8 @@ public class Constants {
 	public static final String JPG = ".jpg";
 	public static final String JSON = "json";
 
+	public static final String SHARE_IMAGE = "share.png";
+
 	// for error dialog box
 	public static final String TITLE = "title";
 	public static final String MESSAGE = "message";

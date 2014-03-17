@@ -45,6 +45,9 @@ import org.catnut.metadata.User;
 import org.catnut.support.ConfirmBarController;
 import org.catnut.support.QuickReturnScrollView;
 import org.catnut.util.CatnutUtils;
+import org.catnut.util.Constants;
+
+import java.io.File;
 
 /**
  * 应用程序主界面。
@@ -360,11 +363,11 @@ public class MainActivity extends Activity implements
 				break;
 			case R.id.action_share_app:
 				Intent intent = new Intent(Intent.ACTION_SEND);
-				intent.setType(getString(R.string.mime_text_plain));
+				intent.setType(getString(R.string.mime_image));
 				intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_app));
 				intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text));
-//				intent.putExtra(Intent.EXTRA_STREAM,
-//						Uri.parse("android.resource://org.catnut/drawable/ic_launcher"));
+				intent.putExtra(Intent.EXTRA_STREAM,
+						Uri.fromFile(new File(getExternalCacheDir() + File.separator + Constants.SHARE_IMAGE)));
 				startActivity(intent);
 				return;
 			case R.id.action_view_source_code:

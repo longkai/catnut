@@ -9,15 +9,22 @@ import android.content.*;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
+import org.catnut.R;
 import org.catnut.metadata.Draft;
 import org.catnut.metadata.Photo;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
+import org.catnut.util.Constants;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * 应用程序数据源。
@@ -289,8 +296,11 @@ public class CatnutProvider extends ContentProvider {
 
 		private static final String TAG = "TingtingSource";
 
+		private Context mContext;
+
 		public TingtingSource(Context context, String name, int version) {
 			super(context, name, null, version);
+			mContext = context;
 		}
 
 		@Override
@@ -299,6 +309,26 @@ public class CatnutProvider extends ContentProvider {
 			db.execSQL(Status.METADATA.ddl());
 			db.execSQL(Draft.METADATA.ddl());
 			db.execSQL(Photo.METADATA.ddl());
+			// 保存分享的图片
+			(new Thread(new Runnable() {
+				@Override
+				public void run() {
+					Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_launcher);
+					FileOutputStream shareImage = null;
+					try {
+						shareImage = new FileOutputStream(mContext.getExternalCacheDir() + File.separator + Constants.SHARE_IMAGE);
+						bitmap.compress(Bitmap.CompressFormat.PNG, 100, shareImage);
+					} catch (FileNotFoundException e) {
+					} finally {
+						if (shareImage != null) {
+							try {
+								shareImage.close();
+							} catch (IOException e) {
+							}
+						}
+					}
+				}
+			})).start();
 			Log.i(TAG, "finish create tables...");
 		}
 
