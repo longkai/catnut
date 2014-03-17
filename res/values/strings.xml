@@ -69,7 +69,7 @@
 	<string name="load_cover_fail">载入封面图片失败，使用默认图片Orz</string>
 	<string name="his_followers">%1$s 的粉丝</string>
 	<string name="his_followings">%1$s 的关注</string>
-	<string name="loading">载入中</string>
+	<string name="loading">载入中...</string>
 	<string name="show_latest_tweet">显示最新一条微博</string>
 	<string name="show_latest_tweet_summary">查看用户信息时显示Ta最新的一条微博</string>
 	<string name="follow">关注Ta</string>
@@ -209,4 +209,9 @@
 	<string name="mine">我的</string>
 	<string name="discovery">话题</string>
 	<string name="malformed_json">无法解析的json数据！</string>
+	<string name="new_tweet_count">新微博</string>
+	<string name="new_comment_count">新评论</string>
+	<string name="new_mention_count">\@</string>
+	<string name="last_check_time">%1$s，点击刷新</string>
+	<string name="error_click_try_again">出错了...点击重试</string>
 </resources>

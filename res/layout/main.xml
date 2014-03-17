@@ -33,6 +33,54 @@
 				android:layout_width="match_parent"
 				android:layout_height="match_parent">
 
+				<!--header view-->
+				<RelativeLayout
+					android:orientation="horizontal"
+					android:layout_width="match_parent"
+					android:layout_height="100dp">
+
+					<ImageView
+						android:id="@id/avatar_profile"
+						android:layout_alignParentLeft="true"
+						android:layout_marginRight="@dimen/medium"
+						android:layout_width="100dp"
+						android:layout_height="100dp" />
+
+					<TextView
+						android:id="@id/nick"
+						android:layout_toRightOf="@id/avatar_profile"
+						android:textAppearance="@android:style/TextAppearance.Large"
+						android:textColor="@color/actionbar_background"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content" />
+
+					<ImageView
+						android:id="@id/verified"
+						android:visibility="gone"
+						android:src="@drawable/ic_verified"
+						android:layout_toRightOf="@id/nick"
+						android:layout_alignTop="@id/nick"
+						android:layout_alignBottom="@id/nick"
+						android:layout_marginLeft="@dimen/small"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content" />
+
+					<ScrollView
+						android:layout_marginTop="@dimen/medium"
+						android:layout_alignLeft="@id/nick"
+						android:layout_alignBottom="@id/avatar_profile"
+						android:layout_below="@id/nick"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content">
+
+						<TextView
+							android:id="@id/description"
+							android:textColor="@android:color/darker_gray"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content" />
+					</ScrollView>
+				</RelativeLayout>
+
 				<!--place holder view-->
 				<View
 					android:id="@id/place_holder"
@@ -154,53 +202,63 @@
 			</LinearLayout>
 
 			<!--sticky view-->
-			<RelativeLayout
+			<LinearLayout
 				android:id="@+id/quick_return"
-				android:orientation="horizontal"
+				android:layout_marginTop="@dimen/small"
+				android:orientation="vertical"
 				android:layout_width="match_parent"
 				android:layout_height="100dp">
 
-				<ImageView
-					android:id="@id/avatar_profile"
-					android:layout_alignParentLeft="true"
-					android:layout_marginRight="@dimen/medium"
-					android:layout_width="100dp"
-					android:layout_height="100dp" />
-
 				<TextView
-					android:id="@id/nick"
-					android:layout_toRightOf="@id/avatar_profile"
-					android:textAppearance="@android:style/TextAppearance.Large"
-					android:textColor="@color/actionbar_background"
-					android:layout_width="wrap_content"
+					android:id="@+id/fetch_news"
+					android:text="@string/last_check_time"
+					android:padding="@dimen/medium"
+					android:clickable="true"
+					android:background="?android:attr/selectableItemBackground"
+					android:textColor="@android:color/holo_blue_bright"
+					android:textAppearance="?android:attr/textAppearanceMedium"
+					android:layout_width="match_parent"
 					android:layout_height="wrap_content" />
 
-				<ImageView
-					android:id="@id/verified"
-					android:visibility="gone"
-					android:src="@drawable/ic_verified"
-					android:layout_toRightOf="@id/nick"
-					android:layout_alignTop="@id/nick"
-					android:layout_alignBottom="@id/nick"
-					android:layout_marginLeft="@dimen/small"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content" />
+				<View
+					android:layout_marginLeft="@dimen/medium"
+					android:layout_marginRight="@dimen/medium"
+					android:background="@android:color/holo_blue_bright"
+					android:layout_width="match_parent"
+					android:layout_height="1dp" />
 
-				<ScrollView
+				<LinearLayout
+					android:id="@+id/news"
+					android:background="@color/snowColor"
 					android:layout_marginTop="@dimen/medium"
-					android:layout_alignLeft="@id/nick"
-					android:layout_alignBottom="@id/avatar_profile"
-					android:layout_below="@id/nick"
+					android:orientation="horizontal"
+					android:showDividers="middle"
+					android:divider="?android:dividerVertical"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content">
 
-					<TextView
-						android:id="@id/description"
-						android:textColor="@android:color/darker_gray"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content" />
-				</ScrollView>
-			</RelativeLayout>
+					<include
+						android:id="@+id/new_comment"
+						android:layout_weight="1"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						layout="@layout/two_line_text" />
+
+					<include
+						android:id="@+id/new_mention"
+						android:layout_weight="1"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						layout="@layout/two_line_text" />
+
+					<include
+						android:id="@+id/new_tweet"
+						android:layout_weight="1"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						layout="@layout/two_line_text" />
+				</LinearLayout>
+			</LinearLayout>
 		</FrameLayout>
 	</org.catnut.support.QuickReturnScrollView>
 </android.support.v4.widget.DrawerLayout>

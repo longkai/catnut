@@ -23,6 +23,7 @@ import android.os.Process;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,21 +32,28 @@ import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.squareup.picasso.Picasso;
 import org.catnut.R;
+import org.catnut.api.StuffAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
+import org.catnut.core.CatnutRequest;
 import org.catnut.fragment.DraftFragment;
 import org.catnut.fragment.FavoriteFragment;
 import org.catnut.fragment.HomeTimelineFragment;
 import org.catnut.fragment.MyRelationshipFragment;
 import org.catnut.fragment.UserTimelineFragment;
+import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
+import org.catnut.metadata.WeiboAPIError;
 import org.catnut.support.ConfirmBarController;
 import org.catnut.support.QuickReturnScrollView;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
+import org.json.JSONObject;
 
 import java.io.File;
 
@@ -81,6 +89,11 @@ public class MainActivity extends Activity implements
 	private ImageView mProfileCover;
 	private TextView mTextNick;
 	private TextView mDescription;
+
+	private TextView mFetchNews;
+	private TextView mNewTweet;
+	private TextView mNewMention;
+	private TextView mNewComment;
 
 	private ConfirmBarController.Callbacks mCallbacks;
 
@@ -124,6 +137,7 @@ public class MainActivity extends Activity implements
 
 		prepareDrawer();
 		injectListeners();
+		fetchNews();
 
 		if (savedInstanceState == null) {
 			HomeTimelineFragment fragment = HomeTimelineFragment.getFragment();
@@ -221,6 +235,50 @@ public class MainActivity extends Activity implements
 				},
 				null, null, null
 		);
+	}
+
+	// 更新消息数
+	private void fetchNews() {
+		if (mFetchNews == null) {
+			mFetchNews = (TextView) findViewById(R.id.fetch_news);
+			mFetchNews.setOnClickListener(this);
+			View newTweet = findViewById(R.id.new_tweet);
+			CatnutUtils.setText(newTweet, android.R.id.text2, getString(R.string.new_tweet_count));
+			mNewTweet = (TextView) newTweet.findViewById(android.R.id.text1);
+			View newComment = findViewById(R.id.new_comment);
+			mNewComment = (TextView) newComment.findViewById(android.R.id.text1);
+			CatnutUtils.setText(newComment, android.R.id.text2, getString(R.string.new_comment_count));
+			View newMention = findViewById(R.id.new_mention);
+			mNewMention = (TextView) newMention.findViewById(android.R.id.text1);
+			CatnutUtils.setText(newMention, android.R.id.text2, getString(R.string.new_mention_count));
+		}
+		mFetchNews.setText(R.string.loading);
+		mFetchNews.setClickable(false);
+		mApp.getRequestQueue().add(new CatnutRequest(
+				this,
+				StuffAPI.unread_count(mApp.getAccessToken().uid, 0),
+				null,
+				new Response.Listener<JSONObject>() {
+					@Override
+					public void onResponse(JSONObject response) {
+						CatnutUtils.setText(mNewTweet, android.R.id.text1, String.valueOf(response.optInt(Status.SINGLE)));
+						CatnutUtils.setText(mNewComment, android.R.id.text1, String.valueOf(response.optInt("cmt")));
+						CatnutUtils.setText(mNewMention, android.R.id.text1, String.valueOf(response.optInt("mention_status")));
+
+						mFetchNews.setText(getString(R.string.last_check_time, DateUtils.getRelativeTimeSpanString(System.currentTimeMillis())));
+						mFetchNews.setClickable(true);
+					}
+				},
+				new Response.ErrorListener() {
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
+						Toast.makeText(MainActivity.this, weiboAPIError.error, Toast.LENGTH_LONG).show();
+						mFetchNews.setText(getString(R.string.error_click_try_again));
+						mFetchNews.setClickable(true);
+					}
+				}
+		));
 	}
 
 	private void injectListeners() {
@@ -334,7 +392,6 @@ public class MainActivity extends Activity implements
 
 	@Override
 	public void onClick(View v) {
-		mDrawerLayout.closeDrawer(mQuickReturnDrawer);
 		Fragment fragment;
 		String tag;
 		switch (v.getId()) {
@@ -376,11 +433,15 @@ public class MainActivity extends Activity implements
 			case R.id.fantasy:
 				startActivity(new Intent(this, HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG));
 				return;
+			case R.id.fetch_news:
+				fetchNews();
+				return;
 			case R.id.action_my_list:
 			default:
 				Toast.makeText(this, "sorry, not yet implemented =.=", Toast.LENGTH_SHORT).show();
 				return;
 		}
+		mDrawerLayout.closeDrawer(mQuickReturnDrawer);
 		pendingFragment(fragment, tag);
 	}
 
