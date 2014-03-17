@@ -22,8 +22,8 @@
 	<string name="followings">Following</string>
 	<string name="followers">Follower</string>
 	<string name="tweets">Weibo</string>
-	<string name="share_app">Share this app</string>
-	<string name="share_text">I\' m using「Catnut」, a Fast and Clean Weibo Android app, I recommend it for u :-) http://longkai.github.io/catnut</string>
+	<string name="share_app">App share</string>
+	<string name="share_text">I\' m using「Catnut」, a Fast and Clean Weibo Android app, I recommend it for u :-) intro[http://longkai.github.io/catnut] download[https://dl.dropboxusercontent.com/u/96034496/apps/catnut-latest.apk]</string>
 	<string name="github_link">https://github.com/longkai/catnut</string>
 	<string name="my_profile">My profile</string>
 	<string name="cancellation">Cancellation</string>

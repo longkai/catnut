@@ -360,11 +360,11 @@ public class MainActivity extends Activity implements
 				break;
 			case R.id.action_share_app:
 				Intent intent = new Intent(Intent.ACTION_SEND);
-				intent.setType("image/*");
+				intent.setType(getString(R.string.mime_text_plain));
 				intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_app));
 				intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text));
-				intent.putExtra(Intent.EXTRA_STREAM,
-						Uri.parse("android.resource://org.catnut/drawable/ic_launcher"));
+//				intent.putExtra(Intent.EXTRA_STREAM,
+//						Uri.parse("android.resource://org.catnut/drawable/ic_launcher"));
 				startActivity(intent);
 				return;
 			case R.id.action_view_source_code:

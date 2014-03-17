@@ -23,7 +23,7 @@
 	<string name="followers">粉丝</string>
 	<string name="tweets">微博</string>
 	<string name="share_app">app分享</string>
-	<string name="share_text">我正在使用『新浪微博Android Rest Client』，推荐你也用用:-) http://longkai.github.io/catnut</string>
+	<string name="share_text">我正在使用『新浪微博Android Rest Client』，推荐你也用用:-) 介绍[http://longkai.github.io/catnut]，下载[https://dl.dropboxusercontent.com/u/96034496/apps/catnut-latest.apk]</string>
 	<string name="github_link">https://github.com/longkai/catnut</string>
 	<string name="my_profile">我的信息</string>
 	<string name="cancellation">注销</string>
