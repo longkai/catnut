@@ -23,7 +23,7 @@
 
 		<TextView
 			android:id="@+id/retweet_nick"
-			android:textColor="#808080"
+			android:textColor="@android:color/secondary_text_light"
 			android:singleLine="true"
 			android:ellipsize="end"
 			android:textStyle="bold"
@@ -34,7 +34,7 @@
 
 		<TextView
 			android:id="@+id/retweet_create_at"
-			android:textColor="#767a85"
+			android:textColor="@android:color/darker_gray"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" />
 	</LinearLayout>

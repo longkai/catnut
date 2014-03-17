@@ -282,7 +282,7 @@ public class TweetAdapter extends CursorAdapter {
 		retweet(cursor.getString(holder.retweetIndex), holder);
 	}
 
-	private void retweet(String jsonString, ViewHolder holder) {
+	private void retweet(final String jsonString, ViewHolder holder) {
 		if (!TextUtils.isEmpty(jsonString)) {
 			final JSONObject json;
 			try {
@@ -301,11 +301,13 @@ public class TweetAdapter extends CursorAdapter {
 				if (TextUtils.isEmpty(str)) {
 					str = user.optString(User.screen_name);
 				}
-				CatnutUtils.setText(holder.retweetView, R.id.retweet_nick, "@" + str);
+				CatnutUtils.setText(holder.retweetView, R.id.retweet_nick, mContext.getString(R.string.mention_text, str));
 				holder.retweetView.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						injectRetweetListener(json);
+						Intent intent = new Intent(mContext, TweetActivity.class);
+						intent.putExtra(Constants.JSON, jsonString);
+						mContext.startActivity(intent);
 					}
 				});
 			}
@@ -319,30 +321,5 @@ public class TweetAdapter extends CursorAdapter {
 		} else {
 			holder.retweetView.setVisibility(View.GONE);
 		}
-	}
-
-	private void injectRetweetListener(final JSONObject json) {
-		// 先存入本地sqlite，再跳转
-		final ProgressDialog dialog = ProgressDialog.show(mContext, null, mContext.getString(R.string.loading));
-		// thread go!
-		(new Thread(new Runnable() {
-			@Override
-			public void run() {
-				ContentValues status = Status.METADATA.convert(json);
-				status.put(Status.TYPE, Status.RETWEET);
-				ContentValues user = User.METADATA.convert(json.optJSONObject(User.SINGLE));
-				mContext.getContentResolver().insert(CatnutProvider.parse(Status.MULTIPLE), status);
-				mContext.getContentResolver().insert(CatnutProvider.parse(User.MULTIPLE), user);
-				mHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						dialog.dismiss();
-						Intent intent = new Intent(mContext, TweetActivity.class);
-						intent.putExtra(Constants.ID, json.optLong(Constants.ID));
-						mContext.startActivity(intent);
-					}
-				});
-			}
-		})).start();
 	}
 }

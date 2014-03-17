@@ -59,6 +59,7 @@ import org.catnut.support.TweetTextView;
 import org.catnut.ui.HelloActivity;
 import org.catnut.ui.ProfileActivity;
 import org.catnut.ui.SingleFragmentActivity;
+import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
@@ -118,6 +119,7 @@ public class TweetFragment extends Fragment implements
 
 	// tweet id
 	private long mId;
+	private JSONObject mJson;
 	// 共有多少条评论
 	private int mTotal; // 注意，这个是时时更新的，很可能出现这样的情况：我已经滑倒低了，但是此时又有新的评论，那么，total增加了，但是我们真的已经到底了...所以还需要另一个变量来控制
 	private int mLastTotalCount; // 两次一样表示，完了...
@@ -164,6 +166,14 @@ public class TweetFragment extends Fragment implements
 	public static TweetFragment getFragment(long id) {
 		Bundle args = new Bundle();
 		args.putLong(Constants.ID, id);
+		TweetFragment fragment = new TweetFragment();
+		fragment.setArguments(args);
+		return fragment;
+	}
+
+	public static TweetFragment getFragment(String tweet) {
+		Bundle args = new Bundle();
+		args.putString(Constants.JSON, tweet);
 		TweetFragment fragment = new TweetFragment();
 		fragment.setArguments(args);
 		return fragment;
@@ -323,7 +333,19 @@ public class TweetFragment extends Fragment implements
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		mId = getArguments().getLong(Constants.ID);
+		Bundle args = getArguments();
+		if (args.containsKey(Constants.JSON)) {
+			try {
+				mJson = new JSONObject(args.getString(Constants.JSON));
+				mId = mJson.optLong(Constants.ID);
+			} catch (JSONException e) {
+				Log.e(TAG, "malformed json!", e);
+				Toast.makeText(activity, activity.getString(R.string.malformed_json), Toast.LENGTH_LONG).show();
+				// getActivity().onBackPressed();
+			}
+		} else {
+			mId = args.getLong(Constants.ID);
+		}
 		mSelection = new StringBuilder(Status.TYPE)
 				.append("=").append(Status.COMMENT)
 				.append(" and ").append(Status.TO_WHICH_TWEET)
@@ -404,8 +426,12 @@ public class TweetFragment extends Fragment implements
 		} else {
 			initFromLocal();
 		}
-		// 载入微博
-		loadTweet();
+		// 载入微博/转发微博
+		if (mJson == null) {
+			loadTweet();
+		} else {
+			loadRetweet();
+		}
 	}
 
 	// 载入那条微博
@@ -457,7 +483,7 @@ public class TweetFragment extends Fragment implements
 					});
 					String remark = cursor.getString(cursor.getColumnIndex(User.remark));
 					mRemark.setText(TextUtils.isEmpty(remark) ? screenName : remark);
-					mScreenName.setText("@" + screenName);
+					mScreenName.setText(getString(R.string.mention_text, screenName));
 					String text = cursor.getString(cursor.getColumnIndex(Status.columnText));
 					mText.setText(text);
 					CatnutUtils.vividTweet(mText, mImageSpan);
@@ -477,40 +503,33 @@ public class TweetFragment extends Fragment implements
 						mTweetLayout.findViewById(R.id.verified).setVisibility(View.VISIBLE);
 					}
 					String thumb = cursor.getString(cursor.getColumnIndex(Status.bmiddle_pic));
-					if (!TextUtils.isEmpty(thumb)) {
-						Picasso.with(getActivity()).load(thumb).into(mThumbs);
-						mThumbs.setVisibility(View.VISIBLE);
-						final String url = cursor.getString(cursor.getColumnIndex(Status.original_pic));
-						mThumbs.setOnClickListener(new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								Intent intent = SingleFragmentActivity.getIntent(getActivity(),
-										SingleFragmentActivity.PHOTO_VIEWER);
-								intent.putExtra(Constants.PIC, url);
-								startActivity(intent);
-							}
-						});
-					} else {
-						mThumbs.setVisibility(View.GONE);
-					}
+					String url = cursor.getString(cursor.getColumnIndex(Status.original_pic));
+					loadThumbs(thumb, url);
 					// retweet
-					String jsonString = cursor.getString(cursor.getColumnIndex(Status.retweeted_status));
+					final String jsonString = cursor.getString(cursor.getColumnIndex(Status.retweeted_status));
 					if (!TextUtils.isEmpty(jsonString)) {
 						try {
-							final JSONObject json = new JSONObject(jsonString);
+							JSONObject json = new JSONObject(jsonString);
 							JSONObject user = json.optJSONObject(User.SINGLE);
 							String _remark = user.optString(User.remark);
 							if (TextUtils.isEmpty(_remark)) {
 								_remark = user.optString(User.screen_name);
 							}
-							CatnutUtils.setText(mRetweetLayout, R.id.retweet_nick, _remark);
+							CatnutUtils.setText(mRetweetLayout, R.id.retweet_nick, getString(R.string.mention_text, _remark));
 							long mills = DateTime.getTimeMills(json.optString(Status.created_at));
 							CatnutUtils.setText(mRetweetLayout, R.id.retweet_create_at, DateUtils.getRelativeTimeSpanString(mills));
 							TweetTextView retweetText = (TweetTextView) CatnutUtils.setText(mRetweetLayout, R.id.retweet_text, json.optString(Status.text));
 							CatnutUtils.vividTweet(retweetText, mImageSpan);
 							CatnutUtils.setTypeface(retweetText, mTypeface);
 							retweetText.setLineSpacing(0, mLineSpacing);
-							mRetweetLayout.setVisibility(View.VISIBLE);
+							mRetweetLayout.findViewById(R.id.retweet).setOnClickListener(new View.OnClickListener() {
+								@Override
+								public void onClick(View v) {
+									Intent intent = new Intent(getActivity(), TweetActivity.class);
+									intent.putExtra(Constants.JSON, jsonString);
+									startActivity(intent);
+								}
+							});
 						} catch (JSONException e) {
 							Log.e(TAG, "convert text to string error!", e);
 							mRetweetLayout.setVisibility(View.GONE);
@@ -518,18 +537,102 @@ public class TweetFragment extends Fragment implements
 					} else {
 						mRetweetLayout.setVisibility(View.GONE);
 					}
-					// share...
-					mShareIntent = new Intent(Intent.ACTION_SEND).setType("text/plain");
-					mShareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.tweet_share_subject));
-					mShareIntent.putExtra(Intent.EXTRA_TEXT, text);
-					if (mShareActionProvider != null) {
-						mShareActionProvider.setShareIntent(mShareIntent);
-					}
-					mFavorited = CatnutUtils.getBoolean(cursor, Status.favorited);
+					// shareAndFavorite&favorite
+					shareAndFavorite(CatnutUtils.getBoolean(cursor, Status.favorited), text);
 				}
 				cursor.close();
 			}
 		}.startQuery(0, null, CatnutProvider.parse(Status.MULTIPLE), null, query, null, null);
+	}
+
+	// 载入转发微博
+	private void loadRetweet() {
+		JSONObject user = mJson.optJSONObject(User.SINGLE);
+		Picasso.with(getActivity())
+				.load(user == null ? Constants.NULL : user.optString(User.avatar_large))
+				.placeholder(R.drawable.error)
+				.error(R.drawable.error)
+				.into(mAvatar);
+		final long uid = mJson.optLong(Status.uid);
+		final String screenName = user == null ? getString(R.string.unknown_user) : user.optString(User.screen_name);
+		mAvatar.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getActivity(), ProfileActivity.class);
+				intent.putExtra(Constants.ID, uid);
+				intent.putExtra(User.screen_name, screenName);
+				startActivity(intent);
+			}
+		});
+		String remark = user.optString(User.remark);
+		mRemark.setText(TextUtils.isEmpty(remark) ? screenName : remark);
+		mScreenName.setText(getString(R.string.mention_text, screenName));
+		String text = mJson.optString(Status.text);
+		mText.setText(text);
+		CatnutUtils.vividTweet(mText, mImageSpan);
+		CatnutUtils.setTypeface(mText, mTypeface);
+		mText.setLineSpacing(0, mLineSpacing);
+		int replyCount = mJson.optInt(Status.comments_count);
+		mReplayCount.setText(CatnutUtils.approximate(replyCount));
+		int retweetCount = mJson.optInt(Status.reposts_count);
+		mReteetCount.setText(CatnutUtils.approximate(retweetCount));
+		int favoriteCount = mJson.optInt(Status.attitudes_count);
+		mFavoriteCount.setText(CatnutUtils.approximate(favoriteCount));
+		String source = mJson.optString(Status.source);
+		mSource.setText(Html.fromHtml(source).toString());
+		mCreateAt.setText(DateUtils.getRelativeTimeSpanString(
+				DateTime.getTimeMills(mJson.optString(Status.created_at))));
+		if (user.optBoolean(User.verified)) {
+			mTweetLayout.findViewById(R.id.verified).setVisibility(View.VISIBLE);
+		}
+
+		loadThumbs(mJson.optString(Status.bmiddle_pic), mJson.optString(Status.original_pic));
+		shareAndFavorite(mJson.optBoolean(Status.favorited), mJson.optString(Status.text));
+
+		if (!mJson.has(Status.retweeted_status)) {
+			//todo: 转发再转发貌似没什么意思
+			mRetweetLayout.setVisibility(View.GONE);
+		}
+	}
+
+	/**
+	 * 载入微博缩略图并监听用户查看原图
+	 *
+	 * @param thumb 缩略图url
+	 * @param originalUrl 原图url
+	 */
+	private void loadThumbs(String thumb, final String originalUrl) {
+		if (!TextUtils.isEmpty(thumb)) {
+			Picasso.with(getActivity()).load(thumb).into(mThumbs);
+			mThumbs.setVisibility(View.VISIBLE);
+			mThumbs.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = SingleFragmentActivity.getIntent(getActivity(),
+							SingleFragmentActivity.PHOTO_VIEWER);
+					intent.putExtra(Constants.PIC, originalUrl);
+					startActivity(intent);
+				}
+			});
+		} else {
+			mThumbs.setVisibility(View.GONE);
+		}
+	}
+
+	/**
+	 * 分享与收藏/取消收藏
+	 *
+	 * @param favorited 是否已经收藏/取消这条微博
+	 * @param text 微博文字
+	 */
+	private void shareAndFavorite(boolean favorited, String text) {
+		mShareIntent = new Intent(Intent.ACTION_SEND).setType(getString(R.string.mime_text_plain));
+		mShareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.tweet_share_subject));
+		mShareIntent.putExtra(Intent.EXTRA_TEXT, text);
+		if (mShareActionProvider != null) {
+			mShareActionProvider.setShareIntent(mShareIntent);
+		}
+		mFavorited = favorited;
 	}
 
 	@Override

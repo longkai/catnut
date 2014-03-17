@@ -40,8 +40,11 @@ public class TweetActivity extends Activity {
 		bar.setDisplayHomeAsUpEnabled(true);
 
 		long id = getIntent().getLongExtra(Constants.ID, 0L);
+		String json = getIntent().getStringExtra(Constants.JSON);
 		if (savedInstanceState == null) {
-			TweetFragment fragment = TweetFragment.getFragment(id);
+			TweetFragment fragment = id != 0L
+					? TweetFragment.getFragment(id)
+					: TweetFragment.getFragment(json);
 			// 添加back回调
 			mKeyDownListener = fragment;
 			getFragmentManager().beginTransaction()

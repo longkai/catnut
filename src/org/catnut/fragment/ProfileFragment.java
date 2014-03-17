@@ -348,9 +348,9 @@ public class ProfileFragment extends Fragment implements
 						String create_at = cursor.getString(cursor.getColumnIndex(Status.created_at));
 						CatnutUtils.setText(tweet, R.id.create_at, DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(create_at)));
 						// retweet
-						String jsonString = cursor.getString(cursor.getColumnIndex(Status.retweeted_status));
+						final String jsonString = cursor.getString(cursor.getColumnIndex(Status.retweeted_status));
 						try {
-							final JSONObject jsonObject = new JSONObject(jsonString);
+							JSONObject jsonObject = new JSONObject(jsonString);
 							TweetTextView retweet = (TweetTextView) mRetweetLayout.findViewById(R.id.retweet_text);
 							retweet.setText(jsonObject.optString(Status.text));
 							CatnutUtils.vividTweet(retweet, tweetImageSpan);
@@ -368,28 +368,9 @@ public class ProfileFragment extends Fragment implements
 								mRetweetLayout.setOnClickListener(new View.OnClickListener() {
 									@Override
 									public void onClick(View v) {
-										// 先存入本地sqlite，再跳转
-										final ProgressDialog dialog = ProgressDialog.show(getActivity(), null, getString(R.string.loading));
-										// thread go!
-										(new Thread(new Runnable() {
-											@Override
-											public void run() {
-												ContentValues status = Status.METADATA.convert(jsonObject);
-												status.put(Status.TYPE, Status.RETWEET);
-												ContentValues user = User.METADATA.convert(jsonObject.optJSONObject(User.SINGLE));
-												getActivity().getContentResolver().insert(CatnutProvider.parse(Status.MULTIPLE), status);
-												getActivity().getContentResolver().insert(CatnutProvider.parse(User.MULTIPLE), user);
-												mScrollSettleHandler.post(new Runnable() {
-													@Override
-													public void run() {
-														dialog.dismiss();
-														Intent intent = new Intent(getActivity(), TweetActivity.class);
-														intent.putExtra(Constants.ID, jsonObject.optLong(Constants.ID));
-														startActivity(intent);
-													}
-												});
-											}
-										})).start();
+										Intent intent = new Intent(getActivity(), TweetActivity.class);
+										intent.putExtra(Constants.JSON, jsonString);
+										startActivity(intent);
 									}
 								});
 							}

@@ -21,6 +21,7 @@ public class Constants {
 	public static final String FANTASY_DIR = "fantasy";
 	public static final String NULL = "null";
 	public static final String JPG = ".jpg";
+	public static final String JSON = "json";
 
 	// for error dialog box
 	public static final String TITLE = "title";
