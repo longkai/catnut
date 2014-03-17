@@ -45,6 +45,7 @@ import org.catnut.core.CatnutRequest;
 import org.catnut.fragment.DraftFragment;
 import org.catnut.fragment.FavoriteFragment;
 import org.catnut.fragment.HomeTimelineFragment;
+import org.catnut.fragment.MentionTimelineFragment;
 import org.catnut.fragment.MyRelationshipFragment;
 import org.catnut.fragment.UserTimelineFragment;
 import org.catnut.metadata.Status;
@@ -459,6 +460,10 @@ public class MainActivity extends Activity implements
 						mRefreshCallback.callback(null);
 					}
 				}
+				break;
+			case R.id.new_mention:
+				fragment = MentionTimelineFragment.getFragment();
+				tag = MentionTimelineFragment.TAG;
 				break;
 			case R.id.action_my_list:
 			default:
