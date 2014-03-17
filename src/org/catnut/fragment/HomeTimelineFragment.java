@@ -31,6 +31,7 @@ import org.catnut.core.CatnutRequest;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.processor.StatusProcessor;
+import org.catnut.support.FragmentCallbackFromActivity;
 import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
@@ -42,7 +43,7 @@ import org.json.JSONObject;
  *
  * @author longkai
  */
-public class HomeTimelineFragment extends TimelineFragment {
+public class HomeTimelineFragment extends TimelineFragment implements FragmentCallbackFromActivity {
 
 	public static final String TAG = "HomeTimelineFragment";
 
@@ -376,6 +377,15 @@ public class HomeTimelineFragment extends TimelineFragment {
 				getLoaderManager().restartLoader(0, args, this);
 				mListView.setSelection(firstVisiblePosition);
 			}
+		}
+	}
+
+	@Override
+	public void callback(Bundle args) {
+		// 简单的刷新而已
+		if (!mPullToRefreshLayout.isRefreshing()) {
+			mPullToRefreshLayout.setRefreshing(true);
+			refresh();
 		}
 	}
 }

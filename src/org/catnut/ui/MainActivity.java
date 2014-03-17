@@ -24,6 +24,7 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,6 +51,7 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.support.ConfirmBarController;
+import org.catnut.support.FragmentCallbackFromActivity;
 import org.catnut.support.QuickReturnScrollView;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
@@ -97,6 +99,8 @@ public class MainActivity extends Activity implements
 
 	private ConfirmBarController.Callbacks mCallbacks;
 
+	private FragmentCallbackFromActivity mRefreshCallback;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -142,9 +146,10 @@ public class MainActivity extends Activity implements
 		if (savedInstanceState == null) {
 			HomeTimelineFragment fragment = HomeTimelineFragment.getFragment();
 			mCallbacks = fragment;
+			mRefreshCallback = fragment;
 			getFragmentManager()
 					.beginTransaction()
-					.replace(R.id.fragment_container, fragment)
+					.replace(R.id.fragment_container, fragment, HomeTimelineFragment.TAG)
 					.commit();
 		}
 
@@ -242,15 +247,21 @@ public class MainActivity extends Activity implements
 		if (mFetchNews == null) {
 			mFetchNews = (TextView) findViewById(R.id.fetch_news);
 			mFetchNews.setOnClickListener(this);
+
 			View newTweet = findViewById(R.id.new_tweet);
 			CatnutUtils.setText(newTweet, android.R.id.text2, getString(R.string.new_tweet_count));
 			mNewTweet = (TextView) newTweet.findViewById(android.R.id.text1);
+			newTweet.setOnClickListener(this);
+
 			View newComment = findViewById(R.id.new_comment);
 			mNewComment = (TextView) newComment.findViewById(android.R.id.text1);
 			CatnutUtils.setText(newComment, android.R.id.text2, getString(R.string.new_comment_count));
+			newComment.setOnClickListener(this);
+
 			View newMention = findViewById(R.id.new_mention);
 			mNewMention = (TextView) newMention.findViewById(android.R.id.text1);
 			CatnutUtils.setText(newMention, android.R.id.text2, getString(R.string.new_mention_count));
+			newMention.setOnClickListener(this);
 		}
 		mFetchNews.setText(R.string.loading);
 		mFetchNews.setClickable(false);
@@ -392,8 +403,8 @@ public class MainActivity extends Activity implements
 
 	@Override
 	public void onClick(View v) {
-		Fragment fragment;
-		String tag;
+		Fragment fragment = null;
+		String tag = null;
 		switch (v.getId()) {
 			case R.id.tweets_count:
 			case R.id.action_my_tweets:
@@ -436,13 +447,28 @@ public class MainActivity extends Activity implements
 			case R.id.fetch_news:
 				fetchNews();
 				return;
+			case R.id.new_tweet:
+				// 回掉主页时间线
+				Fragment home = getFragmentManager().findFragmentByTag(HomeTimelineFragment.TAG);
+				// never null, but we still check it.
+				if (home == null || !home.isVisible()) {
+					fragment = HomeTimelineFragment.getFragment();
+					tag = HomeTimelineFragment.TAG;
+				} else {
+					if (mRefreshCallback != null) {
+						mRefreshCallback.callback(null);
+					}
+				}
+				break;
 			case R.id.action_my_list:
 			default:
 				Toast.makeText(this, "sorry, not yet implemented =.=", Toast.LENGTH_SHORT).show();
 				return;
 		}
 		mDrawerLayout.closeDrawer(mQuickReturnDrawer);
-		pendingFragment(fragment, tag);
+		if (fragment != null) {
+			pendingFragment(fragment, tag);
+		}
 	}
 
 	/**
