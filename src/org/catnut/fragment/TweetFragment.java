@@ -34,6 +34,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.*;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -144,7 +145,8 @@ public class TweetFragment extends Fragment implements
 	private TextView mSource;
 	private TextView mCreateAt;
 	private ImageView mThumbs;
-	private View mRetweetLayout;
+//	private View mRetweetLayout;
+	private ViewStub mRetweetLayout;
 
 	private Typeface mTypeface;
 	private float mLineSpacing = 1.0f;
@@ -388,7 +390,7 @@ public class TweetFragment extends Fragment implements
 		mSource = (TextView) mTweetLayout.findViewById(R.id.source);
 		mCreateAt = (TextView) mTweetLayout.findViewById(R.id.create_at);
 		mThumbs = (ImageView) mTweetLayout.findViewById(R.id.thumbs);
-		mRetweetLayout = mTweetLayout.findViewById(R.id.place_holder);
+		mRetweetLayout = (ViewStub) mTweetLayout.findViewById(R.id.view_stub);
 		// just return the list
 		return view;
 	}
@@ -508,6 +510,7 @@ public class TweetFragment extends Fragment implements
 					// retweet
 					final String jsonString = cursor.getString(cursor.getColumnIndex(Status.retweeted_status));
 					if (!TextUtils.isEmpty(jsonString)) {
+						View retweet = mRetweetLayout.inflate();
 						try {
 							JSONObject json = new JSONObject(jsonString);
 							JSONObject user = json.optJSONObject(User.SINGLE);
@@ -515,14 +518,14 @@ public class TweetFragment extends Fragment implements
 							if (TextUtils.isEmpty(_remark)) {
 								_remark = user.optString(User.screen_name);
 							}
-							CatnutUtils.setText(mRetweetLayout, R.id.retweet_nick, getString(R.string.mention_text, _remark));
+							CatnutUtils.setText(retweet, R.id.retweet_nick, getString(R.string.mention_text, _remark));
 							long mills = DateTime.getTimeMills(json.optString(Status.created_at));
-							CatnutUtils.setText(mRetweetLayout, R.id.retweet_create_at, DateUtils.getRelativeTimeSpanString(mills));
-							TweetTextView retweetText = (TweetTextView) CatnutUtils.setText(mRetweetLayout, R.id.retweet_text, json.optString(Status.text));
+							CatnutUtils.setText(retweet, R.id.retweet_create_at, DateUtils.getRelativeTimeSpanString(mills));
+							TweetTextView retweetText = (TweetTextView) CatnutUtils.setText(retweet, R.id.retweet_text, json.optString(Status.text));
 							CatnutUtils.vividTweet(retweetText, mImageSpan);
 							CatnutUtils.setTypeface(retweetText, mTypeface);
 							retweetText.setLineSpacing(0, mLineSpacing);
-							mRetweetLayout.findViewById(R.id.retweet).setOnClickListener(new View.OnClickListener() {
+							retweet.setOnClickListener(new View.OnClickListener() {
 								@Override
 								public void onClick(View v) {
 									Intent intent = new Intent(getActivity(), TweetActivity.class);
@@ -532,10 +535,8 @@ public class TweetFragment extends Fragment implements
 							});
 						} catch (JSONException e) {
 							Log.e(TAG, "convert text to string error!", e);
-							mRetweetLayout.setVisibility(View.GONE);
+							retweet.setVisibility(View.GONE);
 						}
-					} else {
-						mRetweetLayout.setVisibility(View.GONE);
 					}
 					// shareAndFavorite&favorite
 					shareAndFavorite(CatnutUtils.getBoolean(cursor, Status.favorited), text);
@@ -591,7 +592,6 @@ public class TweetFragment extends Fragment implements
 
 		if (!mJson.has(Status.retweeted_status)) {
 			//todo: 转发再转发貌似没什么意思
-			mRetweetLayout.setVisibility(View.GONE);
 		}
 	}
 

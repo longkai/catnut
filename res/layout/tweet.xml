@@ -84,17 +84,18 @@
 
 	<FrameLayout
 		android:id="@+id/place_holder"
-		android:clickable="true"
-		android:focusable="true"
 		android:layout_below="@id/thumbs"
 		android:layout_marginTop="@dimen/small"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
 
-		<include
-			android:clickable="true"
-			android:focusable="true"
-			layout="@layout/retweet" />
+		<ViewStub
+			android:id="@id/view_stub"
+			android:layout="@layout/retweet"
+			android:inflatedId="@+id/retweet"
+			android:layout_marginTop="@dimen/small"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
 	</FrameLayout>
 
 	<FrameLayout
