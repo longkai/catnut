@@ -35,6 +35,13 @@ public class CatnutAPI {
 		this.params = params;
 	}
 
+	public CatnutAPI(int method, StringBuilder uri, boolean authRequired, Map<String, String> params) {
+		this.method = method;
+		this.uri = uri.toString();
+		this.authRequired = authRequired;
+		this.params = params;
+	}
+
 	public static String encode(String string) {
 		String encode = null;
 		try {
