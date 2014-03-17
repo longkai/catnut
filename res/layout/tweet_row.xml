@@ -9,23 +9,44 @@
 	android:descendantFocusability="blocksDescendants"
 	android:paddingLeft="@dimen/medium"
 	android:paddingRight="@dimen/medium"
-	android:paddingTop="@dimen/medium"
 	android:orientation="horizontal"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent">
 
-	<ImageView
-		android:id="@+id/avatar"
-		android:visibility="gone"
-		android:padding="@dimen/small"
-		android:clickable="true"
-		android:focusable="true"
-		android:background="?android:attr/selectableItemBackground"
-		android:layout_marginRight="@dimen/medium"
+	<FrameLayout
+		android:id="@+id/line"
+		android:layout_marginRight="@dimen/small"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content" />
+		android:layout_height="match_parent">
+		
+		<View
+			android:layout_gravity="center"
+			android:background="@android:color/holo_blue_light"
+			android:layout_width="1dp"
+			android:layout_height="match_parent" />
+
+		<ImageView
+			android:id="@+id/avatar"
+			android:layout_marginTop="@dimen/medium"
+			android:visibility="gone"
+			android:padding="@dimen/small"
+			android:clickable="true"
+			android:focusable="true"
+			android:background="@drawable/avatar_background"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+
+		<TextView
+			android:id="@+id/timeline"
+			android:textColor="@android:color/darker_gray"
+			android:textAppearance="?android:attr/textAppearanceSmall"
+			android:layout_gravity="center"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+	</FrameLayout>
 
 	<LinearLayout
+		android:paddingTop="@dimen/medium"
 		android:orientation="vertical"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
