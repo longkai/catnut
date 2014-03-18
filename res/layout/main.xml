@@ -22,7 +22,7 @@
 		android:layout_gravity="start"
 		android:layout_width="300dp"
 		android:layout_height="match_parent"
-		android:background="@color/seashellColor">
+		android:background="@drawable/balloon_background">
 
 		<FrameLayout
 			android:layout_width="match_parent"
@@ -65,17 +65,25 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content" />
 
+					<TextView
+						android:id="@+id/location"
+						android:layout_below="@id/nick"
+						android:layout_alignLeft="@id/nick"
+						android:textColor="@android:color/darker_gray"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content" />
+
 					<ScrollView
-						android:layout_marginTop="@dimen/medium"
+						android:layout_marginTop="@dimen/small"
 						android:layout_alignLeft="@id/nick"
 						android:layout_alignBottom="@id/avatar_profile"
-						android:layout_below="@id/nick"
+						android:layout_below="@id/location"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content">
 
 						<TextView
 							android:id="@id/description"
-							android:textColor="@android:color/darker_gray"
+							android:textColor="@color/black50PercentColor"
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content" />
 					</ScrollView>
@@ -138,7 +146,7 @@
 					<View
 						android:background="@android:color/holo_blue_bright"
 						android:layout_width="match_parent"
-						android:layout_height="1dp" />
+						android:layout_height="1px" />
 
 					<TextView
 						android:id="@+id/action_my_tweets"
@@ -182,7 +190,7 @@
 					<View
 						android:background="@android:color/holo_blue_bright"
 						android:layout_width="match_parent"
-						android:layout_height="1dp" />
+						android:layout_height="1px" />
 
 					<TextView
 						android:id="@+id/fantasy"
@@ -213,6 +221,7 @@
 					android:id="@+id/fetch_news"
 					android:text="@string/last_check_time"
 					android:padding="@dimen/medium"
+					android:gravity="center"
 					android:clickable="true"
 					android:background="?android:attr/selectableItemBackground"
 					android:textColor="@android:color/holo_blue_bright"
@@ -221,15 +230,13 @@
 					android:layout_height="wrap_content" />
 
 				<View
-					android:layout_marginLeft="@dimen/medium"
-					android:layout_marginRight="@dimen/medium"
 					android:background="@android:color/holo_blue_bright"
 					android:layout_width="match_parent"
-					android:layout_height="1dp" />
+					android:layout_height="1px" />
 
 				<LinearLayout
 					android:id="@+id/news"
-					android:background="@color/snowColor"
+					android:background="@drawable/balloon_pressed"
 					android:layout_marginTop="@dimen/medium"
 					android:orientation="horizontal"
 					android:showDividers="middle"

@@ -23,7 +23,7 @@
 
 	<TextView
 		android:id="@android:id/text2"
-		android:textColor="@android:color/darker_gray"
+		android:textColor="@color/black50PercentColor"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" />
 </LinearLayout>

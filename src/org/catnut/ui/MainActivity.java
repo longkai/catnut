@@ -210,6 +210,9 @@ public class MainActivity extends Activity implements
 							.placeholder(R.drawable.error)
 							.error(R.drawable.error)
 							.into(mProfileCover);
+					TextView location = (TextView) findViewById(R.id.location);
+					location.setText(cursor.getString(cursor.getColumnIndex(User.location)));
+
 					String description = cursor.getString(cursor.getColumnIndex(User.description));
 					mDescription.setText(TextUtils.isEmpty(description) ? getString(R.string.no_description) : description);
 
@@ -239,7 +242,8 @@ public class MainActivity extends Activity implements
 						User.statuses_count,
 						User.followers_count,
 						User.friends_count,
-						User.verified
+						User.verified,
+						User.location
 				},
 				null, null, null
 		);
