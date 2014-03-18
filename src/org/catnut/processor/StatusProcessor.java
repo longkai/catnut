@@ -11,6 +11,7 @@ import android.provider.BaseColumns;
 import org.catnut.core.CatnutProcessor;
 import org.catnut.core.CatnutProvider;
 import org.catnut.fragment.FavoriteFragment;
+import org.catnut.metadata.Comment;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.util.CatnutUtils;
@@ -135,6 +136,28 @@ public class StatusProcessor {
 			// 持久化
 			context.getContentResolver().bulkInsert(CatnutProvider.parse(Status.MULTIPLE), comments);
 			context.getContentResolver().bulkInsert(CatnutProvider.parse(User.MULTIPLE), users);
+		}
+	}
+
+	/**
+	 * 当前登录用户收到的评论
+	 *
+	 * @author longkai
+	 */
+	public static class Comments2MeProcessor implements CatnutProcessor<JSONObject> {
+		@Override
+		public void asyncProcess(Context context, JSONObject data) throws Exception {
+			JSONArray commentsArray = data.optJSONArray(Status.COMMENTS);
+			ContentValues[] comments = new ContentValues[commentsArray.length()];
+			ContentValues[] users = new ContentValues[comments.length];
+			JSONObject json;
+			for (int i = 0; i < comments.length; i++) {
+				json = commentsArray.optJSONObject(i);
+				comments[i] = Comment.METADATA.convert(json);
+				users[i] = User.METADATA.convert(json.optJSONObject(User.SINGLE));
+			}
+			context.getContentResolver().bulkInsert(CatnutProvider.parse(Comment.MULTIPLE), comments);
+			context.getContentResolver().bulkInsert(CatnutProvider.parse(User.MULTIPLE), comments);
 		}
 	}
 

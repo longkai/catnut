@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
 import org.catnut.R;
+import org.catnut.metadata.Comment;
 import org.catnut.metadata.Draft;
 import org.catnut.metadata.Photo;
 import org.catnut.metadata.Status;
@@ -50,6 +51,8 @@ public class CatnutProvider extends ContentProvider {
 	public static final int DRAFTS = 5;
 	public static final int PHOTO = 6;
 	public static final int PHOTOS = 7;
+	public static final int COMMENT = 8;
+	public static final int COMMENTS = 9;
 	public static final int CLEAR = 100;
 
 	private static UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -59,10 +62,12 @@ public class CatnutProvider extends ContentProvider {
 		matcher.addURI(AUTHORITY, User.MULTIPLE, USERS);
 		matcher.addURI(AUTHORITY, Status.MULTIPLE + "/#", STATUS);
 		matcher.addURI(AUTHORITY, Status.MULTIPLE, STATUSES);
-		matcher.addURI(AUTHORITY, Draft.SINGLE, DRAFT);
+		matcher.addURI(AUTHORITY, Draft.SINGLE + "/#", DRAFT);
 		matcher.addURI(AUTHORITY, Draft.MULTIPLE, DRAFTS);
-		matcher.addURI(AUTHORITY, Photo.SINGLE, PHOTO);
+		matcher.addURI(AUTHORITY, Photo.SINGLE + "/#", PHOTO);
 		matcher.addURI(AUTHORITY, Photo.MULTIPLE, PHOTOS);
+		matcher.addURI(AUTHORITY, Comment.SINGLE + "/#", COMMENT);
+		matcher.addURI(AUTHORITY, Comment.MULTIPLE, COMMENTS);
 		matcher.addURI(AUTHORITY, CLEAR_DATA, CLEAR);
 	}
 
@@ -135,6 +140,12 @@ public class CatnutProvider extends ContentProvider {
 			case PHOTOS:
 				type = MULTIPLE_RECORDS_MIME_TYPE + Photo.MULTIPLE;
 				break;
+			case COMMENT:
+				type = SINGLE_RECORD_MIME_TYPE + Comment.SINGLE;
+				break;
+			case COMMENTS:
+				type = MULTIPLE_RECORDS_MIME_TYPE + Comment.MULTIPLE;
+				break;
 			default:
 				Log.wtf(TAG, "unknown uri: " + uri);
 		}
@@ -168,6 +179,11 @@ public class CatnutProvider extends ContentProvider {
 			case PHOTOS:
 				cursor = db.rawQuery(selection, selectionArgs);
 				break;
+			case COMMENT:
+				// fall through currently
+			case COMMENTS:
+				cursor = db.rawQuery(selection, selectionArgs);
+				break;
 			default:
 				Log.wtf(TAG, "unknown uri: " + uri);
 				return null;
@@ -192,6 +208,9 @@ public class CatnutProvider extends ContentProvider {
 			case PHOTOS:
 				table = Photo.TABLE;
 				break;
+			case COMMENTS:
+				table = Comment.TABLE;
+				break;
 			default:
 				throw new RuntimeException("unknown uri: " + uri);
 		}
@@ -213,6 +232,9 @@ public class CatnutProvider extends ContentProvider {
 				break;
 			case PHOTOS:
 				table = Photo.TABLE;
+				break;
+			case COMMENTS:
+				table = Comment.TABLE;
 				break;
 			default:
 				throw new RuntimeException("unknown uri: " + uri);
@@ -243,6 +265,9 @@ public class CatnutProvider extends ContentProvider {
 			case PHOTOS:
 				count = mDb.getWritableDatabase().delete(Photo.TABLE, selection, selectionArgs);
 				break;
+			case COMMENTS:
+				count = mDb.getWritableDatabase().delete(Comment.TABLE, selection, selectionArgs);
+				break;
 			case CLEAR:
 				SQLiteDatabase db = mDb.getWritableDatabase();
 				db.beginTransaction();
@@ -250,6 +275,7 @@ public class CatnutProvider extends ContentProvider {
 				db.execSQL("delete from " + User.TABLE + " where "
 						+ BaseColumns._ID + " != " + CatnutApp.getTingtingApp().getAccessToken().uid);
 				db.execSQL("delete from " + Status.TABLE);
+				db.execSQL("delete from " + Comment.TABLE);
 				db.setTransactionSuccessful();
 				db.endTransaction();
 				count = Integer.MAX_VALUE;
@@ -309,6 +335,7 @@ public class CatnutProvider extends ContentProvider {
 			db.execSQL(Status.METADATA.ddl());
 			db.execSQL(Draft.METADATA.ddl());
 			db.execSQL(Photo.METADATA.ddl());
+			db.execSQL(Comment.METADATA.ddl());
 			// 保存分享的图片
 			(new Thread(new Runnable() {
 				@Override
@@ -338,6 +365,9 @@ public class CatnutProvider extends ContentProvider {
 			db.execSQL("DROP TABLE " + Status.TABLE);
 			db.execSQL("DROP TABLE " + Draft.TABLE);
 			db.execSQL("DROP TABLE " + Photo.TABLE);
+			db.execSQL("DROP TABLE " + Comment.TABLE);
+			// recreate...
+			onCreate(db);
 			Log.i(TAG, "finish upgrade table...");
 		}
 	}
