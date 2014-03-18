@@ -80,7 +80,8 @@ public class ProfileFragment extends Fragment implements
 			User.friends_count,
 			User.statuses_count,
 			User.followers_count,
-			User.following
+			User.following,
+			User.verified_reason
 	};
 
 	private CatnutApp mApp;
@@ -105,6 +106,7 @@ public class ProfileFragment extends Fragment implements
 	private String mDescription;
 	private String mLocation;
 	private String mProfileUrl;
+	private String mVerifiedReason;
 
 	private ViewPager mViewPager;
 	private LinePageIndicator mIndicator;
@@ -243,6 +245,7 @@ public class ProfileFragment extends Fragment implements
 					mLocation = cursor.getString(cursor.getColumnIndex(User.location));
 					mProfileUrl = cursor.getString(cursor.getColumnIndex(User.profile_url));
 					mCoverUrl = cursor.getString(cursor.getColumnIndex(User.cover_image));
+					mVerifiedReason = cursor.getString(cursor.getColumnIndex(User.verified_reason));
 					// +关注
 					mFollowing = CatnutUtils.getBoolean(cursor, User.following);
 					// menu
@@ -521,6 +524,10 @@ public class ProfileFragment extends Fragment implements
 					CatnutUtils.setText(introPage, R.id.description, TextUtils.isEmpty(mDescription)
 							? getString(R.string.no_description) : mDescription);
 					CatnutUtils.setText(introPage, R.id.location, mLocation);
+					if (!TextUtils.isEmpty(mVerifiedReason)) {
+						CatnutUtils.setText(introPage, R.id.verified_reason, mVerifiedReason)
+								.setVisibility(View.VISIBLE);
+					}
 					CatnutUtils.setText(introPage, R.id.profile_url, Constants.WEIBO_DOMAIN + mProfileUrl);
 					container.addView(introPage);
 					return introPage;
