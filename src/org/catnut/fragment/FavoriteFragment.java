@@ -61,6 +61,7 @@ public class FavoriteFragment extends TimelineFragment {
 			Status.favorited,
 			"s." + Status.created_at,
 			User.screen_name,
+			User.verified,
 			User.profile_image_url,
 			User.remark
 	};

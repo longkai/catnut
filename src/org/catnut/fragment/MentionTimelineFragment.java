@@ -59,6 +59,7 @@ public class MentionTimelineFragment extends TimelineFragment {
 			User.screen_name,
 			User.profile_image_url,
 			User.remark,
+			User.verified,
 			Status.favorited,
 			Status.retweeted_status
 	};

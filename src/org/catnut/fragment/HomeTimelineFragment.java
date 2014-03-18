@@ -62,6 +62,7 @@ public class HomeTimelineFragment extends TimelineFragment implements FragmentCa
 			User.screen_name,
 			User.profile_image_url,
 			User.remark,
+			User.verified,
 			Status.favorited,
 			Status.retweeted_status
 	};

@@ -87,7 +87,7 @@ public class TweetAdapter extends CursorAdapter {
 	private static class ViewHolder {
 		ImageView avatar;
 		int avatarIndex;
-		TextView create_at;
+//		TextView create_at;
 		int create_atIndex;
 		TextView nick;
 		int nickIndex;
@@ -115,6 +115,8 @@ public class TweetAdapter extends CursorAdapter {
 		int retweetIndex;
 
 		TextView time;
+		View verified;
+//		int verifiedIndex;
 	}
 
 	@Override
@@ -131,7 +133,7 @@ public class TweetAdapter extends CursorAdapter {
 		// 微博相关
 		holder.text = (TweetTextView) view.findViewById(R.id.text);
 		holder.textIndex = cursor.getColumnIndex(Status.columnText);
-		holder.create_at = (TextView) view.findViewById(R.id.create_at);
+//		holder.create_at = (TextView) view.findViewById(R.id.create_at);
 		holder.create_atIndex = cursor.getColumnIndex(Status.created_at);
 		holder.replyCount = (TextView) view.findViewById(R.id.reply_count);
 		holder.replyCountIndex = cursor.getColumnIndex(Status.comments_count);
@@ -166,6 +168,8 @@ public class TweetAdapter extends CursorAdapter {
 		holder.retweetIndex = cursor.getColumnIndex(Status.retweeted_status);
 		// time
 		holder.time = (TextView) view.findViewById(R.id.time);
+		holder.verified = view.findViewById(R.id.verified);
+//		holder.verifiedIndex = cursor.getColumnIndex(User.verified);
 		view.setTag(holder);
 		return view;
 	}
@@ -196,6 +200,11 @@ public class TweetAdapter extends CursorAdapter {
 			});
 			String remark = cursor.getString(holder.remarkIndex);
 			holder.nick.setText(TextUtils.isEmpty(remark) ? cursor.getString(holder.nickIndex) : remark);
+			if (CatnutUtils.getBoolean(cursor, User.verified)) {
+				holder.verified.setVisibility(View.VISIBLE);
+			} else {
+				holder.verified.setVisibility(View.GONE);
+			}
 		} else {
 			holder.nick.setText(mScreenName);
 		}
@@ -237,7 +246,7 @@ public class TweetAdapter extends CursorAdapter {
 		holder.text.setText(cursor.getString(holder.textIndex));
 		String create_at = cursor.getString(holder.create_atIndex);
 		holder.time.setText(DateTime.getRelativeTimeString(create_at));
-		holder.create_at.setText(DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(create_at)));
+//		holder.create_at.setText(DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(create_at)));
 		int replyCount = cursor.getInt(holder.replyCountIndex);
 		holder.replyCount.setText(CatnutUtils.approximate(replyCount));
 		int retweetCount = cursor.getInt(holder.reteetCountIndex);

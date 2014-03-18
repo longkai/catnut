@@ -50,7 +50,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
 
-		<LinearLayout
+		<RelativeLayout
 			android:orientation="horizontal"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content">
@@ -61,17 +61,43 @@
 				android:singleLine="true"
 				android:ellipsize="end"
 				android:textStyle="bold"
+				android:layout_marginRight="@dimen/small"
 				android:textAppearance="@android:style/TextAppearance.Medium"
-				android:layout_weight="1"
-				android:layout_width="0dp"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+
+			<ImageView
+				android:id="@id/verified"
+				android:layout_toRightOf="@id/nick"
+				android:src="@drawable/ic_verified"
+				android:visibility="gone"
+				android:layout_alignTop="@id/nick"
+				android:layout_alignBottom="@id/nick"
+				android:layout_marginRight="@dimen/small"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+
+			<ImageView
+				android:id="@+id/tweet_overflow"
+				android:src="@drawable/ic_down"
+				android:clickable="true"
+				android:padding="@dimen/small"
+				android:focusable="true"
+				android:background="?android:attr/selectableItemBackground"
+				android:layout_alignParentRight="true"
+				android:scaleType="center"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content" />
 
 			<TextView
 				android:id="@+id/create_at"
+				android:layout_toLeftOf="@id/tweet_overflow"
+				android:layout_alignParentRight="true"
+				android:visibility="gone"
 				android:textColor="@android:color/darker_gray"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content" />
-		</LinearLayout>
+		</RelativeLayout>
 
 		<org.catnut.support.TweetTextView
 			android:id="@+id/text"

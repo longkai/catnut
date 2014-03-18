@@ -316,6 +316,9 @@ public class ProfileFragment extends Fragment implements
 						ViewStub viewStub = (ViewStub) mTweetLayout.findViewById(R.id.latest_tweet);
 						View tweet = viewStub.inflate();
 						mRetweetLayout = tweet.findViewById(R.id.retweet);
+						tweet.findViewById(R.id.timeline).setVisibility(View.GONE);
+						tweet.findViewById(R.id.verified).setVisibility(View.GONE);
+						tweet.findViewById(R.id.tweet_overflow).setVisibility(View.GONE);
 						CatnutUtils.setText(tweet, R.id.nick, getString(R.string.latest_statues))
 								.setTextColor(getResources().getColor(R.color.actionbar_background));
 						String tweetText = cursor.getString(cursor.getColumnIndex(Status.columnText));
@@ -346,7 +349,8 @@ public class ProfileFragment extends Fragment implements
 						String source = cursor.getString(cursor.getColumnIndex(Status.source));
 						CatnutUtils.setText(tweet, R.id.source, Html.fromHtml(source).toString());
 						String create_at = cursor.getString(cursor.getColumnIndex(Status.created_at));
-						CatnutUtils.setText(tweet, R.id.create_at, DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(create_at)));
+						CatnutUtils.setText(tweet, R.id.create_at, DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(create_at)))
+							.setVisibility(View.VISIBLE);
 						// retweet
 						final String jsonString = cursor.getString(cursor.getColumnIndex(Status.retweeted_status));
 						try {
