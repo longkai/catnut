@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<item android:state_pressed="true" android:drawable="@drawable/message_received_bubble_pressed" />
+	<item android:state_pressed="false" android:drawable="@drawable/message_received_bubble" />
+	<item android:drawable="@drawable/message_received_bubble" />
+</selector>
