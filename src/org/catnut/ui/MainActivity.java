@@ -42,6 +42,7 @@ import org.catnut.api.StuffAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
+import org.catnut.fragment.ConversationFragment;
 import org.catnut.fragment.DraftFragment;
 import org.catnut.fragment.FavoriteFragment;
 import org.catnut.fragment.HomeTimelineFragment;
@@ -469,6 +470,10 @@ public class MainActivity extends Activity implements
 				fragment = MentionTimelineFragment.getFragment();
 				tag = MentionTimelineFragment.TAG;
 				mNewMention.setText("0");
+				break;
+			case R.id.new_comment:
+				fragment = ConversationFragment.getFragment();
+				tag = ConversationFragment.TAG;
 				break;
 			case R.id.action_my_list:
 			default:

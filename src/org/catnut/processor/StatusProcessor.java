@@ -157,7 +157,7 @@ public class StatusProcessor {
 				users[i] = User.METADATA.convert(json.optJSONObject(User.SINGLE));
 			}
 			context.getContentResolver().bulkInsert(CatnutProvider.parse(Comment.MULTIPLE), comments);
-			context.getContentResolver().bulkInsert(CatnutProvider.parse(User.MULTIPLE), comments);
+			context.getContentResolver().bulkInsert(CatnutProvider.parse(User.MULTIPLE), users);
 		}
 	}
 

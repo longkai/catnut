@@ -108,7 +108,7 @@ public class CatnutProvider extends ContentProvider {
 
 	@Override
 	public boolean onCreate() {
-		mDb = new TingtingSource(getContext(), "catnut.db", 1);
+		mDb = new TingtingSource(getContext(), "catnut.db", 2);
 		return true;
 	}
 
@@ -361,11 +361,12 @@ public class CatnutProvider extends ContentProvider {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			db.execSQL("DROP TABLE " + User.TABLE);
-			db.execSQL("DROP TABLE " + Status.TABLE);
-			db.execSQL("DROP TABLE " + Draft.TABLE);
-			db.execSQL("DROP TABLE " + Photo.TABLE);
-			db.execSQL("DROP TABLE " + Comment.TABLE);
+			Log.i(TAG, "drop tables...");
+			db.execSQL("DROP TABLE IF EXISTS " + User.TABLE);
+			db.execSQL("DROP TABLE IF EXISTS " + Status.TABLE);
+			db.execSQL("DROP TABLE IF EXISTS " + Draft.TABLE);
+			db.execSQL("DROP TABLE IF EXISTS " + Photo.TABLE);
+			db.execSQL("DROP TABLE IF EXISTS " + Comment.TABLE);
 			// recreate...
 			onCreate(db);
 			Log.i(TAG, "finish upgrade table...");

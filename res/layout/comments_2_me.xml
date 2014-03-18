@@ -13,7 +13,7 @@
 
 	<TextView
 		android:id="@+id/my_create_at"
-		android:layout_margin="@dimen/medium"
+		android:padding="@dimen/small"
 		android:textColor="@color/black50PercentColor"
 		android:background="@drawable/date_balloon"
 		android:layout_centerHorizontal="true"
@@ -23,9 +23,8 @@
 	<FrameLayout
 		android:id="@+id/dummy"
 		android:layout_below="@id/my_create_at"
+		android:layout_marginTop="@dimen/small"
 		android:layout_alignParentRight="true"
-		android:clickable="true"
-		android:focusable="true"
 		android:background="@drawable/balloon_outgoing"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content">
@@ -56,7 +55,7 @@
 		android:id="@+id/avatar"
 		android:layout_below="@id/his_create_at"
 		android:padding="@dimen/small"
-		android:layout_marginTop="@dimen/medium"
+		android:layout_marginTop="@dimen/small"
 		android:clickable="true"
 		android:background="@drawable/avatar_background"
 		android:layout_width="50dp"
@@ -65,8 +64,6 @@
 	<LinearLayout
 		android:id="@+id/place_holder"
 		android:orientation="vertical"
-		android:clickable="true"
-		android:focusable="true"
 		android:layout_toRightOf="@id/avatar"
 		android:layout_alignTop="@id/avatar"
 		android:background="@drawable/balloon_incoming"
@@ -79,6 +76,7 @@
 			android:textAppearance="?android:attr/textAppearanceMedium"
 			android:textColor="@color/black25PercentColor"
 			android:layout_marginLeft="@dimen/medium"
+			android:layout_marginRight="@dimen/medium"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" />
 
