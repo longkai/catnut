@@ -5,8 +5,6 @@
  */
 package org.catnut.adapter;
 
-import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,7 +25,6 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
-import org.catnut.core.CatnutProvider;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.support.TweetImageSpan;
@@ -116,6 +113,8 @@ public class TweetAdapter extends CursorAdapter {
 
 		View retweetView;
 		int retweetIndex;
+
+		TextView time;
 	}
 
 	@Override
@@ -165,6 +164,8 @@ public class TweetAdapter extends CursorAdapter {
 		// 转发
 		holder.retweetView = view.findViewById(R.id.retweet);
 		holder.retweetIndex = cursor.getColumnIndex(Status.retweeted_status);
+		// time
+		holder.time = (TextView) view.findViewById(R.id.time);
 		view.setTag(holder);
 		return view;
 	}
@@ -235,6 +236,7 @@ public class TweetAdapter extends CursorAdapter {
 		holder.text.setTextSize(mCustomizedFontSize);
 		holder.text.setText(cursor.getString(holder.textIndex));
 		String create_at = cursor.getString(holder.create_atIndex);
+		holder.time.setText(DateTime.getRelativeTimeString(create_at));
 		holder.create_at.setText(DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(create_at)));
 		int replyCount = cursor.getInt(holder.replyCountIndex);
 		holder.replyCount.setText(CatnutUtils.approximate(replyCount));
