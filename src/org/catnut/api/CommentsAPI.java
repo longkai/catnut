@@ -85,4 +85,27 @@ public class CommentsAPI {
 		params.put("rip", String.valueOf(rip));
 		return new CatnutAPI(Request.Method.POST, uri.toString(), true, params);
 	}
+
+	/**
+	 * 获取当前登录用户所接收到的评论列表
+	 *
+	 * @param since_id         若指定此参数，则返回ID比since_id大的评论（即比since_id时间晚的评论），默认为0
+	 * @param max_id           若指定此参数，则返回ID小于或等于max_id的评论，默认为0
+	 * @param count            单页返回的记录条数，默认为50
+	 * @param page             返回结果的页码，默认为1
+	 * @param filter_by_author 作者筛选类型，0：全部、1：我关注的人、2：陌生人，默认为0
+	 * @param filter_by_source 来源筛选类型，0：全部、1：来自微博的评论、2：来自微群的评论，默认为0
+	 * @return api
+	 */
+	public static CatnutAPI to_me(long since_id, long max_id, int count, int page, int filter_by_author, int filter_by_source) {
+		StringBuilder uri = new StringBuilder(BASE_URI);
+		uri.append("to_me.json")
+				.append("?since_id=").append(CatnutUtils.optValue(since_id, 0))
+				.append("&max_id=").append(CatnutUtils.optValue(max_id, 0))
+				.append("&count=").append(CatnutUtils.optValue(count, 50))
+				.append("&page=").append(CatnutUtils.optValue(page, 1))
+				.append("&filter_by_author=").append(CatnutUtils.optValue(filter_by_author, 0))
+				.append("&filter_by_source=").append(CatnutUtils.optValue(filter_by_source, 0));
+		return new CatnutAPI(Request.Method.GET, uri, true, null);
+	}
 }
