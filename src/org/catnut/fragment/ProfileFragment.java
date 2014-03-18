@@ -7,9 +7,7 @@ package org.catnut.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.ProgressDialog;
 import android.content.AsyncQueryHandler;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -345,7 +343,7 @@ public class ProfileFragment extends Fragment implements
 						int retweetCount = cursor.getInt(cursor.getColumnIndex(Status.reposts_count));
 						CatnutUtils.setText(tweet, R.id.reteet_count, CatnutUtils.approximate(retweetCount));
 						int favoriteCount = cursor.getInt(cursor.getColumnIndex(Status.attitudes_count));
-						CatnutUtils.setText(tweet, R.id.favorite_count, CatnutUtils.approximate(favoriteCount));
+						CatnutUtils.setText(tweet, R.id.like_count, CatnutUtils.approximate(favoriteCount));
 						String source = cursor.getString(cursor.getColumnIndex(Status.source));
 						CatnutUtils.setText(tweet, R.id.source, Html.fromHtml(source).toString());
 						String create_at = cursor.getString(cursor.getColumnIndex(Status.created_at));

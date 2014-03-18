@@ -7,6 +7,7 @@ package org.catnut.processor;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.provider.BaseColumns;
 import org.catnut.core.CatnutProcessor;
 import org.catnut.core.CatnutProvider;
 import org.catnut.fragment.FavoriteFragment;
@@ -173,10 +174,17 @@ public class StatusProcessor {
 		@Override
 		public void asyncProcess(Context context, JSONObject data) throws Exception {
 			JSONObject jsonObject = data.optJSONObject(Status.SINGLE);
-			ContentValues status = Status.METADATA.convert(jsonObject);
-			ContentValues user = User.METADATA.convert(jsonObject.optJSONObject(User.SINGLE));
-			context.getContentResolver().insert(CatnutProvider.parse(User.MULTIPLE), user);
-			context.getContentResolver().insert(CatnutProvider.parse(Status.MULTIPLE), status);
+			StringBuilder update = new StringBuilder("UPDATE ").append(Status.TABLE);
+			update.append(" SET ").append(Status.favorited).append("=")
+					.append(jsonObject.optBoolean(Status.favorited) ? "1" : "0")
+					.append(" WHERE ").append(BaseColumns._ID).append("=").append(jsonObject.getLong(Constants.ID));
+			context.getContentResolver().update(CatnutProvider.parse(Status.MULTIPLE), null, update.toString(), null);
+			// 更新用户数据
+			JSONObject user = jsonObject.optJSONObject(User.SINGLE);
+			if (user != null) {
+				String increment = CatnutUtils.increment(true, User.TABLE, User.favourites_count, user.getLong(Constants.ID));
+				context.getContentResolver().update(CatnutProvider.parse(User.MULTIPLE), null, increment, null);
+			}
 		}
 	}
 

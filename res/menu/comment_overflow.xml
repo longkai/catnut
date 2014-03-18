@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<item
+		android:id="@+id/action_emotions"
+		android:title="@string/add_emotions" />
+
+	<item
+		android:title="@string/retweet_option_hint">
+
+		<menu>
+			<group android:checkableBehavior="single">
+				<item
+					android:checked="true"
+					android:id="@+id/action_reply_none"
+					android:title="@android:string/no" />
+				<item
+					android:id="@+id/action_reply_current"
+					android:title="@string/reply_current" />
+				<item
+					android:id="@+id/action_reply_original"
+					android:title="@string/reply_original" />
+				<item
+					android:id="@+id/action_reply_both"
+					android:title="@string/reply_both" />
+			</group>
+		</menu>
+	</item>
+</menu>

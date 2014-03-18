@@ -5,7 +5,7 @@
   ~ Copyright (c) 2014 longkai
   ~ The software shall be used for good, not evil.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:orientation="horizontal"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content">
@@ -17,6 +17,8 @@
 
 	<TextView
 		android:id="@+id/reply_count"
+		android:layout_toRightOf="@id/action_reply"
+		android:layout_alignBottom="@id/action_reply"
 		style="@style/Tweet_Inline"
 		android:textSize="@dimen/text_size_small"
 		android:textColor="@android:color/darker_gray"
@@ -25,24 +27,26 @@
 
 	<ImageView
 		android:id="@id/action_reteet"
+		android:layout_toRightOf="@id/reply_count"
+		android:layout_alignBottom="@id/action_reply"
 		style="@style/Tweet_Inline.Icon"
 		android:src="@drawable/ic_inline_reteet" />
 
 	<TextView
 		android:id="@+id/reteet_count"
+		android:layout_toRightOf="@id/action_reteet"
+		android:layout_alignBottom="@id/action_reteet"
 		style="@style/Tweet_Inline"
 		android:textSize="@dimen/text_size_small"
 		android:textColor="@android:color/darker_gray"
 		android:layout_width="@dimen/counter_width"
 		android:layout_height="wrap_content" />
 
-	<ImageView
-		android:id="@id/action_favorite"
-		style="@style/Tweet_Inline.Icon"
-		android:src="@drawable/ic_inline_favorite" />
-
 	<TextView
-		android:id="@+id/favorite_count"
+		android:id="@+id/like"
+		android:text="@string/like"
+		android:layout_toRightOf="@id/reteet_count"
+		android:layout_alignBottom="@id/action_reteet"
 		style="@style/Tweet_Inline"
 		android:textSize="@dimen/text_size_small"
 		android:layout_marginRight="@dimen/medium"
@@ -51,13 +55,34 @@
 		android:layout_height="wrap_content" />
 
 	<TextView
+		android:id="@+id/like_count"
+		style="@style/Tweet_Inline"
+		android:layout_toRightOf="@id/like"
+		android:layout_alignBottom="@id/action_reply"
+		android:textSize="@dimen/text_size_small"
+		android:layout_marginRight="@dimen/medium"
+		android:textColor="@android:color/darker_gray"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+
+	<!--<ImageView-->
+		<!--android:id="@id/action_favorite"-->
+		<!--android:layout_toRightOf="@id/like_count"-->
+		<!--android:layout_alignBottom="@id/action_reply"-->
+		<!--android:layout_marginBottom="2dp"-->
+		<!--style="@style/Tweet_Inline.Icon"-->
+		<!--android:src="@drawable/ic_inline_favorite" />-->
+
+	<TextView
 		android:id="@+id/source"
+		android:layout_toRightOf="@id/like_count"
+		android:layout_alignParentRight="true"
 		style="@style/Tweet_Inline"
 		android:textSize="@dimen/text_size_small"
 		android:singleLine="true"
 		android:ellipsize="end"
 		android:textColor="@android:color/darker_gray"
 		android:gravity="right"
-		android:layout_width="match_parent"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" />
-</LinearLayout>
+</RelativeLayout>

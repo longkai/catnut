@@ -387,7 +387,7 @@ public class TweetFragment extends Fragment implements
 		mText = (TweetTextView) mTweetLayout.findViewById(R.id.text);
 		mReplayCount = (TextView) mTweetLayout.findViewById(R.id.reply_count);
 		mReteetCount = (TextView) mTweetLayout.findViewById(R.id.reteet_count);
-		mFavoriteCount = (TextView) mTweetLayout.findViewById(R.id.favorite_count);
+		mFavoriteCount = (TextView) mTweetLayout.findViewById(R.id.like_count);
 		mSource = (TextView) mTweetLayout.findViewById(R.id.source);
 		mCreateAt = (TextView) mTweetLayout.findViewById(R.id.create_at);
 		mThumbs = (ImageView) mTweetLayout.findViewById(R.id.thumbs);
@@ -414,7 +414,7 @@ public class TweetFragment extends Fragment implements
 				send();
 			}
 		});
-		mPopupMenu.inflate(R.menu.tweet_overflow);
+		mPopupMenu.inflate(R.menu.comment_overflow);
 		mPopupMenu.setOnMenuItemClickListener(this);
 		mOverflow.setOnClickListener(new View.OnClickListener() {
 			@Override
