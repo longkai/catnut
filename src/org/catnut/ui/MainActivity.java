@@ -93,6 +93,7 @@ public class MainActivity extends Activity implements
 	private TextView mTextNick;
 	private TextView mDescription;
 
+	private long mLastFetchMillis;
 	private TextView mFetchNews;
 	private TextView mNewTweet;
 	private TextView mNewMention;
@@ -277,7 +278,8 @@ public class MainActivity extends Activity implements
 						CatnutUtils.setText(mNewComment, android.R.id.text1, String.valueOf(response.optInt("cmt")));
 						CatnutUtils.setText(mNewMention, android.R.id.text1, String.valueOf(response.optInt("mention_status")));
 
-						mFetchNews.setText(getString(R.string.last_check_time, DateUtils.getRelativeTimeSpanString(System.currentTimeMillis())));
+						mLastFetchMillis = System.currentTimeMillis();
+						mFetchNews.setText(getString(R.string.last_check_time, DateUtils.getRelativeTimeSpanString(mLastFetchMillis)));
 						mFetchNews.setClickable(true);
 					}
 				},
@@ -379,6 +381,7 @@ public class MainActivity extends Activity implements
 	@Override
 	public void onDrawerOpened(View drawerView) {
 		mDrawerToggle.onDrawerOpened(drawerView);
+		mFetchNews.setText(getString(R.string.last_check_time, DateUtils.getRelativeTimeSpanString(mLastFetchMillis)));
 	}
 
 	@Override
@@ -460,10 +463,12 @@ public class MainActivity extends Activity implements
 						mRefreshCallback.callback(null);
 					}
 				}
+				mNewTweet.setText("0");
 				break;
 			case R.id.new_mention:
 				fragment = MentionTimelineFragment.getFragment();
 				tag = MentionTimelineFragment.TAG;
+				mNewMention.setText("0");
 				break;
 			case R.id.action_my_list:
 			default:
