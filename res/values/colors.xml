@@ -11,4 +11,6 @@
 	<color name="menuitem_background">#83c7f8</color>
 	<color name="snowColor">#fffafa</color>
 	<color name="seashellColor">#fff5ee</color>
+	<color name="black25PercentColor">#404040</color>
+	<color name="black50PercentColor">#808080</color>
 </resources>

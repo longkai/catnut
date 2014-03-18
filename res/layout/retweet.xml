@@ -9,21 +9,20 @@
 	android:id="@+id/retweet"
 	android:clickable="true"
 	android:focusable="true"
-	android:padding="@dimen/medium"
+	android:padding="@dimen/small"
 	android:orientation="vertical"
-	android:background="@drawable/retweet_background"
+	android:background="@drawable/balloon_background"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content">
 
 	<LinearLayout
-		android:layout_marginTop="@dimen/small"
 		android:orientation="horizontal"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
 
 		<TextView
 			android:id="@+id/retweet_nick"
-			android:textColor="@android:color/secondary_text_light"
+			android:textColor="@color/black25PercentColor"
 			android:singleLine="true"
 			android:ellipsize="end"
 			android:textStyle="bold"
@@ -41,7 +40,7 @@
 
 	<org.catnut.support.TweetTextView
 		android:id="@+id/retweet_text"
-		android:textColor="@android:color/secondary_text_light"
+		android:textColor="@color/black50PercentColor"
 		android:textColorLink="@android:color/holo_blue_dark"
 		android:layout_marginTop="@dimen/small"
 		android:textAppearance="@android:style/TextAppearance.DeviceDefault"

@@ -215,4 +215,5 @@
 	<string name="last_check_time">%1$s，点击刷新</string>
 	<string name="error_click_try_again">出错了...点击重试</string>
 	<string name="mention_me_timeline">艾特时间线</string>
+	<string name="received_reply">收到的评论</string>
 </resources>

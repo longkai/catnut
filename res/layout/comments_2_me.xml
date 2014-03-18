@@ -25,6 +25,7 @@
 			android:id="@+id/my_text"
 			android:textSize="16sp"
 			android:textColor="@android:color/secondary_text_light"
+			android:textColorLink="@android:color/holo_blue_bright"
 			android:layout_width="wrap_content"
 			android:layout_marginRight="@dimen/medium"
 			android:layout_height="wrap_content" />
@@ -72,6 +73,7 @@
 		<org.catnut.support.TweetTextView
 			android:id="@+id/his_text"
 			android:textColor="@android:color/secondary_text_light"
+			android:textColorLink="@color/snowColor"
 			android:textSize="16sp"
 			android:layout_marginLeft="@dimen/medium"
 			android:layout_width="wrap_content"
