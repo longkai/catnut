@@ -53,6 +53,10 @@ public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 	/** 头像 */
 	public static final String AVATAR = "avatar";
 
+	// 自定义
+	/** 是否读过 */
+	public static final String HAS_READ = "has_read";
+
 	@Override
 	public String ddl() {
 		StringBuilder sql = new StringBuilder();
@@ -71,7 +75,8 @@ public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 				.append(UID).append(" text,")
 				.append(NICK).append(" text,")
 				.append(STATUS).append(" text,")
-				.append(AVATAR).append(" text")
+				.append(AVATAR).append(" text,")
+				.append(HAS_READ).append(" int")
 				.append(")");
 		return sql.toString();
 	}
