@@ -7,10 +7,13 @@ package org.catnut.plugin.zhihu;
 
 import android.app.ListFragment;
 import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.BaseColumns;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.ListView;
 import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -77,6 +81,17 @@ public class ZhihuItemsFragment extends ListFragment implements
 				mTotal = cursor.getInt(0);
 			}
 			cursor.close();
+
+			if (mTotal == 0) {
+				// 如果一条也没有，那么去load一回吧...
+				new Handler(Looper.getMainLooper()).post(new Runnable() {
+					@Override
+					public void run() {
+						mPullToRefreshLayout.setRefreshing(true);
+						refresh();
+					}
+				});
+			}
 		}
 	};
 
@@ -134,6 +149,25 @@ public class ZhihuItemsFragment extends ListFragment implements
 				break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onListItemClick(ListView l, View v, int position, final long id) {
+		// 标记已读
+		(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				ContentValues values = new ContentValues();
+				values.put(Zhihu.HAS_READ, true);
+				getActivity().getContentResolver().update(
+						CatnutProvider.parse(Zhihu.SINGLE),
+						values,
+						Zhihu.ANSWER_ID + "=" + id,
+						null
+				);
+			}
+		})).start();
+		// 跳转 todo
 	}
 
 	@Override

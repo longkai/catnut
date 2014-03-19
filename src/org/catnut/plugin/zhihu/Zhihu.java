@@ -66,11 +66,11 @@ public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 		// _id 仅做为本地的一个标识与列表顺序比较的时间戳，实际的主键还是答案的id
 		sql.append("CREATE TABLE ").append(TABLE).append("(")
 				.append(BaseColumns._ID).append(" int,")
-				.append(QUESTION_ID).append(" int PRIMARY KEY,")
-				.append(TITLE).append(" text NOT NULL,")
+				.append(QUESTION_ID).append(" int,")
+				.append(TITLE).append(" text,")
 				.append(DESCRIPTION).append(" text,")
 
-				.append(ANSWER_ID).append(" int NOT NULL,")
+				.append(ANSWER_ID).append(" int primary key,")
 				.append(ANSWER).append(" text,")
 				.append(LAST_ALTER_DATE).append(" int,")
 

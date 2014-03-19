@@ -336,6 +336,7 @@ public class CatnutProvider extends ContentProvider {
 
 	@Override
 	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+		int count = 1; // 随便填的
 		SQLiteDatabase db;
 		switch (matcher.match(uri)) {
 			case USERS:
@@ -344,13 +345,15 @@ public class CatnutProvider extends ContentProvider {
 				db.execSQL(selection);
 				break;
 			// plugins...starting
-
+			case ZHIHU:
+				count = mDb.getWritableDatabase().update(Zhihu.TABLE, values, selection, selectionArgs);
+				break;
 			// plugins...ending
 			default:
 				throw new UnsupportedOperationException("not supported for now!");
 		}
 		getContext().getContentResolver().notifyChange(uri, null, false);
-		return 1; // 随便填的
+		return count;
 	}
 
 	/**
