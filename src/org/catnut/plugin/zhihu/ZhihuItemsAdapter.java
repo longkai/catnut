@@ -8,7 +8,6 @@ package org.catnut.plugin.zhihu;
 import android.content.Context;
 import android.database.Cursor;
 import android.text.Html;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,8 +42,8 @@ public class ZhihuItemsAdapter extends CursorAdapter {
 		holder.digest = (TextView) view.findViewById(android.R.id.text1);
 		holder.digestIndex = cursor.getColumnIndex(Zhihu.ANSWER);
 
-		holder.lastAlterDate = (TextView) view.findViewById(R.id.last_alter_date);
-		holder.lastAlterDateIndex = cursor.getColumnIndex(Zhihu.LAST_ALTER_DATE);
+		holder.answerMan = (TextView) view.findViewById(R.id.answer_man);
+		holder.answerManIndex = cursor.getColumnIndex(Zhihu.NICK);
 
 		view.setTag(holder);
 		return view;
@@ -60,7 +59,7 @@ public class ZhihuItemsAdapter extends CursorAdapter {
 		}
 		holder.title.setText(cursor.getString(holder.titleIndex));
 		holder.digest.setText(Html.fromHtml(cursor.getString(holder.digestIndex)));
-		holder.lastAlterDate.setText(DateUtils.getRelativeTimeSpanString(cursor.getLong(holder.lastAlterDateIndex)));
+		holder.answerMan.setText(cursor.getString(holder.answerManIndex));
 	}
 
 	private static class ViewHolder {
@@ -70,7 +69,7 @@ public class ZhihuItemsAdapter extends CursorAdapter {
 		int titleIndex;
 		TextView digest;
 		int digestIndex;
-		TextView lastAlterDate;
-		int lastAlterDateIndex;
+		TextView answerMan;
+		int answerManIndex;
 	}
 }

@@ -49,9 +49,9 @@ public class ZhihuItemsFragment extends ListFragment implements
 			BaseColumns._ID,
 			Zhihu.HAS_READ,
 			Zhihu.TITLE,
-			"substr(" + Zhihu.ANSWER + ",0,80) as " + Zhihu.ANSWER, // 0-50子串
+			"substr(" + Zhihu.ANSWER + ",0,80) as " + Zhihu.ANSWER, // [0-80)子串
 			Zhihu.ANSWER_ID,
-			Zhihu.LAST_ALTER_DATE
+			Zhihu.NICK
 	};
 
 	private PullToRefreshLayout mPullToRefreshLayout;
@@ -59,7 +59,7 @@ public class ZhihuItemsFragment extends ListFragment implements
 	private RequestQueue mRequestQueue;
 	private ZhihuItemsAdapter mAdapter;
 
-	// 当前列表长度
+	// 当前items数目，有可能超过的哦
 	private int mCount = PAGE_SIZE;
 	// 本地items总数
 	private int mTotal;
