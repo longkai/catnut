@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.Html;
 import android.text.TextUtils;
@@ -178,9 +179,11 @@ public class ZhihuItemFragment extends Fragment implements
 					matcher = HTML_IMG.matcher(_question);
 					final List<String> questionSegment = new ArrayList<String>();
 					processText(_question, matcher, questionSegment);
-					mScrollSettleHandler.post(new Runnable() {
+					Log.d(TAG, "done regex.");
+					new Handler(Looper.getMainLooper()).post(new Runnable() {
 						@Override
 						public void run() {
+							Log.d(TAG, "main");
 							title.setText(_title);
 							if (_title.length() > 30) {
 								title.setTextSize(18);
@@ -253,10 +256,12 @@ public class ZhihuItemFragment extends Fragment implements
 							}
 							author.setText(_nick);
 							lastAlterDate.setText(DateUtils.getRelativeTimeSpanString(_lastAlterDate));
+							Log.d(TAG, "end");
 							mPullToRefreshLayout.setRefreshComplete();
 						}
 					});
 				} else {
+					Log.d(TAG, "404");
 					cursor.close();
 				}
 			}

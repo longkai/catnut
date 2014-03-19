@@ -32,6 +32,7 @@ import org.catnut.core.CatnutAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutArrayRequest;
 import org.catnut.core.CatnutProvider;
+import org.catnut.ui.PluginsActivity;
 import org.catnut.util.Constants;
 import org.json.JSONArray;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
@@ -169,11 +170,9 @@ public class ZhihuItemsFragment extends ListFragment implements
 				);
 			}
 		})).start();
-		// 跳转 todo
-		getFragmentManager().beginTransaction()
-				.replace(android.R.id.content, ZhihuItemFragment.getFragment(answer_id))
-				.addToBackStack(null)
-				.commit();
+		// 跳转
+		PluginsActivity activity = (PluginsActivity) getActivity();
+		activity.flipCard(ZhihuItemFragment.getFragment(answer_id), null, true);
 	}
 
 	@Override
