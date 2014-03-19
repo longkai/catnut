@@ -172,7 +172,8 @@ public class ZhihuItemsFragment extends ListFragment implements
 		})).start();
 		// 跳转
 		PluginsActivity activity = (PluginsActivity) getActivity();
-		activity.flipCard(ZhihuItemFragment.getFragment(answer_id), null, true);
+//		activity.flipCard(ZhihuItemFragment.getFragment(answer_id), null, true);
+		activity.flipCard(PagerItemFragment.getFragment(answer_id, id), null, true);
 	}
 
 	@Override
