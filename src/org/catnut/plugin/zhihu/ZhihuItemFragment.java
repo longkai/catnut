@@ -25,22 +25,30 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.TextView;
+import com.squareup.picasso.Picasso;
 import org.catnut.R;
 import org.catnut.core.CatnutProvider;
-import org.catnut.support.HtmlImageGetter;
 import org.catnut.support.QuickReturnScrollView;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 知乎条目
  *
  * @author longkai
  */
-public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView.Callbacks {
+public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView.Callbacks, OnRefreshListener {
 	public static final String TAG = ZhihuItemFragment.class.getSimpleName();
 
 	private static final String[] PROJECTION = new String[]{
@@ -52,9 +60,10 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 			Zhihu.NICK,
 	};
 
+	public static final Pattern HTML_IMG = Pattern.compile("<img[^>]+src\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>");
+
 	private static final int ACTION_VIEW_ON_WEB = 1;
 	private static final int ACTION_VIEW_ALL_ON_WEB = 2;
-
 
 	private ScrollSettleHandler mScrollSettleHandler = new ScrollSettleHandler();
 
@@ -67,8 +76,12 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 	private int mQuickReturnHeight;
 	private int mMaxScrollY;
 
-	private long mAnsertId;
+	private PullToRefreshLayout mPullToRefreshLayout;
+
+	private long mAnswerId;
 	private long mQuestionId;
+
+	private String[] mImageUrls;
 
 	public static ZhihuItemFragment getFragment(long id) {
 		Bundle args = new Bundle();
@@ -81,13 +94,22 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		mAnsertId = getArguments().getLong(Constants.ID);
+		mAnswerId = getArguments().getLong(Constants.ID);
 		setHasOptionsMenu(true);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		mQuickReturnLayout = (QuickReturnScrollView) inflater.inflate(R.layout.zhihu_item, container, false);
+		View view = inflater.inflate(R.layout.zhihu_item, container, false);
+
+		mPullToRefreshLayout = (PullToRefreshLayout) view;
+		ActionBarPullToRefresh.from(getActivity())
+				.allChildrenArePullable()
+				.listener(this)
+				.setup(mPullToRefreshLayout);
+		mPullToRefreshLayout.setRefreshing(true);
+
+		mQuickReturnLayout = (QuickReturnScrollView) view.findViewById(R.id.quick_return);
 		mPlaceholderView = mQuickReturnLayout.findViewById(R.id.place_holder);
 		mQuickReturnView = mQuickReturnLayout.findViewById(android.R.id.title);
 		mQuickReturnLayout.setCallbacks(this);
@@ -102,15 +124,14 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 					}
 				}
 		);
-		return mQuickReturnLayout;
+
+		return view;
 	}
 
 	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
+	public void onViewCreated(final View view, Bundle savedInstanceState) {
 		final TextView title = (TextView) view.findViewById(android.R.id.title);
-		final TextView question = (TextView) view.findViewById(R.id.question);
 		final TextView author = (TextView) view.findViewById(R.id.author);
-		final TextView content = (TextView) view.findViewById(android.R.id.content);
 		final TextView lastAlterDate = (TextView) view.findViewById(R.id.last_alter_date);
 
 		registerForContextMenu(title);
@@ -127,7 +148,7 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 				Cursor cursor = getActivity().getContentResolver().query(
 						CatnutProvider.parse(Zhihu.MULTIPLE),
 						PROJECTION,
-						Zhihu.ANSWER_ID + "=" + mAnsertId,
+						Zhihu.ANSWER_ID + "=" + mAnswerId,
 						null,
 						null
 				);
@@ -138,6 +159,17 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 					final String _nick = cursor.getString(cursor.getColumnIndex(Zhihu.NICK));
 					final String _content = cursor.getString(cursor.getColumnIndex(Zhihu.ANSWER));
 					final long _lastAlterDate = cursor.getLong(cursor.getColumnIndex(Zhihu.LAST_ALTER_DATE));
+					cursor.close();
+
+					// answer
+					Matcher matcher = HTML_IMG.matcher(_content);
+					final List<String> contentSegment = new ArrayList<String>();
+					processText(_content, matcher, contentSegment);
+
+					// question
+					matcher = HTML_IMG.matcher(_question);
+					final List<String> questionSegment = new ArrayList<String>();
+					processText(_question, matcher, questionSegment);
 					mScrollSettleHandler.post(new Runnable() {
 						@Override
 						public void run() {
@@ -146,30 +178,100 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 								title.setTextSize(18);
 							}
 
-							String location = null;
-							try {
-								location = CatnutUtils.mkdir(getActivity(), Zhihu.CACHE_IMAGE_LOCATION);
-							} catch (Exception e) {
+							// 假设第一个是文本，即偶数文本，奇数图片
+							int imageIndex = 0;
+							int l = contentSegment.size() > 1 ? contentSegment.size() >> 1 : 0;
+							l += questionSegment.size() > 1 ? questionSegment.size() >> 1 : 0;
+
+							if (l > 0) {
+								mImageUrls = new String[l];
 							}
 
+							l = 0; // reset for reuse
+							String text;
+							LayoutInflater inflater = LayoutInflater.from(getActivity());
 							if (TextUtils.isEmpty(_question)) {
-								question.setVisibility(View.GONE);
 							} else {
-								question.setText(Html.fromHtml(_question, new HtmlImageGetter(question, location), null));
+								ViewGroup questionHolder = (ViewGroup) view.findViewById(R.id.question);
+								for (int i = 0; i < questionSegment.size(); i++) {
+									text = questionSegment.get(i);
+									if (!TextUtils.isEmpty(text)) {
+										if ((i & 1) == 0) {
+											TextView section = (TextView) inflater.inflate(R.layout.zhihu_text, null);
+											section.setTextSize(16);
+											section.setTextColor(getResources().getColor(R.color.black50PercentColor));
+											section.setText(Html.fromHtml(text));
+											section.setMovementMethod(LinkMovementMethod.getInstance());
+											CatnutUtils.removeLinkUnderline(section);
+											questionHolder.addView(section);
+										} else {
+											ImageView imageView = (ImageView) inflater.inflate(R.layout.zhihu_image, null);
+											Picasso.with(getActivity())
+													.load(text)
+													.placeholder(R.drawable.error)
+													.error(R.drawable.error)
+													.into(imageView);
+											imageView.setTag(l); // for click
+											mImageUrls[l++] = text;
+										}
+									}
+								}
 							}
-							CatnutUtils.removeLinkUnderline(question);
-							question.setMovementMethod(LinkMovementMethod.getInstance());
+
+							ViewGroup answerHolder = (ViewGroup) view.findViewById(R.id.answer);
+							for (int i = 0; i < contentSegment.size(); i++) {
+								text = contentSegment.get(i);
+								if (!TextUtils.isEmpty(text)) {
+									if ((i & 1) == 0) {
+										TextView section = (TextView) inflater.inflate(R.layout.zhihu_text, null);
+										section.setText(Html.fromHtml(text));
+										CatnutUtils.removeLinkUnderline(section);
+										section.setMovementMethod(LinkMovementMethod.getInstance());
+										answerHolder.addView(section);
+									} else {
+										ImageView image = (ImageView) inflater.inflate(R.layout.zhihu_image, null);
+										Picasso.with(getActivity())
+												.load(text)
+												.placeholder(R.drawable.error)
+												.error(R.drawable.error)
+												.into(image);
+										image.setTag(imageIndex); // 方便点击事件
+										mImageUrls[imageIndex++] = text;
+										answerHolder.addView(image);
+									}
+								}
+							}
 							author.setText(_nick);
-							content.setText(Html.fromHtml(_content, new HtmlImageGetter(content, location), null));
-							content.setMovementMethod(LinkMovementMethod.getInstance());
-							CatnutUtils.removeLinkUnderline(content);
 							lastAlterDate.setText(DateUtils.getRelativeTimeSpanString(_lastAlterDate));
+							mPullToRefreshLayout.setRefreshComplete();
 						}
 					});
+				} else {
+					cursor.close();
 				}
-				cursor.close();
 			}
 		})).start();
+	}
+
+	private void processText(String _content, Matcher matcher, List<String> contentSegment) {
+		int start;
+		int lastStart = 0;
+		while (matcher.find()) {
+			start = matcher.start();
+			contentSegment.add(_content.substring(lastStart, start));
+			lastStart = matcher.end();
+			contentSegment.add(matcher.group(1));
+		}
+		// no image, fallback
+		if (contentSegment.size() == 0) {
+			contentSegment.add(_content);
+		} else {
+			// append tail
+			if ((contentSegment.size() - 1 & 1) == 0) {
+				contentSegment.add(null); // place holder...
+			}
+			contentSegment.add(_content.substring(lastStart));
+		}
 	}
 
 	@Override
@@ -209,7 +311,7 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 		switch (which) {
 			case ACTION_VIEW_ON_WEB:
 				startActivity(new Intent(Intent.ACTION_VIEW,
-						Uri.parse("http://www.zhihu.com/question/" + mQuestionId + "/answer/" + mAnsertId)));
+						Uri.parse("http://www.zhihu.com/question/" + mQuestionId + "/answer/" + mAnswerId)));
 				break;
 			case ACTION_VIEW_ALL_ON_WEB:
 				startActivity(new Intent(Intent.ACTION_VIEW,
@@ -278,6 +380,26 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 	public void onUpOrCancelMotionEvent() {
 		mScrollSettleHandler.setSettleEnabled(true);
 		mScrollSettleHandler.onScroll(mQuickReturnLayout.getScrollY());
+	}
+
+	@Override
+	public void onRefreshStarted(View view) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// just for fun~
+				try {
+					TimeUnit.MILLISECONDS.sleep(1500);
+				} catch (InterruptedException e) {
+				}
+				mScrollSettleHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						mPullToRefreshLayout.setRefreshComplete();
+					}
+				});
+			}
+		}).start();
 	}
 
 	// quick return animation

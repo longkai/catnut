@@ -175,15 +175,15 @@ public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 				}
 			}
 			context.getContentResolver().bulkInsert(CatnutProvider.parse(MULTIPLE), items);
-			try {
-				String location = CatnutUtils.mkdir(context, Zhihu.CACHE_IMAGE_LOCATION);
-				Intent intent = new Intent(context, ImagesDownloader.class);
-				intent.putExtra(ImagesDownloader.LOCATION, location);
-				intent.putStringArrayListExtra(ImagesDownloader.URLS, images);
-				context.startService(intent);
-			} catch (Exception e) {
-				// no-op, just quit download the images...
-			}
+//			try {
+//				String location = CatnutUtils.mkdir(context, Zhihu.CACHE_IMAGE_LOCATION);
+//				Intent intent = new Intent(context, ImagesDownloader.class);
+//				intent.putExtra(ImagesDownloader.LOCATION, location);
+//				intent.putStringArrayListExtra(ImagesDownloader.URLS, images);
+//				context.startService(intent);
+//			} catch (Exception e) {
+//				// no-op, just quit download the images...
+//			}
 		}
 	}
 }

@@ -179,7 +179,7 @@
 	<string name="swipe_right_hint">Swipe to right to see something!</string>
 	<string name="plugins">Plugins</string>
 	<string name="zhihu_refresh_hint">No items, please pull or click menu to refresh!</string>
-	<string name="read_zhihu">Read Zhihu</string>
+	<string name="read_zhihu">Zhihu\' s Choice</string>
 	<string name="view_all_answer">View all answers on web</string>
 	<string name="zhihu_view_on_web">View it on web</string>
 	<string name="downloading_img">Image downloading...</string>
