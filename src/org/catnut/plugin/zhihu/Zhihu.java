@@ -6,8 +6,11 @@
 package org.catnut.plugin.zhihu;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.provider.BaseColumns;
 import org.catnut.core.CatnutMetadata;
+import org.catnut.core.CatnutProcessor;
+import org.catnut.core.CatnutProvider;
 import org.json.JSONArray;
 
 /**
@@ -20,6 +23,9 @@ public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 	public static final String TABLE = "zhihu";
 	public static final String SINGLE = "zhihu";
 	public static final String MULTIPLE = "zhihus";
+
+	public static final Zhihu METADATA = new Zhihu();
+	private Zhihu() {}
 
 	// 问题相关
 	/** id */
@@ -102,5 +108,33 @@ public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 		}
 
 		return item;
+	}
+
+	/**
+	 * 每日精选处理器
+	 *
+	 * @author longkai
+	 */
+	public static class ZhihuProcessor implements CatnutProcessor<JSONArray> {
+
+		private static ZhihuProcessor processor;
+
+		private ZhihuProcessor(){}
+
+		public static ZhihuProcessor getProcessor() {
+			if (processor == null) {
+				processor = new ZhihuProcessor();
+			}
+			return processor;
+		}
+
+		@Override
+		public void asyncProcess(Context context, JSONArray data) throws Exception {
+			ContentValues[] items = new ContentValues[data.length()];
+			for (int i = 0; i < items.length; i++) {
+				items[i] = METADATA.convert(data.optJSONArray(i));
+			}
+			context.getContentResolver().bulkInsert(CatnutProvider.parse(MULTIPLE), items);
+		}
 	}
 }
