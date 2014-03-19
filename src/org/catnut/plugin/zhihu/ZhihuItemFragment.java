@@ -10,6 +10,7 @@ import android.app.Fragment;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -17,10 +18,12 @@ import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 import org.catnut.R;
 import org.catnut.core.CatnutProvider;
 import org.catnut.support.HtmlImageGetter;
+import org.catnut.support.QuickReturnScrollView;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 
@@ -29,7 +32,7 @@ import org.catnut.util.Constants;
  *
  * @author longkai
  */
-public class ZhihuItemFragment extends Fragment {
+public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView.Callbacks {
 	public static final String TAG = ZhihuItemFragment.class.getSimpleName();
 
 	private static final String[] PROJECTION = new String[]{
@@ -41,7 +44,16 @@ public class ZhihuItemFragment extends Fragment {
 			Zhihu.NICK,
 	};
 
-	private Handler mHandler = new Handler();
+	private ScrollSettleHandler mScrollSettleHandler = new ScrollSettleHandler();
+
+	private View mPlaceholderView;
+	private View mQuickReturnView;
+	private QuickReturnScrollView mQuickReturnLayout;
+
+	private int mMinRawY = 0;
+	private int mState = STATE_ON_SCREEN;
+	private int mQuickReturnHeight;
+	private int mMaxScrollY;
 
 	private long mId;
 
@@ -61,7 +73,22 @@ public class ZhihuItemFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.zhihu_item, container, false);
+		mQuickReturnLayout = (QuickReturnScrollView) inflater.inflate(R.layout.zhihu_item, container, false);
+		mPlaceholderView = mQuickReturnLayout.findViewById(R.id.place_holder);
+		mQuickReturnView = mQuickReturnLayout.findViewById(android.R.id.title);
+		mQuickReturnLayout.setCallbacks(this);
+		mQuickReturnLayout.getViewTreeObserver().addOnGlobalLayoutListener(
+				new ViewTreeObserver.OnGlobalLayoutListener() {
+					@Override
+					public void onGlobalLayout() {
+						onScrollChanged(mQuickReturnLayout.getScrollY());
+						mMaxScrollY = mQuickReturnLayout.computeVerticalScrollRange()
+								- mQuickReturnLayout.getHeight();
+						mQuickReturnHeight = mQuickReturnView.getHeight();
+					}
+				}
+		);
+		return mQuickReturnLayout;
 	}
 
 	@Override
@@ -87,7 +114,7 @@ public class ZhihuItemFragment extends Fragment {
 					final String _nick = cursor.getString(cursor.getColumnIndex(Zhihu.NICK));
 					final String _content = cursor.getString(cursor.getColumnIndex(Zhihu.ANSWER));
 					final long _lastAlterDate = cursor.getLong(cursor.getColumnIndex(Zhihu.LAST_ALTER_DATE));
-					mHandler.post(new Runnable() {
+					mScrollSettleHandler.post(new Runnable() {
 						@Override
 						public void run() {
 							title.setText(_title);
@@ -115,5 +142,106 @@ public class ZhihuItemFragment extends Fragment {
 	public void onStart() {
 		super.onStart();
 		getActivity().getActionBar().setTitle(getString(R.string.read_zhihu));
+	}
+
+	@Override
+	public void onScrollChanged(int scrollY) {
+		scrollY = Math.min(mMaxScrollY, scrollY);
+
+		mScrollSettleHandler.onScroll(scrollY);
+
+		int rawY = mPlaceholderView.getTop() - scrollY;
+		int translationY = 0;
+
+		switch (mState) {
+			case STATE_OFF_SCREEN:
+				if (rawY <= mMinRawY) {
+					mMinRawY = rawY;
+				} else {
+					mState = STATE_RETURNING;
+				}
+				translationY = rawY;
+				break;
+
+			case STATE_ON_SCREEN:
+				if (rawY < -mQuickReturnHeight) {
+					mState = STATE_OFF_SCREEN;
+					mMinRawY = rawY;
+				}
+				translationY = rawY;
+				break;
+
+			case STATE_RETURNING:
+				translationY = (rawY - mMinRawY) - mQuickReturnHeight;
+				if (translationY > 0) {
+					translationY = 0;
+					mMinRawY = rawY - mQuickReturnHeight;
+				}
+
+				if (rawY > 0) {
+					mState = STATE_ON_SCREEN;
+					translationY = rawY;
+				}
+
+				if (translationY < -mQuickReturnHeight) {
+					mState = STATE_OFF_SCREEN;
+					mMinRawY = rawY;
+				}
+				break;
+		}
+		mQuickReturnView.animate().cancel();
+		mQuickReturnView.setTranslationY(translationY + scrollY);
+	}
+
+	@Override
+	public void onDownMotionEvent() {
+		mScrollSettleHandler.setSettleEnabled(false);
+	}
+
+	@Override
+	public void onUpOrCancelMotionEvent() {
+		mScrollSettleHandler.setSettleEnabled(true);
+		mScrollSettleHandler.onScroll(mQuickReturnLayout.getScrollY());
+	}
+
+	// quick return animation
+	private class ScrollSettleHandler extends Handler {
+		private static final int SETTLE_DELAY_MILLIS = 100;
+
+		private int mSettledScrollY = Integer.MIN_VALUE;
+		private boolean mSettleEnabled;
+
+		public void onScroll(int scrollY) {
+			if (mSettledScrollY != scrollY) {
+				// Clear any pending messages and post delayed
+				removeMessages(0);
+				sendEmptyMessageDelayed(0, SETTLE_DELAY_MILLIS);
+				mSettledScrollY = scrollY;
+			}
+		}
+
+		public void setSettleEnabled(boolean settleEnabled) {
+			mSettleEnabled = settleEnabled;
+		}
+
+		@Override
+		public void handleMessage(Message msg) {
+			// Handle the scroll settling.
+			if (STATE_RETURNING == mState && mSettleEnabled) {
+				int mDestTranslationY;
+				if (mSettledScrollY - mQuickReturnView.getTranslationY() > mQuickReturnHeight / 2) {
+					mState = STATE_OFF_SCREEN;
+					mDestTranslationY = Math.max(
+							mSettledScrollY - mQuickReturnHeight,
+							mPlaceholderView.getTop());
+				} else {
+					mDestTranslationY = mSettledScrollY;
+				}
+
+				mMinRawY = mPlaceholderView.getTop() - mQuickReturnHeight - mDestTranslationY;
+				mQuickReturnView.animate().translationY(mDestTranslationY);
+			}
+			mSettledScrollY = Integer.MIN_VALUE; // reset
+		}
 	}
 }
