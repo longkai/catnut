@@ -57,6 +57,7 @@
 				android:lineSpacingMultiplier="1.2"
 				android:clickable="true"
 				android:focusable="true"
+				android:textIsSelectable="true"
 				android:textColorLink="@android:color/holo_blue_dark"
 				android:layout_marginTop="@dimen/large"
 				android:layout_width="match_parent"

@@ -7,7 +7,9 @@ package org.catnut.plugin.zhihu;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,7 +17,11 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -26,6 +32,8 @@ import org.catnut.support.HtmlImageGetter;
 import org.catnut.support.QuickReturnScrollView;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
+
+import java.io.File;
 
 /**
  * 知乎条目
@@ -44,6 +52,10 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 			Zhihu.NICK,
 	};
 
+	private static final int ACTION_VIEW_ON_WEB = 1;
+	private static final int ACTION_VIEW_ALL_ON_WEB = 2;
+
+
 	private ScrollSettleHandler mScrollSettleHandler = new ScrollSettleHandler();
 
 	private View mPlaceholderView;
@@ -55,7 +67,8 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 	private int mQuickReturnHeight;
 	private int mMaxScrollY;
 
-	private long mId;
+	private long mAnsertId;
+	private long mQuestionId;
 
 	public static ZhihuItemFragment getFragment(long id) {
 		Bundle args = new Bundle();
@@ -68,7 +81,8 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		mId = getArguments().getLong(Constants.ID);
+		mAnsertId = getArguments().getLong(Constants.ID);
+		setHasOptionsMenu(true);
 	}
 
 	@Override
@@ -98,17 +112,27 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 		final TextView author = (TextView) view.findViewById(R.id.author);
 		final TextView content = (TextView) view.findViewById(android.R.id.content);
 		final TextView lastAlterDate = (TextView) view.findViewById(R.id.last_alter_date);
+
+		registerForContextMenu(title);
+		title.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				getActivity().openContextMenu(title);
+			}
+		});
+
 		(new Thread(new Runnable() {
 			@Override
 			public void run() {
 				Cursor cursor = getActivity().getContentResolver().query(
 						CatnutProvider.parse(Zhihu.MULTIPLE),
 						PROJECTION,
-						Zhihu.ANSWER_ID + "=" + mId,
+						Zhihu.ANSWER_ID + "=" + mAnsertId,
 						null,
 						null
 				);
 				if (cursor.moveToNext()) {
+					mQuestionId = cursor.getLong(cursor.getColumnIndex(Zhihu.QUESTION_ID));
 					final String _title = cursor.getString(cursor.getColumnIndex(Zhihu.TITLE));
 					final String _question = cursor.getString(cursor.getColumnIndex(Zhihu.DESCRIPTION));
 					final String _nick = cursor.getString(cursor.getColumnIndex(Zhihu.NICK));
@@ -118,15 +142,25 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 						@Override
 						public void run() {
 							title.setText(_title);
+							if (_title.length() > 30) {
+								title.setTextSize(18);
+							}
+
+							String location = null;
+							try {
+								location = CatnutUtils.mkdir(getActivity(), Zhihu.CACHE_IMAGE_LOCATION);
+							} catch (Exception e) {
+							}
+
 							if (TextUtils.isEmpty(_question)) {
 								question.setVisibility(View.GONE);
 							} else {
-								question.setText(Html.fromHtml(_question));
+								question.setText(Html.fromHtml(_question, new HtmlImageGetter(question, location), null));
 							}
 							CatnutUtils.removeLinkUnderline(question);
 							question.setMovementMethod(LinkMovementMethod.getInstance());
 							author.setText(_nick);
-							content.setText(Html.fromHtml(_content, new HtmlImageGetter(content, null), null));
+							content.setText(Html.fromHtml(_content, new HtmlImageGetter(content, location), null));
 							content.setMovementMethod(LinkMovementMethod.getInstance());
 							CatnutUtils.removeLinkUnderline(content);
 							lastAlterDate.setText(DateUtils.getRelativeTimeSpanString(_lastAlterDate));
@@ -142,6 +176,48 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 	public void onStart() {
 		super.onStart();
 		getActivity().getActionBar().setTitle(getString(R.string.read_zhihu));
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+		menu.add(Menu.NONE, ACTION_VIEW_ALL_ON_WEB, Menu.NONE, getString(R.string.view_all_answer));
+		menu.add(Menu.NONE, ACTION_VIEW_ON_WEB, Menu.NONE, getString(R.string.zhihu_view_on_web));
+		super.onCreateContextMenu(menu, v, menuInfo);
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		viewOutside(item.getItemId());
+		return super.onContextItemSelected(item);
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		menu.add(Menu.NONE, ACTION_VIEW_ALL_ON_WEB, Menu.NONE, getString(R.string.view_all_answer))
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+		menu.add(Menu.NONE, ACTION_VIEW_ON_WEB, Menu.NONE, getString(R.string.zhihu_view_on_web))
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		viewOutside(item.getItemId());
+		return super.onOptionsItemSelected(item);
+	}
+
+	private void viewOutside(int which) {
+		switch (which) {
+			case ACTION_VIEW_ON_WEB:
+				startActivity(new Intent(Intent.ACTION_VIEW,
+						Uri.parse("http://www.zhihu.com/question/" + mQuestionId + "/answer/" + mAnsertId)));
+				break;
+			case ACTION_VIEW_ALL_ON_WEB:
+				startActivity(new Intent(Intent.ACTION_VIEW,
+						Uri.parse("http://www.zhihu.com/question/" + mQuestionId)));
+				break;
+			default:
+				break;
+		}
 	}
 
 	@Override

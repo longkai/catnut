@@ -180,4 +180,9 @@
 	<string name="plugins">Plugins</string>
 	<string name="zhihu_refresh_hint">No items, please pull or click menu to refresh!</string>
 	<string name="read_zhihu">Read Zhihu</string>
+	<string name="view_all_answer">View all answers on web</string>
+	<string name="zhihu_view_on_web">View it on web</string>
+	<string name="downloading_img">Image downloading...</string>
+	<string name="img_download_done">Image downloaded.</string>
+	<string name="total_cache_img">Cache %1$s images.</string>
 </resources>

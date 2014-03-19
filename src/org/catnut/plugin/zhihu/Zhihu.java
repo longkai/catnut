@@ -7,11 +7,17 @@ package org.catnut.plugin.zhihu;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.provider.BaseColumns;
 import org.catnut.core.CatnutMetadata;
 import org.catnut.core.CatnutProcessor;
 import org.catnut.core.CatnutProvider;
+import org.catnut.util.CatnutUtils;
 import org.json.JSONArray;
+
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 知乎的一条精选回答条目
@@ -24,6 +30,7 @@ public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 	public static final String SINGLE = "zhihu";
 	public static final String MULTIPLE = "zhihus";
 
+	public static final String CACHE_IMAGE_LOCATION = "plugins/zhihu";
 	public static final Zhihu METADATA = new Zhihu();
 
 	private Zhihu() {
@@ -137,6 +144,8 @@ public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 
 		private static ZhihuProcessor processor;
 
+		public static final Pattern HTML_IMG = Pattern.compile("\\s*(?i)src\\s*=\\s*(\"([^\"]*)\"|'[^']*'|([^'\">\\s]+))");
+
 		private ZhihuProcessor() {
 		}
 
@@ -150,10 +159,31 @@ public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 		@Override
 		public void asyncProcess(Context context, JSONArray data) throws Exception {
 			ContentValues[] items = new ContentValues[data.length()];
+			ArrayList<String> images = new ArrayList<String>(); // 图片下载
+			Matcher matcher;
 			for (int i = 0; i < items.length; i++) {
 				items[i] = METADATA.convert(data.optJSONArray(i));
+				matcher = HTML_IMG.matcher(items[i].getAsString(Zhihu.DESCRIPTION));
+				while (matcher.find()) {
+					String group = matcher.group();
+					images.add(group);
+				}
+				matcher = HTML_IMG.matcher(items[i].getAsString(Zhihu.ANSWER));
+				while (matcher.find()) {
+					String group = matcher.group(2);
+					images.add(group);
+				}
 			}
 			context.getContentResolver().bulkInsert(CatnutProvider.parse(MULTIPLE), items);
+			try {
+				String location = CatnutUtils.mkdir(context, Zhihu.CACHE_IMAGE_LOCATION);
+				Intent intent = new Intent(context, ImagesDownloader.class);
+				intent.putExtra(ImagesDownloader.LOCATION, location);
+				intent.putStringArrayListExtra(ImagesDownloader.URLS, images);
+				context.startService(intent);
+			} catch (Exception e) {
+				// no-op, just quit download the images...
+			}
 		}
 	}
 }

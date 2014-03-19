@@ -220,4 +220,9 @@
 	<string name="plugins">插件</string>
 	<string name="zhihu_refresh_hint">当前没有条目，请下拉或者点击菜单刷新！</string>
 	<string name="read_zhihu">知乎阅读</string>
+	<string name="view_all_answer">查看所有回答</string>
+	<string name="zhihu_view_on_web">在网页上阅读</string>
+	<string name="downloading_img">下载图片中...</string>
+	<string name="img_download_done">图片下载完毕！</string>
+	<string name="total_cache_img">共缓存%1$s张图片</string>
 </resources>

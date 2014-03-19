@@ -64,5 +64,6 @@
 			android:name=".core.CatnutProvider" />
 		<service android:name=".service.ComposeTweetService" />
 		<service android:name=".service.UpgradeService" />
+		<service android:name=".plugin.zhihu.ImagesDownloader" />
 	</application>
 </manifest>
