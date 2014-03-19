@@ -219,4 +219,5 @@
 	<string name="swipe_right_hint">向右滑动试试！</string>
 	<string name="plugins">插件</string>
 	<string name="zhihu_refresh_hint">当前没有条目，请下拉或者点击菜单刷新！</string>
+	<string name="read_zhihu">知乎阅读</string>
 </resources>

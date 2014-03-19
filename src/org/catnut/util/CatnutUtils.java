@@ -35,6 +35,7 @@ import org.catnut.support.TweetTextView;
 import org.catnut.support.TweetURLSpan;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -522,5 +523,18 @@ public class CatnutUtils {
 			throw new RuntimeException(context.getString(R.string.cannot_create_dir));
 		}
 		return dir.getPath();
+	}
+
+	// 关掉io
+	public static void closeIO(Closeable... closeables) {
+		for (Closeable closeable : closeables) {
+			if (closeable != null) {
+				try {
+					closeable.close();
+				} catch (IOException e) {
+					// no-op
+				}
+			}
+		}
 	}
 }

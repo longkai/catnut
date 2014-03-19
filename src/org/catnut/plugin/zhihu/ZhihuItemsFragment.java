@@ -170,6 +170,10 @@ public class ZhihuItemsFragment extends ListFragment implements
 			}
 		})).start();
 		// 跳转 todo
+		getFragmentManager().beginTransaction()
+				.replace(android.R.id.content, ZhihuItemFragment.getFragment(answer_id))
+				.addToBackStack(null)
+				.commit();
 	}
 
 	@Override

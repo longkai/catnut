@@ -177,4 +177,7 @@
 	<string name="mention_me_timeline">Mention Timeline</string>
 	<string name="received_reply">Reply Timeline</string>
 	<string name="swipe_right_hint">Swipe to right to see something!</string>
+	<string name="plugins">Plugins</string>
+	<string name="zhihu_refresh_hint">No items, please pull or click menu to refresh!</string>
+	<string name="read_zhihu">Read Zhihu</string>
 </resources>
