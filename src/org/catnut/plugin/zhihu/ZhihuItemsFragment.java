@@ -12,7 +12,6 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,6 +28,8 @@ import org.catnut.core.CatnutAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutArrayRequest;
 import org.catnut.core.CatnutProvider;
+import org.catnut.util.Constants;
+import org.json.JSONArray;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
@@ -63,6 +64,22 @@ public class ZhihuItemsFragment extends ListFragment implements
 	// 本地items总数
 	private int mTotal;
 
+	// 载入本地items总数线程
+	private Runnable mLoadTotalCount = new Runnable() {
+		@Override
+		public void run() {
+			Cursor cursor = getActivity().getContentResolver().query(
+					CatnutProvider.parse(Zhihu.MULTIPLE),
+					Constants.COUNT_PROJECTION,
+					null, null, null
+			);
+			if (cursor.moveToNext()) {
+				mTotal = cursor.getInt(0);
+			}
+			cursor.close();
+		}
+	};
+
 	public static ZhihuItemsFragment getFragment() {
 		return new ZhihuItemsFragment();
 	}
@@ -91,8 +108,10 @@ public class ZhihuItemsFragment extends ListFragment implements
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		setListAdapter(mAdapter);
+		setEmptyText(getString(R.string.zhihu_refresh_hint));
 		getListView().setOnScrollListener(this);
 		getLoaderManager().initLoader(0, null, this);
+		new Thread(mLoadTotalCount).start(); // 载入总数
 	}
 
 	@Override
@@ -106,18 +125,10 @@ public class ZhihuItemsFragment extends ListFragment implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.refresh:
-				mRequestQueue.add(new CatnutArrayRequest(
-						getActivity(),
-						new CatnutAPI(Request.Method.GET, Zhihu.fetchUrl(1), false, null),
-						Zhihu.ZhihuProcessor.getProcessor(),
-						null,
-						new Response.ErrorListener() {
-							@Override
-							public void onErrorResponse(VolleyError error) {
-								Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-							}
-						}
-				));
+				if (!mPullToRefreshLayout.isRefreshing()) {
+					mPullToRefreshLayout.setRefreshing(true);
+					refresh();
+				}
 				break;
 			default:
 				break;
@@ -128,8 +139,12 @@ public class ZhihuItemsFragment extends ListFragment implements
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		if (scrollState == SCROLL_STATE_IDLE
-				&& getListView().getLastVisiblePosition() != mTotal) {
-			Log.d(TAG, "load more...");
+				&& getListView().getLastVisiblePosition() == mAdapter.getCount() - 1
+				&& mAdapter.getCount() < mTotal
+				&& !mPullToRefreshLayout.isRefreshing()) {
+			mPullToRefreshLayout.setRefreshing(true);
+			mCount += PAGE_SIZE;
+			getLoaderManager().restartLoader(0, null, this);
 		}
 	}
 
@@ -153,6 +168,9 @@ public class ZhihuItemsFragment extends ListFragment implements
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		mAdapter.swapCursor(data);
+		if (mPullToRefreshLayout.isRefreshing()) {
+			mPullToRefreshLayout.setRefreshComplete();
+		}
 	}
 
 	@Override
@@ -162,6 +180,30 @@ public class ZhihuItemsFragment extends ListFragment implements
 
 	@Override
 	public void onRefreshStarted(View view) {
+		refresh();
+	}
 
+	// 刷新
+	private void refresh() {
+		mRequestQueue.add(new CatnutArrayRequest(
+				getActivity(),
+				new CatnutAPI(Request.Method.GET, Zhihu.fetchUrl(1), false, null),
+				Zhihu.ZhihuProcessor.getProcessor(),
+				new Response.Listener<JSONArray>() {
+					@Override
+					public void onResponse(JSONArray response) {
+						mCount = response.length();
+						new Thread(mLoadTotalCount).start();
+						mPullToRefreshLayout.setRefreshComplete();
+					}
+				},
+				new Response.ErrorListener() {
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+						mPullToRefreshLayout.setRefreshComplete();
+					}
+				}
+		));
 	}
 }

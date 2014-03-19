@@ -28,4 +28,8 @@ public class Constants {
 	// for error dialog box
 	public static final String TITLE = "title";
 	public static final String MESSAGE = "message";
+
+	public static final String[] COUNT_PROJECTION = new String[]{
+			"count(0)"
+	};
 }

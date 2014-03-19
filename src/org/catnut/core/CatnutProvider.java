@@ -256,6 +256,7 @@ public class CatnutProvider extends ContentProvider {
 
 	@Override
 	public int bulkInsert(Uri uri, ContentValues[] values) {
+		int conflicOption = SQLiteDatabase.CONFLICT_REPLACE;
 		String table;
 		switch (matcher.match(uri)) {
 			case USERS:
@@ -273,6 +274,7 @@ public class CatnutProvider extends ContentProvider {
 			// plugins...starting
 			case ZHIHUS:
 				table = Zhihu.TABLE;
+				conflicOption = SQLiteDatabase.CONFLICT_IGNORE;
 				break;
 			// plugins...ending
 			default:
@@ -282,7 +284,7 @@ public class CatnutProvider extends ContentProvider {
 		db.beginTransaction();
 		for (int i = 0; i < values.length; i++) {
 			if (values[i] != null) {
-				db.insertWithOnConflict(table, null, values[i], SQLiteDatabase.CONFLICT_REPLACE);
+				db.insertWithOnConflict(table, null, values[i], conflicOption);
 			}
 		}
 		db.setTransactionSuccessful();
