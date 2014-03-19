@@ -20,6 +20,7 @@ import org.catnut.metadata.Draft;
 import org.catnut.metadata.Photo;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
+import org.catnut.plugin.zhihu.Zhihu;
 import org.catnut.util.Constants;
 
 import java.io.File;
@@ -53,6 +54,12 @@ public class CatnutProvider extends ContentProvider {
 	public static final int PHOTOS = 7;
 	public static final int COMMENT = 8;
 	public static final int COMMENTS = 9;
+
+	// plugins...starting
+	public static final int ZHIHU = 20;
+	public static final int ZHIHUS = 21;
+	// plugins...ending
+
 	public static final int CLEAR = 100;
 
 	private static UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -68,6 +75,12 @@ public class CatnutProvider extends ContentProvider {
 		matcher.addURI(AUTHORITY, Photo.MULTIPLE, PHOTOS);
 		matcher.addURI(AUTHORITY, Comment.SINGLE + "/#", COMMENT);
 		matcher.addURI(AUTHORITY, Comment.MULTIPLE, COMMENTS);
+
+		// plugins...starting
+		matcher.addURI(AUTHORITY, Zhihu.SINGLE + "/#", ZHIHU);
+		matcher.addURI(AUTHORITY, Zhihu.MULTIPLE, ZHIHUS);
+		// plugins...ending
+
 		matcher.addURI(AUTHORITY, CLEAR_DATA, CLEAR);
 	}
 
@@ -146,6 +159,14 @@ public class CatnutProvider extends ContentProvider {
 			case COMMENTS:
 				type = MULTIPLE_RECORDS_MIME_TYPE + Comment.MULTIPLE;
 				break;
+			// plugins...starting
+			case ZHIHU:
+				type = SINGLE_RECORD_MIME_TYPE + Zhihu.SINGLE;
+				break;
+			case ZHIHUS:
+				type = MULTIPLE_RECORDS_MIME_TYPE + Zhihu.MULTIPLE;
+				break;
+			// plugins...ending
 			default:
 				Log.wtf(TAG, "unknown uri: " + uri);
 		}
@@ -184,6 +205,14 @@ public class CatnutProvider extends ContentProvider {
 			case COMMENTS:
 				cursor = db.rawQuery(selection, selectionArgs);
 				break;
+			// plugins...starting
+			case ZHIHU:
+				cursor = db.query(Zhihu.TABLE, projection, queryWithId(uri), selectionArgs, null, null, sortOrder);
+				break;
+			case ZHIHUS:
+				cursor = db.query(Zhihu.TABLE, projection, selection, selectionArgs, null, null, sortOrder);
+				break;
+			// plugins...ending
 			default:
 				Log.wtf(TAG, "unknown uri: " + uri);
 				return null;
@@ -211,6 +240,11 @@ public class CatnutProvider extends ContentProvider {
 			case COMMENTS:
 				table = Comment.TABLE;
 				break;
+			// plugins...starting
+			case ZHIHUS:
+				table = Zhihu.TABLE;
+				break;
+			// plugins...ending
 			default:
 				throw new RuntimeException("unknown uri: " + uri);
 		}
@@ -236,6 +270,11 @@ public class CatnutProvider extends ContentProvider {
 			case COMMENTS:
 				table = Comment.TABLE;
 				break;
+			// plugins...starting
+			case ZHIHUS:
+				table = Zhihu.TABLE;
+				break;
+			// plugins...ending
 			default:
 				throw new RuntimeException("unknown uri: " + uri);
 		}
@@ -268,7 +307,13 @@ public class CatnutProvider extends ContentProvider {
 			case COMMENTS:
 				count = mDb.getWritableDatabase().delete(Comment.TABLE, selection, selectionArgs);
 				break;
-			case CLEAR:
+			// plugins...starting
+			case ZHIHUS:
+				// 直接清掉全部
+				count = mDb.getWritableDatabase().delete(Zhihu.TABLE, null, null);
+				break;
+			// plugins...ending
+			case CLEAR: // 插件的缓存清除分开搞
 				SQLiteDatabase db = mDb.getWritableDatabase();
 				db.beginTransaction();
 				db.execSQL("delete from " + Photo.TABLE);
@@ -296,6 +341,9 @@ public class CatnutProvider extends ContentProvider {
 				db = mDb.getWritableDatabase();
 				db.execSQL(selection);
 				break;
+			// plugins...starting
+
+			// plugins...ending
 			default:
 				throw new UnsupportedOperationException("not supported for now!");
 		}
@@ -336,6 +384,10 @@ public class CatnutProvider extends ContentProvider {
 			db.execSQL(Draft.METADATA.ddl());
 			db.execSQL(Photo.METADATA.ddl());
 			db.execSQL(Comment.METADATA.ddl());
+			// plugins...starting
+			db.execSQL(Zhihu.METADATA.ddl());
+			// plugins...ending
+
 			// 保存分享的图片
 			(new Thread(new Runnable() {
 				@Override
@@ -367,6 +419,11 @@ public class CatnutProvider extends ContentProvider {
 			db.execSQL("DROP TABLE IF EXISTS " + Draft.TABLE);
 			db.execSQL("DROP TABLE IF EXISTS " + Photo.TABLE);
 			db.execSQL("DROP TABLE IF EXISTS " + Comment.TABLE);
+
+			// plugins...starting
+			db.execSQL("DROP TABLE IF EXISTS " + Zhihu.TABLE);
+			// plugins...ending
+
 			// recreate...
 			onCreate(db);
 			Log.i(TAG, "finish upgrade table...");

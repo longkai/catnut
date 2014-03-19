@@ -20,7 +20,7 @@ import org.json.JSONArray;
  */
 public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 
-	public static final String TABLE = "zhihu";
+	public static final String TABLE = "zhihus";
 	public static final String SINGLE = "zhihu";
 	public static final String MULTIPLE = "zhihus";
 
