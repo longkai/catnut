@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:padding="@dimen/medium"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content">
+
+	<ImageView
+		android:id="@+id/has_read"
+		android:scaleType="center"
+		android:layout_centerVertical="true"
+		android:src="@drawable/ic_check"
+		android:layout_marginRight="@dimen/medium"
+		android:layout_width="@dimen/large"
+		android:layout_height="wrap_content" />
+
+	<TextView
+		android:id="@android:id/title"
+		android:layout_toRightOf="@id/has_read"
+		android:textColor="@color/black25PercentColor"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:maxLines="2"
+		android:ellipsize="end"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+
+	<TextView
+		android:id="@android:id/text1"
+		android:layout_toRightOf="@id/has_read"
+		android:layout_below="@android:id/title"
+		android:layout_width="match_parent"
+		android:textColor="@color/black50PercentColor"
+		android:maxLines="3"
+		android:ellipsize="end"
+		android:layout_marginTop="@dimen/medium"
+		android:layout_height="wrap_content" />
+
+	<TextView
+		android:id="@+id/last_alter_date"
+		android:layout_marginTop="@dimen/small"
+		android:layout_below="@android:id/text1"
+		android:textColor="@color/black50PercentColor"
+		android:layout_alignParentRight="true"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+</RelativeLayout>

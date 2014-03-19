@@ -364,6 +364,9 @@ public class MainActivity extends Activity implements
 			case R.id.fantasy:
 				startActivity(new Intent(this, HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG));
 				break;
+			case R.id.plugins:
+				startActivity(new Intent(this, PluginsActivity.class));
+				break;
 			default:
 				break;
 		}

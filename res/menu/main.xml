@@ -24,6 +24,10 @@
 		android:title="@string/logout"
 		android:showAsAction="never" />
 	<item
+		android:id="@+id/plugins"
+		android:title="@string/plugins"
+		android:showAsAction="never" />
+	<item
 		android:id="@id/pref"
 		android:title="@string/pref"
 		android:showAsAction="never" />

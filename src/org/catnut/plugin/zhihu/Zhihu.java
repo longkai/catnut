@@ -25,7 +25,9 @@ public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 	public static final String MULTIPLE = "zhihus";
 
 	public static final Zhihu METADATA = new Zhihu();
-	private Zhihu() {}
+
+	private Zhihu() {
+	}
 
 	// 问题相关
 	/** id */
@@ -116,6 +118,17 @@ public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 	}
 
 	/**
+	 * page == 1 表最新
+	 *
+	 * @param page which page?
+	 * @return url
+	 */
+	public static String fetchUrl(int page) {
+		return "http://www.zhihu.com/reader/json/"
+				+ page + "?r=" + System.currentTimeMillis();
+	}
+
+	/**
 	 * 每日精选处理器
 	 *
 	 * @author longkai
@@ -124,7 +137,8 @@ public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 
 		private static ZhihuProcessor processor;
 
-		private ZhihuProcessor(){}
+		private ZhihuProcessor() {
+		}
 
 		public static ZhihuProcessor getProcessor() {
 			if (processor == null) {

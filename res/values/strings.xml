@@ -217,4 +217,5 @@
 	<string name="mention_me_timeline">艾特时间线</string>
 	<string name="received_reply">收到的评论</string>
 	<string name="swipe_right_hint">向右滑动试试！</string>
+	<string name="plugins">插件</string>
 </resources>
