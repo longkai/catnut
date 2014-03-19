@@ -17,6 +17,7 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,7 +31,9 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import org.catnut.R;
 import org.catnut.core.CatnutProvider;
+import org.catnut.fragment.GalleryPagerFragment;
 import org.catnut.support.QuickReturnScrollView;
+import org.catnut.ui.SingleFragmentActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
@@ -48,7 +51,8 @@ import java.util.regex.Pattern;
  *
  * @author longkai
  */
-public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView.Callbacks, OnRefreshListener {
+public class ZhihuItemFragment extends Fragment implements
+		QuickReturnScrollView.Callbacks, OnRefreshListener, View.OnClickListener {
 	public static final String TAG = ZhihuItemFragment.class.getSimpleName();
 
 	private static final String[] PROJECTION = new String[]{
@@ -124,7 +128,11 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 					}
 				}
 		);
-
+		if (savedInstanceState != null) {
+			int scrollY = savedInstanceState.getInt(TAG);
+			Log.d(TAG, String.valueOf(scrollY));
+			mQuickReturnLayout.setScrollY(scrollY);
+		}
 		return view;
 	}
 
@@ -212,6 +220,7 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 													.error(R.drawable.error)
 													.into(imageView);
 											imageView.setTag(l); // for click
+											imageView.setOnClickListener(ZhihuItemFragment.this);
 											mImageUrls[l++] = text;
 										}
 									}
@@ -236,6 +245,7 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 												.error(R.drawable.error)
 												.into(image);
 										image.setTag(imageIndex); // 方便点击事件
+										image.setOnClickListener(ZhihuItemFragment.this);
 										mImageUrls[imageIndex++] = text;
 										answerHolder.addView(image);
 									}
@@ -400,6 +410,22 @@ public class ZhihuItemFragment extends Fragment implements QuickReturnScrollView
 				});
 			}
 		}).start();
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putInt(TAG, mQuickReturnLayout.getScrollY());
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	public void onClick(View v) {
+		Integer index = (Integer) v.getTag();
+		Intent intent = SingleFragmentActivity.getIntent(getActivity(), SingleFragmentActivity.GALLERY);
+		intent.putExtra(GalleryPagerFragment.CUR_INDEX, index);
+		intent.putExtra(GalleryPagerFragment.URLS, mImageUrls);
+		intent.putExtra(GalleryPagerFragment.TITLE, getString(R.string.view_photos));
+		startActivity(intent);
 	}
 
 	// quick return animation

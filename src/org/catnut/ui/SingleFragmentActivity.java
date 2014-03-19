@@ -18,6 +18,7 @@ import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.fragment.DraftFragment;
 import org.catnut.fragment.FavoriteFragment;
+import org.catnut.fragment.GalleryPagerFragment;
 import org.catnut.fragment.MyRelationshipFragment;
 import org.catnut.fragment.OAuthFragment;
 import org.catnut.fragment.PhotoViewerFragment;
@@ -43,6 +44,7 @@ public class SingleFragmentActivity extends Activity {
 	public static final int FRIENDS = 4; // 可以为关注或者粉丝
 	public static final int FAVORITES = 5;
 	public static final int AUTH = 6;
+	public static final int GALLERY = 7;
 
 	private EasyTracker mTracker;
 
@@ -81,6 +83,13 @@ public class SingleFragmentActivity extends Activity {
 					break;
 				case AUTH:
 					fragment = new OAuthFragment();
+					break;
+				case GALLERY:
+					setTheme(R.style.Theme_Fantasy);
+					int index = getIntent().getIntExtra(GalleryPagerFragment.CUR_INDEX, 0);
+					String[] strings = getIntent().getStringArrayExtra(GalleryPagerFragment.URLS);
+					String title = getIntent().getStringExtra(GalleryPagerFragment.TITLE);
+					fragment = GalleryPagerFragment.getFragment(index, strings, title);
 					break;
 				default:
 					// get out!
