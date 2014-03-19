@@ -175,4 +175,6 @@
 	<string name="last_check_time">%1$s, click to refresh</string>
 	<string name="error_click_try_again">error...click to try again</string>
 	<string name="mention_me_timeline">Mention Timeline</string>
+	<string name="received_reply">Reply Timeline</string>
+	<string name="swipe_right_hint">Swipe to right to see something!</string>
 </resources>

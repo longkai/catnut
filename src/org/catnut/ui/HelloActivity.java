@@ -64,6 +64,7 @@ public class HelloActivity extends Activity {
 
 	/** 欢迎界面默认的播放时间 */
 	private static final long DEFAULT_SPLASH_TIME_MILLS = 3000L;
+	private static final int MAX_SHOWCASE_TIMES = 3;
 
 	private static final String LAST_FANTASY_MILLIS = "LAST_FANTASY_MILLIS";
 
@@ -145,6 +146,13 @@ public class HelloActivity extends Activity {
 		} else {
 			about.setText(Html.fromHtml(getString(R.string.about_body)));
 			about.setMovementMethod(LinkMovementMethod.getInstance());
+		}
+
+		String key = getString(R.string.pref_run_times);
+		int runTimes = mPreferences.getInt(key, 0);
+		if (runTimes < MAX_SHOWCASE_TIMES) {
+			Toast.makeText(this, getString(R.string.swipe_right_hint), Toast.LENGTH_LONG).show();
+			mPreferences.edit().putInt(key, runTimes + 1);
 		}
 
 		loadImage();
