@@ -69,15 +69,15 @@ public class CatnutProvider extends ContentProvider {
 		matcher.addURI(AUTHORITY, User.MULTIPLE, USERS);
 		matcher.addURI(AUTHORITY, Status.MULTIPLE + "/#", STATUS);
 		matcher.addURI(AUTHORITY, Status.MULTIPLE, STATUSES);
-		matcher.addURI(AUTHORITY, Draft.SINGLE + "/#", DRAFT);
+		matcher.addURI(AUTHORITY, Draft.MULTIPLE + "/#", DRAFT);
 		matcher.addURI(AUTHORITY, Draft.MULTIPLE, DRAFTS);
-		matcher.addURI(AUTHORITY, Photo.SINGLE + "/#", PHOTO);
+		matcher.addURI(AUTHORITY, Photo.MULTIPLE + "/#", PHOTO);
 		matcher.addURI(AUTHORITY, Photo.MULTIPLE, PHOTOS);
-		matcher.addURI(AUTHORITY, Comment.SINGLE + "/#", COMMENT);
+		matcher.addURI(AUTHORITY, Comment.MULTIPLE + "/#", COMMENT);
 		matcher.addURI(AUTHORITY, Comment.MULTIPLE, COMMENTS);
 
 		// plugins...starting
-		matcher.addURI(AUTHORITY, Zhihu.SINGLE + "/#", ZHIHU);
+		matcher.addURI(AUTHORITY, Zhihu.MULTIPLE + "/#", ZHIHU);
 		matcher.addURI(AUTHORITY, Zhihu.MULTIPLE, ZHIHUS);
 		// plugins...ending
 
@@ -346,6 +346,7 @@ public class CatnutProvider extends ContentProvider {
 				break;
 			// plugins...starting
 			case ZHIHU:
+				selection = Zhihu.ANSWER_ID + "=" + uri.getLastPathSegment();
 				count = mDb.getWritableDatabase().update(Zhihu.TABLE, values, selection, selectionArgs);
 				break;
 			// plugins...ending

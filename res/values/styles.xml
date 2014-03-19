@@ -21,7 +21,6 @@
 		<item name="android:buttonStyle">@style/RobotoButtonStyle</item>
 		<item name="android:webTextViewStyle">@style/RobotoWebViewStyle</item>
 		<item name="android:actionBarItemBackground">@drawable/actionbar_item_background_light</item>
-		<item name="android:icon">@android:color/transparent</item>
 	</style>
 
 	<style name="AppTheme.Dark" parent="android:Theme.Holo">

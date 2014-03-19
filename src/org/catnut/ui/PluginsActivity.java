@@ -26,6 +26,7 @@ public class PluginsActivity extends Activity {
 					.replace(android.R.id.content, ZhihuItemsFragment.getFragment())
 					.commit();
 		}
+		getActionBar().setDisplayShowHomeEnabled(false);
 		getActionBar().setTitle(R.string.plugins);
 	}
 

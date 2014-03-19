@@ -7,6 +7,9 @@ package org.catnut.plugin.zhihu;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +25,9 @@ import org.catnut.util.CatnutUtils;
  *
  * @author longkai
  */
-public class ZhihuItemsAdapter extends CursorAdapter {
+public class ZhihuItemsAdapter extends CursorAdapter implements Html.ImageGetter {
+
+	private Drawable mNoImage;
 
 	public ZhihuItemsAdapter(Context context) {
 		super(context, null, 0);
@@ -58,8 +63,16 @@ public class ZhihuItemsAdapter extends CursorAdapter {
 			holder.hasRead.setVisibility(View.INVISIBLE);
 		}
 		holder.title.setText(cursor.getString(holder.titleIndex));
-		holder.digest.setText(Html.fromHtml(cursor.getString(holder.digestIndex)));
+		holder.digest.setText(Html.fromHtml(cursor.getString(holder.digestIndex), this, null));
 		holder.answerMan.setText(cursor.getString(holder.answerManIndex));
+	}
+
+	@Override
+	public Drawable getDrawable(String source) {
+		if (mNoImage == null) {
+			mNoImage = new ColorDrawable(Color.TRANSPARENT);
+		}
+		return mNoImage;
 	}
 
 	private static class ViewHolder {
