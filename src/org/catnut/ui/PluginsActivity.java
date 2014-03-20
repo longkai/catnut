@@ -35,7 +35,9 @@ public class PluginsActivity extends Activity implements FragmentManager.OnBackS
 		getActionBar().setTitle(R.string.plugins);
 		getFragmentManager().addOnBackStackChangedListener(this);
 		if (savedInstanceState == null) {
-			flipCard(ZhihuItemsFragment.getFragment(), null, false);
+			getFragmentManager().beginTransaction()
+					.replace(android.R.id.content, ZhihuItemsFragment.getFragment())
+					.commit();
 		}
 		if (CatnutApp.getTingtingApp().getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
 			mTracker = EasyTracker.getInstance(this);

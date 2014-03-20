@@ -7,6 +7,7 @@ package org.catnut.plugin.zhihu;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -179,11 +180,9 @@ public class ZhihuItemFragment extends Fragment implements
 					matcher = HTML_IMG.matcher(_question);
 					final List<String> questionSegment = new ArrayList<String>();
 					processText(_question, matcher, questionSegment);
-					Log.d(TAG, "done regex.");
 					new Handler(Looper.getMainLooper()).post(new Runnable() {
 						@Override
 						public void run() {
-							Log.d(TAG, "main");
 							title.setText(_title);
 							if (_title.length() > 30) {
 								title.setTextSize(18);
@@ -219,7 +218,8 @@ public class ZhihuItemFragment extends Fragment implements
 											ImageView imageView = (ImageView) inflater.inflate(R.layout.zhihu_image, null);
 											Picasso.with(getActivity())
 													.load(text)
-													.placeholder(R.drawable.error)
+													.centerCrop()
+													.resize(200, 200)
 													.error(R.drawable.error)
 													.into(imageView);
 											imageView.setTag(l); // for click
@@ -244,7 +244,8 @@ public class ZhihuItemFragment extends Fragment implements
 										ImageView image = (ImageView) inflater.inflate(R.layout.zhihu_image, null);
 										Picasso.with(getActivity())
 												.load(text)
-												.placeholder(R.drawable.error)
+												.centerCrop()
+												.resize(200, 200)
 												.error(R.drawable.error)
 												.into(image);
 										image.setTag(imageIndex); // 方便点击事件
@@ -256,14 +257,33 @@ public class ZhihuItemFragment extends Fragment implements
 							}
 							author.setText(_nick);
 							lastAlterDate.setText(DateUtils.getRelativeTimeSpanString(_lastAlterDate));
-							Log.d(TAG, "end");
-							mPullToRefreshLayout.setRefreshComplete();
+							if (mPullToRefreshLayout != null) {
+								mPullToRefreshLayout.setRefreshComplete();
+							}
 						}
 					});
 				} else {
-					Log.d(TAG, "404");
 					cursor.close();
 				}
+			}
+		})).start();
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		// 标记已读
+		(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				ContentValues values = new ContentValues();
+				values.put(Zhihu.HAS_READ, true);
+				getActivity().getContentResolver().update(
+						CatnutProvider.parse(Zhihu.MULTIPLE, mAnswerId),
+						values,
+						null,
+						null
+				);
 			}
 		})).start();
 	}
@@ -410,7 +430,9 @@ public class ZhihuItemFragment extends Fragment implements
 				mScrollSettleHandler.post(new Runnable() {
 					@Override
 					public void run() {
-						mPullToRefreshLayout.setRefreshComplete();
+						if (mPullToRefreshLayout != null) {
+							mPullToRefreshLayout.setRefreshComplete();
+						}
 					}
 				});
 			}

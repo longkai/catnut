@@ -10,7 +10,7 @@
 	<item
 		android:id="@+id/action_gallery"
 		android:title="@string/add_photo"
-		android:icon="@drawable/ic_title_new_picture"
+		android:icon="@drawable/ic_action_compoe_gallery"
 		android:showAsAction="always" />
 
 	<item

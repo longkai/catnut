@@ -154,26 +154,12 @@ public class ZhihuItemsFragment extends ListFragment implements
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		// 标记已读
 		Cursor c = (Cursor) mAdapter.getItem(position);
-		final long answer_id = c.getLong(c.getColumnIndex(Zhihu.ANSWER_ID));
-		(new Thread(new Runnable() {
-			@Override
-			public void run() {
-				ContentValues values = new ContentValues();
-				values.put(Zhihu.HAS_READ, true);
-				getActivity().getContentResolver().update(
-						CatnutProvider.parse(Zhihu.MULTIPLE, answer_id),
-						values,
-						null,
-						null
-				);
-			}
-		})).start();
+		long answer_id = c.getLong(c.getColumnIndex(Zhihu.ANSWER_ID));
 		// 跳转
 		PluginsActivity activity = (PluginsActivity) getActivity();
-//		activity.flipCard(ZhihuItemFragment.getFragment(answer_id), null, true);
-		activity.flipCard(PagerItemFragment.getFragment(answer_id, id), null, true);
+		activity.flipCard(ZhihuItemFragment.getFragment(answer_id), null, true);
+//		activity.flipCard(PagerItemFragment.getFragment(answer_id, id), null, true);
 	}
 
 	@Override

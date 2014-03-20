@@ -14,7 +14,8 @@
 		<item name="android:windowBackground">@color/snowColor</item>
 		<item name="android:actionBarStyle">@style/ActionBar_Light</item>
 		<item name="android:actionOverflowButtonStyle">@style/OverflowButtonStyle_Light</item>
-		<item name="android:homeAsUpIndicator">@drawable/ic_title_up_default</item>
+		<!--<item name="android:homeAsUpIndicator">@drawable/ic_title_up_default</item>-->
+		<item name="android:homeAsUpIndicator">@drawable/ic_ab_back</item>
 		<item name="android:actionBarTabStyle">@style/ActionBar_Light_TabStyle</item>
 		<item name="android:actionBarTabBarStyle">@style/ActionBar_Light_TabBarStyle</item>
 		<item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
@@ -82,7 +83,8 @@
 	<!--for convenient api 19-->
 	<style name="_Theme_Fantasy" parent="android:Theme.Holo">
 		<item name="android:actionBarStyle">@style/About.ActionBar</item>
-		<item name="android:homeAsUpIndicator">@drawable/ic_title_up_default</item>
+		<!--<item name="android:homeAsUpIndicator">@drawable/ic_title_up_default</item>-->
+		<item name="android:homeAsUpIndicator">@drawable/ic_ab_back</item>
 		<item name="android:windowContentOverlay">@null</item>
 		<item name="android:windowActionBarOverlay">true</item>
 		<item name="android:windowBackground">@android:color/transparent</item>
