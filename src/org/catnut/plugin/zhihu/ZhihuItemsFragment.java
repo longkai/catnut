@@ -70,8 +70,6 @@ public class ZhihuItemsFragment extends ListFragment implements
 	// 本地items总数
 	private int mTotal;
 
-	private boolean mUsePagerMode = false;
-
 	// 载入本地items总数线程
 	private Runnable mLoadTotalCount = new Runnable() {
 		@Override
@@ -106,7 +104,6 @@ public class ZhihuItemsFragment extends ListFragment implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-//		setHasOptionsMenu(true);
 		mAdapter = new ZhihuItemsAdapter(getActivity());
 		mRequestQueue = CatnutApp.getTingtingApp().getRequestQueue();
 	}
@@ -129,41 +126,13 @@ public class ZhihuItemsFragment extends ListFragment implements
 		setListAdapter(mAdapter);
 		setEmptyText(getString(R.string.zhihu_refresh_hint));
 		getListView().setOnScrollListener(this);
-		getLoaderManager().initLoader(0, null, this);
-		new Thread(mLoadTotalCount).start(); // 载入总数
-	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		menu.add(Menu.NONE, R.id.refresh, Menu.NONE, R.string.refresh)
-				.setIcon(R.drawable.ic_action_retry)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-		menu.add(Menu.NONE, R.id.pager, Menu.NONE, R.string.pager_mode)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.refresh:
-				if (!mPullToRefreshLayout.isRefreshing()) {
-					mPullToRefreshLayout.setRefreshing(true);
-					refresh();
-				}
-				break;
-			case R.id.pager:
-				mUsePagerMode = !mUsePagerMode;
-				break;
-			default:
-				break;
+		mPullToRefreshLayout.setRefreshing(true);
+		if (CatnutApp.getBoolean(R.string.pref_enable_zhihu_auto_refresh, R.bool.default_plugin_status)) {
+			refresh();
+		} else {
+			getLoaderManager().initLoader(0, null, this);
 		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
-	public void onPrepareOptionsMenu(Menu menu) {
-		MenuItem item = menu.findItem(R.id.pager);
-		item.setTitle(mUsePagerMode ? getString(R.string.simple_mode) : getString(R.string.pager_mode));
+		new Thread(mLoadTotalCount).start(); // 载入总数
 	}
 
 	@Override
@@ -172,16 +141,13 @@ public class ZhihuItemsFragment extends ListFragment implements
 		long answer_id = c.getLong(c.getColumnIndex(Zhihu.ANSWER_ID));
 		// 跳转
 		PluginsActivity activity = (PluginsActivity) getActivity();
-		if (mUsePagerMode) {
-			Toast.makeText(activity, "not stability yet:-(", Toast.LENGTH_SHORT).show();
+		if (CatnutApp.getBoolean(R.string.pref_enable_zhihu_pager, R.bool.default_plugin_status)) {
 			Intent intent = new Intent(activity, PluginsActivity.class);
 			intent.putExtra(PagerItemFragment.ORDER_ID, id);
 			intent.putExtra(Constants.ID, answer_id);
 			intent.putExtra(Constants.ACTION, PluginsActivity.ACTION_ZHIHU_PAGER);
 			startActivity(intent);
-//			activity.flipCard(PagerItemFragment.getFragment(answer_id, id), null, true);
 		} else {
-//			activity.flipCard(ZhihuItemFragment.getFragment(answer_id), null, true);
 			Intent intent = new Intent(activity, PluginsActivity.class);
 			intent.putExtra(Constants.ACTION, PluginsActivity.ACTION_ZHIHU_ITEM);
 			intent.putExtra(Constants.ID, answer_id);
@@ -246,8 +212,8 @@ public class ZhihuItemsFragment extends ListFragment implements
 					@Override
 					public void onResponse(JSONArray response) {
 						mCount = response.length();
+						getLoaderManager().restartLoader(0, null, ZhihuItemsFragment.this);
 						new Thread(mLoadTotalCount).start();
-						mPullToRefreshLayout.setRefreshComplete();
 					}
 				},
 				new Response.ErrorListener() {

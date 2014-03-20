@@ -7,6 +7,7 @@ package org.catnut.core;
 
 import android.app.Application;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -137,6 +138,19 @@ public class CatnutApp extends Application implements SharedPreferences.OnShared
 	 */
 	public RequestQueue getRequestQueue() {
 		return mRequestQueue;
+	}
+
+	/**
+	 * 获得boolean偏好
+	 *
+	 * @param key
+	 * @param defaultValue
+	 * @return a boolean with default res bool value
+	 */
+	public static boolean getBoolean(int key, int defaultValue) {
+		SharedPreferences pref = sApp.getPreferences();
+		Resources res = sApp.getResources();
+		return sApp.getPreferences().getBoolean(sApp.getString(key), res.getBoolean(defaultValue));
 	}
 
 	/**

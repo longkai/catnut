@@ -231,4 +231,11 @@
 	<string name="read_zhihu_summary">每日知乎精选</string>
 	<string name="plugins_summay">启用，禁用，设置一些有趣或有用的插件</string>
 	<string name="plugins_pref">插件设置</string>
+	<string name="enable">启用</string>
+	<string name="read_mode">阅读模式</string>
+	<string name="pager_read_mode_summary">向左滑动查看上一篇，向右滑动查看下一篇（测试功能）</string>
+	<string name="simple_read_mode_summary">单页查看</string>
+	<string name="auto_refresh">自动刷新</string>
+	<string name="auto_refresh_on_summary">每次启用时自动刷新条目</string>
+	<string name="auto_refresh_off_summary">自行下拉刷新</string>
 </resources>

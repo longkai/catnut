@@ -19,6 +19,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
+import android.preference.Preference;
 import android.provider.BaseColumns;
 import android.text.Spannable;
 import android.text.SpannableString;

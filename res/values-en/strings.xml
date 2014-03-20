@@ -188,4 +188,14 @@
 	<string name="pager_mode">Swipe read mode</string>
 	<string name="simple_mode">Simple read mode</string>
 	<string name="tweet_text_copied">Text copied to clip board.</string>
+	<string name="read_zhihu_summary">Zhihu Daily Picks</string>
+	<string name="plugins_summay">Enable, Disable, Setting some interesting or useful plugins.</string>
+	<string name="plugins_pref">Plugins Settings</string>
+	<string name="enable">Enable</string>
+	<string name="read_mode">Reading Mode</string>
+	<string name="pager_read_mode_summary">Swipe left to read last item, right to next. (testing function)</string>
+	<string name="simple_read_mode_summary">One item at a time.</string>
+	<string name="auto_refresh">Auto refresh</string>
+	<string name="auto_refresh_on_summary">Auto refresh when opening</string>
+	<string name="auto_refresh_off_summary">Pull to refresh manually</string>
 </resources>

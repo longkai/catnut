@@ -6,9 +6,25 @@
   ~ The software shall be used for good, not evil.
   -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-	<CheckBoxPreference
-		android:key="@string/pref_enable_zhihu"
-		android:defaultValue="@bool/default_plugin_status"
-		android:title="@string/read_zhihu"
-		android:summary="@string/read_zhihu_summary" />
+	<PreferenceCategory android:title="@string/read_zhihu">
+		<CheckBoxPreference
+			android:key="@string/pref_enable_zhihu"
+			android:defaultValue="@bool/default_plugin_status"
+			android:title="@string/enable"
+			android:summary="@string/read_zhihu_summary" />
+
+		<CheckBoxPreference
+			android:key="@string/pref_enable_zhihu_pager"
+			android:title="@string/read_mode"
+			android:defaultValue="@bool/default_plugin_status"
+			android:summaryOn="@string/pager_read_mode_summary"
+			android:summaryOff="@string/simple_read_mode_summary" />
+
+		<CheckBoxPreference
+			android:key="@string/pref_enable_zhihu_auto_refresh"
+			android:title="@string/auto_refresh"
+			android:defaultValue="@bool/default_plugin_status"
+			android:summaryOn="@string/auto_refresh_on_summary"
+			android:summaryOff="@string/auto_refresh_off_summary" />
+	</PreferenceCategory>
 </PreferenceScreen>
