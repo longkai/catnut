@@ -5,6 +5,8 @@
  */
 package org.catnut.util;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -27,6 +29,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.service.UpgradeService;
@@ -535,6 +538,23 @@ public class CatnutUtils {
 					// no-op
 				}
 			}
+		}
+	}
+
+	/**
+	 * copy plain text to clip board
+	 *
+	 * @param context
+	 * @param tag
+	 * @param text
+	 * @param toastText may null, no toast at all
+	 */
+	public static void copy2ClipBoard(Context context, String tag, String text, String toastText) {
+		ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+		ClipData clip = ClipData.newPlainText(tag, text);
+		clipboard.setPrimaryClip(clip);
+		if (toastText != null) {
+			Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
 		}
 	}
 }

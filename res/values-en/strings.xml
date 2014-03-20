@@ -187,4 +187,5 @@
 	<string name="total_cache_img">Cache %1$s images.</string>
 	<string name="pager_mode">Swipe read mode</string>
 	<string name="simple_mode">Simple read mode</string>
+	<string name="tweet_text_copied">Text copied to clip board.</string>
 </resources>

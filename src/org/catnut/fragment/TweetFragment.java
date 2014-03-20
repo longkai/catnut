@@ -10,6 +10,8 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -80,7 +82,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 public class TweetFragment extends Fragment implements
 		TextWatcher, OnFragmentBackPressedListener, PopupMenu.OnMenuItemClickListener,
 		LoaderManager.LoaderCallbacks<Cursor>, OnRefreshListener, AdapterView.OnItemClickListener,
-		AbsListView.OnScrollListener {
+		AbsListView.OnScrollListener, AdapterView.OnItemLongClickListener {
 
 	private static final String TAG = "TweetFragment";
 	private static final String RETWEET_INDICATOR = ">"; // 标记转发
@@ -133,6 +135,8 @@ public class TweetFragment extends Fragment implements
 	private int mRetweetOption = 0;
 	// 提示没有更多了的次数，
 	private int mShowToastTimes = 0;
+
+	private String mPlainText; // 微博纯文本
 
 	// widgets
 	private View mTweetLayout;
@@ -491,8 +495,8 @@ public class TweetFragment extends Fragment implements
 					String remark = cursor.getString(cursor.getColumnIndex(User.remark));
 					mRemark.setText(TextUtils.isEmpty(remark) ? screenName : remark);
 					mScreenName.setText(getString(R.string.mention_text, screenName));
-					String text = cursor.getString(cursor.getColumnIndex(Status.columnText));
-					mText.setText(text);
+					mPlainText = cursor.getString(cursor.getColumnIndex(Status.columnText));
+					mText.setText(mPlainText);
 					CatnutUtils.vividTweet(mText, mImageSpan);
 					CatnutUtils.setTypeface(mText, mTypeface);
 					mText.setLineSpacing(0, mLineSpacing);
@@ -544,7 +548,7 @@ public class TweetFragment extends Fragment implements
 						}
 					}
 					// shareAndFavorite&favorite
-					shareAndFavorite(CatnutUtils.getBoolean(cursor, Status.favorited), text);
+					shareAndFavorite(CatnutUtils.getBoolean(cursor, Status.favorited), mPlainText);
 				}
 				cursor.close();
 			}
@@ -573,8 +577,8 @@ public class TweetFragment extends Fragment implements
 		String remark = user.optString(User.remark);
 		mRemark.setText(TextUtils.isEmpty(remark) ? screenName : remark);
 		mScreenName.setText(getString(R.string.mention_text, screenName));
-		String text = mJson.optString(Status.text);
-		mText.setText(text);
+		mPlainText = mJson.optString(Status.text);
+		mText.setText(mPlainText);
 		CatnutUtils.vividTweet(mText, mImageSpan);
 		CatnutUtils.setTypeface(mText, mTypeface);
 		mText.setLineSpacing(0, mLineSpacing);
@@ -658,6 +662,7 @@ public class TweetFragment extends Fragment implements
 		mListView.addHeaderView(mTweetLayout);
 		mListView.setAdapter(mAdapter);
 		mListView.setOnItemClickListener(this);
+		mListView.setOnItemLongClickListener(this);
 		mListView.setOnScrollListener(this);
 	}
 
@@ -825,6 +830,9 @@ public class TweetFragment extends Fragment implements
 				break;
 			case R.id.fantasy:
 				startActivity(new Intent(getActivity(), HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG));
+				break;
+			case android.R.id.copy:
+				CatnutUtils.copy2ClipBoard(getActivity(), getString(R.string.tweet), mPlainText, getString(R.string.tweet_text_copied));
 				break;
 			default:
 				break;
@@ -1050,5 +1058,13 @@ public class TweetFragment extends Fragment implements
 		NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
 		return activeNetwork != null &&
 				activeNetwork.isConnectedOrConnecting();
+	}
+
+	@Override
+	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+		Cursor cursor = (Cursor) mAdapter.getItem(position - 1);
+		String text = cursor.getString(cursor.getColumnIndex(Status.columnText));
+		CatnutUtils.copy2ClipBoard(getActivity(), getString(R.string.tweet), text, getString(R.string.tweet_text_copied));
+		return true;
 	}
 }

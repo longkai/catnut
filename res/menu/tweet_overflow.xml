@@ -13,6 +13,9 @@
 		android:title="@string/favorite"
 		android:icon="@drawable/ic_title_favorite" />
 	<item
+		android:id="@android:id/copy"
+		android:title="@android:string/copy" />
+	<item
 		android:showAsAction="always"
 		android:id="@+id/action_like"
 		android:title="@string/like" />

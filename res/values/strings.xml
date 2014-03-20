@@ -227,4 +227,5 @@
 	<string name="total_cache_img">共缓存%1$s张图片</string>
 	<string name="pager_mode">左右切换阅读模式</string>
 	<string name="simple_mode">普通模式</string>
+	<string name="tweet_text_copied">微博内容已复制到剪切板</string>
 </resources>

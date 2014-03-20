@@ -13,7 +13,6 @@ import android.graphics.Typeface;
 import android.provider.BaseColumns;
 import android.text.Html;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -133,6 +132,10 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 						break;
 					case R.id.action_like:
 						Toast.makeText(mContext, "sina not provide this option...", Toast.LENGTH_SHORT).show();
+						break;
+					case android.R.id.copy:
+						CatnutUtils.copy2ClipBoard(mContext, mContext.getString(R.string.tweet), bean.text,
+								mContext.getString(R.string.tweet_text_copied));
 						break;
 					default:
 						break;
@@ -345,6 +348,7 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 		Bean bean = new Bean();
 		bean.id = id;
 		bean.favorited = CatnutUtils.getBoolean(cursor, Status.favorited);
+		bean.text = cursor.getString(holder.textIndex);
 		holder.overflow.setTag(bean); // inject data
 		holder.overflow.setOnClickListener(this);
 	}
@@ -393,5 +397,6 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 	private static class Bean {
 		long id;
 		boolean favorited;
+		String text;
 	}
 }
