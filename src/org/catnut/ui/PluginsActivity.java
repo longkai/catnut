@@ -23,10 +23,14 @@ import android.widget.TextView;
 import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
+import org.catnut.fragment.PluginsPrefFragment;
 import org.catnut.plugin.zhihu.PagerItemFragment;
 import org.catnut.plugin.zhihu.ZhihuItemFragment;
 import org.catnut.plugin.zhihu.ZhihuItemsFragment;
 import org.catnut.util.Constants;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * 插件界面
@@ -35,6 +39,8 @@ import org.catnut.util.Constants;
  */
 public class PluginsActivity extends Activity implements
 		FragmentManager.OnBackStackChangedListener, ActionBar.TabListener {
+
+	public static final String PLUGINS = "plugins";
 
 	public static final int ACTION_ZHIHU_PAGER = 0;
 	public static final int ACTION_ZHIHU_ITEM = 1;
@@ -85,6 +91,9 @@ public class PluginsActivity extends Activity implements
 		bar.setDisplayShowTitleEnabled(false);
 		setContentView(R.layout.pager);
 
+		final ArrayList<Integer> ids = getIntent().getIntegerArrayListExtra(PLUGINS);
+		ids.add(0); // add an alt one...
+		Collections.shuffle(ids); // shuffle it :-)
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setPageMargin(10);
 
@@ -92,8 +101,8 @@ public class PluginsActivity extends Activity implements
 		mViewPager.setAdapter(new FragmentPagerAdapter(getFragmentManager()) {
 			@Override
 			public Fragment getItem(int position) {
-				switch (position) {
-					case 0:
+				switch (ids.get(position)) {
+					case PluginsPrefFragment.ZHIHU:
 					return ZhihuItemsFragment.getFragment();
 					default:
 						return new PlaceHolderFragment();
@@ -102,18 +111,17 @@ public class PluginsActivity extends Activity implements
 
 			@Override
 			public int getCount() {
-				return 2;
+				return ids.size();
 			}
 
 			@Override
 			public CharSequence getPageTitle(int position) {
-				switch (position) {
-					case 0:
+				switch (ids.get(position)) {
+					case PluginsPrefFragment.ZHIHU:
 						return getString(R.string.read_zhihu);
-					case 1:
+					default:
 						return "more plugins...";
 				}
-				return null;
 			}
 		});
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);

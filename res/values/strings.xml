@@ -228,4 +228,7 @@
 	<string name="pager_mode">左右切换阅读模式</string>
 	<string name="simple_mode">普通模式</string>
 	<string name="tweet_text_copied">微博内容已复制到剪切板</string>
+	<string name="read_zhihu_summary">每日知乎精选</string>
+	<string name="plugins_summay">启用，禁用，设置一些有趣或有用的插件</string>
+	<string name="plugins_pref">插件设置</string>
 </resources>

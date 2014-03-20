@@ -111,6 +111,15 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 				ClearCacheBoxFragment fragment = new ClearCacheBoxFragment();
 				fragment.show(getFragmentManager(), null);
 				return true;
+			} else if (key.equals(getString(R.string.pref_plugins))) {
+				getFragmentManager().beginTransaction()
+						.setCustomAnimations(
+								R.animator.card_flip_right_in, R.animator.card_flip_right_out,
+								R.animator.card_flip_left_in, R.animator.card_flip_left_out)
+						.replace(android.R.id.content, PluginsPrefFragment.getFragment())
+						.addToBackStack(null)
+						.commit();
+				return true;
 			}
 			if (intent != null) {
 				startActivity(intent);

@@ -49,6 +49,10 @@
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/advanced_settings">
+		<Preference
+			android:key="@string/pref_plugins"
+			android:title="@string/plugins"
+			android:summary="@string/plugins_summay" />
 
 		<Preference
 			android:key="@string/pref_customize_tweet_font"

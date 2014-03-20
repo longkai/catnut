@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -32,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
+import org.catnut.fragment.PluginsPrefFragment;
 import org.catnut.service.UpgradeService;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
@@ -45,7 +47,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static org.catnut.support.TweetTextView.MENTION_FILTER;
 import static org.catnut.support.TweetTextView.MENTION_PATTERN;
@@ -556,5 +560,21 @@ public class CatnutUtils {
 		if (toastText != null) {
 			Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
 		}
+	}
+
+	/**
+	 * 检查激活了那些插件
+	 *
+	 * @return plug' s id, or null
+	 */
+	public static ArrayList<Integer> enabledPlugins() {
+		CatnutApp app = CatnutApp.getTingtingApp();
+		SharedPreferences pref = app.getPreferences();
+		ArrayList<Integer> ids = new ArrayList<Integer>();
+		Resources res = app.getResources();
+		if (pref.getBoolean(res.getString(R.string.pref_enable_zhihu), res.getBoolean(R.bool.default_plugin_status))) {
+			ids.add(PluginsPrefFragment.ZHIHU);
+		}
+		return ids.size() == 0 ? null : ids;
 	}
 }

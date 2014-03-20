@@ -16,15 +16,7 @@ import android.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
-import org.catnut.fragment.DraftFragment;
-import org.catnut.fragment.FavoriteFragment;
-import org.catnut.fragment.GalleryPagerFragment;
-import org.catnut.fragment.MyRelationshipFragment;
-import org.catnut.fragment.OAuthFragment;
-import org.catnut.fragment.PhotoViewerFragment;
-import org.catnut.fragment.PrefFragment;
-import org.catnut.fragment.TimelineFragment;
-import org.catnut.fragment.UserTimelineFragment;
+import org.catnut.fragment.*;
 import org.catnut.metadata.User;
 import org.catnut.support.ConfirmBarController;
 import org.catnut.util.Constants;
@@ -45,6 +37,7 @@ public class SingleFragmentActivity extends Activity {
 	public static final int FAVORITES = 5;
 	public static final int AUTH = 6;
 	public static final int GALLERY = 7;
+	public static final int PLUGINS_PREF = 8;
 
 	private EasyTracker mTracker;
 
@@ -91,6 +84,9 @@ public class SingleFragmentActivity extends Activity {
 					String title = getIntent().getStringExtra(GalleryPagerFragment.TITLE);
 					fragment = GalleryPagerFragment.getFragment(index, strings, title);
 					break;
+				case PLUGINS_PREF:
+					fragment = PluginsPrefFragment.getFragment();
+					break;
 				default:
 					// get out!
 					navigateUpTo(getIntent());
@@ -110,7 +106,7 @@ public class SingleFragmentActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		if (mWhich != PREF) {
+		if (mWhich != PREF && mWhich != PLUGINS_PREF) {
 			menu.add(Menu.NONE, R.id.pref, Menu.NONE, R.string.pref)
 					.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 		}
@@ -121,7 +117,7 @@ public class SingleFragmentActivity extends Activity {
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
-				if (mWhich == PREF) {
+				if (mWhich == PREF || mWhich == PLUGINS_PREF) {
 					onBackPressed();
 				} else {
 					navigateUpTo(getIntent());

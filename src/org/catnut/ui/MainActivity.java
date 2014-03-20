@@ -24,7 +24,6 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -60,6 +59,7 @@ import org.catnut.util.Constants;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * 应用程序主界面。
@@ -366,7 +366,7 @@ public class MainActivity extends Activity implements
 				startActivity(new Intent(this, HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG));
 				break;
 			case R.id.plugins:
-				startActivity(new Intent(this, PluginsActivity.class));
+				switch2Plugins();
 				break;
 			default:
 				break;
@@ -459,7 +459,7 @@ public class MainActivity extends Activity implements
 				startActivity(new Intent(this, HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG));
 				return;
 			case R.id.plugins:
-				startActivity(new Intent(this, PluginsActivity.class));
+				switch2Plugins();
 				return;
 			case R.id.fetch_news:
 				fetchNews();
@@ -494,6 +494,18 @@ public class MainActivity extends Activity implements
 		}
 		if (fragment != null) {
 			pendingFragment(fragment, tag);
+		}
+	}
+
+	// 切换到插件，如果没有启用插件则跳转到插件设置界面
+	private void switch2Plugins() {
+		ArrayList<Integer> plugins = CatnutUtils.enabledPlugins();
+		if (plugins != null) {
+			Intent intent = new Intent(this, PluginsActivity.class);
+			intent.putExtra(PluginsActivity.PLUGINS, plugins);
+			startActivity(intent);
+		} else {
+			startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.PLUGINS_PREF));
 		}
 	}
 
