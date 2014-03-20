@@ -106,7 +106,7 @@ public class ZhihuItemsFragment extends ListFragment implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
+//		setHasOptionsMenu(true);
 		mAdapter = new ZhihuItemsAdapter(getActivity());
 		mRequestQueue = CatnutApp.getTingtingApp().getRequestQueue();
 	}
@@ -177,11 +177,15 @@ public class ZhihuItemsFragment extends ListFragment implements
 			Intent intent = new Intent(activity, PluginsActivity.class);
 			intent.putExtra(PagerItemFragment.ORDER_ID, id);
 			intent.putExtra(Constants.ID, answer_id);
-			intent.setAction(PluginsActivity.ACTION_ZHIHU_PAGER);
+			intent.putExtra(Constants.ACTION, PluginsActivity.ACTION_ZHIHU_PAGER);
 			startActivity(intent);
 //			activity.flipCard(PagerItemFragment.getFragment(answer_id, id), null, true);
 		} else {
-			activity.flipCard(ZhihuItemFragment.getFragment(answer_id), null, true);
+//			activity.flipCard(ZhihuItemFragment.getFragment(answer_id), null, true);
+			Intent intent = new Intent(activity, PluginsActivity.class);
+			intent.putExtra(Constants.ACTION, PluginsActivity.ACTION_ZHIHU_ITEM);
+			intent.putExtra(Constants.ID, answer_id);
+			startActivity(intent);
 		}
 	}
 

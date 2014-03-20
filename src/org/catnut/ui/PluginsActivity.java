@@ -5,17 +5,26 @@
  */
 package org.catnut.ui;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.plugin.zhihu.PagerItemFragment;
+import org.catnut.plugin.zhihu.ZhihuItemFragment;
 import org.catnut.plugin.zhihu.ZhihuItemsFragment;
 import org.catnut.util.Constants;
 
@@ -24,34 +33,98 @@ import org.catnut.util.Constants;
  *
  * @author longkai
  */
-public class PluginsActivity extends Activity implements FragmentManager.OnBackStackChangedListener {
+public class PluginsActivity extends Activity implements
+		FragmentManager.OnBackStackChangedListener, ActionBar.TabListener {
 
-	public static final String ACTION_ZHIHU_PAGER = "action_zhihu_pager";
+	public static final int ACTION_ZHIHU_PAGER = 0;
+	public static final int ACTION_ZHIHU_ITEM = 1;
 
 	private EasyTracker mTracker;
 
 	private Handler mHandler = new Handler();
 
+	private ViewPager mViewPager;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getActionBar().setDisplayShowHomeEnabled(false);
-		getActionBar().setTitle(R.string.plugins);
+		ActionBar bar = getActionBar();
+		bar.setDisplayShowHomeEnabled(false);
+		bar.setTitle(R.string.plugins);
 		getFragmentManager().addOnBackStackChangedListener(this);
-		if (savedInstanceState == null) {
-			Fragment fragment;
-			if (ACTION_ZHIHU_PAGER.equals(getIntent().getAction())) {
-				fragment = PagerItemFragment.getFragment(getIntent().getLongExtra(Constants.ID, 0L),
-						getIntent().getLongExtra(PagerItemFragment.ORDER_ID, 0L));
-			} else {
-				fragment = ZhihuItemsFragment.getFragment();
-			}
-			getFragmentManager().beginTransaction()
-					.replace(android.R.id.content, fragment)
-					.commit();
+		int which = getIntent().getIntExtra(Constants.ACTION, -1);
+		switch (which) {
+			case ACTION_ZHIHU_ITEM:
+			case ACTION_ZHIHU_PAGER:
+				if (savedInstanceState == null) {
+					Fragment fragment =
+							which == ACTION_ZHIHU_ITEM
+							? ZhihuItemFragment.getFragment(getIntent().getLongExtra(Constants.ID, 0L))
+							: PagerItemFragment.getFragment(getIntent().getLongExtra(Constants.ID, 0L),
+									getIntent().getLongExtra(PagerItemFragment.ORDER_ID, 0L));
+					getFragmentManager().beginTransaction()
+							.replace(android.R.id.content, fragment)
+							.commit();
+				} else {
+					injectPager(bar);
+				}
+				break;
+			default:
+				injectPager(bar);
+				break;
 		}
 		if (CatnutApp.getTingtingApp().getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
 			mTracker = EasyTracker.getInstance(this);
+		}
+	}
+
+	private void injectPager(ActionBar bar) {
+		// not show the bar, but not hide, u known what i mean?
+		bar.setDisplayHomeAsUpEnabled(false);
+		bar.setDisplayShowHomeEnabled(false);
+		bar.setDisplayShowTitleEnabled(false);
+		setContentView(R.layout.pager);
+
+		mViewPager = (ViewPager) findViewById(R.id.pager);
+		mViewPager.setPageMargin(10);
+
+		mViewPager.setPageMarginDrawable(new ColorDrawable(getResources().getColor(android.R.color.darker_gray)));
+		mViewPager.setAdapter(new FragmentPagerAdapter(getFragmentManager()) {
+			@Override
+			public Fragment getItem(int position) {
+				switch (position) {
+					case 0:
+					return ZhihuItemsFragment.getFragment();
+					default:
+						return new PlaceHolderFragment();
+				}
+			}
+
+			@Override
+			public int getCount() {
+				return 2;
+			}
+
+			@Override
+			public CharSequence getPageTitle(int position) {
+				switch (position) {
+					case 0:
+						return getString(R.string.read_zhihu);
+					case 1:
+						return "and more...";
+				}
+				return null;
+			}
+		});
+		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+			@Override
+			public void onPageSelected(int position) {
+				getActionBar().setSelectedNavigationItem(position);
+			}
+		});
+		for (int i = 0; i < mViewPager.getAdapter().getCount(); i++) {
+			bar.addTab(bar.newTab().setText(mViewPager.getAdapter().getPageTitle(i)).setTabListener(this));
 		}
 	}
 
@@ -75,15 +148,15 @@ public class PluginsActivity extends Activity implements FragmentManager.OnBackS
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
-				if (ACTION_ZHIHU_PAGER.equals(getIntent().getAction())) {
-					onBackPressed();
-					return true;
-				}
-				int count = getFragmentManager().getBackStackEntryCount();
-				if (count == 0) {
-					navigateUpTo(getIntent());
+				if (getIntent().getIntExtra(Constants.ACTION, -1) != -1) {
+					int count = getFragmentManager().getBackStackEntryCount();
+					if (count == 0) {
+						onBackPressed();
+					} else {
+						getFragmentManager().popBackStack();
+					}
 				} else {
-					getFragmentManager().popBackStack();
+					onBackPressed();
 				}
 				break;
 			default:
@@ -115,5 +188,30 @@ public class PluginsActivity extends Activity implements FragmentManager.OnBackS
 				invalidateOptionsMenu();
 			}
 		});
+	}
+
+	@Override
+	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+		mViewPager.setCurrentItem(tab.getPosition());
+	}
+
+	@Override
+	public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+		// no-op
+	}
+
+	@Override
+	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+		// no-op
+	}
+
+	public static class PlaceHolderFragment extends Fragment {
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			TextView view = (TextView) inflater.inflate(R.layout.empty_list, container, false);
+			view.setTextSize(25);
+			view.setText("if interesting and free, there would be one or more coming :-)");
+			return view;
+		}
 	}
 }

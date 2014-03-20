@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<resources>
+
+	<style name="Theme.Plugins" parent="AppTheme.Light">
+		<item name="android:actionBarStyle">@style/ActionBar_Plug_Light</item>
+	</style>
+
+	<style name="ActionBar_Plug_Light" parent="ActionBar_Light">
+		<item name="android:background">@color/cardTableColor</item>
+		<item name="android:backgroundSplit">@color/cardTableColor</item>
+	</style>
+</resources>

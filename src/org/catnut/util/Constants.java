@@ -14,7 +14,8 @@ package org.catnut.util;
 public class Constants {
 
 	public static final String WEIBO_DOMAIN = "weibo.com/";
-	
+
+	public static final String ACTION = "action";
 	public static final String ID = "id";
 	public static final String PIC = "pic";
 	public static final String IMAGE_DIR = "images/"; // 保持在用户外部存储上的，并非cache的

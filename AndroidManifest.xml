@@ -57,7 +57,9 @@
 				<data android:mimeType="@string/mime_image" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".ui.PluginsActivity" />
+		<activity
+			android:theme="@style/Theme.Plugins"
+			android:name=".ui.PluginsActivity" />
 
 		<provider
 			android:authorities="org.catnut"

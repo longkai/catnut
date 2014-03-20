@@ -96,17 +96,26 @@ public class HomeTimelineFragment extends TimelineFragment implements FragmentCa
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		Log.d(TAG, String.valueOf(savedInstanceState));
+		if (mAdapter != null) {
+			Log.d(TAG, String.valueOf(mAdapter.getCount()));
+		}
 		// refresh it!
 		mPullToRefreshLayout.setRefreshing(true);
-		String key = getString(R.string.pref_first_run);
-		boolean firstRun = mPreferences.getBoolean(key, true);
-		if (firstRun) {
-			refresh();
-			mPreferences.edit().putBoolean(key, false).commit();
-		} else if (mPreferences.getBoolean(getString(R.string.pref_keep_latest), true)) {
-			refresh();
+		if (savedInstanceState == null) {
+			String key = getString(R.string.pref_first_run);
+			boolean firstRun = mPreferences.getBoolean(key, true);
+			if (firstRun) {
+				refresh();
+				mPreferences.edit().putBoolean(key, false).commit();
+			} else if (mPreferences.getBoolean(getString(R.string.pref_keep_latest), true)) {
+				refresh();
+			} else {
+				initFromLocal();
+			}
 		} else {
-			initFromLocal();
+			Log.d(TAG, "rota...");
+			initFromLocal(); // screen rotation
 		}
 	}
 
@@ -128,6 +137,12 @@ public class HomeTimelineFragment extends TimelineFragment implements FragmentCa
 	public void onStop() {
 		super.onStop();
 		mRequestQueue.cancelAll(TAG);
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putString(TAG, TAG);
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override

@@ -17,6 +17,7 @@
 		<!--<item name="android:homeAsUpIndicator">@drawable/ic_title_up_default</item>-->
 		<item name="android:homeAsUpIndicator">@drawable/ic_ab_back</item>
 		<item name="android:actionBarTabStyle">@style/ActionBar_Light_TabStyle</item>
+		<item name="android:actionBarTabTextStyle">@style/ActionBar_Light_TabTextStyle</item>
 		<item name="android:actionBarTabBarStyle">@style/ActionBar_Light_TabBarStyle</item>
 		<item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
 		<item name="android:buttonStyle">@style/RobotoButtonStyle</item>
@@ -49,13 +50,15 @@
 	</style>
 
 	<style name="ActionBar_Light_TabStyle" parent="android:Widget.Holo.Light.ActionBar.TabView">
-		<item name="android:background">@drawable/bg_actionbar</item>
-		<item name="android:paddingLeft">0dp</item>
-		<item name="android:paddingRight">0dp</item>
+		<item name="android:background">@drawable/tab_background</item>
+	</style>
+
+	<style name="ActionBar_Light_TabTextStyle" parent="android:Widget.Holo.ActionBar.TabText">
+		<item name="android:textColor">@color/tab_text</item>
 	</style>
 
 	<style name="ActionBar_Light_TabBarStyle" parent="android:Widget.Holo.Light.ActionBar.TabBar">
-		<item name="android:background">@drawable/bg_actionbar</item>
+		<item name="android:background">@color/ivoryColor</item>
 	</style>
 
 	<!-- Roboto font -->

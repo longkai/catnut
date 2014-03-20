@@ -10,7 +10,12 @@
 	<color name="black_background">#ff333333</color>
 	<color name="menuitem_background">#83c7f8</color>
 	<color name="snowColor">#fffafa</color>
+	<color name="ivoryColor">#fffff0</color>
+	<color name="cardTableColor">#57796b</color>
 	<color name="seashellColor">#fff5ee</color>
+	<color name="tab_selected">#99D9D9</color>
+	<color name="tab_pressed">#8099D9D9</color>
 	<color name="black25PercentColor">#404040</color>
+	<color name="black38PercentColor">#606060</color>
 	<color name="black50PercentColor">#808080</color>
 </resources>
