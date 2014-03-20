@@ -6,6 +6,30 @@
   ~ The software shall be used for good, not evil.
   -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory android:title="@string/fantasy">
+		<CheckBoxPreference
+			android:key="@string/pref_enable_fantasy"
+			android:defaultValue="@bool/default_plugin_status"
+			android:title="@string/enable"
+			android:summary="@string/enable_fantasy_summary" />
+
+		<CheckBoxPreference
+			android:key="@string/pref_enter_home_directly"
+			android:defaultValue="@bool/pref_enter_home_directly"
+			android:title="@string/enter_home_directly"
+			android:summaryOn="@string/enter_home_directly_on_summary"
+			android:summaryOff="@string/enter_home_directly_off_summary" />
+
+		<CheckBoxPreference
+			android:key="@string/pref_fantasy_say_salutation"
+			android:defaultValue="@bool/default_fantasy_say_salutation"
+			android:title="@string/say_salutation"
+			android:summary="@string/fantasy_say_salutation_summary" />
+		<CheckBoxPreference
+			android:title="@string/viewing_mode"
+			android:defaultValue="true"
+			android:summary="@string/fantasy_pager_mode_summary" />
+	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/read_zhihu">
 		<CheckBoxPreference
 			android:key="@string/pref_enable_zhihu"

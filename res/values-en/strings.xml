@@ -144,7 +144,8 @@
 	<string name="enable_fantasy">Enable fantasy</string>
 	<string name="enable_fantasy_summary">If enable, u can find what u might expect:-), wifi recommend</string>
 	<string name="enter_home_directly">Enter home directly</string>
-	<string name="enter_home_directly_summary">Start app entering home directly, no fantasy</string>
+	<string name="enter_home_directly_on_summary">Entering home directly after opening app</string>
+	<string name="enter_home_directly_off_summary">Entering Fantasy directly after opening app</string>
 	<string name="fantasy">Fantasy</string>
 	<string name="unknown_user">\@Weibo User</string>
 	<string name="find_new_version">Find new version! (%1$s)</string>
@@ -198,4 +199,8 @@
 	<string name="auto_refresh">Auto refresh</string>
 	<string name="auto_refresh_on_summary">Auto refresh when opening</string>
 	<string name="auto_refresh_off_summary">Pull to refresh manually</string>
+	<string name="say_salutation">Say app\' s salutation</string>
+	<string name="fantasy_say_salutation_summary">Say salutation from the cover of fantasy, or not</string>
+	<string name="viewing_mode">Viewing mode</string>
+	<string name="fantasy_pager_mode_summary">Swipe left to view last one, right next.</string>
 </resources>

@@ -17,7 +17,8 @@ import org.catnut.R;
  */
 public class PluginsPrefFragment extends PreferenceFragment {
 
-	public static final int ZHIHU = 1;
+	public static final int FANTASY = 1;
+	public static final int ZHIHU = 2;
 
 	public static PluginsPrefFragment getFragment() {
 		return new PluginsPrefFragment();

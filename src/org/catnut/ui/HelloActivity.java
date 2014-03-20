@@ -133,26 +133,26 @@ public class HelloActivity extends Activity {
 		bar.setTitle(R.string.fantasy);
 		TextView about = (TextView) findViewById(R.id.about_body);
 		TextView version = (TextView) findViewById(R.id.app_version);
-		version.setText(getString(R.string.about_version_template, getString(R.string.version_name)));
-
-		// for girl' s day only, in march 7-21
-		Calendar now = Calendar.getInstance();
-		boolean girl = now.get(Calendar.MONTH) == Calendar.MARCH
-				&& now.get(Calendar.DAY_OF_MONTH) >= 7
-				&& now.get(Calendar.DAY_OF_MONTH) <= 21;
-		if (girl) {
-			about.setText(Html.fromHtml(getString(R.string.girls_day)));
-			about.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+		TextView appName = (TextView) findViewById(R.id.app_name);
+		appName.setText(R.string.app_name);
+		TextView appDesc = (TextView) findViewById(R.id.app_desc);
+		appDesc.setText(R.string.app_desc);
+		if (CatnutApp.getBoolean(R.string.pref_fantasy_say_salutation, R.bool.default_fantasy_say_salutation)) {
+			version.setText(getString(R.string.about_version_template, getString(R.string.version_name)));
+			// for girl' s day only, in march 7-21
+			Calendar now = Calendar.getInstance();
+			boolean girl = now.get(Calendar.MONTH) == Calendar.MARCH
+					&& now.get(Calendar.DAY_OF_MONTH) >= 7
+					&& now.get(Calendar.DAY_OF_MONTH) <= 21;
+			if (girl) {
+				about.setText(Html.fromHtml(getString(R.string.girls_day)));
+				about.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+			} else {
+				about.setText(Html.fromHtml(getString(R.string.about_body)));
+				about.setMovementMethod(LinkMovementMethod.getInstance());
+			}
 		} else {
-			about.setText(Html.fromHtml(getString(R.string.about_body)));
-			about.setMovementMethod(LinkMovementMethod.getInstance());
-		}
-
-		String key = getString(R.string.pref_run_times);
-		int runTimes = mPreferences.getInt(key, 0);
-		if (runTimes < MAX_SHOWCASE_TIMES) {
-			Toast.makeText(this, getString(R.string.swipe_right_hint), Toast.LENGTH_LONG).show();
-			mPreferences.edit().putInt(key, runTimes + 1);
+			mAbout.setVisibility(View.GONE);
 		}
 
 		loadImage();
@@ -319,7 +319,11 @@ public class HelloActivity extends Activity {
 					mFantasyDesc.setText(Html.fromHtml(desc));
 				}
 			} else {
-				mAbout.setVisibility(View.VISIBLE);
+				if (CatnutApp.getBoolean(R.string.pref_fantasy_say_salutation, R.bool.default_fantasy_say_salutation)) {
+					mAbout.setVisibility(View.VISIBLE);
+				} else {
+					mAbout.setVisibility(View.GONE);
+				}
 				mFantasyDesc.setVisibility(View.GONE);
 			}
 		}

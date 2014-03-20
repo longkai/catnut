@@ -180,7 +180,8 @@
 	<string name="enable_fantasy">启用fantasy</string>
 	<string name="enable_fantasy_summary">启用后，你可以发现意象不到的精彩瞬间:-)，建议在wifi下开启</string>
 	<string name="enter_home_directly">直接进入主页</string>
-	<string name="enter_home_directly_summary">启动应用后直接进入主页时间线，不显示fantasy</string>
+	<string name="enter_home_directly_on_summary">启动应用后进入Fantasy</string>
+	<string name="enter_home_directly_off_summary">启动应用后进入主页时间线</string>
 	<string name="fantasy">fantasy</string>
 	<string name="unknown_user">\@微博用户</string>
 	<string name="find_new_version">发现新版本！（%1$s）</string>
@@ -238,4 +239,8 @@
 	<string name="auto_refresh">自动刷新</string>
 	<string name="auto_refresh_on_summary">每次启用时自动刷新条目</string>
 	<string name="auto_refresh_off_summary">自行下拉刷新</string>
+	<string name="say_salutation">显示应用说明</string>
+	<string name="fantasy_say_salutation_summary">是否在Fantasy封面上显示应用信息</string>
+	<string name="viewing_mode">查看模式</string>
+	<string name="fantasy_pager_mode_summary">向左滑动查看上一张，向右滑动查看下一张</string>
 </resources>

@@ -30,18 +30,6 @@
 			android:title="@string/show_latest_tweet"
 			android:summary="@string/show_latest_tweet_summary" />
 
-		<CheckBoxPreference
-			android:key="@string/pref_enter_home_directly"
-			android:defaultValue="@bool/pref_enter_home_directly"
-			android:title="@string/enter_home_directly"
-			android:summary="@string/enter_home_directly_summary" />
-
-		<CheckBoxPreference
-			android:key="@string/pref_enable_fantasy"
-			android:defaultValue="@bool/pref_enable_fantasy"
-			android:title="@string/enable_fantasy"
-			android:summary="@string/enable_fantasy_summary" />
-
 		<Preference
 			android:key="@string/pref_clear_cache"
 			android:summary="@string/clear_cache_summary"

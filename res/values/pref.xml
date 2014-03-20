@@ -34,8 +34,7 @@
 	<string name="default_line_spacing">1.0</string>
 
 	<bool name="pref_load_more_from_cloud">true</bool>
-	<bool name="pref_enable_fantasy">true</bool>
-	<bool name="pref_enter_home_directly">true</bool>
+
 	<!-- cannot use integer array Orz... -->
 	<string-array name="fetch_size_pref_entries">
 		<item>20</item>
