@@ -130,16 +130,11 @@ public class ZhihuItemFragment extends Fragment implements
 					}
 				}
 		);
-		if (savedInstanceState != null) {
-			int scrollY = savedInstanceState.getInt(TAG);
-			Log.d(TAG, String.valueOf(scrollY));
-			mQuickReturnLayout.setScrollY(scrollY);
-		}
 		return view;
 	}
 
 	@Override
-	public void onViewCreated(final View view, Bundle savedInstanceState) {
+	public void onViewCreated(final View view, final Bundle savedInstanceState) {
 		final TextView title = (TextView) view.findViewById(android.R.id.title);
 		final TextView author = (TextView) view.findViewById(R.id.author);
 		final TextView lastAlterDate = (TextView) view.findViewById(R.id.last_alter_date);
@@ -259,6 +254,16 @@ public class ZhihuItemFragment extends Fragment implements
 							lastAlterDate.setText(DateUtils.getRelativeTimeSpanString(_lastAlterDate));
 							if (mPullToRefreshLayout != null) {
 								mPullToRefreshLayout.setRefreshComplete();
+							}
+							if (savedInstanceState != null) {
+								final int scrollY = savedInstanceState.getInt(TAG);
+								mQuickReturnLayout.scrollTo(0, scrollY);
+								mQuickReturnLayout.postDelayed(new Runnable() {
+									@Override
+									public void run() {
+										mQuickReturnLayout.scrollTo(0, scrollY);
+									}
+								}, 500);
 							}
 						}
 					});

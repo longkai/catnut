@@ -185,4 +185,6 @@
 	<string name="downloading_img">Image downloading...</string>
 	<string name="img_download_done">Image downloaded.</string>
 	<string name="total_cache_img">Cache %1$s images.</string>
+	<string name="pager_mode">Swipe read mode</string>
+	<string name="simple_mode">Simple read mode</string>
 </resources>

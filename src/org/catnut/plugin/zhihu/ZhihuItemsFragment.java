@@ -9,6 +9,7 @@ import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -68,6 +69,8 @@ public class ZhihuItemsFragment extends ListFragment implements
 	private int mCount = PAGE_SIZE;
 	// 本地items总数
 	private int mTotal;
+
+	private boolean mUsePagerMode = false;
 
 	// 载入本地items总数线程
 	private Runnable mLoadTotalCount = new Runnable() {
@@ -135,6 +138,8 @@ public class ZhihuItemsFragment extends ListFragment implements
 		menu.add(Menu.NONE, R.id.refresh, Menu.NONE, R.string.refresh)
 				.setIcon(R.drawable.ic_action_retry)
 				.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+		menu.add(Menu.NONE, R.id.pager, Menu.NONE, R.string.pager_mode)
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 	}
 
 	@Override
@@ -146,10 +151,19 @@ public class ZhihuItemsFragment extends ListFragment implements
 					refresh();
 				}
 				break;
+			case R.id.pager:
+				mUsePagerMode = !mUsePagerMode;
+				break;
 			default:
 				break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		MenuItem item = menu.findItem(R.id.pager);
+		item.setTitle(mUsePagerMode ? getString(R.string.simple_mode) : getString(R.string.pager_mode));
 	}
 
 	@Override
@@ -158,8 +172,17 @@ public class ZhihuItemsFragment extends ListFragment implements
 		long answer_id = c.getLong(c.getColumnIndex(Zhihu.ANSWER_ID));
 		// 跳转
 		PluginsActivity activity = (PluginsActivity) getActivity();
-		activity.flipCard(ZhihuItemFragment.getFragment(answer_id), null, true);
-//		activity.flipCard(PagerItemFragment.getFragment(answer_id, id), null, true);
+		if (mUsePagerMode) {
+			Toast.makeText(activity, "not stability yet:-(", Toast.LENGTH_SHORT).show();
+			Intent intent = new Intent(activity, PluginsActivity.class);
+			intent.putExtra(PagerItemFragment.ORDER_ID, id);
+			intent.putExtra(Constants.ID, answer_id);
+			intent.setAction(PluginsActivity.ACTION_ZHIHU_PAGER);
+			startActivity(intent);
+//			activity.flipCard(PagerItemFragment.getFragment(answer_id, id), null, true);
+		} else {
+			activity.flipCard(ZhihuItemFragment.getFragment(answer_id), null, true);
+		}
 	}
 
 	@Override

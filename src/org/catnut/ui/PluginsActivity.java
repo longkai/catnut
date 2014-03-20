@@ -15,7 +15,9 @@ import android.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
+import org.catnut.plugin.zhihu.PagerItemFragment;
 import org.catnut.plugin.zhihu.ZhihuItemsFragment;
+import org.catnut.util.Constants;
 
 /**
  * 插件界面
@@ -23,6 +25,8 @@ import org.catnut.plugin.zhihu.ZhihuItemsFragment;
  * @author longkai
  */
 public class PluginsActivity extends Activity implements FragmentManager.OnBackStackChangedListener {
+
+	public static final String ACTION_ZHIHU_PAGER = "action_zhihu_pager";
 
 	private EasyTracker mTracker;
 
@@ -35,8 +39,15 @@ public class PluginsActivity extends Activity implements FragmentManager.OnBackS
 		getActionBar().setTitle(R.string.plugins);
 		getFragmentManager().addOnBackStackChangedListener(this);
 		if (savedInstanceState == null) {
+			Fragment fragment;
+			if (ACTION_ZHIHU_PAGER.equals(getIntent().getAction())) {
+				fragment = PagerItemFragment.getFragment(getIntent().getLongExtra(Constants.ID, 0L),
+						getIntent().getLongExtra(PagerItemFragment.ORDER_ID, 0L));
+			} else {
+				fragment = ZhihuItemsFragment.getFragment();
+			}
 			getFragmentManager().beginTransaction()
-					.replace(android.R.id.content, ZhihuItemsFragment.getFragment())
+					.replace(android.R.id.content, fragment)
 					.commit();
 		}
 		if (CatnutApp.getTingtingApp().getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
@@ -64,6 +75,10 @@ public class PluginsActivity extends Activity implements FragmentManager.OnBackS
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
+				if (ACTION_ZHIHU_PAGER.equals(getIntent().getAction())) {
+					onBackPressed();
+					return true;
+				}
 				int count = getFragmentManager().getBackStackEntryCount();
 				if (count == 0) {
 					navigateUpTo(getIntent());

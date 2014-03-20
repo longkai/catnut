@@ -225,4 +225,6 @@
 	<string name="downloading_img">下载图片中...</string>
 	<string name="img_download_done">图片下载完毕！</string>
 	<string name="total_cache_img">共缓存%1$s张图片</string>
+	<string name="pager_mode">左右切换阅读模式</string>
+	<string name="simple_mode">普通模式</string>
 </resources>
