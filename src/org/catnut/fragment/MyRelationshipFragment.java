@@ -97,10 +97,13 @@ public class MyRelationshipFragment extends TimelineFragment {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		// refresh it!
-		// refresh it!
+		// load it!
 		mPullToRefreshLayout.setRefreshing(true);
-		refresh();
+		if (savedInstanceState == null) {
+			refresh();
+		} else {
+			initFromLocal();
+		}
 	}
 
 	@Override

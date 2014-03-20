@@ -42,6 +42,7 @@ import org.json.JSONObject;
  */
 public class ConversationFragment extends TimelineFragment {
 
+
 	public static final String TAG = ConversationFragment.class.getSimpleName();
 
 	private static final String[] PROJECTION = new String[]{
@@ -78,15 +79,19 @@ public class ConversationFragment extends TimelineFragment {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		// refresh it!
+		// load it!
 		mPullToRefreshLayout.setRefreshing(true);
-		String key = getString(R.string.pref_first_run);
-		boolean firstRun = mPreferences.getBoolean(key, true);
-		if (firstRun) {
-			refresh();
-			mPreferences.edit().putBoolean(key, false).commit();
-		} else if (mPreferences.getBoolean(getString(R.string.pref_keep_latest), true)) {
-			refresh();
+		if (savedInstanceState == null) {
+			String key = getString(R.string.pref_first_run);
+			boolean firstRun = mPreferences.getBoolean(key, true);
+			if (firstRun) {
+				refresh();
+				mPreferences.edit().putBoolean(key, false).commit();
+			} else if (mPreferences.getBoolean(getString(R.string.pref_keep_latest), true)) {
+				refresh();
+			} else {
+				initFromLocal();
+			}
 		} else {
 			initFromLocal();
 		}

@@ -424,8 +424,12 @@ public class TweetFragment extends Fragment implements
 		});
 		// 载入评论
 		mPullToRefreshLayout.setRefreshing(true);
-		if (mPreferences.getBoolean(getString(R.string.pref_keep_latest), true)) {
-			refresh();
+		if (savedInstanceState == null) {
+			if (mPreferences.getBoolean(getString(R.string.pref_keep_latest), true)) {
+				refresh();
+			} else {
+				initFromLocal();
+			}
 		} else {
 			initFromLocal();
 		}
@@ -701,10 +705,10 @@ public class TweetFragment extends Fragment implements
 			// 可以加载更多，但是我们需要判断一下是否加载完了，没有更多了
 			if (mAdapter.getCount() >= mTotal || mLastTotalCount == mAdapter.getCount()) {
 				Log.d(TAG, "load all done...");
-				if (mShowToastTimes < MAX_SHOW_TOAST_TIME) {
-					Toast.makeText(getActivity(), R.string.no_more, Toast.LENGTH_SHORT).show();
-					mShowToastTimes++;
-				}
+//				if (mShowToastTimes < MAX_SHOW_TOAST_TIME) {
+//					Toast.makeText(getActivity(), R.string.no_more, Toast.LENGTH_SHORT).show();
+//					mShowToastTimes++;
+//				}
 			} else {
 				Log.d(TAG, "load...");
 				loadMore(mAdapter.getItemId(mAdapter.getCount() - 1));

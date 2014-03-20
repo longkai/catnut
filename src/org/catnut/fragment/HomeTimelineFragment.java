@@ -96,10 +96,6 @@ public class HomeTimelineFragment extends TimelineFragment implements FragmentCa
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		Log.d(TAG, String.valueOf(savedInstanceState));
-		if (mAdapter != null) {
-			Log.d(TAG, String.valueOf(mAdapter.getCount()));
-		}
 		// refresh it!
 		mPullToRefreshLayout.setRefreshing(true);
 		if (savedInstanceState == null) {
@@ -114,7 +110,6 @@ public class HomeTimelineFragment extends TimelineFragment implements FragmentCa
 				initFromLocal();
 			}
 		} else {
-			Log.d(TAG, "rota...");
 			initFromLocal(); // screen rotation
 		}
 	}
