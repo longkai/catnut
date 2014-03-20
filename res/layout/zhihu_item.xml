@@ -31,7 +31,7 @@
 				<View
 					android:id="@id/place_holder"
 					android:layout_width="match_parent"
-					android:layout_height="100dp" />
+					android:layout_height="@dimen/zhihu_title_height" />
 
 				<LinearLayout
 					android:layout_marginTop="@dimen/small"
@@ -88,7 +88,7 @@
 				android:textColor="@color/black25PercentColor"
 				android:textAppearance="?android:attr/textAppearanceLarge"
 				android:layout_width="match_parent"
-				android:layout_height="100dp" />
+				android:layout_height="@dimen/zhihu_title_height" />
 		</FrameLayout>
 	</org.catnut.support.QuickReturnScrollView>
 </uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>

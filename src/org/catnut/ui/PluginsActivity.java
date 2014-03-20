@@ -111,7 +111,7 @@ public class PluginsActivity extends Activity implements
 					case 0:
 						return getString(R.string.read_zhihu);
 					case 1:
-						return "and more...";
+						return "more plugins...";
 				}
 				return null;
 			}

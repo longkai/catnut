@@ -310,6 +310,7 @@ public class MainActivity extends Activity implements
 		findViewById(R.id.action_share_app).setOnClickListener(this);
 		findViewById(R.id.action_view_source_code).setOnClickListener(this);
 		findViewById(R.id.fantasy).setOnClickListener(this);
+		findViewById(R.id.plugins).setOnClickListener(this);
 	}
 
 	@Override
@@ -415,6 +416,7 @@ public class MainActivity extends Activity implements
 
 	@Override
 	public void onClick(View v) {
+		mDrawerLayout.closeDrawer(mQuickReturnDrawer);
 		Fragment fragment = null;
 		String tag = null;
 		switch (v.getId()) {
@@ -456,6 +458,9 @@ public class MainActivity extends Activity implements
 			case R.id.fantasy:
 				startActivity(new Intent(this, HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG));
 				return;
+			case R.id.plugins:
+				startActivity(new Intent(this, PluginsActivity.class));
+				return;
 			case R.id.fetch_news:
 				fetchNews();
 				return;
@@ -487,7 +492,6 @@ public class MainActivity extends Activity implements
 				Toast.makeText(this, "sorry, not yet implemented =.=", Toast.LENGTH_SHORT).show();
 				return;
 		}
-		mDrawerLayout.closeDrawer(mQuickReturnDrawer);
 		if (fragment != null) {
 			pendingFragment(fragment, tag);
 		}

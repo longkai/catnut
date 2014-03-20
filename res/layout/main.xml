@@ -198,6 +198,11 @@
 						style="@style/Profile_Action" />
 
 					<TextView
+						android:id="@+id/plugins"
+						android:text="@string/plugins"
+						style="@style/Profile_Action" />
+
+					<TextView
 						android:id="@+id/action_share_app"
 						android:text="@string/share_app"
 						style="@style/Profile_Action" />
@@ -236,7 +241,6 @@
 
 				<LinearLayout
 					android:id="@+id/news"
-					android:background="@drawable/balloon_pressed"
 					android:layout_marginTop="@dimen/medium"
 					android:orientation="horizontal"
 					android:showDividers="middle"
