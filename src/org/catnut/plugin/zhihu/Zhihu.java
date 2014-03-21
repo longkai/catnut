@@ -8,16 +8,19 @@ package org.catnut.plugin.zhihu;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.provider.BaseColumns;
+import org.catnut.R;
+import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutMetadata;
 import org.catnut.core.CatnutProcessor;
 import org.catnut.core.CatnutProvider;
 import org.catnut.util.CatnutUtils;
 import org.json.JSONArray;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 知乎的一条精选回答条目
@@ -136,6 +139,19 @@ public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 	}
 
 	/**
+	 * 获取本地缓存的图片地址
+	 *
+	 * @param context
+	 * @param uri
+	 * @return
+	 */
+	public static Uri getCacheImageLocation(Context context, Uri uri) {
+		File img = new File(context.getExternalCacheDir() + File.separator
+				+ CACHE_IMAGE_LOCATION + File.separator + uri.getLastPathSegment());
+		return Uri.fromFile(img);
+	}
+
+	/**
 	 * 每日精选处理器
 	 *
 	 * @author longkai
@@ -143,8 +159,6 @@ public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 	public static class ZhihuProcessor implements CatnutProcessor<JSONArray> {
 
 		private static ZhihuProcessor processor;
-
-		public static final Pattern HTML_IMG = Pattern.compile("\\s*(?i)src\\s*=\\s*(\"([^\"]*)\"|'[^']*'|([^'\">\\s]+))");
 
 		private ZhihuProcessor() {
 		}
@@ -163,27 +177,29 @@ public class Zhihu implements CatnutMetadata<JSONArray, ContentValues> {
 			Matcher matcher;
 			for (int i = 0; i < items.length; i++) {
 				items[i] = METADATA.convert(data.optJSONArray(i));
-				matcher = HTML_IMG.matcher(items[i].getAsString(Zhihu.DESCRIPTION));
+				matcher = ZhihuItemFragment.HTML_IMG.matcher(items[i].getAsString(Zhihu.DESCRIPTION));
 				while (matcher.find()) {
-					String group = matcher.group();
+					String group = matcher.group(1);
 					images.add(group);
 				}
-				matcher = HTML_IMG.matcher(items[i].getAsString(Zhihu.ANSWER));
+				matcher = ZhihuItemFragment.HTML_IMG.matcher(items[i].getAsString(Zhihu.ANSWER));
 				while (matcher.find()) {
-					String group = matcher.group(2);
+					String group = matcher.group(1);
 					images.add(group);
 				}
 			}
 			context.getContentResolver().bulkInsert(CatnutProvider.parse(MULTIPLE), items);
-//			try {
-//				String location = CatnutUtils.mkdir(context, Zhihu.CACHE_IMAGE_LOCATION);
-//				Intent intent = new Intent(context, ImagesDownloader.class);
-//				intent.putExtra(ImagesDownloader.LOCATION, location);
-//				intent.putStringArrayListExtra(ImagesDownloader.URLS, images);
-//				context.startService(intent);
-//			} catch (Exception e) {
-//				// no-op, just quit download the images...
-//			}
+			if (CatnutApp.getBoolean(R.string.pref_enable_cache_zhihu_images, R.bool.default_plugin_status)) {
+				try {
+					String location = CatnutUtils.mkdir(context, Zhihu.CACHE_IMAGE_LOCATION);
+					Intent intent = new Intent(context, ImagesDownloader.class);
+					intent.putExtra(ImagesDownloader.LOCATION, location);
+					intent.putStringArrayListExtra(ImagesDownloader.URLS, images);
+					context.startService(intent);
+				} catch (Exception e) {
+					// no-op, just quit download the images...
+				}
+			}
 		}
 	}
 }

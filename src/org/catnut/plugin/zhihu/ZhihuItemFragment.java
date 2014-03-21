@@ -20,7 +20,6 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import org.catnut.R;
+import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
 import org.catnut.fragment.GalleryPagerFragment;
 import org.catnut.support.QuickReturnScrollView;
@@ -193,6 +193,9 @@ public class ZhihuItemFragment extends Fragment implements
 								mImageUrls = new String[l];
 							}
 
+							// 是否使用缓存的图片
+							boolean useCachedImg = CatnutApp.getBoolean(R.string.pref_enable_cache_zhihu_images, R.bool.default_plugin_status);
+
 							l = 0; // reset for reuse
 							String text;
 							LayoutInflater inflater = LayoutInflater.from(getActivity());
@@ -213,7 +216,7 @@ public class ZhihuItemFragment extends Fragment implements
 										} else {
 											ImageView imageView = (ImageView) inflater.inflate(R.layout.zhihu_image, null);
 											Picasso.with(getActivity())
-													.load(text)
+													.load(useCachedImg ? Zhihu.getCacheImageLocation(getActivity(), Uri.parse(text)) : Uri.parse(text))
 													.centerCrop()
 													.resize(200, 200)
 													.error(R.drawable.error)
@@ -239,7 +242,7 @@ public class ZhihuItemFragment extends Fragment implements
 									} else {
 										ImageView image = (ImageView) inflater.inflate(R.layout.zhihu_image, null);
 										Picasso.with(getActivity())
-												.load(text)
+												.load(useCachedImg ? Zhihu.getCacheImageLocation(getActivity(), Uri.parse(text)) : Uri.parse(text))
 												.centerCrop()
 												.resize(200, 200)
 												.error(R.drawable.error)

@@ -85,7 +85,7 @@ public class ImagesDownloader extends IntentService {
 			mNotificationManager.notify(ID, mBuilder.build());
 
 			mBuilder.setContentText(getString(R.string.img_download_done))
-					.setContentText(getString(R.string.total_cache_img, urls.size()))
+					.setContentText(getString(R.string.total_cache_img, urls.size(), location))
 					.setAutoCancel(true);
 			mNotificationManager.notify(ID, mBuilder.build());
 		}

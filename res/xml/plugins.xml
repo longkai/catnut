@@ -50,5 +50,11 @@
 			android:defaultValue="@bool/default_plugin_status"
 			android:summaryOn="@string/auto_refresh_on_summary"
 			android:summaryOff="@string/auto_refresh_off_summary" />
+
+		<CheckBoxPreference
+			android:key="@string/pref_enable_cache_zhihu_images"
+			android:title="@string/cache_images"
+			android:defaultValue="@bool/default_plugin_status"
+			android:summary="@string/cache_images_summary" />
 	</PreferenceCategory>
 </PreferenceScreen>

@@ -12,10 +12,6 @@
 		android:icon="@drawable/ic_title_compose"
 		android:showAsAction="always" />
 	<item
-		android:id="@+id/fantasy"
-		android:title="@string/fantasy"
-		android:showAsAction="never" />
-	<item
 		android:id="@+id/cancellation"
 		android:title="@string/cancellation"
 		android:showAsAction="never" />

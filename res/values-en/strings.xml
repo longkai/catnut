@@ -185,7 +185,7 @@
 	<string name="zhihu_view_on_web">View it on web</string>
 	<string name="downloading_img">Image downloading...</string>
 	<string name="img_download_done">Image downloaded.</string>
-	<string name="total_cache_img">Cache %1$s images.</string>
+	<string name="total_cache_img">Cached %1$s images in %2$s.</string>
 	<string name="pager_mode">Swipe read mode</string>
 	<string name="simple_mode">Simple read mode</string>
 	<string name="tweet_text_copied">Text copied to clip board.</string>
@@ -203,4 +203,6 @@
 	<string name="fantasy_say_salutation_summary">Say salutation from the cover of fantasy, or not</string>
 	<string name="viewing_mode">Viewing mode</string>
 	<string name="fantasy_pager_mode_summary">Swipe left to view last one, right next.</string>
+	<string name="cache_images">Cache images</string>
+	<string name="cache_images_summary">Cache all the images in Android\' default location when loading items</string>
 </resources>
