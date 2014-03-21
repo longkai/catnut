@@ -26,6 +26,8 @@ public class Constants {
 	public static final String JPG = ".jpg";
 	public static final String JSON = "json";
 
+	public static final float GOLDEN_RATIO = 0.618f;
+
 	public static final String SHARE_IMAGE = "share.png";
 
 	// for error dialog box

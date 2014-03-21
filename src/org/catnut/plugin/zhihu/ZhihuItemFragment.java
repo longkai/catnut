@@ -25,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -197,9 +198,9 @@ public class ZhihuItemFragment extends Fragment implements
 
 							l = 0; // reset for reuse
 							String text;
+							int screenWidth = CatnutUtils.getScreenWidth(getActivity());
 							LayoutInflater inflater = LayoutInflater.from(getActivity());
-							if (TextUtils.isEmpty(_question)) {
-							} else {
+							if (!TextUtils.isEmpty(_question)) {
 								ViewGroup questionHolder = (ViewGroup) view.findViewById(R.id.question);
 								for (int i = 0; i < questionSegment.size(); i++) {
 									text = questionSegment.get(i);
@@ -213,12 +214,11 @@ public class ZhihuItemFragment extends Fragment implements
 											CatnutUtils.removeLinkUnderline(section);
 											questionHolder.addView(section);
 										} else {
-											ImageView imageView = (ImageView) inflater.inflate(R.layout.zhihu_image, null);
+											ImageView imageView = getImageView();
 											Uri uri = useCachedImg ? Zhihu.getCacheImageLocation(getActivity(), Uri.parse(text)) : Uri.parse(text);
 											Picasso.with(getActivity())
 													.load(uri)
-													.centerCrop()
-													.resize(200, 200)
+													.resize(screenWidth, (int) (Constants.GOLDEN_RATIO * screenWidth))
 													.error(R.drawable.error)
 													.into(imageView);
 											imageView.setTag(l++); // for click
@@ -240,12 +240,11 @@ public class ZhihuItemFragment extends Fragment implements
 										section.setMovementMethod(LinkMovementMethod.getInstance());
 										answerHolder.addView(section);
 									} else {
-										ImageView image = (ImageView) inflater.inflate(R.layout.zhihu_image, null);
+										ImageView image = getImageView();
 										Uri uri = useCachedImg ? Zhihu.getCacheImageLocation(getActivity(), Uri.parse(text)) : Uri.parse(text);
 										Picasso.with(getActivity())
 												.load(uri)
-												.centerCrop()
-												.resize(200, 200)
+												.resize(screenWidth, (int) (Constants.GOLDEN_RATIO * screenWidth))
 												.error(R.drawable.error)
 												.into(image);
 										image.setTag(l++); // 方便点击事件
@@ -277,6 +276,19 @@ public class ZhihuItemFragment extends Fragment implements
 				}
 			}
 		})).start();
+	}
+
+	private ImageView getImageView() {
+		ImageView image = new ImageView(getActivity());
+		image.setAdjustViewBounds(true);
+		image.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return CatnutUtils.imageOverlay(v, event);
+			}
+		});
+		image.setOnClickListener(this);
+		return image;
 	}
 
 	@Override
@@ -445,6 +457,9 @@ public class ZhihuItemFragment extends Fragment implements
 
 	@Override
 	public void onClick(View v) {
+		ImageView image = (ImageView) v;
+		((ImageView) v).getDrawable().clearColorFilter();
+		image.invalidate();
 		Integer index = (Integer) v.getTag();
 		Intent intent = SingleFragmentActivity.getIntent(getActivity(), SingleFragmentActivity.GALLERY);
 		intent.putExtra(GalleryPagerFragment.CUR_INDEX, index);

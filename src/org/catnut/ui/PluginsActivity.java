@@ -30,8 +30,8 @@ import org.catnut.plugin.zhihu.ZhihuItemFragment;
 import org.catnut.plugin.zhihu.ZhihuItemsFragment;
 import org.catnut.util.Constants;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * 插件界面
@@ -51,6 +51,8 @@ public class PluginsActivity extends Activity implements
 	private Handler mHandler = new Handler();
 
 	private ViewPager mViewPager;
+
+	private List<Integer> mIds;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -72,8 +74,6 @@ public class PluginsActivity extends Activity implements
 					getFragmentManager().beginTransaction()
 							.replace(android.R.id.content, fragment)
 							.commit();
-				} else {
-					injectPager(bar, savedInstanceState);
 				}
 				break;
 			default:
@@ -92,11 +92,11 @@ public class PluginsActivity extends Activity implements
 		bar.setDisplayShowTitleEnabled(false);
 		setContentView(R.layout.pager);
 
-		final ArrayList<Integer> ids = getIntent().getIntegerArrayListExtra(PLUGINS);
+		mIds = getIntent().getIntegerArrayListExtra(PLUGINS);
 		if (savedInstanceState == null) {
-			ids.add(0); // add an alt one...
+			mIds.add(0); // add an alt one...
 		}
-		Collections.shuffle(ids); // shuffle it :-)
+		Collections.shuffle(mIds); // shuffle it :-)
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setPageMargin(10);
 
@@ -105,7 +105,7 @@ public class PluginsActivity extends Activity implements
 			@Override
 			public Fragment getItem(int position) {
 				Fragment fragment;
-				switch (ids.get(position)) {
+				switch (mIds.get(position)) {
 					case PluginsPrefFragment.ZHIHU:
 						fragment = ZhihuItemsFragment.getFragment();
 						break;
@@ -121,12 +121,12 @@ public class PluginsActivity extends Activity implements
 
 			@Override
 			public int getCount() {
-				return ids.size();
+				return mIds.size();
 			}
 
 			@Override
 			public CharSequence getPageTitle(int position) {
-				switch (ids.get(position)) {
+				switch (mIds.get(position)) {
 					case PluginsPrefFragment.ZHIHU:
 						return getString(R.string.read_zhihu);
 					case PluginsPrefFragment.FANTASY:
