@@ -16,7 +16,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Spinner;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.etsy.android.grid.StaggeredGridView;
@@ -40,7 +42,7 @@ import uk.co.senab.actionbarpulltorefresh.library.viewdelegates.AbsListViewDeleg
  * @author longkai
  */
 public class FantasyFallFragment extends Fragment implements
-		LoaderManager.LoaderCallbacks<Cursor>, AbsListView.OnScrollListener, OnRefreshListener {
+		LoaderManager.LoaderCallbacks<Cursor>, AbsListView.OnScrollListener, OnRefreshListener, AdapterView.OnItemSelectedListener {
 
 	public static final String TAG = FantasyFallFragment.class.getSimpleName();
 
@@ -53,9 +55,12 @@ public class FantasyFallFragment extends Fragment implements
 	};
 
 	protected PullToRefreshLayout mPullToRefreshLayout;
+	private Spinner mSwitcher;
 
 	private StaggeredGridView mFall;
 	private FantasyFallAdapter mAdapter;
+
+	private String mChoice = Photo.FEATURE_POPULAR;
 
 	public static FantasyFallFragment getFragment() {
 		return new FantasyFallFragment();
@@ -69,13 +74,15 @@ public class FantasyFallFragment extends Fragment implements
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		mSwitcher = (Spinner) inflater.inflate(R.layout.fantasy_fall_spinner, null);
 		return inflater.inflate(R.layout.fantasy_fall, container, false);
 	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
+		mSwitcher.setOnItemSelectedListener(this);
 		mFall = (StaggeredGridView) view.findViewById(R.id.fall);
-
+		mFall.addHeaderView(mSwitcher);
 		mPullToRefreshLayout = (PullToRefreshLayout) view.findViewById(R.id.pull2refresh);
 		ActionBarPullToRefresh.from(getActivity())
 				.options(Options.create().build())
@@ -99,7 +106,7 @@ public class FantasyFallFragment extends Fragment implements
 				getActivity(),
 				CatnutProvider.parse(Photo.MULTIPLE),
 				PROJECTION,
-				null,
+				Photo.feature + "=" + CatnutUtils.quote(mChoice),
 				null,
 				Photo.TABLE,
 				null,
@@ -141,8 +148,8 @@ public class FantasyFallFragment extends Fragment implements
 	public void onRefreshStarted(final View view) {
 		CatnutApp.getTingtingApp().getRequestQueue().add(new CatnutRequest(
 				getActivity(),
-				_500pxAPI.photos(Photo.FEATURE_POPULAR, 0),
-				new Photo._500pxProcessor(),
+				_500pxAPI.photos(mChoice, 0),
+				new Photo._500pxProcessor(mChoice),
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {
@@ -156,5 +163,39 @@ public class FantasyFallFragment extends Fragment implements
 					}
 				}
 		));
+	}
+
+	@Override
+	public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+		String last = mChoice;
+		switch (position) {
+			default:
+			case 0:
+				mChoice = Photo.FEATURE_POPULAR;
+				break;
+			case 1:
+				mChoice = Photo.FEATURE_UPCOMING;
+				break;
+			case 2:
+				mChoice = Photo.FEATURE_FRESH_TODAY;
+				break;
+			case 3:
+				mChoice = Photo.FEATURE_EDITORS;
+				break;
+			case 4:
+				mChoice = Photo.FEATURE_FRESH_YESTERDAY;
+				break;
+			case 5:
+				mChoice = Photo.FEATURE_FRESH_WEEK;
+				break;
+		}
+		if (!mChoice.equals(last)) {
+			getLoaderManager().restartLoader(0, null, this);
+		}
+	}
+
+	@Override
+	public void onNothingSelected(AdapterView<?> parent) {
+		// no-op
 	}
 }

@@ -205,4 +205,13 @@
 	<string name="fantasy_pager_mode_summary">Swipe left to view last one, right next.</string>
 	<string name="cache_images">Cache images</string>
 	<string name="cache_images_summary">Cache all the images in Android\' default location when loading items</string>
+
+	<string-array name="fantasy_features">
+		<item>popular</item>
+		<item>upcoming</item>
+		<item>fresh_today</item>
+		<item>editors</item>
+		<item>fresh_yesterday</item>
+		<item>fresh_week</item>
+	</string-array>
 </resources>

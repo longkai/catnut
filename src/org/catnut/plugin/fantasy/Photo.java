@@ -35,7 +35,7 @@ public class Photo implements CatnutMetadata<JSONObject, ContentValues> {
 	public static final String LAST_FANTASY_MILLIS = "last_fantasy_millis";
 
 	public static final String FEATURE_POPULAR = "popular";
-	public static final String feature_editors = "editors";
+	public static final String FEATURE_EDITORS = "editors";
 	public static final String FEATURE_UPCOMING = "upcoming";
 	public static final String FEATURE_FRESH_TODAY = "fresh_today";
 	public static final String FEATURE_FRESH_YESTERDAY = "fresh_yesterday";

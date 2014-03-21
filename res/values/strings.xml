@@ -245,4 +245,12 @@
 	<string name="fantasy_pager_mode_summary">向左滑动查看上一张，向右滑动查看下一张</string>
 	<string name="cache_images">缓存图片</string>
 	<string name="cache_images_summary">加载条目时自动下载全部条目的图片缓存在本地Android官方指定的文件夹，不会产生垃圾文件夹</string>
+	<string-array name="fantasy_features">
+		<item>最受欢迎</item>
+		<item>即将到来</item>
+		<item>今日更新</item>
+		<item>编辑推荐</item>
+		<item>昨日精彩</item>
+		<item>本周主打</item>
+	</string-array>
 </resources>
