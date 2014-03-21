@@ -13,6 +13,7 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import org.catnut.R;
 import org.catnut.metadata.AccessToken;
 import org.json.JSONObject;
 
@@ -33,9 +34,6 @@ public class CatnutApp extends Application implements SharedPreferences.OnShared
 
 	public static final String TAG = "CatnutApp";
 
-	private static int DISK_IMAGE_CACHE_SIZE = 1024 * 1024 * 10;
-	private static int DISK_IMAGE_CACHE_QUALITY = 100;
-
 	/** singleton */
 	private static CatnutApp sApp;
 	/** http request header for weibo' s access token */
@@ -52,6 +50,16 @@ public class CatnutApp extends Application implements SharedPreferences.OnShared
 		mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		mPreferences.registerOnSharedPreferenceChangeListener(this);
 		mRequestQueue = Volley.newRequestQueue(this);
+		// solve the first time entering settings problem -> the timeline will be empty 'cause many pref got changed :-(
+		if (!mPreferences.contains(getString(R.string.pref_first_run))) {
+			Resources res = getResources();
+			SharedPreferences.Editor edit = mPreferences.edit();
+			edit.putString(getString(R.string.pref_tweet_font_size), String.valueOf(res.getInteger(R.integer.default_tweet_font_size)));
+			edit.putString(getString(R.string.pref_line_spacing), res.getString(R.string.default_line_spacing));
+			edit.putString(getString(R.string.pref_customize_tweet_font), res.getString(R.string.pref_customize_tweet_font));
+			edit.putString(getString(R.string.pref_thumbs_options), res.getString(R.string.pref_thumbs_options));
+			edit.commit();
+		}
 		checkAccessToken();
 	}
 
