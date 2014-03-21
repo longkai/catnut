@@ -15,6 +15,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -27,9 +28,12 @@ import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.text.style.URLSpan;
 import android.text.util.Linkify;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import org.catnut.R;
@@ -569,13 +573,42 @@ public class CatnutUtils {
 	 * @return plug' s id, or null
 	 */
 	public static ArrayList<Integer> enabledPlugins() {
-		CatnutApp app = CatnutApp.getTingtingApp();
-		SharedPreferences pref = app.getPreferences();
 		ArrayList<Integer> ids = new ArrayList<Integer>();
-		Resources res = app.getResources();
-		if (pref.getBoolean(res.getString(R.string.pref_enable_zhihu), res.getBoolean(R.bool.default_plugin_status))) {
+		if (CatnutApp.getBoolean(R.string.pref_enable_zhihu,R.bool.default_plugin_status)) {
 			ids.add(PluginsPrefFragment.ZHIHU);
 		}
+		if (CatnutApp.getBoolean(R.string.pref_enable_fantasy, R.bool.pref_enable_fantasy)) {
+			ids.add(PluginsPrefFragment.FANTASY);
+		}
 		return ids.size() == 0 ? null : ids;
+	}
+
+	public static int getScreenWidth(Context context) {
+		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+		return metrics.widthPixels;
+	}
+
+	/**
+	 * inject a image touch overley
+	 * @param v
+	 * @param event
+	 */
+	public static boolean imageOverlay(View v, MotionEvent event) {
+		ImageView view = (ImageView) v;
+		switch (event.getAction()) {
+			case MotionEvent.ACTION_DOWN:
+				// overlay is black with transparency of 0x77 (119)
+				view.getDrawable().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
+				view.invalidate();
+				break;
+			case MotionEvent.ACTION_UP:
+			case MotionEvent.ACTION_CANCEL: {
+				// clear the overlay
+				view.getDrawable().clearColorFilter();
+				view.invalidate();
+				break;
+			}
+		}
+		return false;
 	}
 }

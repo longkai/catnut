@@ -5,6 +5,8 @@
  */
 package org.catnut.util;
 
+import android.provider.BaseColumns;
+
 /**
  * 常量池
  *
@@ -29,6 +31,10 @@ public class Constants {
 	// for error dialog box
 	public static final String TITLE = "title";
 	public static final String MESSAGE = "message";
+
+	// default sort order, must have `_id` field!
+	public static final String DEFAULT_ORDER = BaseColumns._ID + " desc";
+	public static final String RANDOM_ORDER = "RANDOM()";
 
 	public static final String[] COUNT_PROJECTION = new String[]{
 			"count(0)"

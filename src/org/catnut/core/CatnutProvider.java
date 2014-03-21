@@ -17,7 +17,7 @@ import android.util.Log;
 import org.catnut.R;
 import org.catnut.metadata.Comment;
 import org.catnut.metadata.Draft;
-import org.catnut.metadata.Photo;
+import org.catnut.plugin.fantasy.Photo;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.plugin.zhihu.Zhihu;

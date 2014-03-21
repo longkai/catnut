@@ -24,6 +24,7 @@ import com.google.analytics.tracking.android.EasyTracker;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.fragment.PluginsPrefFragment;
+import org.catnut.plugin.fantasy.FantasyFallFragment;
 import org.catnut.plugin.zhihu.PagerItemFragment;
 import org.catnut.plugin.zhihu.ZhihuItemFragment;
 import org.catnut.plugin.zhihu.ZhihuItemsFragment;
@@ -72,11 +73,11 @@ public class PluginsActivity extends Activity implements
 							.replace(android.R.id.content, fragment)
 							.commit();
 				} else {
-					injectPager(bar);
+					injectPager(bar, savedInstanceState);
 				}
 				break;
 			default:
-				injectPager(bar);
+				injectPager(bar, savedInstanceState);
 				break;
 		}
 		if (CatnutApp.getTingtingApp().getPreferences().getBoolean(getString(R.string.pref_enable_analytics), true)) {
@@ -84,7 +85,7 @@ public class PluginsActivity extends Activity implements
 		}
 	}
 
-	private void injectPager(ActionBar bar) {
+	private void injectPager(ActionBar bar, Bundle savedInstanceState) {
 		// not show the bar, but not hide, u known what i mean?
 		bar.setDisplayHomeAsUpEnabled(false);
 		bar.setDisplayShowHomeEnabled(false);
@@ -92,7 +93,9 @@ public class PluginsActivity extends Activity implements
 		setContentView(R.layout.pager);
 
 		final ArrayList<Integer> ids = getIntent().getIntegerArrayListExtra(PLUGINS);
-		ids.add(0); // add an alt one...
+		if (savedInstanceState == null) {
+			ids.add(0); // add an alt one...
+		}
 		Collections.shuffle(ids); // shuffle it :-)
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setPageMargin(10);
@@ -101,12 +104,19 @@ public class PluginsActivity extends Activity implements
 		mViewPager.setAdapter(new FragmentPagerAdapter(getFragmentManager()) {
 			@Override
 			public Fragment getItem(int position) {
+				Fragment fragment;
 				switch (ids.get(position)) {
 					case PluginsPrefFragment.ZHIHU:
-					return ZhihuItemsFragment.getFragment();
+						fragment = ZhihuItemsFragment.getFragment();
+						break;
+					case PluginsPrefFragment.FANTASY:
+						fragment = FantasyFallFragment.getFragment();
+						break;
 					default:
-						return new PlaceHolderFragment();
+						fragment = new PlaceHolderFragment();
+						break;
 				}
+				return fragment;
 			}
 
 			@Override
@@ -119,6 +129,8 @@ public class PluginsActivity extends Activity implements
 				switch (ids.get(position)) {
 					case PluginsPrefFragment.ZHIHU:
 						return getString(R.string.read_zhihu);
+					case PluginsPrefFragment.FANTASY:
+						return getString(R.string.fantasy);
 					default:
 						return "more plugins...";
 				}

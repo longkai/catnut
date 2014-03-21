@@ -40,10 +40,11 @@ import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
 import org.catnut.fragment.FantasyFragment;
 import org.catnut.metadata.AccessToken;
-import org.catnut.metadata.Photo;
+import org.catnut.plugin.fantasy.Photo;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
+import org.catnut.util.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -63,10 +64,9 @@ public class HelloActivity extends Activity {
 	public static final String TAG = "HelloActivity";
 
 	/** 欢迎界面默认的播放时间 */
-	private static final long DEFAULT_SPLASH_TIME_MILLS = 3000L;
-	private static final int MAX_SHOWCASE_TIMES = 3;
+//	private static final long DEFAULT_SPLASH_TIME_MILLS = 3000L;
 
-	private static final String LAST_FANTASY_MILLIS = "LAST_FANTASY_MILLIS";
+	public static final String ACTION_FROM_GRID = "action_from_grid";
 
 	// only use for auth!
 	private EasyTracker mTracker;
@@ -78,6 +78,7 @@ public class HelloActivity extends Activity {
 	private ConnectivityManager mConnectivityManager;
 
 	private List<Image> mImages;
+	private Image mTargetFromGrid;
 	private ViewPager mViewPager;
 	private FragmentStatePagerAdapter mPagerAdapter;
 	private View mAbout;
@@ -104,13 +105,17 @@ public class HelloActivity extends Activity {
 			// 根据情况跳转
 			if (getIntent().hasExtra(TAG)) {
 				init();
+			} else if (ACTION_FROM_GRID.equals(getIntent().getAction())) {
+				mTargetFromGrid = new Image();
+				mTargetFromGrid.url = getIntent().getStringExtra(Photo.image_url);
+				mTargetFromGrid.name = getIntent().getStringExtra(Photo.name);
+				init();
 			} else {
-				if (mPreferences.getBoolean(getString(R.string.pref_enter_home_directly),
-						getResources().getBoolean(R.bool.pref_enter_home_directly))) {
+				if (CatnutApp.getBoolean(R.string.pref_enter_home_directly, R.bool.pref_enter_home_directly)) {
 					startActivity(new Intent(this, MainActivity.class)
-						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
-								| Intent.FLAG_ACTIVITY_NEW_TASK
-								| Intent.FLAG_ACTIVITY_NO_ANIMATION)
+							.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
+									| Intent.FLAG_ACTIVITY_NEW_TASK
+									| Intent.FLAG_ACTIVITY_NO_ANIMATION)
 					);
 				} else {
 					init();
@@ -121,11 +126,19 @@ public class HelloActivity extends Activity {
 
 	private void init() {
 		setContentView(R.layout.about);
-		mImages = new ArrayList<Image>();
+
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setOnPageChangeListener(new PagerListener());
+
+		mImages = new ArrayList<Image>();
+
 		mPagerAdapter = new Gallery();
 		mViewPager.setAdapter(mPagerAdapter);
+		if (mTargetFromGrid != null) {
+			mImages.add(mTargetFromGrid);
+			mPagerAdapter.notifyDataSetChanged();
+		}
+
 		mAbout = findViewById(R.id.about);
 		mFantasyDesc = (TextView) findViewById(R.id.description);
 		mFantasyDesc.setMovementMethod(LinkMovementMethod.getInstance());
@@ -170,29 +183,11 @@ public class HelloActivity extends Activity {
 
 	// save image urls locally
 	private void fetch500px() {
-		if (mPreferences.getBoolean(getString(R.string.pref_enable_fantasy),
-				getResources().getBoolean(R.bool.pref_enable_fantasy))) {
-			final long now = System.currentTimeMillis();
-			if (now - mPreferences.getLong(LAST_FANTASY_MILLIS, 0L) < 24 * 60 * 60 * 1000) {
-				// 一天一次而已
-				return;
-			}
+		if (Photo.shouldRefresh()) {
 			mApp.getRequestQueue().add(new CatnutRequest(
 					this,
-					_500pxAPI.photos("popular"),
-					new CatnutProcessor<JSONObject>() {
-						@Override
-						public void asyncProcess(Context context, JSONObject data) throws Exception {
-							Log.d(TAG, "load 500px done...");
-							JSONArray array = data.optJSONArray(Photo.MULTIPLE);
-							ContentValues[] photos = new ContentValues[array.length()];
-							for (int i = 0; i < array.length(); i++) {
-								photos[i] = Photo.METADATA.convert(array.optJSONObject(i));
-							}
-							context.getContentResolver().bulkInsert(CatnutProvider.parse(Photo.MULTIPLE), photos);
-							mPreferences.edit().putLong(LAST_FANTASY_MILLIS, now).commit(); // 记录上次更新的日期
-						}
-					},
+					_500pxAPI.photos(Photo.FEATURE_POPULAR, 0),
+					new Photo._500pxProcessor(),
 					null,
 					new Response.ErrorListener() {
 						@Override
@@ -218,16 +213,20 @@ public class HelloActivity extends Activity {
 	private Runnable mLoadImage = new Runnable() {
 		@Override
 		public void run() {
-			String query = CatnutUtils.buildQuery(null, null, Photo.TABLE, null, "RANDOM()", "10");
+			String query = CatnutUtils.buildQuery(null, null, Photo.TABLE, null, Constants.RANDOM_ORDER, "1");
 			final Cursor cursor = getContentResolver().query(CatnutProvider.parse(Photo.MULTIPLE), null, query, null, null);
 			if (cursor.moveToNext()) {
 				mHandler.post(new Runnable() {
 					@Override
 					public void run() {
+						if (mTargetFromGrid != null) {
+							mImages.add(mTargetFromGrid);
+							mPagerAdapter.notifyDataSetChanged();
+							mViewPager.setCurrentItem(1);
+						}
 						Image image = new Image();
 						image.name = cursor.getString(cursor.getColumnIndex(Photo.name));
 						image.url = cursor.getString(cursor.getColumnIndex(Photo.image_url));
-						mImages.add(image);
 						mImages.add(image);
 						mPagerAdapter.notifyDataSetChanged();
 						cursor.close();
@@ -337,7 +336,7 @@ public class HelloActivity extends Activity {
 	private Runnable expand = new Runnable() {
 		@Override
 		public void run() {
-			String query = CatnutUtils.buildQuery(PROJECTION, null, Photo.TABLE, null, "RANDOM()", String.valueOf(mImages.size() + 10));
+			String query = CatnutUtils.buildQuery(PROJECTION, null, Photo.TABLE, null, Constants.RANDOM_ORDER, String.valueOf(mImages.size() + 10));
 			final Cursor cursor = getContentResolver()
 					.query(CatnutProvider.parse(Photo.MULTIPLE), null, query, null, null);
 			mHandler.post(new Runnable() {
