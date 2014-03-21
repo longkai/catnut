@@ -25,6 +25,7 @@ public class Constants {
 	public static final String NULL = "null";
 	public static final String JPG = ".jpg";
 	public static final String JSON = "json";
+	public static final String KEYWORDS = "keywords";
 
 	public static final float GOLDEN_RATIO = 0.618f;
 

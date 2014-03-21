@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:padding="@dimen/small"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content">
+
+	<AutoCompleteTextView
+		android:id="@+id/zhihu_search"
+		android:hint="搜索感兴趣的条目？"
+		android:singleLine="true"
+		android:drawableStart="@drawable/ic_action_search_light"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:textColor="@color/black25PercentColor"
+		android:textColorHint="@color/black50PercentColor"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+
+	<ImageView
+		android:id="@+id/clear"
+		android:src="@drawable/ic_clear"
+		android:clickable="true"
+		android:focusable="true"
+		android:scaleType="center"
+		android:visibility="gone"
+		android:layout_marginRight="@dimen/medium"
+		android:background="?android:attr/selectableItemBackground"
+		android:layout_gravity="right|center_vertical"
+		android:layout_width="@dimen/xlarge"
+		android:layout_height="match_parent" />
+</FrameLayout>

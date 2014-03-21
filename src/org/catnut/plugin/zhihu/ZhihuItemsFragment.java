@@ -7,7 +7,7 @@ package org.catnut.plugin.zhihu;
 
 import android.app.ListFragment;
 import android.app.LoaderManager;
-import android.content.ContentValues;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -16,14 +16,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.BaseColumns;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -35,6 +38,7 @@ import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutArrayRequest;
 import org.catnut.core.CatnutProvider;
 import org.catnut.ui.PluginsActivity;
+import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.json.JSONArray;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
@@ -47,21 +51,27 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  * @author longkai
  */
 public class ZhihuItemsFragment extends ListFragment implements
-		AbsListView.OnScrollListener, LoaderManager.LoaderCallbacks<Cursor>,OnRefreshListener, AdapterView.OnItemLongClickListener {
+		AbsListView.OnScrollListener, LoaderManager.LoaderCallbacks<Cursor>,OnRefreshListener, AdapterView.OnItemLongClickListener, TextWatcher, View.OnClickListener {
 
 	public static final String TAG = ZhihuItemsFragment.class.getSimpleName();
 	private static final int PAGE_SIZE = 10; // 每次加载10条吧
 
 	private static final String[] PROJECTION = new String[]{
 			BaseColumns._ID,
-			Zhihu.HAS_READ,
 			Zhihu.TITLE,
+			Zhihu.HAS_READ,
 			"substr(" + Zhihu.ANSWER + ",0,80) as " + Zhihu.ANSWER, // [0-80)子串
 			Zhihu.ANSWER_ID,
 			Zhihu.NICK
 	};
 
 	private PullToRefreshLayout mPullToRefreshLayout;
+
+	private View mSearchFrame;
+	private View mClear;
+	private AutoCompleteTextView mSearchView;
+	private CursorAdapter mSearchAdapter;
+	private LoaderManager.LoaderCallbacks<Cursor> mSearchLoader;
 
 	private RequestQueue mRequestQueue;
 	private ZhihuItemsAdapter mAdapter;
@@ -110,8 +120,20 @@ public class ZhihuItemsFragment extends ListFragment implements
 	}
 
 	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		mSearchFrame = inflater.inflate(R.layout.zhihu_search, null);
+		mSearchView = (AutoCompleteTextView) mSearchFrame.findViewById(R.id.zhihu_search);
+		mClear = mSearchFrame.findViewById(R.id.clear);
+		return super.onCreateView(inflater, container, savedInstanceState);
+	}
+
+	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		mSearchView.addTextChangedListener(this);
+		mSearchView.setThreshold(1); // 1 word
+		mClear.setOnClickListener(this);
+		getListView().addHeaderView(mSearchFrame);
 		ViewGroup viewGroup = (ViewGroup) view;
 		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
 		ActionBarPullToRefresh.from(getActivity())
@@ -139,7 +161,11 @@ public class ZhihuItemsFragment extends ListFragment implements
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		Cursor c = (Cursor) mAdapter.getItem(position);
+		Cursor c = (Cursor) mAdapter.getItem(position - 1); // a header
+		viewItem(c, id);
+	}
+
+	private void viewItem(Cursor c, long id) {
 		long answer_id = c.getLong(c.getColumnIndex(Zhihu.ANSWER_ID));
 		// 跳转
 		PluginsActivity activity = (PluginsActivity) getActivity();
@@ -237,5 +263,92 @@ public class ZhihuItemsFragment extends ListFragment implements
 				c.getInt(c.getColumnIndex(Zhihu.HAS_READ)) != 1
 		)).start();
 		return true;
+	}
+
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+		// no-op
+	}
+
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+		// no-op
+	}
+
+	@Override
+	public void afterTextChanged(Editable s) {
+		String keywords = s.toString().trim();
+		if (keywords.length() > 0) {
+			if (mSearchAdapter == null) {
+				initSearchLoader();
+			}
+			Bundle args = new Bundle();
+			args.putString(Constants.KEYWORDS, keywords);
+			getLoaderManager().restartLoader(1, args, mSearchLoader);
+			mClear.setVisibility(View.VISIBLE);
+		} else {
+			mClear.setVisibility(View.GONE);
+		}
+	}
+
+	private void initSearchLoader() {
+		mSearchAdapter = new CursorAdapter(getActivity(), null, 0) {
+			@Override
+			public View newView(Context context, Cursor cursor, ViewGroup parent) {
+				return LayoutInflater.from(context).inflate(android.R.layout.simple_list_item_1, null);
+			}
+
+			@Override
+			public CharSequence convertToString(Cursor cursor) {
+				return cursor.getString(1);
+			}
+
+			@Override
+			public void bindView(View view, Context context, Cursor cursor) {
+				TextView tv = (TextView) view;
+				tv.setText(cursor.getString(1));
+			}
+		};
+		mSearchLoader = new LoaderManager.LoaderCallbacks<Cursor>() {
+			@Override
+			public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+				String keywords = args.getString(Constants.KEYWORDS);
+				return new CursorLoader(
+						getActivity(),
+						CatnutProvider.parse(Zhihu.MULTIPLE),
+						PROJECTION,
+						new StringBuilder(Zhihu.TITLE)
+								.append(" like ").append(CatnutUtils.like(keywords))
+								.append(" or ").append(Zhihu.DESCRIPTION).append(" like ")
+								.append(CatnutUtils.like(keywords)).toString(),
+						null,
+						Zhihu.LAST_ALTER_DATE + " desc"
+
+				);
+			}
+
+			@Override
+			public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+				mSearchAdapter.swapCursor(data);
+			}
+
+			@Override
+			public void onLoaderReset(Loader<Cursor> loader) {
+				mSearchAdapter.swapCursor(null);
+			}
+		};
+		mSearchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Cursor c = (Cursor) mSearchAdapter.getItem(position);
+				viewItem(c, id);
+			}
+		});
+		mSearchView.setAdapter(mSearchAdapter);
+	}
+
+	@Override
+	public void onClick(View v) {
+		mSearchView.setText(null);
 	}
 }
