@@ -7,6 +7,7 @@ package org.catnut.plugin.fantasy;
 
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import org.catnut.api._500pxAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
+import org.catnut.ui.HelloActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.json.JSONObject;
@@ -148,7 +150,7 @@ public class FantasyFallFragment extends Fragment implements
 	public void onRefreshStarted(final View view) {
 		CatnutApp.getTingtingApp().getRequestQueue().add(new CatnutRequest(
 				getActivity(),
-				_500pxAPI.photos(mChoice, 0),
+				_500pxAPI.photos(mChoice, (int) (Math.random() * 400)),
 				new Photo._500pxProcessor(mChoice),
 				new Response.Listener<JSONObject>() {
 					@Override
@@ -188,6 +190,11 @@ public class FantasyFallFragment extends Fragment implements
 			case 5:
 				mChoice = Photo.FEATURE_FRESH_WEEK;
 				break;
+			case 6: // switch pager mode
+				startActivity(new Intent(getActivity(), HelloActivity.class)
+						.putExtra(HelloActivity.TAG, HelloActivity.TAG));
+				mSwitcher.setSelection(0);
+				return;
 		}
 		if (!mChoice.equals(last)) {
 			getLoaderManager().restartLoader(0, null, this);

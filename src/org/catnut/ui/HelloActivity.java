@@ -154,11 +154,9 @@ public class HelloActivity extends Activity {
 			version.setText(getString(R.string.about_version_template, getString(R.string.version_name)));
 			// for girl' s day only, in march 7-21
 			Calendar now = Calendar.getInstance();
-			boolean girl = now.get(Calendar.MONTH) == Calendar.MARCH
-					&& now.get(Calendar.DAY_OF_MONTH) >= 7
-					&& now.get(Calendar.DAY_OF_MONTH) <= 21;
-			if (girl) {
-				about.setText(Html.fromHtml(getString(R.string.girls_day)));
+			boolean salutation = now.get(Calendar.MONTH) <= Calendar.MAY;
+			if (salutation) {
+				about.setText(Html.fromHtml(getString(R.string.salutation)));
 				about.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
 			} else {
 				about.setText(Html.fromHtml(getString(R.string.about_body)));
@@ -219,14 +217,16 @@ public class HelloActivity extends Activity {
 				mHandler.post(new Runnable() {
 					@Override
 					public void run() {
+						Image image = new Image();
+						image.name = cursor.getString(cursor.getColumnIndex(Photo.name));
+						image.url = cursor.getString(cursor.getColumnIndex(Photo.image_url));
 						if (mTargetFromGrid != null) {
 							mImages.add(mTargetFromGrid);
 							mPagerAdapter.notifyDataSetChanged();
 							mViewPager.setCurrentItem(1);
+						} else {
+							mImages.add(image);
 						}
-						Image image = new Image();
-						image.name = cursor.getString(cursor.getColumnIndex(Photo.name));
-						image.url = cursor.getString(cursor.getColumnIndex(Photo.image_url));
 						mImages.add(image);
 						mPagerAdapter.notifyDataSetChanged();
 						cursor.close();

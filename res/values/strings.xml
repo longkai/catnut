@@ -167,15 +167,16 @@
         <b>Some icons &nbsp;</b><br>
         <i>from Twitter for Android and my friends:-)</i><br><br>
     ]]></string>
-	<string name="girls_day"><![CDATA[
-		<b>女生节快乐，愿你每天都有一个好心情！</b><br><br>
-		<b>无论以后你会成为谁的女人，你永远是我们的高中女生^_^<b><br><br>
-		<b>在路上，我们一起走向远方，只是不要忘了来时的路，还有你我的梦想</b><br><br>
+	<string name="salutation"><![CDATA[
+		<b>要等你，要证明自己</b><br><br>
+		<b>我可以纵容你在心底<b><br><br>
+		<b>也可以当你只是路过的人而已</b><br><br>
+		<b><p align="right">我等你</p></b><br><br>
 	]]></string>
 	<string name="about_version_template">v%1$s</string>
 	<string name="hide_fantasy_words">隐藏文字</string>
 	<string name="show_fantasy_words">显示文字</string>
-	<string name="app_desc">让微博 简洁&amp;流畅</string>
+	<string name="app_desc">追求 <b>简洁&amp;流畅</b> 的微博app</string>
 	<string name="default_art">默认</string>
 	<string name="enable_fantasy">启用fantasy</string>
 	<string name="enable_fantasy_summary">启用后，每天你都可以发现和分享各种精彩照片:-) 来自「500px」，建议在wifi下开启</string>
@@ -252,5 +253,6 @@
 		<item>编辑推荐</item>
 		<item>昨日精彩</item>
 		<item>本周主打</item>
+		<item>切换到PPT模式</item>
 	</string-array>
 </resources>
