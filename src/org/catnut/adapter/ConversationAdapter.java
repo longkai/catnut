@@ -39,16 +39,18 @@ import org.json.JSONObject;
  */
 public class ConversationAdapter extends CursorAdapter {
 
+	private LayoutInflater mInflater;
 	private TweetImageSpan mTweetImageSpan;
 
 	public ConversationAdapter(Context context) {
 		super(context, null, 0);
+		mInflater = LayoutInflater.from(context);
 		mTweetImageSpan = new TweetImageSpan(context);
 	}
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
-		View view = LayoutInflater.from(context).inflate(R.layout.comments_2_me, null);
+		View view = mInflater.inflate(R.layout.comments_2_me, null);
 		ViewHolder holder = new ViewHolder();
 
 		holder.myText = (TweetTextView) view.findViewById(R.id.my_text);

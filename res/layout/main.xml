@@ -179,7 +179,7 @@
 						style="@style/Profile_Action" />
 
 					<TextView
-						android:text="@string/others"
+						android:text="@string/plugins"
 						android:textColor="@android:color/holo_blue_bright"
 						android:layout_marginTop="@dimen/medium"
 						android:layout_marginBottom="@dimen/medium"
@@ -193,14 +193,28 @@
 						android:layout_height="1px" />
 
 					<TextView
-						android:id="@+id/fantasy"
 						android:text="@string/fantasy"
+						android:onClick="switch2Plugins"
 						style="@style/Profile_Action" />
 
 					<TextView
-						android:id="@+id/plugins"
-						android:text="@string/plugins"
+						android:onClick="switch2Plugins"
+						android:text="@string/read_zhihu"
 						style="@style/Profile_Action" />
+
+					<TextView
+						android:text="@string/others"
+						android:textColor="@android:color/holo_blue_bright"
+						android:layout_marginTop="@dimen/medium"
+						android:layout_marginBottom="@dimen/medium"
+						android:textAppearance="?android:attr/textAppearanceMedium"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content" />
+
+					<View
+						android:background="@android:color/holo_blue_bright"
+						android:layout_width="match_parent"
+						android:layout_height="1px" />
 
 					<TextView
 						android:id="@+id/action_share_app"

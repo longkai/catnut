@@ -26,8 +26,11 @@ import java.util.List;
  */
 public class TransientUsersAdapter extends ArrayAdapter<TransientUser> {
 
+	private LayoutInflater mInflater;
+
 	public TransientUsersAdapter(Context context, List<TransientUser> users) {
 		super(context, R.layout.friend_row, users);
+		mInflater = LayoutInflater.from(context);
 	}
 
 	private static class ViewHolder {
@@ -45,7 +48,7 @@ public class TransientUsersAdapter extends ArrayAdapter<TransientUser> {
 		View view = convertView;
 		ViewHolder holder;
 		if (view == null) {
-			view = LayoutInflater.from(getContext()).inflate(R.layout.friend_row, null);
+			view = mInflater.inflate(R.layout.friend_row, null);
 			holder = new ViewHolder();
 			holder.avatar = (ImageView) view.findViewById(R.id.avatar);
 			holder.screenName = (TextView) view.findViewById(R.id.nick);

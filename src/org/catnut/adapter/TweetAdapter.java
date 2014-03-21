@@ -58,6 +58,7 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 	private static final String TAG = "TweetAdapter";
 
 	private Context mContext;
+	private LayoutInflater mInflater;
 	private RequestQueue mRequestQueue;
 	private TweetImageSpan mImageSpan;
 	private String mThumbsOption;
@@ -76,6 +77,7 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 	public TweetAdapter(Context context, String nick) {
 		super(context, null, 0);
 		mContext = context;
+		mInflater = LayoutInflater.from(context);
 		this.mScreenName = nick;
 		CatnutApp app = CatnutApp.getTingtingApp();
 		mRequestQueue = app.getRequestQueue();
@@ -193,7 +195,7 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 		ViewHolder holder = new ViewHolder();
-		View view = LayoutInflater.from(context).inflate(R.layout.tweet_row, null);
+		View view = mInflater.inflate(R.layout.tweet_row, null);
 		holder.nick = (TextView) view.findViewById(R.id.nick);
 		// 如果是某个主页时间线
 		if (mScreenName == null) {

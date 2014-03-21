@@ -23,8 +23,11 @@ import org.catnut.metadata.User;
  */
 public class MentionSearchAdapter extends CursorAdapter {
 
+	private LayoutInflater mInflater;
+
 	public MentionSearchAdapter(Context context) {
 		super(context, null, 0);
+		mInflater = LayoutInflater.from(context);
 	}
 
 	private static class ViewHolder {
@@ -35,7 +38,7 @@ public class MentionSearchAdapter extends CursorAdapter {
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
-		View view = LayoutInflater.from(context).inflate(android.R.layout.simple_list_item_1, null);
+		View view = mInflater.inflate(android.R.layout.simple_list_item_1, null);
 		ViewHolder holder = new ViewHolder();
 		holder.item = (TextView) view.findViewById(android.R.id.text1);
 		holder.screenNameIndex = cursor.getColumnIndex(User.screen_name);

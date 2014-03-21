@@ -26,8 +26,11 @@ import org.catnut.util.CatnutUtils;
  */
 public class UsersAdapter extends CursorAdapter {
 
+	private LayoutInflater mInflater;
+
 	public UsersAdapter(Context context) {
 		super(context, null, 0);
+		mInflater = LayoutInflater.from(context);
 	}
 
 	private static class ViewHolder {
@@ -51,7 +54,7 @@ public class UsersAdapter extends CursorAdapter {
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 		ViewHolder holder = new ViewHolder();
-		View view = LayoutInflater.from(context).inflate(R.layout.friend_row , parent, false);
+		View view = mInflater.inflate(R.layout.friend_row , parent, false);
 		holder.avatar = (ImageView) view.findViewById(R.id.avatar);
 		holder.avatarIndex = cursor.getColumnIndex(User.profile_image_url);
 		holder.screenName = (TextView) view.findViewById(R.id.nick);

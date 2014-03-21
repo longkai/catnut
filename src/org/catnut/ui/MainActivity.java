@@ -309,8 +309,6 @@ public class MainActivity extends Activity implements
 		findViewById(R.id.action_my_drafts).setOnClickListener(this);
 		findViewById(R.id.action_share_app).setOnClickListener(this);
 		findViewById(R.id.action_view_source_code).setOnClickListener(this);
-		findViewById(R.id.fantasy).setOnClickListener(this);
-		findViewById(R.id.plugins).setOnClickListener(this);
 	}
 
 	@Override
@@ -366,7 +364,7 @@ public class MainActivity extends Activity implements
 				startActivity(new Intent(this, HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG));
 				break;
 			case R.id.plugins:
-				switch2Plugins();
+				switch2Plugins(null);
 				break;
 			default:
 				break;
@@ -416,10 +414,13 @@ public class MainActivity extends Activity implements
 
 	@Override
 	public void onClick(View v) {
-		mDrawerLayout.closeDrawer(mQuickReturnDrawer);
+		int id = v.getId();
+		if (id != R.id.fetch_news) {
+			mDrawerLayout.closeDrawer(mQuickReturnDrawer);
+		}
 		Fragment fragment = null;
 		String tag = null;
-		switch (v.getId()) {
+		switch (id) {
 			case R.id.tweets_count:
 			case R.id.action_my_tweets:
 				fragment = UserTimelineFragment.getFragment(mApp.getAccessToken().uid, mApp.getPreferences().getString(User.screen_name, null));
@@ -454,12 +455,6 @@ public class MainActivity extends Activity implements
 				return;
 			case R.id.action_view_source_code:
 				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.github_link))));
-				return;
-			case R.id.fantasy:
-				startActivity(new Intent(this, HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG));
-				return;
-			case R.id.plugins:
-				switch2Plugins();
 				return;
 			case R.id.fetch_news:
 				fetchNews();
@@ -498,7 +493,10 @@ public class MainActivity extends Activity implements
 	}
 
 	// 切换到插件，如果没有启用插件则跳转到插件设置界面
-	private void switch2Plugins() {
+	public void switch2Plugins(View view) {
+		if (mDrawerLayout.isDrawerOpen(mQuickReturnDrawer)) {
+			mDrawerLayout.closeDrawer(mQuickReturnDrawer);
+		}
 		ArrayList<Integer> plugins = CatnutUtils.enabledPlugins();
 		if (plugins != null) {
 			Intent intent = new Intent(this, PluginsActivity.class);

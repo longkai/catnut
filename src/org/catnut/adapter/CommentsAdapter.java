@@ -40,12 +40,14 @@ import org.catnut.util.DateTime;
  */
 public class CommentsAdapter extends CursorAdapter {
 
+	private LayoutInflater mInflater;
 	private TweetImageSpan mImageSpan;
 	private Typeface mTypeface;
 	private float mLineSpacing = 1.0f;
 
 	public CommentsAdapter(Context context) {
 		super(context, null, 0);
+		mInflater = LayoutInflater.from(context);
 		mImageSpan = new TweetImageSpan(context);
 		SharedPreferences preferences = CatnutApp.getTingtingApp().getPreferences();
 		mTypeface = CatnutUtils.getTypeface(preferences,
@@ -71,7 +73,7 @@ public class CommentsAdapter extends CursorAdapter {
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
-		View view = LayoutInflater.from(context).inflate(R.layout.comment_row, null);
+		View view = mInflater.inflate(R.layout.comment_row, null);
 		ViewHolder holder = new ViewHolder();
 		holder.avatar = (ImageView) view.findViewById(R.id.avatar);
 		holder.avatarIndex = cursor.getColumnIndex(User.profile_image_url);

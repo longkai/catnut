@@ -106,7 +106,7 @@ public class SingleFragmentActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		if (mWhich != PREF && mWhich != PLUGINS_PREF) {
+		if (mWhich != PREF && mWhich != PLUGINS_PREF && mWhich != AUTH) {
 			menu.add(Menu.NONE, R.id.pref, Menu.NONE, R.string.pref)
 					.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 		}
