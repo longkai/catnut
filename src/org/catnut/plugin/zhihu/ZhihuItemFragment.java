@@ -8,6 +8,7 @@ package org.catnut.plugin.zhihu;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -278,19 +279,7 @@ public class ZhihuItemFragment extends Fragment implements
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		// 标记已读
-		(new Thread(new Runnable() {
-			@Override
-			public void run() {
-				ContentValues values = new ContentValues();
-				values.put(Zhihu.HAS_READ, true);
-				getActivity().getContentResolver().update(
-						CatnutProvider.parse(Zhihu.MULTIPLE, mAnswerId),
-						values,
-						null,
-						null
-				);
-			}
-		})).start();
+		new Thread(new MarkHasReadRunable(mAnswerId, getActivity(), true)).start();
 	}
 
 	private void processText(String _content, Matcher matcher, List<String> contentSegment) {
@@ -498,6 +487,34 @@ public class ZhihuItemFragment extends Fragment implements
 				mQuickReturnView.animate().translationY(mDestTranslationY);
 			}
 			mSettledScrollY = Integer.MIN_VALUE; // reset
+		}
+	}
+
+	/**
+	 * 标记已读线程
+	 */
+	public static class MarkHasReadRunable implements Runnable {
+
+		private long answerId;
+		private Context context;
+		private boolean hasRead;
+
+		public MarkHasReadRunable(long answerId, Context context, boolean hasRead) {
+			this.answerId = answerId;
+			this.context = context;
+			this.hasRead = hasRead;
+		}
+
+		@Override
+		public void run() {
+			ContentValues values = new ContentValues();
+			values.put(Zhihu.HAS_READ, hasRead);
+			context.getContentResolver().update(
+					CatnutProvider.parse(Zhihu.MULTIPLE, answerId),
+					values,
+					null,
+					null
+			);
 		}
 	}
 }

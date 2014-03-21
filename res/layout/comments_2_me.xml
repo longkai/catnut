@@ -54,7 +54,6 @@
 	<ImageView
 		android:id="@+id/avatar"
 		android:layout_below="@id/his_create_at"
-		android:padding="@dimen/small"
 		android:layout_marginTop="@dimen/small"
 		android:clickable="true"
 		android:background="@drawable/avatar_background"

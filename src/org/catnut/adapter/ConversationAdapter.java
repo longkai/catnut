@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
@@ -74,7 +75,7 @@ public class ConversationAdapter extends CursorAdapter {
 
 	@Override
 	public void bindView(View view, final Context context, Cursor cursor) {
-		ViewHolder holder = (ViewHolder) view.getTag();
+		final ViewHolder holder = (ViewHolder) view.getTag();
 		Picasso.with(context)
 				.load(cursor.getString(holder.avatarIndex))
 				.error(R.drawable.error)
@@ -122,9 +123,17 @@ public class ConversationAdapter extends CursorAdapter {
 		));
 		// bind tag for click listener
 		final long uid = cursor.getLong(holder.uidIndex);
+		holder.avatar.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return CatnutUtils.imageOverlay(v, event);
+			}
+		});
 		holder.avatar.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				holder.avatar.getDrawable().clearColorFilter();
+				holder.avatar.invalidate();
 				Intent intent = new Intent(context, ProfileActivity.class);
 				intent.putExtra(Constants.ID, uid);
 				intent.putExtra(User.screen_name, screenName);

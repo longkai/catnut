@@ -9,6 +9,7 @@
 	android:background="@drawable/default_fantasy"
 	android:padding="@dimen/medium"
 	android:text="@string/no_tweets"
+	android:textStyle="bold"
 	android:textColor="@android:color/white"
 	android:layout_gravity="center_vertical|center_horizontal"
 	android:textAppearance="?android:attr/textAppearanceMedium"

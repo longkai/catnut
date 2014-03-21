@@ -147,17 +147,25 @@ public class ProfileFragment extends Fragment implements
 	private Target profileTarget = new Target() {
 		@Override
 		public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-			mPlaceHolder.setBackground(new BitmapDrawable(getResources(), bitmap));
+			try {
+				mPlaceHolder.setBackground(new BitmapDrawable(getResources(), bitmap));
+			} catch (Exception e) {
+				// no-op
+			}
 		}
 
 		@Override
 		public void onBitmapFailed(Drawable errorDrawable) {
-			mPlaceHolder.setBackground(errorDrawable);
+			try {
+				mPlaceHolder.setBackground(errorDrawable);
+			} catch (Exception e) {
+				// no-op
+			}
 		}
 
 		@Override
 		public void onPrepareLoad(Drawable placeHolderDrawable) {
-			//no-op
+			mPlaceHolder.setBackground(placeHolderDrawable);
 		}
 	};
 
@@ -254,6 +262,7 @@ public class ProfileFragment extends Fragment implements
 					if (!TextUtils.isEmpty(mCoverUrl)) {
 						Picasso.with(getActivity())
 								.load(mCoverUrl)
+								.placeholder(R.drawable.default_fantasy)
 								.error(R.drawable.default_fantasy)
 								.into(profileTarget);
 					} else {

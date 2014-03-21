@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
@@ -244,7 +245,7 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 
 	@Override
 	public void bindView(View view, final Context context, Cursor cursor) {
-		ViewHolder holder = (ViewHolder) view.getTag();
+		final ViewHolder holder = (ViewHolder) view.getTag();
 		final long id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 		// 不是某个用户的时间线
 		if (mScreenName == null) {
@@ -260,10 +261,18 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 			holder.avatar.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
+					holder.avatar.getDrawable().clearColorFilter();
+					holder.avatar.invalidate();
 					Intent intent = new Intent(mContext, ProfileActivity.class);
 					intent.putExtra(User.screen_name, nick);
 					intent.putExtra(Constants.ID, uid);
 					mContext.startActivity(intent);
+				}
+			});
+			holder.avatar.setOnTouchListener(new View.OnTouchListener() {
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					return CatnutUtils.imageOverlay(v, event);
 				}
 			});
 			String remark = cursor.getString(holder.remarkIndex);

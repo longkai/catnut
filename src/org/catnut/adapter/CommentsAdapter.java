@@ -14,6 +14,7 @@ import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
@@ -87,7 +88,7 @@ public class CommentsAdapter extends CursorAdapter {
 
 	@Override
 	public void bindView(View view, final Context context, Cursor cursor) {
-		ViewHolder holder = (ViewHolder) view.getTag();
+		final ViewHolder holder = (ViewHolder) view.getTag();
 		Picasso.with(context)
 				.load(cursor.getString(holder.avatarIndex))
 				.placeholder(R.drawable.error)
@@ -96,9 +97,17 @@ public class CommentsAdapter extends CursorAdapter {
 		// 点击头像查看该用户主页
 		final long id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 		final String screenName = cursor.getString(holder.screenNameIndex);
+		holder.avatar.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return CatnutUtils.imageOverlay(v, event);
+			}
+		});
 		holder.avatar.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				holder.avatar.getDrawable().clearColorFilter();
+				holder.avatar.invalidate();
 				Intent intent = new Intent(context, ProfileActivity.class);
 				intent.putExtra(Constants.ID, id);
 				intent.putExtra(User.screen_name, screenName);

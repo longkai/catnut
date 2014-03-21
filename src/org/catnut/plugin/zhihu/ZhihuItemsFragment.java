@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.android.volley.Request;
@@ -46,7 +47,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  * @author longkai
  */
 public class ZhihuItemsFragment extends ListFragment implements
-		AbsListView.OnScrollListener, LoaderManager.LoaderCallbacks<Cursor>,OnRefreshListener {
+		AbsListView.OnScrollListener, LoaderManager.LoaderCallbacks<Cursor>,OnRefreshListener, AdapterView.OnItemLongClickListener {
 
 	public static final String TAG = ZhihuItemsFragment.class.getSimpleName();
 	private static final int PAGE_SIZE = 10; // 每次加载10条吧
@@ -126,6 +127,7 @@ public class ZhihuItemsFragment extends ListFragment implements
 		setListAdapter(mAdapter);
 		setEmptyText(getString(R.string.zhihu_refresh_hint));
 		getListView().setOnScrollListener(this);
+		getListView().setOnItemLongClickListener(this);
 		mPullToRefreshLayout.setRefreshing(true);
 		if (CatnutApp.getBoolean(R.string.pref_enable_zhihu_auto_refresh, R.bool.default_plugin_status)) {
 			refresh();
@@ -224,5 +226,16 @@ public class ZhihuItemsFragment extends ListFragment implements
 					}
 				}
 		));
+	}
+
+	@Override
+	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+		Cursor c = (Cursor) mAdapter.getItem(position);
+		new Thread(new ZhihuItemFragment.MarkHasReadRunable(
+				c.getLong(c.getColumnIndex(Zhihu.ANSWER_ID)),
+				getActivity(),
+				c.getInt(c.getColumnIndex(Zhihu.HAS_READ)) != 1
+		)).start();
+		return true;
 	}
 }

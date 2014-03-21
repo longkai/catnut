@@ -29,7 +29,6 @@
 			android:id="@+id/avatar"
 			android:layout_marginTop="@dimen/medium"
 			android:visibility="gone"
-			android:padding="@dimen/small"
 			android:clickable="true"
 			android:focusable="true"
 			android:background="@drawable/avatar_background"

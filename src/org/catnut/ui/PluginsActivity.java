@@ -100,7 +100,7 @@ public class PluginsActivity extends Activity implements
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setPageMargin(10);
 
-		mViewPager.setPageMarginDrawable(new ColorDrawable(getResources().getColor(android.R.color.darker_gray)));
+		mViewPager.setPageMarginDrawable(new ColorDrawable(getResources().getColor(R.color.tab_selected)));
 		mViewPager.setAdapter(new FragmentPagerAdapter(getFragmentManager()) {
 			@Override
 			public Fragment getItem(int position) {
@@ -230,7 +230,7 @@ public class PluginsActivity extends Activity implements
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			TextView view = (TextView) inflater.inflate(R.layout.empty_list, container, false);
 			view.setTextSize(25);
-			view.setText("if interesting and free, there would be one or more coming :-)");
+			view.setText("if interesting and free, there would be one or more coming :-)\n\nfeel free to drop me a line.");
 			return view;
 		}
 	}
