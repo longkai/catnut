@@ -88,7 +88,7 @@ public class ZhihuItemFragment extends Fragment implements
 	private long mAnswerId;
 	private long mQuestionId;
 
-	private String[] mImageUrls;
+	private ArrayList<Uri> mImageUrls;
 
 	public static ZhihuItemFragment getFragment(long id) {
 		Bundle args = new Bundle();
@@ -185,12 +185,11 @@ public class ZhihuItemFragment extends Fragment implements
 							}
 
 							// 假设第一个是文本，即偶数文本，奇数图片
-							int imageIndex = 0;
 							int l = contentSegment.size() > 1 ? contentSegment.size() >> 1 : 0;
 							l += questionSegment.size() > 1 ? questionSegment.size() >> 1 : 0;
 
 							if (l > 0) {
-								mImageUrls = new String[l];
+								mImageUrls = new ArrayList<Uri>(l);
 							}
 
 							// 是否使用缓存的图片
@@ -215,15 +214,16 @@ public class ZhihuItemFragment extends Fragment implements
 											questionHolder.addView(section);
 										} else {
 											ImageView imageView = (ImageView) inflater.inflate(R.layout.zhihu_image, null);
+											Uri uri = useCachedImg ? Zhihu.getCacheImageLocation(getActivity(), Uri.parse(text)) : Uri.parse(text);
 											Picasso.with(getActivity())
-													.load(useCachedImg ? Zhihu.getCacheImageLocation(getActivity(), Uri.parse(text)) : Uri.parse(text))
+													.load(uri)
 													.centerCrop()
 													.resize(200, 200)
 													.error(R.drawable.error)
 													.into(imageView);
-											imageView.setTag(l); // for click
+											imageView.setTag(l++); // for click
 											imageView.setOnClickListener(ZhihuItemFragment.this);
-											mImageUrls[l++] = text;
+											mImageUrls.add(uri);
 										}
 									}
 								}
@@ -241,15 +241,16 @@ public class ZhihuItemFragment extends Fragment implements
 										answerHolder.addView(section);
 									} else {
 										ImageView image = (ImageView) inflater.inflate(R.layout.zhihu_image, null);
+										Uri uri = useCachedImg ? Zhihu.getCacheImageLocation(getActivity(), Uri.parse(text)) : Uri.parse(text);
 										Picasso.with(getActivity())
-												.load(useCachedImg ? Zhihu.getCacheImageLocation(getActivity(), Uri.parse(text)) : Uri.parse(text))
+												.load(uri)
 												.centerCrop()
 												.resize(200, 200)
 												.error(R.drawable.error)
 												.into(image);
-										image.setTag(imageIndex); // 方便点击事件
+										image.setTag(l++); // 方便点击事件
 										image.setOnClickListener(ZhihuItemFragment.this);
-										mImageUrls[imageIndex++] = text;
+										mImageUrls.add(uri);
 										answerHolder.addView(image);
 									}
 								}

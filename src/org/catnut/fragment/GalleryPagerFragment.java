@@ -7,6 +7,7 @@ package org.catnut.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -17,6 +18,9 @@ import com.squareup.picasso.Picasso;
 import org.catnut.R;
 import org.catnut.support.TouchImageView;
 import org.catnut.util.Constants;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 以pager的形式查看一组（个）图片
@@ -30,13 +34,13 @@ public class GalleryPagerFragment extends Fragment {
 	public static final String URLS = "urls";
 	public static final String TITLE = "title";
 
-	private String[] mUrls;
+	private List<Uri> mUrls;
 	private int mCurrentIndex;
 
-	public static GalleryPagerFragment getFragment(int currentIndex, String[] urls, String actionBarTitle) {
+	public static GalleryPagerFragment getFragment(int currentIndex, ArrayList<Uri> urls, String actionBarTitle) {
 		Bundle args = new Bundle();
 		args.putInt(CUR_INDEX, currentIndex);
-		args.putStringArray(URLS, urls);
+		args.putParcelableArrayList(URLS, urls);
 		args.putString(TITLE, actionBarTitle);
 		GalleryPagerFragment fragment = new GalleryPagerFragment();
 		fragment.setArguments(args);
@@ -46,7 +50,7 @@ public class GalleryPagerFragment extends Fragment {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		mUrls = getArguments().getStringArray(URLS);
+		mUrls = getArguments().getParcelableArrayList(URLS);
 		mCurrentIndex = getArguments().getInt(CUR_INDEX);
 	}
 
@@ -67,12 +71,12 @@ public class GalleryPagerFragment extends Fragment {
 		viewPager.setAdapter(new FragmentStatePagerAdapter(getFragmentManager()) {
 			@Override
 			public Fragment getItem(int position) {
-				return SimpleImageFragment.getFragment(mUrls[position]);
+				return SimpleImageFragment.getFragment(mUrls.get(position));
 			}
 
 			@Override
 			public int getCount() {
-				return mUrls.length;
+				return mUrls.size();
 			}
 		});
 		viewPager.setCurrentItem(mCurrentIndex);
@@ -80,9 +84,9 @@ public class GalleryPagerFragment extends Fragment {
 
 	public static class SimpleImageFragment extends Fragment {
 
-		public static SimpleImageFragment getFragment(String url) {
+		public static SimpleImageFragment getFragment(Uri url) {
 			Bundle args = new Bundle();
-			args.putString(Constants.PIC, url);
+			args.putParcelable(Constants.PIC, url);
 			SimpleImageFragment fragment = new SimpleImageFragment();
 			fragment.setArguments(args);
 			return fragment;
@@ -94,7 +98,7 @@ public class GalleryPagerFragment extends Fragment {
 			view.setBackgroundColor(getResources().getColor(R.color.black_background));
 			TouchImageView image = (TouchImageView) view.findViewById(R.id.image);
 			Picasso.with(getActivity())
-					.load(getArguments().getString(Constants.PIC))
+					.load((Uri) getArguments().getParcelable(Constants.PIC))
 					.error(R.drawable.error)
 					.into(image);
 			return view;

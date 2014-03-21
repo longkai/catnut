@@ -10,7 +10,9 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
@@ -20,6 +22,8 @@ import org.catnut.fragment.*;
 import org.catnut.metadata.User;
 import org.catnut.support.ConfirmBarController;
 import org.catnut.util.Constants;
+
+import java.util.ArrayList;
 
 /**
  * helper activity, just show a single fragment
@@ -80,9 +84,9 @@ public class SingleFragmentActivity extends Activity {
 				case GALLERY:
 					setTheme(R.style.Theme_Fantasy);
 					int index = getIntent().getIntExtra(GalleryPagerFragment.CUR_INDEX, 0);
-					String[] strings = getIntent().getStringArrayExtra(GalleryPagerFragment.URLS);
+					ArrayList<Uri> uris = getIntent().getParcelableArrayListExtra(GalleryPagerFragment.URLS);
 					String title = getIntent().getStringExtra(GalleryPagerFragment.TITLE);
-					fragment = GalleryPagerFragment.getFragment(index, strings, title);
+					fragment = GalleryPagerFragment.getFragment(index, uris, title);
 					break;
 				case PLUGINS_PREF:
 					fragment = PluginsPrefFragment.getFragment();
