@@ -6,7 +6,7 @@
   -->
 <resources>
 	<string name="app_name">Catnut</string>
-	<string name="oauth">授权</string>
+	<string name="oauth">请用新浪微博账号登陆</string>
 	<string name="refresh">刷新</string>
 	<string name="alert_error">出错啦！</string>
 	<string name="auth_success">授权成功！</string>
@@ -178,7 +178,7 @@
 	<string name="app_desc">让微博 简洁&amp;流畅</string>
 	<string name="default_art">默认</string>
 	<string name="enable_fantasy">启用fantasy</string>
-	<string name="enable_fantasy_summary">启用后，你可以发现意象不到的精彩瞬间:-)，建议在wifi下开启</string>
+	<string name="enable_fantasy_summary">启用后，每天你都可以发现和分享各种精彩照片:-) 来自「500px」，建议在wifi下开启</string>
 	<string name="enter_home_directly">直接进入主页</string>
 	<string name="enter_home_directly_on_summary">启动应用后进入Fantasy</string>
 	<string name="enter_home_directly_off_summary">启动应用后进入主页时间线</string>

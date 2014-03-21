@@ -6,7 +6,7 @@
   -->
 <resources>
 	<string name="app_name">Catnut</string>
-	<string name="oauth">Authorize</string>
+	<string name="oauth">Login with sina weibo account</string>
 	<string name="refresh">Refresh</string>
 	<string name="alert_error">oh, no, something wrong!</string>
 	<string name="auth_success">Authorize successfully!</string>
@@ -142,7 +142,7 @@
 	<string name="app_desc">Let weibo clean&amp;fast</string>
 	<string name="default_art">Default</string>
 	<string name="enable_fantasy">Enable fantasy</string>
-	<string name="enable_fantasy_summary">If enable, u can find what u might expect:-), wifi recommend</string>
+	<string name="enable_fantasy_summary">If enable, u can find and share fantastic photo stream from 500px everyday:-), wifi recommend</string>
 	<string name="enter_home_directly">Enter home directly</string>
 	<string name="enter_home_directly_on_summary">Entering home directly after opening app</string>
 	<string name="enter_home_directly_off_summary">Entering Fantasy directly after opening app</string>
@@ -180,7 +180,7 @@
 	<string name="swipe_right_hint">Swipe to right to see something!</string>
 	<string name="plugins">Plugins</string>
 	<string name="zhihu_refresh_hint">No items, please pull or click menu to refresh!</string>
-	<string name="read_zhihu">Zhihu\' s Choice</string>
+	<string name="read_zhihu">@string/read_zhihu_summary</string>
 	<string name="view_all_answer">View all answers on web</string>
 	<string name="zhihu_view_on_web">View it on web</string>
 	<string name="downloading_img">Image downloading...</string>
@@ -199,7 +199,7 @@
 	<string name="auto_refresh">Auto refresh</string>
 	<string name="auto_refresh_on_summary">Auto refresh when opening</string>
 	<string name="auto_refresh_off_summary">Pull to refresh manually</string>
-	<string name="say_salutation">Say app\' s salutation</string>
+	<string name="say_salutation">Say salutation :-)</string>
 	<string name="fantasy_say_salutation_summary">Say salutation from the cover of fantasy, or not</string>
 	<string name="viewing_mode">Viewing mode</string>
 	<string name="fantasy_pager_mode_summary">Swipe left to view last one, right next.</string>

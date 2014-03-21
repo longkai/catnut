@@ -136,9 +136,13 @@ public class OAuthFragment extends Fragment {
 		settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 		settings.setSaveFormData(false);
 		mWebView.loadUrl(Manifest.getOAuthUri());
+	}
 
-		// set actionbar title
+	@Override
+	public void onStart() {
+		super.onStart();
 		mActionBar.setTitle(getString(R.string.oauth));
+		mActionBar.setIcon(R.drawable.weibo_logo);
 	}
 
 	@Override
