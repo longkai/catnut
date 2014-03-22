@@ -1,7 +1,7 @@
 新浪微博Android REST Client
 =====================
 ## 说明
-简洁，流畅的微博app，并且fantasy每天都会带你发现地球上的精彩瞬间:-)
+简洁，流畅，快速的微博app，并且附带500px和知乎每日精选的照片和问答插件 :-)
 
 程序架构启发自Google IO 2010 - [developing-RESTful-android-apps][]，界面设计启发自[Twitter for Android][]（需翻墙）
 
@@ -10,6 +10,8 @@
 项目主页请见[这里][project-host], app安装包[下载][download]，目前需要Android 4.1+
 
 > ![about][]
+
+> ![timeline][]
 
 ## 环境需求
 1. Android SDK >= 4.1.x（API Level >= 16），*建议设置ANDROID_HOME环境变量*
@@ -29,6 +31,7 @@
 5. Google Analytics，匿名统计使用信息，需自行[下载][Google Analytics]并引入
 6. Picasso，图片缓存框架，需自行[下载][Picasso]或者通过Android Studio引入
 7. ViewPagerIndicator, 页面切换指示器，需自行[下载][ViewPagerIndicator]或者通过Android Studio引入
+8. AndroidStaggeredGrid, grid view，需自行[下载][AndroidStaggeredGrid]或者通过Android Studio引入
 
 ## 如何构建
 1. 通过IDE
@@ -59,7 +62,7 @@ document license
 4. 新浪微博：[@龙凯Orz][]
 
 ---
-last update: 2014-03-04
+last update: 2014-03-22
 
 [developing-RESTful-android-apps]: http://www.google.com/events/io/2010/sessions/developing-RESTful-android-apps.html "developing-RESTful-android-apps"
 [Twitter for Android]: https://about.twitter.com/zh-hans/products/android "twitter for android"
@@ -71,11 +74,13 @@ last update: 2014-03-04
 [Google Analytics]: https://developers.google.com/analytics/devguides/collection/android/v3/ "Google Analytics v3"
 [Picasso]: http://square.github.io/picasso/ "Picasso"
 [ViewPagerIndicator]: http://viewpagerindicator.com/ "ViewPagerIndicator"
+[AndroidStaggeredGrid]: https://github.com/etsy/AndroidStaggeredGrid "AndroidStaggeredGrid"
 [@龙凯Orz]: http://weibo.com/coding4fun "sina weibo"
 [@longkai_1991]: https://twitter.com/longkai_1991 "twitter"
 [creative commons icon]: http://i.creativecommons.org/l/by-nc/4.0/88x31.png "creative commons icon"
 [creative commons license]: http://creativecommons.org/licenses/by-nc/4.0/deed.zh "creative commons license"
 
 [about]: https://farm8.staticflickr.com/7417/12923931494_b40944bdcd_o.png "about"
+[timeline]: https://farm3.staticflickr.com/2881/13335091823_7e7d82f215_o.png "timeline"
 [project-host]: http://longkai.github.io/catnut/ "project-host"
 [download]: https://dl.dropboxusercontent.com/u/96034496/apps/catnut-latest.apk "下载apk文件"

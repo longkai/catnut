@@ -65,6 +65,7 @@ dependencies {
 	compile 'com.github.chrisbanes.actionbarpulltorefresh:library:+'
 	compile 'com.viewpagerindicator:library:2.4.1' // no test, you should be aware...
 	compile 'com.squareup.picasso:picasso:2.2.0'
+	compile 'com.etsy.android.grid:library:1.0.4' // 源码有修改注释掉了com.etsy.android.grid.ExtendableListView 557-561
 }
 
 task wrapper(type: Wrapper) {

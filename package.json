@@ -21,7 +21,8 @@
 		"ActionBar-PullToRefresh",
 		"Google Analytics",
 		"Picasso",
-		"ViewPagerIndicator"
+		"ViewPagerIndicator",
+		"AndroidStaggeredGrid"
 	],
 	"license": {
 		"type": "MIT",
