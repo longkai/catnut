@@ -38,3 +38,6 @@ proguard/
 
 # sometimes, may be a vim tmp file
 *~
+
+# ignore our default cover, it may change overtime.
+default_fantasy.jpg
