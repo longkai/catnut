@@ -53,6 +53,7 @@ import org.catnut.support.QuickReturnScrollView;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.ui.ProfileActivity;
+import org.catnut.ui.SingleFragmentActivity;
 import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
@@ -76,6 +77,7 @@ public class ProfileFragment extends Fragment implements
 			User.location,
 			User.description,
 			User.avatar_large,
+			User.avatar_hd,
 			User.cover_image,
 			User.favourites_count,
 			User.friends_count,
@@ -101,6 +103,7 @@ public class ProfileFragment extends Fragment implements
 	private String mScreenName;
 	private String mCoverUrl;
 	private String mAvatarUrl;
+	private String mAvatarHdUrl;
 	private boolean mVerified;
 	private boolean mFollowing; // 哥是否关注他
 	private String mRemark;
@@ -383,6 +386,7 @@ public class ProfileFragment extends Fragment implements
 		// 暂存元数据
 		mUid = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 		mAvatarUrl = cursor.getString(cursor.getColumnIndex(User.avatar_large));
+		mAvatarHdUrl = cursor.getString(cursor.getColumnIndex(User.avatar_hd));
 		mVerified = CatnutUtils.getBoolean(cursor, User.verified);
 		mRemark = cursor.getString(cursor.getColumnIndex(User.remark));
 		mDescription = cursor.getString(cursor.getColumnIndex(User.description));
@@ -428,6 +432,7 @@ public class ProfileFragment extends Fragment implements
 		// 暂存元数据
 		mUid = json.optLong(Constants.ID);
 		mAvatarUrl = json.optString(User.avatar_large);
+		mAvatarHdUrl = json.optString(User.avatar_hd);
 		mVerified = json.optBoolean(User.verified);
 		mRemark = json.optString(User.remark);
 		mDescription = json.optString(User.description);
@@ -587,6 +592,15 @@ public class ProfileFragment extends Fragment implements
 							.placeholder(R.drawable.error)
 							.error(R.drawable.error)
 							.into(avatar);
+					avatar.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							Intent intent = SingleFragmentActivity.getIntent(getActivity(),
+									SingleFragmentActivity.PHOTO_VIEWER);
+							intent.putExtra(Constants.PIC, mAvatarHdUrl);
+							startActivity(intent);
+						}
+					});
 					TextView screenName = (TextView) frontPage.findViewById(R.id.screen_name);
 					screenName.setText("@" + mScreenName);
 					TextView remark = (TextView) frontPage.findViewById(R.id.remark);
