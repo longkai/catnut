@@ -5,6 +5,7 @@
   ~ The software shall be used for good, not evil.
   -->
 <resources>
+	<string name="version_name">0.8 Reeds</string>
 	<string-array name="tweet_font_size_entries">
 		<item>Tiny</item>
 		<item>Small</item>

@@ -32,6 +32,16 @@
 
 		<!--app' s desc-->
 		<TextView
+			android:id="@+id/weibo_app"
+			android:layout_marginTop="@dimen/medium"
+			android:textColor="@android:color/white"
+			android:textSize="18sp"
+			android:gravity="center_horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
+		<!--app' s desc-->
+		<TextView
 			android:id="@+id/app_desc"
 			android:textColor="@android:color/white"
 			android:textSize="20sp"

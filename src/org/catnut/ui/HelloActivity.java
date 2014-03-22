@@ -147,6 +147,8 @@ public class HelloActivity extends Activity {
 		TextView about = (TextView) findViewById(R.id.about_body);
 		TextView version = (TextView) findViewById(R.id.app_version);
 		TextView appName = (TextView) findViewById(R.id.app_name);
+		TextView weiboApp = (TextView) findViewById(R.id.weibo_app);
+		weiboApp.setText(R.string.weibo_app);
 		appName.setText(R.string.app_name);
 		TextView appDesc = (TextView) findViewById(R.id.app_desc);
 		appDesc.setText(R.string.app_desc);

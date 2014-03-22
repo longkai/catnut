@@ -50,7 +50,8 @@ public class Photo implements CatnutMetadata<JSONObject, ContentValues> {
 
 	public static final Photo METADATA = new Photo();
 
-	private Photo(){}
+	private Photo() {
+	}
 
 	@Override
 	public String ddl() {
@@ -71,8 +72,8 @@ public class Photo implements CatnutMetadata<JSONObject, ContentValues> {
 	public static boolean shouldRefresh() {
 		CatnutApp app = CatnutApp.getTingtingApp();
 		SharedPreferences pref = app.getPreferences();
-
-		return pref.getBoolean(
+		return !pref.contains(app.getString(R.string.pref_first_run)) ? true
+				: pref.getBoolean(
 				app.getString(R.string.pref_enable_fantasy),
 				app.getResources().getBoolean(R.bool.default_plugin_status)
 		) && System.currentTimeMillis() - pref.getLong(LAST_FANTASY_MILLIS, 0) > DateTime.DAY_MILLIS;

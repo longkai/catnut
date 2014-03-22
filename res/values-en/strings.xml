@@ -150,7 +150,7 @@
 	<string name="unknown_user">\@Weibo User</string>
 	<string name="find_new_version">Find new version! (%1$s)</string>
 	<string name="down_load_and_upgrade">Download and upgrade</string>
-	<string name="already_updated">U\' re in latest version:-)</string>
+	<string name="already_updated">U\' ve already in the latest version :-)</string>
 	<string name="not_upgrade_now">Not now:-(</string>
 	<string name="done_download">New version downloaded:-)</string>
 	<string name="click_to_upgrade">Click to upgrade</string>
@@ -205,7 +205,7 @@
 	<string name="fantasy_pager_mode_summary">Swipe left to view last one, right next.</string>
 	<string name="cache_images">Cache images</string>
 	<string name="cache_images_summary">Cache all the images in Android\' default location when loading items</string>
-
+	<string name="weibo_app">Sina Weibo Client</string>
 	<string-array name="fantasy_features">
 		<item>popular</item>
 		<item>upcoming</item>
