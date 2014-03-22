@@ -197,7 +197,7 @@
 	<string name="app_desc">追求 <b>简洁&amp;流畅&amp;高速</b></string>
 	<string name="default_art">默认</string>
 	<string name="enable_fantasy">启用fantasy</string>
-	<string name="enable_fantasy_summary">启用后，每天你都可以发现和分享各种精彩照片:-) 来自「500px」，建议在wifi下开启</string>
+	<string name="enable_fantasy_summary">启用后，每天你都可以发现和分享各种精彩照片:-) 版权归原作者或「500px」所有，建议在wifi下开启</string>
 	<string name="enter_home_directly">直接进入主页</string>
 	<string name="enter_home_directly_on_summary">启动应用后进入Fantasy</string>
 	<string name="enter_home_directly_off_summary">启动应用后进入主页时间线</string>
@@ -248,7 +248,7 @@
 	<string name="pager_mode">左右切换阅读模式</string>
 	<string name="simple_mode">普通模式</string>
 	<string name="tweet_text_copied">微博内容已复制到剪切板</string>
-	<string name="read_zhihu_summary">每日知乎精选</string>
+	<string name="read_zhihu_summary">每日知乎精选，版权归原作者及知乎所有</string>
 	<string name="plugins_summay">启用，禁用，设置一些有趣或有用的插件</string>
 	<string name="plugins_pref">插件设置</string>
 	<string name="enable">启用</string>

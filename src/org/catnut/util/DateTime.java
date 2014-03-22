@@ -68,7 +68,7 @@ public class DateTime {
 		} else if (offset < MINUTE_MILLIS) { // 1 min
 			return (offset / SECOND_MILLIS) + " s";
 		} else if (offset < HOUR_MILLIS) { // 1 hour
-			return (offset / MINUTE_MILLIS) + " min";
+			return (offset / MINUTE_MILLIS) + " m";
 		} else if (offset < DAY_MILLIS) { // 1 day
 			return (offset / HOUR_MILLIS) + " h";
 		} else if (offset < 7 * DAY_MILLIS) { // within 1 week

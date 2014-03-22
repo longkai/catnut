@@ -16,6 +16,6 @@
 		android:id="@+id/fall"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		app:item_margin="4dp"
+		app:item_margin="8dp"
 		app:column_count="2" />
 </uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>

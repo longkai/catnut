@@ -142,7 +142,7 @@
 	<string name="app_desc">for the <b>simplicity&amp;high-speedy</b></string>
 	<string name="default_art">Default</string>
 	<string name="enable_fantasy">Enable fantasy</string>
-	<string name="enable_fantasy_summary">If enable, u can find and share fantastic photo stream from 500px everyday:-), wifi recommend</string>
+	<string name="enable_fantasy_summary">If enable, u can find and share fantastic photo stream from 500px everyday:-), wifi recommend. Copyright by 500px, Inc. or the original author or authors</string>
 	<string name="enter_home_directly">Enter home directly</string>
 	<string name="enter_home_directly_on_summary">Entering home directly after opening app</string>
 	<string name="enter_home_directly_off_summary">Entering Fantasy directly after opening app</string>
@@ -180,7 +180,7 @@
 	<string name="swipe_right_hint">Swipe to right to see something!</string>
 	<string name="plugins">Plugins</string>
 	<string name="zhihu_refresh_hint">No items, please pull or click menu to refresh!</string>
-	<string name="read_zhihu">@string/read_zhihu_summary</string>
+	<string name="read_zhihu">Zhihu Daily Picks</string>
 	<string name="view_all_answer">View all answers on web</string>
 	<string name="zhihu_view_on_web">View it on web</string>
 	<string name="downloading_img">Image downloading...</string>
@@ -189,7 +189,7 @@
 	<string name="pager_mode">Swipe read mode</string>
 	<string name="simple_mode">Simple read mode</string>
 	<string name="tweet_text_copied">Text copied to clip board.</string>
-	<string name="read_zhihu_summary">Zhihu Daily Picks</string>
+	<string name="read_zhihu_summary">Zhihu Daily Picks, Copyright the original author or Zhihu Inc.</string>
 	<string name="plugins_summay">Enable, Disable, Setting some interesting or useful plugins.</string>
 	<string name="plugins_pref">Plugins Settings</string>
 	<string name="enable">Enable</string>

@@ -219,14 +219,14 @@
 						android:layout_height="1px" />
 
 					<TextView
-						android:id="@+id/action_share_app"
-						android:text="@string/share_app"
-						style="@style/Profile_Action" />
-
-					<TextView
 						android:tag="@string/fantasy"
 						android:onClick="switch2Plugins"
 						android:text="@string/about"
+						style="@style/Profile_Action" />
+
+					<TextView
+						android:id="@+id/action_share_app"
+						android:text="@string/share_app"
 						style="@style/Profile_Action" />
 
 					<TextView
