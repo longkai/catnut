@@ -224,6 +224,12 @@
 						style="@style/Profile_Action" />
 
 					<TextView
+						android:tag="@string/fantasy"
+						android:onClick="switch2Plugins"
+						android:text="@string/about"
+						style="@style/Profile_Action" />
+
+					<TextView
 						android:id="@+id/action_view_source_code"
 						android:text="@string/source_code"
 						style="@style/Profile_Action" />

@@ -156,15 +156,18 @@ public class HelloActivity extends Activity {
 		appDesc.setText(R.string.app_desc);
 		if (CatnutApp.getBoolean(R.string.pref_fantasy_say_salutation, R.bool.default_fantasy_say_salutation)) {
 			version.setText(getString(R.string.about_version_template, getString(R.string.version_name)));
-			// for girl' s day only, in march 7-21
-			Calendar now = Calendar.getInstance();
-			boolean salutation = now.get(Calendar.MONTH) <= Calendar.MAY;
-			if (salutation) {
-				about.setText(Html.fromHtml(getString(R.string.salutation)));
-				about.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-			} else {
+//			Calendar now = Calendar.getInstance();
+//			boolean salutation = now.get(Calendar.MONTH) <= Calendar.MAY;
+			int n = (int) (Math.random() * 101);
+			if (0 < n && n < 22) {
 				about.setText(Html.fromHtml(getString(R.string.about_body)));
 				about.setMovementMethod(LinkMovementMethod.getInstance());
+			} else if (n > 30) {
+				about.setText(Html.fromHtml(getString(R.string.salutation2)));
+				about.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+			} else {
+				about.setText(Html.fromHtml(getString(R.string.salutation)));
+				about.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
 			}
 		} else {
 			mAbout.setVisibility(View.GONE);

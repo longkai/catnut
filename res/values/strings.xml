@@ -138,6 +138,7 @@
 
 	<string name="about_body"><![CDATA[
         <b>{ }</b> with <b>♥</b> by <b><a href="mailto:im.longkai@gmail.com">longkai</a></b> in <b>Guilin</b>.
+        It was initially created for a girl.<br>
         <i>Catnut</i> is a compound word of cat and nut, which was made by one of my friends.
         Whatever it means, hope you like it!
         <br><br>
@@ -171,7 +172,24 @@
 		<b>要等你，要证明自己</b><br><br>
 		<b>我可以纵容你在心底<b><br><br>
 		<b>也可以当你只是路过的人而已</b><br><br>
-		<b><p align="right">我等你</p></b><br><br>
+		<b>『我等你 - 刘若英』</b><br><br>
+	]]></string>
+	<string name="salutation2"><![CDATA[
+		<b>蒹葭苍苍，白露为霜</b><br><br>
+		<b>所谓伊人，在水一方<b><br><br>
+		<b>溯洄从之，道阻且长</b><br><br>
+		<b>溯游从之，宛在水中央</b><br><br><br>
+		<b>蒹葭萋萋，白露未晞</b><br><br>
+		<b>所谓伊人，在水之湄</b><br><br>
+		<b>所谓伊人，在水之湄</b><br><br>
+		<b>溯洄从之，道阻且跻</b><br><br>
+		<b>溯游从之，宛在水中坻</b><br><br><br>
+		<b>蒹葭采采，白露未已</b><br><br>
+		<b>所谓伊人，在水之涘</b><br><br>
+		<b>所谓伊人，在水之涘</b><br><br>
+		<b>溯洄从之，道阻且右</b><br><br>
+		<b>溯游从之，宛在水中沚</b><br><br>
+		<b>『诗经』</b><br><br>
 	]]></string>
 	<string name="about_version_template">v%1$s</string>
 	<string name="hide_fantasy_words">隐藏文字</string>

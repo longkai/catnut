@@ -13,6 +13,7 @@ import android.app.FragmentManager;
 import android.content.AsyncQueryHandler;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
@@ -499,11 +500,17 @@ public class MainActivity extends Activity implements
 		}
 		if (view != null) { // 来自layout xml
 			String key = (String) view.getTag();
-			boolean enable = CatnutApp.getTingtingApp().getPreferences()
-					.getBoolean(key, getResources().getBoolean(R.bool.default_plugin_status));
-			if (!enable) {
-				startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.PLUGINS_PREF));
-				return;
+			SharedPreferences pref = CatnutApp.getTingtingApp().getPreferences();
+			if (!pref.contains(key)) { // 直接跳到fantasy salutation
+				startActivity(new Intent(this, HelloActivity.class).putExtra(HelloActivity.TAG, HelloActivity.TAG));
+				return; // stop here
+			} else {
+				boolean enable = pref
+						.getBoolean(key, getResources().getBoolean(R.bool.default_plugin_status));
+				if (!enable) {
+					startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.PLUGINS_PREF));
+					return; // stop here
+				}
 			}
 		}
 		ArrayList<Integer> plugins = CatnutUtils.enabledPlugins();
