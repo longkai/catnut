@@ -34,6 +34,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -618,9 +619,17 @@ public class TweetFragment extends Fragment implements
 		if (!TextUtils.isEmpty(thumb)) {
 			Picasso.with(getActivity()).load(thumb).into(mThumbs);
 			mThumbs.setVisibility(View.VISIBLE);
+			mThumbs.setOnTouchListener(new View.OnTouchListener() {
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					return CatnutUtils.imageOverlay(v, event);
+				}
+			});
 			mThumbs.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
+					mThumbs.getDrawable().clearColorFilter();
+					mText.invalidate();
 					Intent intent = SingleFragmentActivity.getIntent(getActivity(),
 							SingleFragmentActivity.PHOTO_VIEWER);
 					intent.putExtra(Constants.PIC, originalUrl);

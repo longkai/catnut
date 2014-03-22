@@ -65,6 +65,8 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 	private boolean mSmall;
 	private String mScreenName;
 
+	private int mScreenWidth;
+
 	/** 自定义字体，用户偏好 */
 	private Typeface mCustomizedFont;
 	private int mCustomizedFontSize;
@@ -100,6 +102,7 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 		mCustomizedLineSpacing = CatnutUtils.getLineSpacing(preferences,
 				context.getString(R.string.pref_line_spacing),
 				context.getString(R.string.default_line_spacing));
+		mScreenWidth = CatnutUtils.getScreenWidth(context);
 	}
 
 	private void showPopupMenu(View view) {
@@ -334,19 +337,29 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 			final String originUri = cursor.getString(holder.originalPicIndex);
 			if (!TextUtils.isEmpty(thumbsUri)) {
 				if (!mSmall) {
+					holder.thumbs.setScaleType(ImageView.ScaleType.CENTER_CROP);
+					holder.thumbs.setAdjustViewBounds(true);
 					Picasso.with(context)
 							.load(thumbsUri)
-							.resizeDimen(R.dimen.thumb_width, R.dimen.thumb_height) // todo: remove hard code
 							.centerCrop()
+							.resize(mScreenWidth, (int) (mScreenWidth * Constants.GOLDEN_RATIO))
 							.into(holder.thumbs);
 				} else {
 					Picasso.with(context)
 							.load(thumbsUri)
 							.into(holder.thumbs);
 				}
+				holder.thumbs.setOnTouchListener(new View.OnTouchListener() {
+					@Override
+					public boolean onTouch(View v, MotionEvent event) {
+						return CatnutUtils.imageOverlay(v, event);
+					}
+				});
 				holder.thumbs.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
+						holder.thumbs.getDrawable().clearColorFilter();
+						holder.thumbs.invalidate();
 						Intent intent = SingleFragmentActivity.getIntent(context, SingleFragmentActivity.PHOTO_VIEWER);
 						intent.putExtra(Constants.PIC, originUri);
 						mContext.startActivity(intent);

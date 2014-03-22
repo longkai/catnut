@@ -128,7 +128,7 @@ public class PhotoViewerFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.photo, container, false);
 		mImageView = (TouchImageView) view.findViewById(R.id.image);
-		mImageView.setMaxZoom(3.5f); // 放大一些，有些长微博畸形啊。。。
+		mImageView.setMaxZoom(7f); // 放大一些，有些长微博畸形啊。。。
 		mImageView.setBackground(new ColorDrawable(getResources().getColor(R.color.black_background)));
 		return view;
 	}
