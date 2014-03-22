@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.squareup.picasso.Picasso;
 import org.catnut.R;
+import org.catnut.support.PageTransformer;
 import org.catnut.support.TouchImageView;
 import org.catnut.util.Constants;
 
@@ -79,6 +80,7 @@ public class GalleryPagerFragment extends Fragment {
 				return mUrls.size();
 			}
 		});
+		viewPager.setPageTransformer(true, new PageTransformer.ZoomOutPageTransformer());
 		viewPager.setCurrentItem(mCurrentIndex);
 	}
 

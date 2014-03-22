@@ -42,6 +42,7 @@ import org.catnut.fragment.FantasyFragment;
 import org.catnut.metadata.AccessToken;
 import org.catnut.plugin.fantasy.Photo;
 import org.catnut.metadata.WeiboAPIError;
+import org.catnut.support.PageTransformer;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
@@ -134,6 +135,7 @@ public class HelloActivity extends Activity {
 
 		mPagerAdapter = new Gallery();
 		mViewPager.setAdapter(mPagerAdapter);
+		mViewPager.setPageTransformer(true, new PageTransformer.DepthPageTransformer());
 		if (mTargetFromGrid != null) {
 			mImages.add(mTargetFromGrid);
 			mPagerAdapter.notifyDataSetChanged();
