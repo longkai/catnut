@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 import org.catnut.ui.HelloActivity;
 import org.catnut.util.CatnutUtils;
+import org.catnut.util.Constants;
 
 /**
  * 瀑布流适配
@@ -31,6 +32,7 @@ public class FantasyFallAdapter extends CursorAdapter implements View.OnTouchLis
 
 	private ColorDrawable[] mColors;
 	private float mFactor;
+	private int mScreenWidth;
 
 	public FantasyFallAdapter(Context context) {
 		super(context, null, 0);
@@ -69,10 +71,18 @@ public class FantasyFallAdapter extends CursorAdapter implements View.OnTouchLis
 		int width = cursor.getInt(holder.widthIndex);
 		int height = cursor.getInt(holder.heightIndex);
 		final String url = cursor.getString(cursor.getColumnIndex(Photo.image_url));
+
+		if (width == 0 || height == 0) { // fall back, if width or height not provide
+			width = (int) mFactor;
+			height = (int) (Constants.GOLDEN_RATIO * width);
+		} else {
+			height = (int) (mFactor * height / width);
+		}
+
 		Picasso.with(context)
 				.load(url)
 				.placeholder(mColors[((int) (Math.random() * N))])
-				.resize((int) mFactor, (int) (mFactor * height / width))
+				.resize((int) mFactor, height)
 				.into(imageView);
 
 		final String name = cursor.getString(holder.nameIndex);

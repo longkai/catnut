@@ -256,7 +256,7 @@ public class ZhihuItemsFragment extends ListFragment implements
 
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-		Cursor c = (Cursor) mAdapter.getItem(position);
+		Cursor c = (Cursor) mAdapter.getItem(position - 1); // a header
 		new Thread(new ZhihuItemFragment.MarkHasReadRunable(
 				c.getLong(c.getColumnIndex(Zhihu.ANSWER_ID)),
 				getActivity(),
