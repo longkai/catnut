@@ -194,12 +194,14 @@
 
 					<TextView
 						android:text="@string/fantasy"
+						android:tag="@string/pref_enable_fantasy"
 						android:onClick="switch2Plugins"
 						style="@style/Profile_Action" />
 
 					<TextView
-						android:onClick="switch2Plugins"
 						android:text="@string/read_zhihu"
+						android:tag="@string/pref_enable_zhihu"
+						android:onClick="switch2Plugins"
 						style="@style/Profile_Action" />
 
 					<TextView

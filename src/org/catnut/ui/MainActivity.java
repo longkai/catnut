@@ -497,6 +497,15 @@ public class MainActivity extends Activity implements
 		if (mDrawerLayout.isDrawerOpen(mQuickReturnDrawer)) {
 			mDrawerLayout.closeDrawer(mQuickReturnDrawer);
 		}
+		if (view != null) { // 来自layout xml
+			String key = (String) view.getTag();
+			boolean enable = CatnutApp.getTingtingApp().getPreferences()
+					.getBoolean(key, getResources().getBoolean(R.bool.default_plugin_status));
+			if (!enable) {
+				startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.PLUGINS_PREF));
+				return;
+			}
+		}
 		ArrayList<Integer> plugins = CatnutUtils.enabledPlugins();
 		if (plugins != null) {
 			Intent intent = new Intent(this, PluginsActivity.class);
