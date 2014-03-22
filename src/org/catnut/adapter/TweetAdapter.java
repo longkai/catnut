@@ -91,7 +91,11 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 				context.getString(R.string.pref_tweet_font_size),
 				context.getResources().getInteger(R.integer.default_tweet_font_size)
 		);
-		mCustomizedFont = CatnutUtils.getTypeface(preferences, context.getString(R.string.pref_customize_tweet_font));
+		mCustomizedFont = CatnutUtils.getTypeface(
+				preferences,
+				context.getString(R.string.pref_customize_tweet_font),
+				context.getString(R.string.default_typeface)
+		);
 		mImageSpan = new TweetImageSpan(mContext);
 		mCustomizedLineSpacing = CatnutUtils.getLineSpacing(preferences,
 				context.getString(R.string.pref_line_spacing),

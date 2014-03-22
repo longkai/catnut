@@ -490,12 +490,15 @@ public class CatnutUtils {
 	 *
 	 * @param pref
 	 * @param key
-	 * @return 若发生任何异常则返回null
+	 * @param defaultTypeface
+	 * @return 若发生任何异常或者和默认相同则返回null
 	 */
-	public static Typeface getTypeface(SharedPreferences pref, String key) {
+	public static Typeface getTypeface(SharedPreferences pref, String key, String defaultTypeface) {
 		Typeface typeface = null;
 		String fontPath = pref.getString(key, null);
-		if (fontPath != null) {
+		if (fontPath == null || fontPath.equals(defaultTypeface)) {
+			return null;
+		} else {
 			try {
 				typeface = Typeface.createFromFile(new File(fontPath));
 			} catch (Exception e) {

@@ -44,7 +44,7 @@
 
 		<Preference
 			android:key="@string/pref_customize_tweet_font"
-			android:defaultValue="@null"
+			android:defaultValue="@string/default_typeface"
 			android:title="@string/font"
 			android:summary="@string/change_font_summary" />
 
@@ -67,7 +67,7 @@
 		<ListPreference
 			android:key="@string/pref_thumbs_options"
 			android:title="@string/show_thumbs"
-			android:defaultValue="@string/thumb_small"
+			android:defaultValue="@string/default_thumbs_option"
 			android:summary="@string/show_thumbs_summary"
 			android:entries="@array/thumbs_options_entries"
 			android:entryValues="@array/thumbs_options_entryValues" />

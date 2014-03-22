@@ -367,7 +367,11 @@ public class TweetFragment extends Fragment implements
 		CatnutApp app = CatnutApp.getTingtingApp();
 		mRequestQueue = app.getRequestQueue();
 		mPreferences = app.getPreferences();
-		mTypeface = CatnutUtils.getTypeface(mPreferences, getString(R.string.pref_customize_tweet_font));
+		mTypeface = CatnutUtils.getTypeface(
+				mPreferences,
+				getString(R.string.pref_customize_tweet_font),
+				getString(R.string.default_typeface)
+		);
 		mLineSpacing = CatnutUtils.getLineSpacing(mPreferences,
 				getString(R.string.pref_line_spacing), getString(R.string.default_line_spacing));
 		mImageSpan = new TweetImageSpan(getActivity());

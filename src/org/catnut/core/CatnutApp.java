@@ -56,8 +56,8 @@ public class CatnutApp extends Application implements SharedPreferences.OnShared
 			SharedPreferences.Editor edit = mPreferences.edit();
 			edit.putString(getString(R.string.pref_tweet_font_size), String.valueOf(res.getInteger(R.integer.default_tweet_font_size)));
 			edit.putString(getString(R.string.pref_line_spacing), res.getString(R.string.default_line_spacing));
-			edit.putString(getString(R.string.pref_customize_tweet_font), res.getString(R.string.pref_customize_tweet_font));
-			edit.putString(getString(R.string.pref_thumbs_options), res.getString(R.string.pref_thumbs_options));
+			edit.putString(getString(R.string.pref_customize_tweet_font), res.getString(R.string.default_typeface));
+			edit.putString(getString(R.string.pref_thumbs_options), res.getString(R.string.default_thumbs_option));
 			edit.commit();
 		}
 		checkAccessToken();

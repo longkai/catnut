@@ -193,7 +193,11 @@ public class ProfileFragment extends Fragment implements
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
 		SharedPreferences preferences = mApp.getPreferences();
-		mTypeface = CatnutUtils.getTypeface(preferences, getString(R.string.pref_customize_tweet_font));
+		mTypeface = CatnutUtils.getTypeface(
+				preferences,
+				getString(R.string.pref_customize_tweet_font),
+				getString(R.string.default_typeface)
+		);
 		mLineSpacing = CatnutUtils.getLineSpacing(preferences,
 				getString(R.string.pref_line_spacing), getString(R.string.default_line_spacing));
 	}

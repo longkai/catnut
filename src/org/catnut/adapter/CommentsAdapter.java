@@ -50,8 +50,11 @@ public class CommentsAdapter extends CursorAdapter {
 		mInflater = LayoutInflater.from(context);
 		mImageSpan = new TweetImageSpan(context);
 		SharedPreferences preferences = CatnutApp.getTingtingApp().getPreferences();
-		mTypeface = CatnutUtils.getTypeface(preferences,
-				context.getString(R.string.pref_customize_tweet_font));
+		mTypeface = CatnutUtils.getTypeface(
+				preferences,
+				context.getString(R.string.pref_customize_tweet_font),
+				context.getString(R.string.default_typeface)
+		);
 		mLineSpacing = CatnutUtils.getLineSpacing(
 				preferences,
 				context.getString(R.string.pref_line_spacing),
