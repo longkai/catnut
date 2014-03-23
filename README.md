@@ -80,7 +80,7 @@ last update: 2014-03-22
 [creative commons icon]: http://i.creativecommons.org/l/by-nc/4.0/88x31.png "creative commons icon"
 [creative commons license]: http://creativecommons.org/licenses/by-nc/4.0/deed.zh "creative commons license"
 
-[about]: https://farm8.staticflickr.com/7417/12923931494_b40944bdcd_o.png "about"
+[about]: https://farm3.staticflickr.com/2841/13335333864_b3c25109a6_o.png "about"
 [timeline]: https://farm3.staticflickr.com/2881/13335091823_7e7d82f215_o.png "timeline"
 [project-host]: http://longkai.github.io/catnut/ "project-host"
 [download]: https://dl.dropboxusercontent.com/u/96034496/apps/catnut-latest.apk "下载apk文件"
