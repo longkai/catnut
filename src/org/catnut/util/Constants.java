@@ -31,10 +31,6 @@ public class Constants {
 
 	public static final String SHARE_IMAGE = "share.png";
 
-	// for error dialog box
-	public static final String TITLE = "title";
-	public static final String MESSAGE = "message";
-
 	// default sort order, must have `_id` field!
 	public static final String DEFAULT_ORDER = BaseColumns._ID + " desc";
 	public static final String RANDOM_ORDER = "RANDOM()";

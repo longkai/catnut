@@ -8,7 +8,7 @@
 	<string name="app_name">Catnut</string>
 	<string name="oauth">Login with sina weibo account</string>
 	<string name="refresh">Refresh</string>
-	<string name="alert_error">oh, no, something wrong!</string>
+	<string name="auth_fail_with_reason">Auth fail, reason: %1$s</string>
 	<string name="auth_success">Authorize successfully!</string>
 	<string name="logout">Logout</string>
 	<string name="logout_confirm">Are u sure to quit app?</string>

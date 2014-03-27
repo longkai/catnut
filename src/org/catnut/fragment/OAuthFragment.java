@@ -7,13 +7,19 @@ package org.catnut.fragment;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -24,16 +30,16 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import org.catnut.metadata.User;
-import org.json.JSONObject;
 import org.catnut.R;
 import org.catnut.api.UserAPI;
 import org.catnut.core.CatnutApp;
-import org.catnut.processor.UserProcessor;
-import org.catnut.metadata.WeiboAPIError;
 import org.catnut.core.CatnutRequest;
+import org.catnut.metadata.User;
+import org.catnut.metadata.WeiboAPIError;
+import org.catnut.processor.UserProcessor;
 import org.catnut.ui.MainActivity;
 import org.catnut.util.Manifest;
+import org.json.JSONObject;
 
 /**
  * 使用Oauth2的方式获取新浪微博的认证
@@ -74,6 +80,9 @@ public class OAuthFragment extends Fragment {
 		mWebView.setWebViewClient(new WebViewClient() {
 			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				if (!url.startsWith(Manifest.AUTH_REDIRECT_URI)) {
+					return false;
+				}
 				String code = Uri.parse(url).getQueryParameter("code");
 				Log.d(TAG, "the auth code is " + code);
 				String accessTokenUri = Manifest.getAccessTokenUri(code);
@@ -112,8 +121,10 @@ public class OAuthFragment extends Fragment {
 						public void onErrorResponse(VolleyError error) {
 							Log.wtf(TAG, "auth fail!", error);
 							WeiboAPIError e = WeiboAPIError.fromVolleyError(error);
-							ErrorDialogFragment fragment = ErrorDialogFragment.newInstance(null, e.error);
-							fragment.show(getFragmentManager(), null);
+							new AlertDialog.Builder(getActivity())
+									.setMessage(getString(R.string.auth_fail_with_reason, e.error))
+									.setNegativeButton(android.R.string.ok, null)
+									.show();
 						}
 					}
 				)).setTag(TAG);
