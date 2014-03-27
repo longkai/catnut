@@ -15,6 +15,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import org.catnut.R;
 import org.catnut.metadata.AccessToken;
+import org.catnut.support.OkHttpStack;
 import org.json.JSONObject;
 
 import java.util.Collections;
@@ -49,7 +50,7 @@ public class CatnutApp extends Application implements SharedPreferences.OnShared
 		sApp = this;
 		mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		mPreferences.registerOnSharedPreferenceChangeListener(this);
-		mRequestQueue = Volley.newRequestQueue(this);
+		mRequestQueue = Volley.newRequestQueue(this, new OkHttpStack());
 		// solve the first time entering settings problem -> the timeline will be empty 'cause many pref got changed :-(
 		if (!mPreferences.contains(getString(R.string.pref_first_run))) {
 			Resources res = getResources();

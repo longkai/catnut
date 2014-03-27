@@ -16,7 +16,7 @@ import org.catnut.util.CatnutUtils;
  */
 public class _500pxAPI {
 
-	private static final String KEY = "HocY5wY9GQaa9sdNO9HvagCGuGt34snyMTHckIQJ";
+	private static final String KEY = "DIEcEBJ3O30PBOrUgf1LuEVTi1kh7K0wKBHE26F8";
 	private static final String DOMAIN = "https://api.500px.com/v1";
 
 	public static CatnutAPI photos(String feature, int page) {

@@ -31,15 +31,17 @@ public class HttpClient {
 	private HttpURLConnection httpURLConnection;
 	private OutputStream outputStream;
 
-	private String delimiter = "--";
 	private String boundary = "SwA" + Long.toString(System.currentTimeMillis()) + "SwA";
+
+	private static final String DELIMITER = "--";
+	private static final String LINE_SEPARATOR = "\r\n";
 
 	public HttpClient(String url) {
 		this.url = url;
 	}
 
 	public void connectForMultipart(Map<String, String> headers) throws Exception {
-		httpURLConnection = (HttpURLConnection) (new URL(url)).openConnection();
+		httpURLConnection = OkHttpStack.getOkHttpClient().open(new URL(url));
 		httpURLConnection.setRequestMethod("POST");
 		httpURLConnection.setDoInput(true);
 		httpURLConnection.setDoOutput(true);
@@ -57,25 +59,25 @@ public class HttpClient {
 	}
 
 	public void addFilePart(String paramName, String fileName, byte[] data) throws Exception {
-		outputStream.write((delimiter + boundary + "\r\n").getBytes());
-		outputStream.write(("Content-Disposition: form-data; name=\"" + paramName + "\"; filename=\"" + fileName + "\"\r\n").getBytes());
-		outputStream.write(("Content-Type: application/octet-stream\r\n").getBytes());
-		outputStream.write(("Content-Transfer-Encoding: binary\r\n").getBytes());
-		outputStream.write("\r\n".getBytes());
+		outputStream.write((DELIMITER + boundary + LINE_SEPARATOR).getBytes());
+		outputStream.write(("Content-Disposition: form-data; name=\"" + paramName + "\"; filename=\"" + fileName + "\"" + LINE_SEPARATOR).getBytes());
+		outputStream.write(("Content-Type: application/octet-stream" + LINE_SEPARATOR).getBytes());
+		outputStream.write(("Content-Transfer-Encoding: binary" + LINE_SEPARATOR).getBytes());
+		outputStream.write(LINE_SEPARATOR.getBytes());
 
 		outputStream.write(data);
 
-		outputStream.write("\r\n".getBytes());
+		outputStream.write(LINE_SEPARATOR.getBytes());
 	}
 
 	public void finishMultipart() throws Exception {
-		outputStream.write((delimiter + boundary + delimiter + "\r\n").getBytes());
+		outputStream.write((DELIMITER + boundary + DELIMITER + LINE_SEPARATOR).getBytes());
 	}
 
 	public UploadResponse getResponse() throws Exception {
 		int responseCode = httpURLConnection.getResponseCode();
 		InputStream is;
-		if (responseCode >= 200 && responseCode < 400) {
+		if (responseCode >= HttpURLConnection.HTTP_OK && responseCode < HttpURLConnection.HTTP_BAD_REQUEST) {
 			is = httpURLConnection.getInputStream();
 		} else {
 			is = httpURLConnection.getErrorStream();
@@ -91,10 +93,10 @@ public class HttpClient {
 	}
 
 	private void writeParamData(String paramName, String value) throws Exception {
-		outputStream.write((delimiter + boundary + "\r\n").getBytes());
-		outputStream.write("Content-Type: text/plain\r\n".getBytes());
-		outputStream.write(("Content-Disposition: form-data; name=\"" + paramName + "\"\r\n").getBytes());
-		outputStream.write(("\r\n" + value + "\r\n").getBytes());
+		outputStream.write((DELIMITER + boundary + LINE_SEPARATOR).getBytes());
+		outputStream.write(("Content-Type: text/plain; charset=utf-8" + LINE_SEPARATOR).getBytes());
+		outputStream.write(("Content-Disposition: form-data; name=\"" + paramName + "\"" + LINE_SEPARATOR).getBytes());
+		outputStream.write((LINE_SEPARATOR + value + LINE_SEPARATOR).getBytes());
 	}
 
 	public static class UploadResponse {
