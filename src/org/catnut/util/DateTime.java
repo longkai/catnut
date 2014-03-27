@@ -63,9 +63,7 @@ public class DateTime {
 	public static String getRelativeTimeString(String string) {
 		long mills = getTimeMills(string);
 		long offset = System.currentTimeMillis() - mills;
-		if (offset < 5 * SECOND_MILLIS) { // 5 sec
-			return "just now";
-		} else if (offset < MINUTE_MILLIS) { // 1 min
+		if (offset < MINUTE_MILLIS) { // 1 min
 			return (offset / SECOND_MILLIS) + " s";
 		} else if (offset < HOUR_MILLIS) { // 1 hour
 			return (offset / MINUTE_MILLIS) + " m";

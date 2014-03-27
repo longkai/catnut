@@ -32,11 +32,12 @@
 			android:clickable="true"
 			android:focusable="true"
 			android:background="@drawable/avatar_background"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
+			android:layout_width="35dp"
+			android:layout_height="35dp" />
 
 		<TextView
 			android:id="@+id/time"
+			android:layout_marginTop="@dimen/medium"
 			android:textColor="@android:color/holo_blue_bright"
 			android:layout_gravity="center"
 			android:layout_width="wrap_content"
