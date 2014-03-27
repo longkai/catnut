@@ -22,6 +22,7 @@ import org.catnut.metadata.Draft;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.util.CatnutUtils;
+import org.catnut.util.Constants;
 
 /**
  * 草稿适配器
@@ -32,15 +33,13 @@ public class DraftsAdapter extends CursorAdapter {
 
 	private LayoutInflater mInflater;
 	private TweetImageSpan mTweetImageSpan;
-	private int mWidth;
-	private int mHeight;
+	private int mScreenWidth;
 
 	public DraftsAdapter(Context context) {
 		super(context, null, 0);
 		mInflater = LayoutInflater.from(context);
 		mTweetImageSpan = new TweetImageSpan(context);
-		mWidth = context.getResources().getDimensionPixelOffset(R.dimen.thumb_width);
-		mHeight = context.getResources().getDimensionPixelOffset(R.dimen.thumb_height);
+		mScreenWidth = CatnutUtils.getScreenWidth(context);
 	}
 
 	private static class ViewHolder {
@@ -61,6 +60,7 @@ public class DraftsAdapter extends CursorAdapter {
 		holder.textIndex = cursor.getColumnIndex(Draft.STATUS);
 		holder.createAtIndex = cursor.getColumnIndex(Draft.CREATE_AT);
 		holder.imageView = (ImageView) view.findViewById(R.id.image);
+		holder.imageView.setAdjustViewBounds(true);
 		holder.picIndex = cursor.getColumnIndex(Draft.PIC);
 		view.setTag(holder);
 		return view;
@@ -77,8 +77,7 @@ public class DraftsAdapter extends CursorAdapter {
 		if (!TextUtils.isEmpty(pic)) {
 			Picasso.with(context)
 					.load(Uri.parse(pic))
-					.resize(mWidth, mHeight)
-					.centerCrop()
+					.resize(mScreenWidth, (int) (mScreenWidth * Constants.GOLDEN_RATIO))
 					.placeholder(R.drawable.error)
 					.error(R.drawable.error)
 					.into(holder.imageView);

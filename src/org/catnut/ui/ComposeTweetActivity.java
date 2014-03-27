@@ -65,6 +65,7 @@ import org.catnut.support.LocationSupport;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.util.CatnutUtils;
+import org.catnut.util.Constants;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -109,7 +110,6 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 	// str
 	private String mTitle;
 	private String mEmotionTitle;
-	private int mImageThumbSize;
 
 	private ImageView mAvatar;
 	private TextView mScreenName;
@@ -141,7 +141,6 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 
 		mTitle = getString(R.string.compose);
 		mEmotionTitle = getString(R.string.add_emotions);
-		mImageThumbSize = getResources().getDimensionPixelSize(R.dimen.image_thumbnail_size);
 
 		injectLayout();
 		injectActionBar();
@@ -721,8 +720,11 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 
 	private class ThumbsAdapter extends ArrayAdapter<Uri> {
 
+		private int mScreenSize;
+
 		public ThumbsAdapter(Context context, List<Uri> uris) {
 			super(context, 0, uris);
+			mScreenSize = CatnutUtils.getScreenWidth(context);
 		}
 
 		@Override
@@ -730,15 +732,15 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 			final ImageView photo;
 			if (convertView == null) {
 				photo = new ImageView(ComposeTweetActivity.this);
-				photo.setBackgroundResource(R.drawable.overflow_dropdown_light);
-				photo.setScaleType(ImageView.ScaleType.CENTER_CROP);
+				photo.setAdjustViewBounds(true);
+//				photo.setScaleType(ImageView.ScaleType.CENTER_CROP);
 			} else {
 				photo = (ImageView) convertView;
 			}
 			// load image efficiently
 			Picasso.with(getContext())
 					.load(getItem(position))
-					.resize(mImageThumbSize, mImageThumbSize)
+					.resize(mScreenSize, (int) (Constants.GOLDEN_RATIO * mScreenSize))
 					.centerCrop()
 					.into(photo);
 			return photo;
