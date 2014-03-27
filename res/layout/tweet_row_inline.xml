@@ -50,7 +50,7 @@
 		style="@style/Tweet_Inline"
 		android:textSize="@dimen/text_size_small"
 		android:layout_marginRight="@dimen/medium"
-		android:textColor="@android:color/darker_gray"
+		android:textColor="#ff9fa9b0"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" />
 

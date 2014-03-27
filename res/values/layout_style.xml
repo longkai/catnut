@@ -22,7 +22,7 @@
 		<item name="android:layout_width">match_parent</item>
 		<item name="android:layout_height">wrap_content</item>
 		<item name="android:gravity">left|center_vertical</item>
-		<item name="android:textColor">@android:color/secondary_text_light</item>
+		<item name="android:textColor">@color/black25PercentColor</item>
 		<item name="android:textStyle">bold</item>
 		<item name="android:textSize">18sp</item>
 	</style>
@@ -35,10 +35,10 @@
 		<item name="android:layout_marginRight">8dp</item>
 		<item name="android:layout_marginBottom">16dp</item>
 		<item name="android:orientation">horizontal</item>
-		<item name="android:background">@drawable/undobar</item>
+		<item name="android:background">@drawable/confirmbar</item>
 		<item name="android:clickable">true</item>
 		<item name="android:showDividers">middle</item>
-		<item name="android:divider">@drawable/undobar_divider</item>
+		<item name="android:divider">@drawable/confirmbar_divider</item>
 		<item name="android:dividerPadding">10dp</item>
 	</style>
 
@@ -59,7 +59,7 @@
 		<item name="android:layout_height">match_parent</item>
 		<item name="android:paddingLeft">16dp</item>
 		<item name="android:paddingRight">16dp</item>
-		<item name="android:background">@drawable/undobar_button</item>
+		<item name="android:background">@drawable/confirmbar_button</item>
 		<item name="android:drawableLeft">@drawable/ic_navigation_accept_dark</item>
 		<item name="android:drawablePadding">12dp</item>
 		<item name="android:textAppearance">?android:textAppearanceSmall</item>

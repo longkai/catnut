@@ -12,7 +12,7 @@
 
 	<AutoCompleteTextView
 		android:id="@+id/zhihu_search"
-		android:hint="搜索感兴趣的条目？"
+		android:hint="@string/zhihu_item_search_hint"
 		android:singleLine="true"
 		android:drawableStart="@drawable/ic_action_search_light"
 		android:textAppearance="?android:attr/textAppearanceMedium"
