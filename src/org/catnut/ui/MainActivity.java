@@ -482,6 +482,7 @@ public class MainActivity extends Activity implements
 			case R.id.new_comment:
 				fragment = ConversationFragment.getFragment();
 				tag = ConversationFragment.TAG;
+				mNewComment.setText("0");
 				break;
 			case R.id.action_my_list:
 			default:

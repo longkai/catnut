@@ -69,6 +69,7 @@
 	<string name="thumb_small">small</string>
 	<string name="thumb_medium">medium</string>
 	<string name="thumb_none">none</string>
+	<string name="thumb_original">large</string>
 	<string-array name="thumbs_options_entryValues">
 		<item>@string/thumb_none</item>
 		<item>@string/thumb_small</item>

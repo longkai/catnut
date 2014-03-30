@@ -8,6 +8,7 @@ package org.catnut.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.provider.BaseColumns;
@@ -29,6 +30,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 import org.catnut.R;
 import org.catnut.api.FavoritesAPI;
 import org.catnut.core.CatnutApp;
@@ -37,6 +39,7 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.StatusProcessor;
+import org.catnut.support.annotation.NotNull;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.ui.ProfileActivity;
@@ -61,13 +64,12 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 	private LayoutInflater mInflater;
 	private RequestQueue mRequestQueue;
 	private TweetImageSpan mImageSpan;
-	private String mThumbsOption;
-	private boolean mSmall;
 	private String mScreenName;
 
 	private int mScreenWidth;
 
 	/** 自定义字体，用户偏好 */
+	private ThumbsOption mThumbsOption;
 	private Typeface mCustomizedFont;
 	private int mCustomizedFontSize;
 	private float mCustomizedLineSpacing = 1.0f;
@@ -84,14 +86,20 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 		CatnutApp app = CatnutApp.getTingtingApp();
 		mRequestQueue = app.getRequestQueue();
 		SharedPreferences preferences = app.getPreferences();
-		mThumbsOption = preferences.getString(
-				context.getString(R.string.pref_thumbs_options),
-				context.getString(R.string.thumb_small)
+		Resources resources = context.getResources();
+		ThumbsOption.injectAliases(resources);
+		mThumbsOption = ThumbsOption.obtainOption(
+				preferences.getString(
+						resources.getString(R.string.pref_thumbs_options),
+						resources.getString(R.string.thumb_small)
+				)
 		);
+
+
 		mCustomizedFontSize = CatnutUtils.resolveListPrefInt(
 				preferences,
 				context.getString(R.string.pref_tweet_font_size),
-				context.getResources().getInteger(R.integer.default_tweet_font_size)
+				resources.getInteger(R.integer.default_tweet_font_size)
 		);
 		mCustomizedFont = CatnutUtils.getTypeface(
 				preferences,
@@ -128,7 +136,8 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 												bean.favorited ?
 														R.string.cancle_favorite_success :
 														R.string.favorite_success,
-												Toast.LENGTH_SHORT).show();
+												Toast.LENGTH_SHORT
+										).show();
 									}
 								},
 								new Response.ErrorListener() {
@@ -227,24 +236,24 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 		holder.remarkIndex = cursor.getColumnIndex(User.remark);
 		holder.reply = (ImageView) view.findViewById(R.id.action_reply);
 		holder.retweet = (ImageView) view.findViewById(R.id.action_reteet);
-		if (mThumbsOption.equals(mContext.getString(R.string.thumb_medium))) {
-			// 中型缩略图
-			holder.thumbsIndex = cursor.getColumnIndex(Status.bmiddle_pic);
-			holder.originalPicIndex = cursor.getColumnIndex(Status.original_pic);
-			mSmall = false;
-		} else if (mThumbsOption.equals(mContext.getString(R.string.thumb_small))) {
-			// 小型缩略图
-			holder.thumbsIndex = cursor.getColumnIndex(Status.thumbnail_pic);
-			holder.originalPicIndex = cursor.getColumnIndex(Status.original_pic);
-			mSmall = true;
-		} else {
-			// ta不要缩略图
-			holder.thumbsIndex = -1;
+		switch (mThumbsOption) {
+			case SMALL:
+				holder.thumbsIndex = cursor.getColumnIndex(Status.thumbnail_pic);
+				break;
+			case MEDIUM:
+				holder.thumbsIndex = cursor.getColumnIndex(Status.bmiddle_pic);
+				break;
+			case NONE:
+				// fall through, no thumbs in timeline
+			case ORIGINAL:
+			default:
+				break;
 		}
+		holder.originalPicIndex = cursor.getColumnIndex(Status.original_pic);
 		// 转发
 		holder.retweetView = view.findViewById(R.id.retweet);
 		holder.retweetIndex = cursor.getColumnIndex(Status.retweeted_status);
-		// time
+		// time ``line``
 		holder.time = (TextView) view.findViewById(R.id.time);
 		holder.verified = view.findViewById(R.id.verified);
 		holder.overflow = view.findViewById(R.id.tweet_overflow);
@@ -330,45 +339,43 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 		// 文字处理
 		CatnutUtils.vividTweet(holder.text, mImageSpan);
 		// 缩略图，用户偏好
-		if (holder.thumbsIndex == -1) {
-			holder.thumbs.setVisibility(View.GONE);
-		} else {
-			final String thumbsUri = cursor.getString(holder.thumbsIndex);
-			final String originUri = cursor.getString(holder.originalPicIndex);
-			if (!TextUtils.isEmpty(thumbsUri)) {
-				if (!mSmall) {
-					holder.thumbs.setScaleType(ImageView.ScaleType.CENTER_CROP);
-					holder.thumbs.setAdjustViewBounds(true);
-					Picasso.with(context)
-							.load(thumbsUri)
-							.centerCrop()
-							.resize(mScreenWidth, (int) (mScreenWidth * Constants.GOLDEN_RATIO))
-							.into(holder.thumbs);
-				} else {
-					Picasso.with(context)
-							.load(thumbsUri)
-							.into(holder.thumbs);
+		switch (mThumbsOption) {
+			case SMALL:
+			case MEDIUM:
+				String thumbsUri = cursor.getString(holder.thumbsIndex);
+				if (!TextUtils.isEmpty(thumbsUri)) {
+					RequestCreator creator = Picasso.with(context).load(thumbsUri);
+					if (mThumbsOption != ThumbsOption.SMALL) {
+						creator.centerCrop()
+								.resize(mScreenWidth, (int) (mScreenWidth * Constants.GOLDEN_RATIO));
+					}
+					creator.into(holder.thumbs);
+					holder.thumbs.setOnTouchListener(new View.OnTouchListener() {
+						@Override
+						public boolean onTouch(View v, MotionEvent event) {
+							return CatnutUtils.imageOverlay(v, event);
+						}
+					});
+					final String originUri = cursor.getString(holder.originalPicIndex);
+					holder.thumbs.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							holder.thumbs.getDrawable().clearColorFilter();
+							holder.thumbs.invalidate();
+							Intent intent = SingleFragmentActivity.getIntent(context, SingleFragmentActivity.PHOTO_VIEWER);
+							intent.putExtra(Constants.PIC, originUri);
+							mContext.startActivity(intent);
+						}
+					});
+					holder.thumbs.setVisibility(View.VISIBLE);
+					break;
 				}
-				holder.thumbs.setOnTouchListener(new View.OnTouchListener() {
-					@Override
-					public boolean onTouch(View v, MotionEvent event) {
-						return CatnutUtils.imageOverlay(v, event);
-					}
-				});
-				holder.thumbs.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						holder.thumbs.getDrawable().clearColorFilter();
-						holder.thumbs.invalidate();
-						Intent intent = SingleFragmentActivity.getIntent(context, SingleFragmentActivity.PHOTO_VIEWER);
-						intent.putExtra(Constants.PIC, originUri);
-						mContext.startActivity(intent);
-					}
-				});
-				holder.thumbs.setVisibility(View.VISIBLE);
-			} else {
+				// otherwise, fall through...
+			case NONE:
+			case ORIGINAL:
+			default:
 				holder.thumbs.setVisibility(View.GONE);
-			}
+				break;
 		}
 		// 处理转发
 		retweet(cursor.getString(holder.retweetIndex), holder);
@@ -426,5 +433,56 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 		long id;
 		boolean favorited;
 		String text;
+	}
+
+	/**
+	 * enum facility for thumbs options
+	 *
+	 * @author longkai
+	 */
+	public static enum ThumbsOption {
+		NONE, SMALL, MEDIUM, ORIGINAL;
+
+		private String alias;
+
+		private static ThumbsOption defaultOption;
+
+		private static boolean initialized = false;
+
+		static void injectAliases(@NotNull Resources res) {
+			if (!initialized) {
+				NONE.alias = res.getString(R.string.thumb_none);
+				SMALL.alias = res.getString(R.string.thumb_small);
+				MEDIUM.alias = res.getString(R.string.thumb_medium);
+				ORIGINAL.alias = res.getString(R.string.thumb_original);
+
+				initialized = true;
+
+				defaultOption = obtainOption(res.getString(R.string.default_thumbs_option));
+			}
+		}
+
+		public static void reset() {
+			initialized = false;
+			for (ThumbsOption option : values()) {
+				option.alias = null;
+			}
+		}
+
+		public static ThumbsOption obtainOption(@NotNull String prefString) {
+			checkInitialized();
+			for (ThumbsOption option : values()) {
+				if (prefString.equals(option.alias)) {
+					return option;
+				}
+			}
+			return defaultOption;
+		}
+
+		static void checkInitialized() {
+			if (!initialized) {
+				throw new RuntimeException("you must initialize thumbs option before use!");
+			}
+		}
 	}
 }
