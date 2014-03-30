@@ -5,56 +5,68 @@
   ~ Copyright (c) 2014 longkai
   ~ The software shall be used for good, not evil.
   -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:padding="@dimen/medium"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="horizontal"
+	android:paddingLeft="@dimen/medium"
+	android:paddingRight="@dimen/medium"
 	android:descendantFocusability="blocksDescendants"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content">
 
-	<ImageView
-		android:id="@+id/avatar"
-		android:background="?android:attr/selectableItemBackground"
-		android:layout_marginRight="@dimen/medium"
+	<FrameLayout
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content" />
+		android:layout_height="match_parent">
+
+		<View
+			android:layout_gravity="center"
+			android:background="?android:attr/listDivider"
+			android:layout_width="1px"
+			android:layout_height="match_parent" />
+
+		<ImageView
+			android:id="@+id/avatar"
+			android:layout_gravity="top|center_horizontal"
+			android:layout_marginTop="@dimen/medium"
+			android:layout_marginBottom="@dimen/medium"
+			android:background="?android:attr/selectableItemBackground"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+
+		<TextView
+			android:id="@+id/create_at"
+			android:layout_gravity="bottom|center_horizontal"
+			android:gravity="center"
+			android:textColor="@color/black50PercentColor"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+	</FrameLayout>
 
 	<LinearLayout
-		android:id="@+id/place_holder"
-		android:orientation="horizontal"
-		android:layout_toRightOf="@id/avatar"
+		android:layout_marginTop="@dimen/medium"
+		android:layout_marginBottom="@dimen/medium"
+		android:layout_marginLeft="@dimen/medium"
+		android:orientation="vertical"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
 
 		<TextView
 			android:id="@+id/screen_name"
-			android:text="@string/adjust_font_size_summary"
 			android:singleLine="true"
 			android:ellipsize="end"
-			android:textColor="@android:color/primary_text_light"
+			android:textColor="@color/black25PercentColor"
 			android:textStyle="bold"
-			android:layout_weight="1"
-			android:layout_width="0dp"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" />
 
-		<TextView
-			android:id="@+id/create_at"
-			android:text="3 hours ago"
-			android:gravity="right|center_vertical"
-			android:textColor="@android:color/darker_gray"
-			android:layout_width="wrap_content"
+		<org.catnut.support.TweetTextView
+			android:id="@+id/text"
+			android:background="?android:attr/selectableItemBackground"
+			android:clickable="true"
+			android:focusable="true"
+			android:layout_marginTop="@dimen/medium"
+			android:textColor="@color/black38PercentColor"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content" />
 	</LinearLayout>
 
-	<org.catnut.support.TweetTextView
-		android:id="@+id/text"
-		android:text="@string/adjust_font_size_summary"
-		android:background="?android:attr/selectableItemBackground"
-		android:clickable="true"
-		android:focusable="true"
-		android:layout_toRightOf="@id/avatar"
-		android:layout_marginTop="@dimen/medium"
-		android:layout_below="@id/place_holder"
-		android:textColor="@android:color/secondary_text_light"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content" />
-</RelativeLayout>
+</LinearLayout>

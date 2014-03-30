@@ -28,6 +28,7 @@
 		<ImageView
 			android:id="@+id/avatar"
 			android:layout_marginTop="@dimen/medium"
+			android:layout_gravity="top|center_horizontal"
 			android:visibility="gone"
 			android:clickable="true"
 			android:focusable="true"
@@ -37,7 +38,7 @@
 
 		<TextView
 			android:id="@+id/time"
-			android:textColor="@android:color/holo_blue_bright"
+			android:textColor="@color/black50PercentColor"
 			android:layout_gravity="center"
 			android:gravity="center"
 			android:layout_width="wrap_content"

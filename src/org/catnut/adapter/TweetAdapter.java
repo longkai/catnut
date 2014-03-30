@@ -283,11 +283,13 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 		// 不是某个用户的时间线
 		if (mScreenName == null) {
 			holder.avatar.setVisibility(View.VISIBLE);
-			Picasso.with(context)
+			RequestCreator creator = Picasso.with(context)
 					.load(cursor.getString(holder.avatarIndex))
-					.placeholder(R.drawable.error)
-					.error(R.drawable.error)
-					.into(holder.avatar);
+					.placeholder(R.drawable.ic_social_person_light);
+			if (mStayInLatest) {
+				creator.error(R.drawable.error);
+			}
+			creator.into(holder.avatar);
 			// 跳转到该用户的时间线
 			final String nick = cursor.getString(holder.nickIndex);
 			final long uid = cursor.getLong(cursor.getColumnIndex(Status.uid));

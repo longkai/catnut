@@ -12,7 +12,6 @@ import android.database.Cursor;
 import android.graphics.Typeface;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,6 +20,7 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.metadata.Status;
@@ -42,6 +42,8 @@ public class CommentsAdapter extends CursorAdapter {
 
 	private LayoutInflater mInflater;
 	private TweetImageSpan mImageSpan;
+
+	private boolean mStayInLatest;
 	private Typeface mTypeface;
 	private float mLineSpacing = 1.0f;
 
@@ -50,6 +52,10 @@ public class CommentsAdapter extends CursorAdapter {
 		mInflater = LayoutInflater.from(context);
 		mImageSpan = new TweetImageSpan(context);
 		SharedPreferences preferences = CatnutApp.getTingtingApp().getPreferences();
+		mStayInLatest = preferences.getBoolean(
+				context.getString(R.string.pref_keep_latest),
+				true
+		);
 		mTypeface = CatnutUtils.getTypeface(
 				preferences,
 				context.getString(R.string.pref_customize_tweet_font),
@@ -94,11 +100,13 @@ public class CommentsAdapter extends CursorAdapter {
 	@Override
 	public void bindView(View view, final Context context, Cursor cursor) {
 		final ViewHolder holder = (ViewHolder) view.getTag();
-		Picasso.with(context)
+		RequestCreator creator = Picasso.with(context)
 				.load(cursor.getString(holder.avatarIndex))
-				.placeholder(R.drawable.error)
-				.error(R.drawable.error)
-				.into(holder.avatar);
+				.placeholder(R.drawable.ic_social_person_light);
+		if (mStayInLatest) {
+			creator.error(R.drawable.error);
+		}
+		creator.into(holder.avatar);
 		// 点击头像查看该用户主页
 		final long id = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 		final String screenName = cursor.getString(holder.screenNameIndex);
@@ -122,7 +130,7 @@ public class CommentsAdapter extends CursorAdapter {
 		String remark = cursor.getString(holder.remarkIndex);
 		holder.screenName.setText(TextUtils.isEmpty(remark) ? screenName : remark);
 		String date = cursor.getString(holder.createAtIndex);
-		holder.createAt.setText(DateUtils.getRelativeTimeSpanString(DateTime.getTimeMills(date)));
+		holder.createAt.setText(DateTime.getRelativeTimeString(date));
 		holder.text.setText(cursor.getString(holder.textIndex));
 		CatnutUtils.vividTweet(holder.text, mImageSpan);
 		CatnutUtils.setTypeface(holder.text, mTypeface);

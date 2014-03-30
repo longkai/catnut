@@ -64,13 +64,13 @@ public class DateTime {
 		long mills = getTimeMills(string);
 		long offset = System.currentTimeMillis() - mills;
 		if (offset < MINUTE_MILLIS) { // 1 min
-			return (offset / SECOND_MILLIS) + " s";
+			return (offset / SECOND_MILLIS) + "s";
 		} else if (offset < HOUR_MILLIS) { // 1 hour
-			return (offset / MINUTE_MILLIS) + " m";
+			return (offset / MINUTE_MILLIS) + "m";
 		} else if (offset < DAY_MILLIS) { // 1 day
-			return (offset / HOUR_MILLIS) + " h";
+			return (offset / HOUR_MILLIS) + "h";
 		} else if (offset < 7 * DAY_MILLIS) { // within 1 week
-			return (offset / DAY_MILLIS) + " d";
+			return (offset / DAY_MILLIS) + "d";
 		} else {
 			Calendar c = Calendar.getInstance();
 			c.setTimeInMillis(mills);
