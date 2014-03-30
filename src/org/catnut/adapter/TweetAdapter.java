@@ -42,6 +42,7 @@ import org.catnut.processor.StatusProcessor;
 import org.catnut.support.annotation.NotNull;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
+import org.catnut.support.annotation.Nullable;
 import org.catnut.ui.ProfileActivity;
 import org.catnut.ui.SingleFragmentActivity;
 import org.catnut.ui.TweetActivity;
@@ -64,25 +65,28 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 	private LayoutInflater mInflater;
 	private RequestQueue mRequestQueue;
 	private TweetImageSpan mImageSpan;
-	private String mScreenName;
+	private @Nullable String mScreenName;
 
 	private int mScreenWidth;
 
-	/** 自定义字体，用户偏好 */
+	/** 用户偏好 */
 	private ThumbsOption mThumbsOption;
 	private Typeface mCustomizedFont;
 	private int mCustomizedFontSize;
 	private float mCustomizedLineSpacing = 1.0f;
 
 	/**
+	 * used for a specific user' s timeline.
+	 *
 	 * @param context
-	 * @param nick    如果是不是某个用户的微博时间线，请赋null
+	 * @param screenName user' s timeline' s screen name,
+	 *                   may null if no user specific or the current user
 	 */
-	public TweetAdapter(Context context, String nick) {
+	public TweetAdapter(Context context, @Nullable String screenName) {
 		super(context, null, 0);
 		mContext = context;
 		mInflater = LayoutInflater.from(context);
-		this.mScreenName = nick;
+		this.mScreenName = screenName;
 		CatnutApp app = CatnutApp.getTingtingApp();
 		mRequestQueue = app.getRequestQueue();
 		SharedPreferences preferences = app.getPreferences();
@@ -94,7 +98,6 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 						resources.getString(R.string.thumb_small)
 				)
 		);
-
 
 		mCustomizedFontSize = CatnutUtils.resolveListPrefInt(
 				preferences,
@@ -111,6 +114,15 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 				context.getString(R.string.pref_line_spacing),
 				context.getString(R.string.default_line_spacing));
 		mScreenWidth = CatnutUtils.getScreenWidth(context);
+	}
+
+	/**
+	 * used for home timeline, no specific user' s timeline.
+	 *
+	 * @param context
+	 */
+	public TweetAdapter(Context context) {
+		this(context, null);
 	}
 
 	private void showPopupMenu(View view) {

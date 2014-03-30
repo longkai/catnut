@@ -174,7 +174,7 @@ public class FavoriteFragment extends TimelineFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mAdapter = new TweetAdapter(getActivity(), null); // 并不是某个用户的时间线，所以null
+		mAdapter = new TweetAdapter(getActivity());
 	}
 
 	@Override

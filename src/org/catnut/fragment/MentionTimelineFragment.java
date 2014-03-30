@@ -87,7 +87,7 @@ public class MentionTimelineFragment extends TimelineFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mRequestQueue = mApp.getRequestQueue();
-		mAdapter = new TweetAdapter(getActivity(), null);
+		mAdapter = new TweetAdapter(getActivity());
 	}
 
 	@Override
