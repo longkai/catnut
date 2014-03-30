@@ -10,8 +10,6 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -38,7 +36,16 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.widget.*;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.PopupMenu;
+import android.widget.ShareActionProvider;
+import android.widget.TextView;
+import android.widget.Toast;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -91,13 +98,13 @@ public class TweetFragment extends Fragment implements
 	private static final int REPLY = 1;
 	private static final int RETWEET = 2;
 
-	private static final int MAX_SHOW_TOAST_TIME = 2;
+//	private static final int MAX_SHOW_TOAST_TIME = 2;
 
 	private Handler mHandler = new Handler();
 
 	/** 回复待检索的列 */
 	private static final String[] PROJECTION = new String[]{
-			"s._id",
+			"s." + BaseColumns._ID,
 			Status.uid,
 			Status.columnText,
 			"s." + Status.created_at,
@@ -155,6 +162,7 @@ public class TweetFragment extends Fragment implements
 	private ViewStub mRetweetLayout;
 
 	private Typeface mTypeface;
+	private boolean mStayInLatest;
 	private float mLineSpacing = 1.0f;
 
 	// others
@@ -372,6 +380,9 @@ public class TweetFragment extends Fragment implements
 				mPreferences,
 				getString(R.string.pref_customize_tweet_font),
 				getString(R.string.default_typeface)
+		);
+		mStayInLatest = mPreferences.getBoolean(
+				getString(R.string.pref_keep_latest), true
 		);
 		mLineSpacing = CatnutUtils.getLineSpacing(mPreferences,
 				getString(R.string.pref_line_spacing), getString(R.string.default_line_spacing));
@@ -617,25 +628,29 @@ public class TweetFragment extends Fragment implements
 	 */
 	private void loadThumbs(String thumb, final String originalUrl) {
 		if (!TextUtils.isEmpty(thumb)) {
-			Picasso.with(getActivity()).load(thumb).into(mThumbs);
+			if (mStayInLatest) {
+				Picasso.with(getActivity()).load(thumb).into(mThumbs);
+				mThumbs.setOnTouchListener(new View.OnTouchListener() {
+					@Override
+					public boolean onTouch(View v, MotionEvent event) {
+						return CatnutUtils.imageOverlay(v, event);
+					}
+				});
+				mThumbs.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						mThumbs.getDrawable().clearColorFilter();
+						mText.invalidate();
+						Intent intent = SingleFragmentActivity.getIntent(getActivity(),
+								SingleFragmentActivity.PHOTO_VIEWER);
+						intent.putExtra(Constants.PIC, originalUrl);
+						startActivity(intent);
+					}
+				});
+			} else {
+				mThumbs.setImageResource(R.drawable.error);
+			}
 			mThumbs.setVisibility(View.VISIBLE);
-			mThumbs.setOnTouchListener(new View.OnTouchListener() {
-				@Override
-				public boolean onTouch(View v, MotionEvent event) {
-					return CatnutUtils.imageOverlay(v, event);
-				}
-			});
-			mThumbs.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					mThumbs.getDrawable().clearColorFilter();
-					mText.invalidate();
-					Intent intent = SingleFragmentActivity.getIntent(getActivity(),
-							SingleFragmentActivity.PHOTO_VIEWER);
-					intent.putExtra(Constants.PIC, originalUrl);
-					startActivity(intent);
-				}
-			});
 		} else {
 			mThumbs.setVisibility(View.GONE);
 		}

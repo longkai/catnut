@@ -128,6 +128,7 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 		this.mScreenName = screenName;
 
 		// register preference changed listener
+		// todo: unregister?
 		preferences.registerOnSharedPreferenceChangeListener(this);
 	}
 
@@ -256,26 +257,14 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 		holder.likeCount = (TextView) view.findViewById(R.id.like_count);
 		holder.likeCountIndex = cursor.getColumnIndex(Status.attitudes_count);
 		holder.source = (TextView) view.findViewById(R.id.source);
+		holder.smallThumbIndex = cursor.getColumnIndex(Status.thumbnail_pic);
+		holder.mediumThumbIndex = cursor.getColumnIndex(Status.bmiddle_pic);
 		holder.sourceIndex = cursor.getColumnIndex(Status.source);
-		holder.thumbsIndex = cursor.getColumnIndex(Status.thumbnail_pic);
+		holder.originalPicIndex = cursor.getColumnIndex(Status.original_pic);
 		holder.thumbs = (ImageView) view.findViewById(R.id.thumbs);
 		holder.remarkIndex = cursor.getColumnIndex(User.remark);
 		holder.reply = (ImageView) view.findViewById(R.id.action_reply);
 		holder.retweet = (ImageView) view.findViewById(R.id.action_reteet);
-		switch (mThumbsOption) {
-			case SMALL:
-				holder.thumbsIndex = cursor.getColumnIndex(Status.thumbnail_pic);
-				break;
-			case MEDIUM:
-				holder.thumbsIndex = cursor.getColumnIndex(Status.bmiddle_pic);
-				break;
-			case NONE:
-				// fall through, no thumbs in timeline
-			case ORIGINAL:
-			default:
-				break;
-		}
-		holder.originalPicIndex = cursor.getColumnIndex(Status.original_pic);
 		// 转发
 		holder.retweetView = view.findViewById(R.id.retweet);
 		holder.retweetIndex = cursor.getColumnIndex(Status.retweeted_status);
@@ -368,22 +357,27 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 		switch (mThumbsOption) {
 			case SMALL:
 			case MEDIUM:
-				String thumbsUri = cursor.getString(holder.thumbsIndex);
-				if (!TextUtils.isEmpty(thumbsUri)) {
+				final String originUri = cursor.getString(holder.originalPicIndex);
+				if (!TextUtils.isEmpty(originUri)) {
 					if (mStayInLatest) { // not in offline mode
-						RequestCreator creator = Picasso.with(context).load(thumbsUri);
-						if (mThumbsOption != ThumbsOption.SMALL) {
-							creator.centerCrop()
+						RequestCreator creator;
+						if (mThumbsOption == ThumbsOption.MEDIUM) {
+							creator = Picasso.with(context).load(cursor.getString(holder.mediumThumbIndex))
+									.centerCrop()
 									.resize(mScreenWidth, (int) (mScreenWidth * Constants.GOLDEN_RATIO));
+						} else {
+							creator = Picasso.with(context)
+									.load(cursor.getString(holder.smallThumbIndex));
 						}
-						creator.into(holder.thumbs);
+						creator.placeholder(android.R.drawable.ic_menu_report_image)
+								.error(R.drawable.error)
+								.into(holder.thumbs);
 						holder.thumbs.setOnTouchListener(new View.OnTouchListener() {
 							@Override
 							public boolean onTouch(View v, MotionEvent event) {
 								return CatnutUtils.imageOverlay(v, event);
 							}
 						});
-						final String originUri = cursor.getString(holder.originalPicIndex);
 						holder.thumbs.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
@@ -399,7 +393,7 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 						// sometimes, the user may read timeline in offline mode(may opening the 2/3g),
 						// so, don' t load the image
 						// todo, may be we need to check it in cache or place the network unavailable image?
-						holder.thumbs.setImageResource(R.drawable.error);
+						holder.thumbs.setImageResource(android.R.drawable.ic_menu_report_image);
 					}
 					holder.thumbs.setVisibility(View.VISIBLE);
 					break;
@@ -481,7 +475,8 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 		int likeCountIndex;
 
 		ImageView thumbs;
-		int thumbsIndex;
+		int smallThumbIndex;
+		int mediumThumbIndex;
 		int originalPicIndex;
 		int remarkIndex;
 
