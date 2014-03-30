@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -416,27 +415,5 @@ public class UserTimelineFragment extends TimelineFragment {
 		mCurFilter = newFilter;
 		getLoaderManager().restartLoader(0, args, this);
 		return true;
-	}
-
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		if (isAdded()) {
-			if (key.equals(getString(R.string.pref_tweet_font_size))
-					|| key.equals(getString(R.string.pref_line_spacing))
-					|| key.equals(getString(R.string.pref_customize_tweet_font))
-					|| key.equals(getString(R.string.pref_thumbs_options))) {
-				Log.d(TAG, "pref change, the home timeline fragment needs update!");
-				// 应用新的偏好
-				int size = mAdapter.getCount();
-				int firstVisiblePosition = mListView.getFirstVisiblePosition();
-				mAdapter.changeCursor(null);
-				mAdapter = new TweetAdapter(getActivity(), mScreenName);
-				mListView.setAdapter(mAdapter);
-				Bundle args = new Bundle();
-				args.putInt(TAG, size);
-				getLoaderManager().restartLoader(0, args, this);
-				mListView.setSelection(firstVisiblePosition); // 保持现场~
-			}
-		}
 	}
 }

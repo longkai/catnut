@@ -13,7 +13,6 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import org.catnut.R;
 import org.catnut.metadata.AccessToken;
 import org.catnut.support.OkHttpStack;
 import org.json.JSONObject;
@@ -31,7 +30,7 @@ import static org.catnut.metadata.AccessToken.UID;
  *
  * @author longkai
  */
-public class CatnutApp extends Application implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class CatnutApp extends Application {
 
 	public static final String TAG = "CatnutApp";
 
@@ -49,18 +48,7 @@ public class CatnutApp extends Application implements SharedPreferences.OnShared
 		super.onCreate();
 		sApp = this;
 		mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-		mPreferences.registerOnSharedPreferenceChangeListener(this);
 		mRequestQueue = Volley.newRequestQueue(this, new OkHttpStack());
-		// solve the first time entering settings problem -> the timeline will be empty 'cause many pref got changed :-(
-		if (!mPreferences.contains(getString(R.string.pref_first_run))) {
-			Resources res = getResources();
-			SharedPreferences.Editor edit = mPreferences.edit();
-			edit.putString(getString(R.string.pref_tweet_font_size), String.valueOf(res.getInteger(R.integer.default_tweet_font_size)));
-			edit.putString(getString(R.string.pref_line_spacing), res.getString(R.string.default_line_spacing));
-			edit.putString(getString(R.string.pref_customize_tweet_font), res.getString(R.string.default_typeface));
-			edit.putString(getString(R.string.pref_thumbs_options), res.getString(R.string.default_thumbs_option));
-			edit.commit();
-		}
 		checkAccessToken();
 	}
 
@@ -80,11 +68,6 @@ public class CatnutApp extends Application implements SharedPreferences.OnShared
 				Log.d(TAG, "授权将在" + DateUtils.getRelativeTimeSpanString(mAccessToken.expires_in) + "过期！");
 			}
 		}
-	}
-
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		Log.d(TAG, "shared prefs " + key + " has got changed!");
 	}
 
 	public SharedPreferences getPreferences() {

@@ -39,9 +39,9 @@ import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.StatusProcessor;
-import org.catnut.support.annotation.NotNull;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
+import org.catnut.support.annotation.NotNull;
 import org.catnut.support.annotation.Nullable;
 import org.catnut.ui.ProfileActivity;
 import org.catnut.ui.SingleFragmentActivity;
@@ -57,23 +57,27 @@ import org.json.JSONObject;
  *
  * @author longkai
  */
-public class TweetAdapter extends CursorAdapter implements View.OnClickListener {
+public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
+		SharedPreferences.OnSharedPreferenceChangeListener {
 
 	private static final String TAG = "TweetAdapter";
 
+	// system specific
 	private Context mContext;
 	private LayoutInflater mInflater;
 	private RequestQueue mRequestQueue;
 	private TweetImageSpan mImageSpan;
-	private @Nullable String mScreenName;
-
 	private int mScreenWidth;
 
-	/** 用户偏好 */
+	// 用户偏好
 	private ThumbsOption mThumbsOption;
 	private Typeface mCustomizedFont;
 	private int mCustomizedFontSize;
+	private boolean mStayInLatest;
 	private float mCustomizedLineSpacing = 1.0f;
+
+	// others
+	@Nullable private String mScreenName;
 
 	/**
 	 * used for a specific user' s timeline.
@@ -84,12 +88,15 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 	 */
 	public TweetAdapter(Context context, @Nullable String screenName) {
 		super(context, null, 0);
+		CatnutApp app = CatnutApp.getTingtingApp();
+
 		mContext = context;
 		mInflater = LayoutInflater.from(context);
-		this.mScreenName = screenName;
-		CatnutApp app = CatnutApp.getTingtingApp();
 		mRequestQueue = app.getRequestQueue();
 		SharedPreferences preferences = app.getPreferences();
+		mImageSpan = new TweetImageSpan(context);
+		mScreenWidth = CatnutUtils.getScreenWidth(context);
+
 		Resources resources = context.getResources();
 		ThumbsOption.injectAliases(resources);
 		mThumbsOption = ThumbsOption.obtainOption(
@@ -98,7 +105,6 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 						resources.getString(R.string.thumb_small)
 				)
 		);
-
 		mCustomizedFontSize = CatnutUtils.resolveListPrefInt(
 				preferences,
 				context.getString(R.string.pref_tweet_font_size),
@@ -109,11 +115,20 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 				context.getString(R.string.pref_customize_tweet_font),
 				context.getString(R.string.default_typeface)
 		);
-		mImageSpan = new TweetImageSpan(mContext);
-		mCustomizedLineSpacing = CatnutUtils.getLineSpacing(preferences,
+		mStayInLatest = preferences.getBoolean(
+				context.getString(R.string.pref_keep_latest),
+				false
+		);
+		mCustomizedLineSpacing = CatnutUtils.getLineSpacing(
+				preferences,
 				context.getString(R.string.pref_line_spacing),
-				context.getString(R.string.default_line_spacing));
-		mScreenWidth = CatnutUtils.getScreenWidth(context);
+				context.getString(R.string.default_line_spacing)
+		);
+
+		this.mScreenName = screenName;
+
+		// register preference changed listener
+		preferences.registerOnSharedPreferenceChangeListener(this);
 	}
 
 	/**
@@ -187,37 +202,36 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 		});
 	}
 
-	private static class ViewHolder {
-		ImageView avatar;
-		int avatarIndex;
-		int create_atIndex;
-		TextView nick;
-		int nickIndex;
-		TweetTextView text;
-		int textIndex;
-		TextView replyCount;
-		int replyCountIndex;
-		TextView reteetCount;
-		int reteetCountIndex;
-		TextView source;
-		int sourceIndex;
-		TextView likeCount;
-		int likeCountIndex;
-
-		ImageView thumbs;
-		int thumbsIndex;
-		int originalPicIndex;
-		int remarkIndex;
-
-		ImageView reply;
-		ImageView retweet;
-
-		View retweetView;
-		int retweetIndex;
-
-		TextView time;
-		View verified;
-		private View overflow;
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+		if (!TextUtils.isEmpty(key)) {
+			if (key.equals(mContext.getString(R.string.pref_thumbs_options))) {
+				mThumbsOption = ThumbsOption.obtainOption(sharedPreferences.getString(
+						key, mContext.getString(R.string.default_thumbs_option))
+				);
+				notifyDataSetChanged();
+			} else if (key.equals(mContext.getString(R.string.pref_line_spacing))) {
+				mCustomizedLineSpacing = CatnutUtils.getLineSpacing(
+						sharedPreferences, key, mContext.getString(R.string.default_line_spacing)
+				);
+				notifyDataSetChanged();
+			} else if (key.equals(mContext.getString(R.string.pref_tweet_font_size))) {
+				mCustomizedFontSize = CatnutUtils.resolveListPrefInt(
+						sharedPreferences,
+						key,
+						mContext.getResources().getInteger(R.integer.default_tweet_font_size)
+				);
+				notifyDataSetChanged();
+			} else if (key.equals(mContext.getString(R.string.pref_customize_tweet_font))) {
+				mCustomizedFont = CatnutUtils.getTypeface(
+						sharedPreferences, key, mContext.getString(R.string.use_default_font)
+				);
+				notifyDataSetChanged();
+			} else if (key.equals(mContext.getString(R.string.pref_keep_latest))) {
+				mStayInLatest = sharedPreferences.getBoolean(key, true);
+				// no need invalidating the existing view
+			}
+		}
 	}
 
 	@Override
@@ -268,7 +282,7 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 		// time ``line``
 		holder.time = (TextView) view.findViewById(R.id.time);
 		holder.verified = view.findViewById(R.id.verified);
-		holder.overflow = view.findViewById(R.id.tweet_overflow);
+		holder.popup = view.findViewById(R.id.tweet_overflow);
 		view.setTag(holder);
 		return view;
 	}
@@ -356,29 +370,37 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 			case MEDIUM:
 				String thumbsUri = cursor.getString(holder.thumbsIndex);
 				if (!TextUtils.isEmpty(thumbsUri)) {
-					RequestCreator creator = Picasso.with(context).load(thumbsUri);
-					if (mThumbsOption != ThumbsOption.SMALL) {
-						creator.centerCrop()
-								.resize(mScreenWidth, (int) (mScreenWidth * Constants.GOLDEN_RATIO));
+					if (mStayInLatest) { // not in offline mode
+						RequestCreator creator = Picasso.with(context).load(thumbsUri);
+						if (mThumbsOption != ThumbsOption.SMALL) {
+							creator.centerCrop()
+									.resize(mScreenWidth, (int) (mScreenWidth * Constants.GOLDEN_RATIO));
+						}
+						creator.into(holder.thumbs);
+						holder.thumbs.setOnTouchListener(new View.OnTouchListener() {
+							@Override
+							public boolean onTouch(View v, MotionEvent event) {
+								return CatnutUtils.imageOverlay(v, event);
+							}
+						});
+						final String originUri = cursor.getString(holder.originalPicIndex);
+						holder.thumbs.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								holder.thumbs.getDrawable().clearColorFilter();
+								holder.thumbs.invalidate();
+								Intent intent = SingleFragmentActivity
+										.getIntent(context, SingleFragmentActivity.PHOTO_VIEWER);
+								intent.putExtra(Constants.PIC, originUri);
+								mContext.startActivity(intent);
+							}
+						});
+					} else {
+						// sometimes, the user may read timeline in offline mode(may opening the 2/3g),
+						// so, don' t load the image
+						// todo, may be we need to check it in cache or place the network unavailable image?
+						holder.thumbs.setImageResource(R.drawable.error);
 					}
-					creator.into(holder.thumbs);
-					holder.thumbs.setOnTouchListener(new View.OnTouchListener() {
-						@Override
-						public boolean onTouch(View v, MotionEvent event) {
-							return CatnutUtils.imageOverlay(v, event);
-						}
-					});
-					final String originUri = cursor.getString(holder.originalPicIndex);
-					holder.thumbs.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							holder.thumbs.getDrawable().clearColorFilter();
-							holder.thumbs.invalidate();
-							Intent intent = SingleFragmentActivity.getIntent(context, SingleFragmentActivity.PHOTO_VIEWER);
-							intent.putExtra(Constants.PIC, originUri);
-							mContext.startActivity(intent);
-						}
-					});
 					holder.thumbs.setVisibility(View.VISIBLE);
 					break;
 				}
@@ -396,8 +418,8 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 		bean.id = id;
 		bean.favorited = CatnutUtils.getBoolean(cursor, Status.favorited);
 		bean.text = cursor.getString(holder.textIndex);
-		holder.overflow.setTag(bean); // inject data
-		holder.overflow.setOnClickListener(this);
+		holder.popup.setTag(bean); // inject data
+		holder.popup.setOnClickListener(this);
 	}
 
 	private void retweet(final String jsonString, ViewHolder holder) {
@@ -439,6 +461,40 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener 
 		} else {
 			holder.retweetView.setVisibility(View.GONE);
 		}
+	}
+
+	private static class ViewHolder {
+		ImageView avatar;
+		int avatarIndex;
+		int create_atIndex;
+		TextView nick;
+		int nickIndex;
+		TweetTextView text;
+		int textIndex;
+		TextView replyCount;
+		int replyCountIndex;
+		TextView reteetCount;
+		int reteetCountIndex;
+		TextView source;
+		int sourceIndex;
+		TextView likeCount;
+		int likeCountIndex;
+
+		ImageView thumbs;
+		int thumbsIndex;
+		int originalPicIndex;
+		int remarkIndex;
+
+		ImageView reply;
+		ImageView retweet;
+
+		View retweetView;
+		int retweetIndex;
+
+		TextView time;
+		View verified;
+
+		View popup;
 	}
 
 	private static class Bean {

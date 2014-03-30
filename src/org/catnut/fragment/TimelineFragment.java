@@ -50,7 +50,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 public abstract class TimelineFragment extends Fragment implements ConfirmBarController.Callbacks,
 		ConfirmBarController.ConfirmListener, OnRefreshListener, AbsListView.OnScrollListener,
 		LoaderManager.LoaderCallbacks<Cursor>, SwipeDismissListViewTouchListener.DismissCallbacks,
-		AdapterView.OnItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener, SearchView.OnQueryTextListener, SearchView.OnCloseListener {
+		AdapterView.OnItemClickListener, SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
 	private static final String TAG = "TimelineFragment";
 
@@ -111,7 +111,6 @@ public abstract class TimelineFragment extends Fragment implements ConfirmBarCon
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mPreferences.registerOnSharedPreferenceChangeListener(this);
 		mConnectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
 		setHasOptionsMenu(true);
 	}
@@ -225,11 +224,6 @@ public abstract class TimelineFragment extends Fragment implements ConfirmBarCon
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		// sub-class impl it...
-	}
-
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 		// sub-class impl it...
 	}
 
