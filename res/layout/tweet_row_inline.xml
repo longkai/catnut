@@ -77,6 +77,7 @@
 		android:id="@+id/source"
 		android:layout_toRightOf="@id/like_count"
 		android:layout_alignParentRight="true"
+		android:layout_alignBottom="@id/action_reply"
 		style="@style/Tweet_Inline"
 		android:textSize="@dimen/text_size_small"
 		android:singleLine="true"

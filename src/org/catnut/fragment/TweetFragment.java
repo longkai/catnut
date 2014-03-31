@@ -1049,7 +1049,7 @@ public class TweetFragment extends Fragment implements
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 					int cursor = mSendText.getSelectionStart();
 					mSendText.getText().insert(cursor, CatnutUtils.text2Emotion(getActivity(),
-							TweetImageSpan.EMOTION_KEYS[position]));
+							TweetImageSpan.EMOTION_KEYS[position],getResources().getInteger(R.integer.icon_bound_px)));
 					mSendText.requestFocus();
 				}
 			});

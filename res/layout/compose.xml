@@ -47,7 +47,7 @@
 				android:layout_alignBottom="@id/avatar"
 				android:layout_toRightOf="@id/avatar"
 				android:layout_marginLeft="@dimen/medium"
-				android:textColor="@android:color/primary_text_light"
+				android:textColor="@color/black25PercentColor"
 				android:textStyle="bold"
 				android:singleLine="true"
 				android:ellipsize="end"
@@ -63,7 +63,7 @@
 			android:maxLength="140"
 			android:maxLines="5"
 			android:padding="@dimen/medium"
-			android:textColor="@android:color/primary_text_light"
+			android:textColor="@color/black25PercentColor"
 			android:hint="@string/new_tweet_hint"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content" />

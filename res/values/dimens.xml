@@ -14,6 +14,8 @@
 	
 	<dimen name="counter_width">40dp</dimen>
 	<dimen name="text_size_small">11sp</dimen>
+	
+	<dimen name="avatar_bound">35dp</dimen>
 
 	<dimen name="emotion_window_height">400dp</dimen>
 

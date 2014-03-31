@@ -33,12 +33,12 @@
 			android:clickable="true"
 			android:focusable="true"
 			android:background="@drawable/avatar_background"
-			android:layout_width="35dp"
-			android:layout_height="35dp" />
+			android:layout_width="@dimen/avatar_bound"
+			android:layout_height="@dimen/avatar_bound" />
 
 		<TextView
 			android:id="@+id/time"
-			android:textColor="@color/black50PercentColor"
+			android:textColor="#ff9fa9b0"
 			android:layout_gravity="center"
 			android:gravity="center"
 			android:layout_width="wrap_content"

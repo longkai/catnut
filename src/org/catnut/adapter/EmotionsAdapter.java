@@ -14,6 +14,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import org.catnut.R;
 import org.catnut.support.TweetImageSpan;
+import org.catnut.util.CatnutUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,13 +67,7 @@ public class EmotionsAdapter extends BaseAdapter {
 			imageView.setImageResource(R.drawable.error);
 			Log.e(TAG, "load emotion fail!", e);
 		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					Log.e(TAG, "close input stream error!", e);
-				}
-			}
+			CatnutUtils.closeIO(inputStream);
 		}
 		return imageView;
 	}

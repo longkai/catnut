@@ -523,7 +523,8 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		// 插入到编辑框里
 		int cursor = mText.getSelectionStart();
-		mText.getText().insert(cursor, CatnutUtils.text2Emotion(this, TweetImageSpan.EMOTION_KEYS[position]));
+		mText.getText().insert(cursor, CatnutUtils.text2Emotion(this, TweetImageSpan.EMOTION_KEYS[position],
+				getResources().getInteger(R.integer.icon_bound_px)));
 		// focus
 		mText.requestFocus();
 	}

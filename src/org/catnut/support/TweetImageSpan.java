@@ -10,6 +10,8 @@ import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
+import org.catnut.R;
+import org.catnut.util.CatnutUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -119,8 +121,11 @@ public class TweetImageSpan implements Html.ImageGetter {
 	// is it worth?
 	public static String[] EMOTION_KEYS = EMOTIONS.keySet().toArray(new String[EMOTIONS.size()]);
 
-	public TweetImageSpan(Context mContext) {
-		this.mContext = mContext;
+	private int mIconBound;
+
+	public TweetImageSpan(Context context) {
+		this.mContext = context;
+		this.mIconBound = context.getResources().getInteger(R.integer.icon_bound_px);
 	}
 
 	public Spanned getImageSpan(CharSequence text) {
@@ -146,16 +151,14 @@ public class TweetImageSpan implements Html.ImageGetter {
 		} catch (IOException e) {
 			Log.wtf(TAG, "error open assets: " + source, e);
 		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					Log.wtf(TAG, "error close input stream!", e);
-				}
-			}
+			CatnutUtils.closeIO(in);
 		}
 		if (drawable != null) {
-			drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+			if (mIconBound == 0) {
+				drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+			} else {
+				drawable.setBounds(0, 0, mIconBound, mIconBound);
+			}
 		}
 		return drawable;
 	}

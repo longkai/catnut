@@ -12,15 +12,12 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
-import android.preference.Preference;
 import android.provider.BaseColumns;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -47,14 +44,11 @@ import org.catnut.support.TweetURLSpan;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import static org.catnut.support.TweetTextView.MENTION_FILTER;
 import static org.catnut.support.TweetTextView.MENTION_PATTERN;
@@ -402,8 +396,10 @@ public class CatnutUtils {
 
 	/**
 	 * 微博文字转表情
+	 *
+	 * @param boundPx the icon' s rectangle bound, if zero, use the default
 	 */
-	public static SpannableString text2Emotion(Context context, String key) {
+	public static SpannableString text2Emotion(Context context, String key, int boundPx) {
 		SpannableString spannable = new SpannableString(key);
 		InputStream inputStream = null;
 		Drawable drawable = null;
@@ -413,16 +409,14 @@ public class CatnutUtils {
 		} catch (IOException e) {
 			Log.e(TAG, "load emotion error!", e);
 		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					Log.e(TAG, "close input error!", e);
-				}
-			}
+			closeIO(inputStream);
 		}
 		if (drawable != null) {
-			drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+			if (boundPx == 0) {
+				drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+			} else {
+				drawable.setBounds(0, 0, boundPx, boundPx);
+			}
 			ImageSpan span = new ImageSpan(drawable, ImageSpan.ALIGN_BASELINE);
 			spannable.setSpan(span, 0, key.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
 		}

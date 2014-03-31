@@ -262,6 +262,7 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 		holder.sourceIndex = cursor.getColumnIndex(Status.source);
 		holder.originalPicIndex = cursor.getColumnIndex(Status.original_pic);
 		holder.thumbs = (ImageView) view.findViewById(R.id.thumbs);
+		holder.thumbs.setAdjustViewBounds(true);
 		holder.remarkIndex = cursor.getColumnIndex(User.remark);
 		holder.reply = (ImageView) view.findViewById(R.id.action_reply);
 		holder.retweet = (ImageView) view.findViewById(R.id.action_reteet);
@@ -451,6 +452,7 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 			CatnutUtils.setText(holder.retweetView, R.id.retweet_create_at,
 					DateTime.getRelativeTimeString(json.optString(Status.created_at)));
 			text.setText(json.optString(Status.text));
+			text.setTextSize(mCustomizedFontSize);
 			CatnutUtils.vividTweet(text, mImageSpan);
 			CatnutUtils.setTypeface(text, mCustomizedFont);
 			text.setLineSpacing(0, mCustomizedLineSpacing);
