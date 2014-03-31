@@ -266,6 +266,7 @@
 	<string name="cache_images_summary">加载条目时自动下载全部条目的图片缓存在本地Android官方指定的文件夹，不会产生垃圾文件夹</string>
 	<string name="weibo_app">新浪微博客户端</string>
 	<string name="zhihu_item_search_hint">搜索感兴趣的条目？</string>
+	<string name="back_to_top">回到顶部</string>
 	<string-array name="fantasy_features">
 		<item>最受欢迎</item>
 		<item>即将到来</item>

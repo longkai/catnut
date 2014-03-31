@@ -156,6 +156,8 @@ public abstract class TimelineFragment extends Fragment implements ConfirmBarCon
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		menu.add(Menu.NONE, R.id.refresh, Menu.NONE, R.string.refresh)
 				.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER); // prefer actionbar refresh
+		menu.add(Menu.NONE, R.id.action_back_top, Menu.NONE, getString(R.string.back_to_top))
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 		// 本地微博搜索
 		MenuItem search = menu.add(android.R.string.search_go);
 		search.setIcon(R.drawable.ic_title_search_default);
@@ -175,6 +177,9 @@ public abstract class TimelineFragment extends Fragment implements ConfirmBarCon
 					mPullToRefreshLayout.setRefreshing(true);
 					refresh();
 				}
+				break;
+			case R.id.action_back_top:
+				mListView.setSelection(0);
 				break;
 			default:
 				break;

@@ -207,6 +207,7 @@
 	<string name="cache_images_summary">Cache all the images in Android\' default location when loading items</string>
 	<string name="weibo_app">Sina Weibo Client</string>
 	<string name="zhihu_item_search_hint">Search interested items?</string>
+	<string name="back_to_top">Back to top</string>
 	<string-array name="fantasy_features">
 		<item>popular</item>
 		<item>upcoming</item>
