@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+
+<resources>
+	<string name="bonus_1"><![CDATA[
+		<b>文章门事件后</b><br><br>
+		<b>很多都支持马伊俐<b><br><br>
+		<b>#挺住，伊俐#<b><br><br>
+		<b>今年是马年，这是否暗示伊利股票会上涨？冏rz...</b><br><br><br>
+		<b>『Happy fool\' s day』</b><br><br>
+	]]></string>
+	<string name="bonus_2"><![CDATA[
+		<b>老师说：找两人我要班花</b><br><br>
+		<b>于是投票评选班花<b><br><br>
+		<b>闹了一节课<b><br><br>
+		<b>选出最漂亮的俩女生</b><br><br>
+		<b>老师说：去教务处，搬花!</b><br><br><br>
+		<b>『Happy fool\' s day』</b><br><br>
+	]]></string>
+</resources>

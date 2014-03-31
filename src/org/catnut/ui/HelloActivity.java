@@ -137,7 +137,6 @@ public class HelloActivity extends Activity {
 		mFantasyDesc = (TextView) findViewById(R.id.description);
 		mFantasyDesc.setMovementMethod(LinkMovementMethod.getInstance());
 		ActionBar bar = getActionBar();
-		bar.setTitle(R.string.fantasy);
 		TextView about = (TextView) findViewById(R.id.about_body);
 		TextView version = (TextView) findViewById(R.id.app_version);
 		TextView appName = (TextView) findViewById(R.id.app_name);
@@ -148,17 +147,22 @@ public class HelloActivity extends Activity {
 		appDesc.setText(R.string.app_desc);
 		if (CatnutApp.getBoolean(R.string.pref_fantasy_say_salutation, R.bool.default_fantasy_say_salutation)) {
 			version.setText(getString(R.string.about_version_template, getString(R.string.version_name)));
-//			Calendar now = Calendar.getInstance();
-//			boolean salutation = now.get(Calendar.MONTH) <= Calendar.MAY;
 			int n = (int) (Math.random() * 101);
-			if (0 < n && n < 22) {
+			if (0 < n && n < 15) {
+				bar.setTitle(R.string.fantasy);
 				about.setText(Html.fromHtml(getString(R.string.about_body)));
 				about.setMovementMethod(LinkMovementMethod.getInstance());
-			} else if (n > 30) {
-				about.setText(Html.fromHtml(getString(R.string.salutation2)));
+			} else if (n <= 30) {
+				bar.setTitle(R.string.fantasy);
+				about.setText(Html.fromHtml(getString(R.string.salutation)));
+				about.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+			} else if (n > 30 && n < 60) {
+				bar.setTitle("Salutation");
+				about.setText(Html.fromHtml(getString(R.string.bonus_1)));
 				about.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
 			} else {
-				about.setText(Html.fromHtml(getString(R.string.salutation)));
+				bar.setTitle("Salutation");
+				about.setText(Html.fromHtml(getString(R.string.bonus_2)));
 				about.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
 			}
 		} else {
