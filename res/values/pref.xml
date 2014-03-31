@@ -7,6 +7,8 @@
 <resources>
 	<string name="version_name">0.8 蒹葭</string>
 	<string name="camera_cached_dir">/camera/</string>
+	<bool name="pref_true">true</bool>
+	<bool name="pref_false">false</bool>
 
 	<string name="pref_first_run">pref_first_run</string>
 	<string name="pref_keep_latest">pref_auto_fetch_on_start</string>

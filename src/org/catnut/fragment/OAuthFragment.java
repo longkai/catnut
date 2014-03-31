@@ -108,7 +108,6 @@ public class OAuthFragment extends Fragment {
 										mProgressDialog.dismiss();
 										mApp.getPreferences().edit().putString(User.screen_name, response.optString(User.screen_name)).commit();
 										Intent intent = new Intent(getActivity(), MainActivity.class);
-										intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 										startActivity(intent);
 									}
 								},
@@ -152,6 +151,7 @@ public class OAuthFragment extends Fragment {
 	@Override
 	public void onStart() {
 		super.onStart();
+		mActionBar.setDisplayHomeAsUpEnabled(false);
 		mActionBar.setTitle(getString(R.string.oauth));
 		mActionBar.setIcon(R.drawable.weibo_logo);
 	}

@@ -18,10 +18,6 @@
 				android:icon="@drawable/ic_action_share"
 				android:actionProviderClass="android.widget.ShareActionProvider" />
 			<item
-				android:id="@+id/pref"
-				android:icon="@drawable/ic_title_pref"
-				android:title="@string/pref" />
-			<item
 				android:id="@+id/toggle_fantasy"
 				android:icon="@drawable/ic_action_fullscreen_on"
 				android:title="@string/hide_fantasy_words" />

@@ -26,6 +26,7 @@
 		android:name=".core.CatnutApp">
 		<activity
 			android:name=".ui.HelloActivity"
+			android:noHistory="true"
 			android:theme="@style/Theme.Fantasy">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -60,6 +61,9 @@
 		<activity
 			android:theme="@style/Theme.Plugins"
 			android:name=".ui.PluginsActivity" />
+		<activity
+			android:noHistory="true"
+			android:name=".ui.NoHistoryActivity" />
 
 		<provider
 			android:authorities="org.catnut"

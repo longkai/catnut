@@ -8,7 +8,6 @@ package org.catnut.ui;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -35,22 +34,17 @@ import com.google.analytics.tracking.android.MapBuilder;
 import org.catnut.R;
 import org.catnut.api._500pxAPI;
 import org.catnut.core.CatnutApp;
-import org.catnut.core.CatnutProcessor;
 import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
 import org.catnut.fragment.FantasyFragment;
 import org.catnut.metadata.AccessToken;
-import org.catnut.plugin.fantasy.Photo;
 import org.catnut.metadata.WeiboAPIError;
+import org.catnut.plugin.fantasy.Photo;
 import org.catnut.support.PageTransformer;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
-import org.catnut.util.DateTime;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -97,9 +91,7 @@ public class HelloActivity extends Activity {
 		if (accessToken == null || System.currentTimeMillis() > accessToken.expires_in) {
 			mApp.invalidateAccessToken();
 			Toast.makeText(this, getString(R.string.not_yet_auth), Toast.LENGTH_SHORT).show();
-			Intent intent = SingleFragmentActivity.getIntent(this, SingleFragmentActivity.AUTH);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-			startActivity(intent);
+			startActivity(new Intent(this, NoHistoryActivity.class));
 		} else {
 			// 检查一次更新，每周一次
 			CatnutUtils.checkout(false, this, mPreferences);
@@ -270,9 +262,6 @@ public class HelloActivity extends Activity {
 								.setIcon(R.drawable.ic_action_fullscreen_on);
 					}
 				}
-				break;
-			case R.id.pref:
-				startActivity(SingleFragmentActivity.getIntent(this, SingleFragmentActivity.PREF));
 				break;
 			case android.R.id.home:
 				Intent intent = getIntent();
