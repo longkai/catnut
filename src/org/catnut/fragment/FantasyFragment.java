@@ -179,7 +179,6 @@ public class FantasyFragment extends Fragment {
 		mShare = menu.findItem(R.id.action_share);
 		if (!Intent.ACTION_MAIN.equals( getActivity().getIntent().getAction())) {
 			menu.findItem(R.id.home).setVisible(false);
-			menu.findItem(R.id.pref).setVisible(false);
 		}
 		mShareActionProvider = (ShareActionProvider) mShare.getActionProvider();
 		mShare.setActionProvider(mShareActionProvider);

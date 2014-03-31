@@ -98,6 +98,12 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 		mScreenWidth = CatnutUtils.getScreenWidth(context);
 
 		Resources resources = context.getResources();
+
+		int maxThumbsWidth = resources.getDimensionPixelSize(R.dimen.max_thumb_width);
+		if (mScreenWidth > maxThumbsWidth) {
+			mScreenWidth = maxThumbsWidth;
+		}
+
 		ThumbsOption.injectAliases(resources);
 		mThumbsOption = ThumbsOption.obtainOption(
 				preferences.getString(
@@ -117,7 +123,7 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 		);
 		mStayInLatest = preferences.getBoolean(
 				context.getString(R.string.pref_keep_latest),
-				false
+				true
 		);
 		mCustomizedLineSpacing = CatnutUtils.getLineSpacing(
 				preferences,

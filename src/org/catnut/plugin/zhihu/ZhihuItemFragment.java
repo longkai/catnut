@@ -199,6 +199,11 @@ public class ZhihuItemFragment extends Fragment implements
 							l = 0; // reset for reuse
 							String text;
 							int screenWidth = CatnutUtils.getScreenWidth(getActivity());
+							int max = getActivity().getResources().getDimensionPixelSize(R.dimen.max_thumb_width);
+							if (screenWidth > max) {
+								screenWidth = max;
+							}
+
 							LayoutInflater inflater = LayoutInflater.from(getActivity());
 							if (!TextUtils.isEmpty(_question)) {
 								ViewGroup questionHolder = (ViewGroup) view.findViewById(R.id.question);

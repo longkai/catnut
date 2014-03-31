@@ -10,6 +10,8 @@
 	<dimen name="large">16dp</dimen>
 	<dimen name="xlarge">32dp</dimen>
 
+	<dimen name="max_thumb_width">480px</dimen>
+
 	<dimen name="list_view_header_height">45dp</dimen>
 	
 	<dimen name="counter_width">40dp</dimen>
