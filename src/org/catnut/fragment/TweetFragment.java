@@ -558,6 +558,8 @@ public class TweetFragment extends Fragment implements
 									startActivity(intent);
 								}
 							});
+							retweet.findViewById(R.id.verified)
+									.setVisibility(user.optBoolean(User.verified) ? View.VISIBLE : View.GONE);
 						} catch (JSONException e) {
 							Log.e(TAG, "convert text to string error!", e);
 							retweet.setVisibility(View.GONE);
