@@ -453,6 +453,8 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 						mContext.startActivity(intent);
 					}
 				});
+				holder.retweetView.findViewById(R.id.verified)
+						.setVisibility(user.optBoolean(User.verified) ? View.VISIBLE : View.GONE);
 			}
 			TweetTextView text = (TweetTextView) holder.retweetView.findViewById(R.id.retweet_text);
 			CatnutUtils.setText(holder.retweetView, R.id.retweet_create_at,

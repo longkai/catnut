@@ -76,6 +76,8 @@
 		android:visibility="gone"
 		android:clickable="true"
 		android:focusable="true"
+		android:layout_marginTop="@dimen/small"
+		android:adjustViewBounds="true"
 		android:layout_below="@id/text"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content" />
@@ -91,14 +93,12 @@
 			android:id="@id/view_stub"
 			android:layout="@layout/retweet"
 			android:inflatedId="@+id/retweet"
-			android:layout_marginTop="@dimen/small"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content" />
 	</FrameLayout>
 
 	<FrameLayout
 		android:layout_below="@id/place_holder"
-		android:layout_marginTop="@dimen/small"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
 
