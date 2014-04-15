@@ -32,6 +32,7 @@
 6. Picasso，图片缓存框架，需自行[下载][Picasso]或者通过Android Studio引入
 7. ViewPagerIndicator, 页面切换指示器，需自行[下载][ViewPagerIndicator]或者通过Android Studio引入
 8. AndroidStaggeredGrid, grid view，需自行[下载][AndroidStaggeredGrid]或者通过Android Studio引入
+9. OkHttp, spdy http client, 需自行[下载][OkHttp]或者通过Android Studio引入
 
 ## 如何构建
 1. 通过IDE
@@ -75,7 +76,8 @@ last update: 2014-03-22
 [Picasso]: http://square.github.io/picasso/ "Picasso"
 [ViewPagerIndicator]: http://viewpagerindicator.com/ "ViewPagerIndicator"
 [AndroidStaggeredGrid]: https://github.com/etsy/AndroidStaggeredGrid "AndroidStaggeredGrid"
-[@龙凯Orz]: http://weibo.com/coding4fun "sina weibo"
+[OkHttp]: http://square.github.io/okhttp/ "OkHttp"
+[@米粉撸油条]: http://weibo.com/coding4fun "sina weibo"
 [@longkai_1991]: https://twitter.com/longkai_1991 "twitter"
 [creative commons icon]: http://i.creativecommons.org/l/by-nc/4.0/88x31.png "creative commons icon"
 [creative commons license]: http://creativecommons.org/licenses/by-nc/4.0/deed.zh "creative commons license"
