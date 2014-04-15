@@ -41,7 +41,7 @@
 			android:textColor="#ff9fa9b0"
 			android:layout_gravity="center"
 			android:gravity="center"
-			android:layout_width="wrap_content"
+			android:layout_width="@dimen/avatar_bound"
 			android:layout_height="wrap_content" />
 	</FrameLayout>
 
