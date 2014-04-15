@@ -23,7 +23,6 @@
 		<item name="android:buttonStyle">@style/RobotoButtonStyle</item>
 		<item name="android:webTextViewStyle">@style/RobotoWebViewStyle</item>
 		<item name="android:actionBarItemBackground">@drawable/actionbar_item_background_light</item>
-		<item name="android:itemTextAppearance">@style/Item_Text_Style</item>
 		<item name="android:spinnerDropDownItemStyle">@style/Spinner_Text_Style</item>
 		<item name="android:spinnerStyle">@style/Spinner_Style_Light</item>
 	</style>
@@ -62,11 +61,6 @@
 
 	<style name="ActionBar_Light_TabBarStyle" parent="android:Widget.Holo.Light.ActionBar.TabBar">
 		<item name="android:background">@color/ivoryColor</item>
-	</style>
-
-	<!--overflow menu, popup menu item text color-->
-	<style name="Item_Text_Style">
-		<item name="android:textColor">@color/black25PercentColor</item>
 	</style>
 
 	<style name="Spinner_Text_Style" parent="android:Widget.Holo.Light.DropDownItem.Spinner">

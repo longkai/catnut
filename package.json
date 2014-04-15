@@ -22,7 +22,8 @@
 		"Google Analytics",
 		"Picasso",
 		"ViewPagerIndicator",
-		"AndroidStaggeredGrid"
+		"AndroidStaggeredGrid",
+    "OkHttp"
 	],
 	"license": {
 		"type": "MIT",
