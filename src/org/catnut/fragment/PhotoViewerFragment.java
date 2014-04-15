@@ -32,7 +32,6 @@ import org.catnut.util.Constants;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 /**
  * 照片查看器
@@ -72,22 +71,16 @@ public class PhotoViewerFragment extends Fragment {
 							// 文件已经存在，没有必要再来一次了
 							mIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(mImage));
 							mSaved = true;
-							return;
+						} else {
+							os = new FileOutputStream(mImage);
+							bitmap.compress(Bitmap.CompressFormat.PNG, 100, os);
+							mIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(mImage));
+							mSaved = true;
 						}
-						os = new FileOutputStream(mImage);
-						bitmap.compress(Bitmap.CompressFormat.PNG, 100, os);
-						mIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(mImage));
-						mSaved = true;
 					} catch (FileNotFoundException e) {
 						Log.e(TAG, "io error!", e);
 					} finally {
-						if (os != null) {
-							try {
-								os.close();
-							} catch (IOException e) {
-								Log.e(TAG, "io closing error!", e);
-							}
-						}
+						CatnutUtils.closeIO(os);
 					}
 				}
 			}).start();
