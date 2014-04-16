@@ -5,7 +5,7 @@
   ~ The software shall be used for good, not evil.
   -->
 <resources>
-	<string name="version_name">0.8.1 且行且珍惜</string>
+	<string name="version_name">0.8.2 豆豆</string>
 	<string name="camera_cached_dir">/camera/</string>
 	<bool name="pref_true">true</bool>
 	<bool name="pref_false">false</bool>

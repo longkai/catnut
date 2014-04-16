@@ -363,35 +363,47 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 		// 文字处理
 		CatnutUtils.vividTweet(holder.text, mImageSpan);
 		// 缩略图，用户偏好
+		injectThumbs(context, cursor.getString(holder.originalPicIndex),
+				cursor.getString(holder.mediumThumbIndex), cursor.getString(holder.smallThumbIndex), holder.thumbs);
+		// 处理转发
+		retweet(cursor.getString(holder.retweetIndex), holder);
+		// others
+		Bean bean = new Bean();
+		bean.id = id;
+		bean.favorited = CatnutUtils.getBoolean(cursor, Status.favorited);
+		bean.text = cursor.getString(holder.textIndex);
+		holder.popup.setTag(bean); // inject data
+		holder.popup.setOnClickListener(this);
+	}
+
+	private void injectThumbs(final Context context, final String originUri, String mediumThumbUrl, String smallThumbUrl, final ImageView thumbs) {
 		switch (mThumbsOption) {
 			case SMALL:
 			case MEDIUM:
-				final String originUri = cursor.getString(holder.originalPicIndex);
 				if (!TextUtils.isEmpty(originUri)) {
 					if (mStayInLatest) { // not in offline mode
 						RequestCreator creator;
 						if (mThumbsOption == ThumbsOption.MEDIUM) {
-							creator = Picasso.with(context).load(cursor.getString(holder.mediumThumbIndex))
+							creator = Picasso.with(context).load(mediumThumbUrl)
 									.centerCrop()
 									.resize(mScreenWidth, (int) (mScreenWidth * Constants.GOLDEN_RATIO));
 						} else {
-							creator = Picasso.with(context)
-									.load(cursor.getString(holder.smallThumbIndex));
+							creator = Picasso.with(context).load(smallThumbUrl);
 						}
 						creator.placeholder(android.R.drawable.ic_menu_report_image)
 								.error(R.drawable.error)
-								.into(holder.thumbs);
-						holder.thumbs.setOnTouchListener(new View.OnTouchListener() {
+								.into(thumbs);
+						thumbs.setOnTouchListener(new View.OnTouchListener() {
 							@Override
 							public boolean onTouch(View v, MotionEvent event) {
 								return CatnutUtils.imageOverlay(v, event);
 							}
 						});
-						holder.thumbs.setOnClickListener(new View.OnClickListener() {
+						thumbs.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								holder.thumbs.getDrawable().clearColorFilter();
-								holder.thumbs.invalidate();
+								thumbs.getDrawable().clearColorFilter();
+								thumbs.invalidate();
 								Intent intent = SingleFragmentActivity
 										.getIntent(context, SingleFragmentActivity.PHOTO_VIEWER);
 								intent.putExtra(Constants.PIC, originUri);
@@ -402,27 +414,18 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 						// sometimes, the user may read timeline in offline mode(may opening the 2/3g),
 						// so, don' t load the image
 						// todo, may be we need to check it in cache or place the network unavailable image?
-						holder.thumbs.setImageResource(android.R.drawable.ic_menu_report_image);
+						thumbs.setImageResource(android.R.drawable.ic_menu_report_image);
 					}
-					holder.thumbs.setVisibility(View.VISIBLE);
+					thumbs.setVisibility(View.VISIBLE);
 					break;
 				}
 				// otherwise, fall through...
 			case NONE:
 			case ORIGINAL:
 			default:
-				holder.thumbs.setVisibility(View.GONE);
+				thumbs.setVisibility(View.GONE);
 				break;
 		}
-		// 处理转发
-		retweet(cursor.getString(holder.retweetIndex), holder);
-		// others
-		Bean bean = new Bean();
-		bean.id = id;
-		bean.favorited = CatnutUtils.getBoolean(cursor, Status.favorited);
-		bean.text = cursor.getString(holder.textIndex);
-		holder.popup.setTag(bean); // inject data
-		holder.popup.setOnClickListener(this);
 	}
 
 	private void retweet(final String jsonString, ViewHolder holder) {
@@ -464,6 +467,8 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 			CatnutUtils.vividTweet(text, mImageSpan);
 			CatnutUtils.setTypeface(text, mCustomizedFont);
 			text.setLineSpacing(0, mCustomizedLineSpacing);
+			injectThumbs(mContext, json.optString(Status.original_pic), json.optString(Status.bmiddle_pic),
+					json.optString(Status.thumbnail_pic), (ImageView) holder.retweetView.findViewById(R.id.thumbs));
 		} else {
 			holder.retweetView.setVisibility(View.GONE);
 		}

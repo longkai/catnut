@@ -531,7 +531,7 @@ public class TweetFragment extends Fragment implements
 					}
 					String thumb = cursor.getString(cursor.getColumnIndex(Status.bmiddle_pic));
 					String url = cursor.getString(cursor.getColumnIndex(Status.original_pic));
-					loadThumbs(thumb, url);
+					loadThumbs(thumb, url, mThumbs);
 					// retweet
 					final String jsonString = cursor.getString(cursor.getColumnIndex(Status.retweeted_status));
 					if (!TextUtils.isEmpty(jsonString)) {
@@ -560,6 +560,10 @@ public class TweetFragment extends Fragment implements
 							});
 							retweet.findViewById(R.id.verified)
 									.setVisibility(user.optBoolean(User.verified) ? View.VISIBLE : View.GONE);
+							if (json.has(Status.thumbnail_pic)) {
+								loadThumbs(json.optString(Status.bmiddle_pic), json.optString(Status.bmiddle_pic),
+										(ImageView) retweet.findViewById(R.id.thumbs));
+							}
 						} catch (JSONException e) {
 							Log.e(TAG, "convert text to string error!", e);
 							retweet.setVisibility(View.GONE);
@@ -614,7 +618,7 @@ public class TweetFragment extends Fragment implements
 			mTweetLayout.findViewById(R.id.verified).setVisibility(View.VISIBLE);
 		}
 
-		loadThumbs(mJson.optString(Status.bmiddle_pic), mJson.optString(Status.original_pic));
+		loadThumbs(mJson.optString(Status.bmiddle_pic), mJson.optString(Status.original_pic), mThumbs);
 		shareAndFavorite(mJson.optBoolean(Status.favorited), mJson.optString(Status.text));
 
 		if (!mJson.has(Status.retweeted_status)) {
@@ -628,20 +632,20 @@ public class TweetFragment extends Fragment implements
 	 * @param thumb 缩略图url
 	 * @param originalUrl 原图url
 	 */
-	private void loadThumbs(String thumb, final String originalUrl) {
+	private void loadThumbs(String thumb, final String originalUrl, final ImageView thumbs) {
 		if (!TextUtils.isEmpty(thumb)) {
 			if (mStayInLatest) {
-				Picasso.with(getActivity()).load(thumb).into(mThumbs);
-				mThumbs.setOnTouchListener(new View.OnTouchListener() {
+				Picasso.with(getActivity()).load(thumb).into(thumbs);
+				thumbs.setOnTouchListener(new View.OnTouchListener() {
 					@Override
 					public boolean onTouch(View v, MotionEvent event) {
 						return CatnutUtils.imageOverlay(v, event);
 					}
 				});
-				mThumbs.setOnClickListener(new View.OnClickListener() {
+				thumbs.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						mThumbs.getDrawable().clearColorFilter();
+						thumbs.getDrawable().clearColorFilter();
 						mText.invalidate();
 						Intent intent = SingleFragmentActivity.getIntent(getActivity(),
 								SingleFragmentActivity.PHOTO_VIEWER);
@@ -650,11 +654,11 @@ public class TweetFragment extends Fragment implements
 					}
 				});
 			} else {
-				mThumbs.setImageResource(R.drawable.error);
+				thumbs.setImageResource(R.drawable.error);
 			}
-			mThumbs.setVisibility(View.VISIBLE);
+			thumbs.setVisibility(View.VISIBLE);
 		} else {
-			mThumbs.setVisibility(View.GONE);
+			thumbs.setVisibility(View.GONE);
 		}
 	}
 

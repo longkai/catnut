@@ -11,6 +11,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -234,6 +235,11 @@ public class ZhihuItemFragment extends Fragment implements
 								}
 							}
 
+							Typeface typeface = CatnutUtils.getTypeface(
+									CatnutApp.getTingtingApp().getPreferences(),
+									getString(R.string.pref_customize_tweet_font),
+									getString(R.string.default_typeface)
+							);
 							ViewGroup answerHolder = (ViewGroup) view.findViewById(R.id.answer);
 							for (int i = 0; i < contentSegment.size(); i++) {
 								text = contentSegment.get(i);
@@ -241,6 +247,7 @@ public class ZhihuItemFragment extends Fragment implements
 									if ((i & 1) == 0) {
 										TextView section = (TextView) inflater.inflate(R.layout.zhihu_text, null);
 										section.setText(Html.fromHtml(text));
+										CatnutUtils.setTypeface(section, typeface);
 										CatnutUtils.removeLinkUnderline(section);
 										section.setMovementMethod(LinkMovementMethod.getInstance());
 										answerHolder.addView(section);
@@ -296,13 +303,6 @@ public class ZhihuItemFragment extends Fragment implements
 		return image;
 	}
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		// 标记已读
-		new Thread(new MarkHasReadRunable(mAnswerId, getActivity(), true)).start();
-	}
-
 	private void processText(String _content, Matcher matcher, List<String> contentSegment) {
 		int start;
 		int lastStart = 0;
@@ -328,6 +328,8 @@ public class ZhihuItemFragment extends Fragment implements
 	public void onStart() {
 		super.onStart();
 		getActivity().getActionBar().setTitle(getString(R.string.read_zhihu));
+		// 标记已读
+		new Thread(new MarkHasReadRunable(mAnswerId, getActivity(), true)).start();
 	}
 
 	@Override
