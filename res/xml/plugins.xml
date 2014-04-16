@@ -51,6 +51,10 @@
 			android:summaryOn="@string/auto_refresh_on_summary"
 			android:summaryOff="@string/auto_refresh_off_summary" />
 
+		<Preference
+			android:key="@string/pref_zhihu_typeface"
+			android:title="@string/font" />
+
 		<CheckBoxPreference
 			android:key="@string/pref_enable_cache_zhihu_images"
 			android:title="@string/cache_images"

@@ -98,6 +98,7 @@ public class PluginsActivity extends Activity implements
 		}
 		Collections.shuffle(mIds); // shuffle it :-)
 		mViewPager = (ViewPager) findViewById(R.id.pager);
+		mViewPager.setOffscreenPageLimit(2);
 		mViewPager.setPageMargin(10);
 
 		mViewPager.setPageMarginDrawable(new ColorDrawable(getResources().getColor(R.color.tab_selected)));

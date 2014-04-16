@@ -134,7 +134,7 @@ public class PrefFragment extends PreferenceFragment implements DialogInterface.
 		if (requestCode == CUSTOMIZE_FONT_REQUEST_CODE && data != null) {
 			// 简单的通过文件名后缀判断一下
 			String path = data.getData().getPath();
-			Pattern pattern = Pattern.compile("(?i)[^\\s]+(ttf|otf|fon|ttc)$");
+			Pattern pattern = Pattern.compile("(?i).+(ttf|otf|fon|ttc)$");
 			if (!pattern.matcher(path).matches()) {
 				Toast.makeText(getActivity(),
 					getString(R.string.supported_font_types), Toast.LENGTH_SHORT).show();
