@@ -131,8 +131,7 @@ public abstract class TimelineFragment extends Fragment implements ConfirmBarCon
 		viewGroup.addView(mEmptyText);
 		mSwipeDismissListViewTouchListener = new SwipeDismissListViewTouchListener(mListView, this);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
-		int[] colors = ColorSwicher.ramdomColors(4);
-		mSwipeRefreshLayout.setColorScheme(colors[0], colors[1], colors[2], colors[3]);
+		ColorSwicher.injectColor(mSwipeRefreshLayout);
 	}
 
 	@Override

@@ -419,8 +419,7 @@ public class TweetFragment extends Fragment implements
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
-		int[] colors = ColorSwicher.ramdomColors(4);
-		mSwipeRefreshLayout.setColorScheme(colors[0], colors[1], colors[2], colors[3]);
+		ColorSwicher.injectColor(mSwipeRefreshLayout);
 		mSendText.addTextChangedListener(this);
 		mSendText.setTextColor(getResources().getColor(android.R.color.primary_text_light));
 		mSend.setOnClickListener(new View.OnClickListener() {

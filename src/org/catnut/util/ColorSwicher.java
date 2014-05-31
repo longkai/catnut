@@ -5,6 +5,7 @@
  */
 package org.catnut.util;
 
+import android.support.v4.widget.SwipeRefreshLayout;
 import org.catnut.R;
 
 import java.util.Random;
@@ -27,6 +28,11 @@ public class ColorSwicher {
 			R.color.cardTableColor,
 			R.color.tab_selected
 	};
+
+	public static void injectColor(SwipeRefreshLayout swipeRefreshLayout) {
+		int[] colors = ramdomColors(4);
+		swipeRefreshLayout.setColorScheme(colors[0], colors[1], colors[2], colors[3]);
+	}
 
 	public static int[] ramdomColors(int n) {
 		int[] colors = new int[n];

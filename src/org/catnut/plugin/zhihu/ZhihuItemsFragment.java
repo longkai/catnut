@@ -132,8 +132,7 @@ public class ZhihuItemsFragment extends SwipeRefreshListFragment implements
 		mClear.setOnClickListener(this);
 		getListView().addHeaderView(mSearchFrame);
 		setOnRefreshListener(this);
-		int[] colors = ColorSwicher.ramdomColors(4);
-		setColorScheme(colors[0], colors[1], colors[2], colors[3]);
+		ColorSwicher.injectColor(getSwipeRefreshLayout());
 	}
 
 	@Override

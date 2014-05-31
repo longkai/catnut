@@ -111,8 +111,7 @@ public class ZhihuItemFragment extends Fragment implements
 		View view = inflater.inflate(R.layout.zhihu_item, container, false);
 
 		mSwipeRefreshLayout = (SwipeRefreshLayout) view;
-		int[] colors = ColorSwicher.ramdomColors(4);
-		mSwipeRefreshLayout.setColorScheme(colors[0], colors[1], colors[2], colors[3]);
+		ColorSwicher.injectColor(mSwipeRefreshLayout);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
 
 		mQuickReturnLayout = (QuickReturnScrollView) view.findViewById(R.id.quick_return);

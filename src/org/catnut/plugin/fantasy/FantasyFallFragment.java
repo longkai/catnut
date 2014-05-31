@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.Spinner;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -83,8 +82,7 @@ public class FantasyFallFragment extends Fragment implements
 		mFall = (StaggeredGridView) view.findViewById(R.id.fall);
 		mFall.addHeaderView(mSwitcher);
 		mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
-		int[] colors = ColorSwicher.ramdomColors(4);
-		mSwipeRefreshLayout.setColorScheme(colors[0], colors[1], colors[2], colors[3]);
+		ColorSwicher.injectColor(mSwipeRefreshLayout);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
 	}
 
