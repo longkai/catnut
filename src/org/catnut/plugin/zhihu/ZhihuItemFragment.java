@@ -32,6 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import org.catnut.R;
@@ -220,12 +221,14 @@ public class ZhihuItemFragment extends Fragment implements
 											Uri uri = useCachedImg ? Zhihu.getCacheImageLocation(getActivity(), Uri.parse(text)) : Uri.parse(text);
 											Picasso.with(getActivity())
 													.load(uri)
+													.centerCrop()
 													.resize(screenWidth, (int) (Constants.GOLDEN_RATIO * screenWidth))
 													.error(R.drawable.error)
 													.into(imageView);
 											imageView.setTag(l++); // for click
 											imageView.setOnClickListener(ZhihuItemFragment.this);
 											mImageUrls.add(uri);
+											questionHolder.addView(imageView);
 										}
 									}
 								}
@@ -252,6 +255,7 @@ public class ZhihuItemFragment extends Fragment implements
 										Uri uri = useCachedImg ? Zhihu.getCacheImageLocation(getActivity(), Uri.parse(text)) : Uri.parse(text);
 										Picasso.with(getActivity())
 												.load(uri)
+												.centerCrop()
 												.resize(screenWidth, (int) (Constants.GOLDEN_RATIO * screenWidth))
 												.error(R.drawable.error)
 												.into(image);
@@ -288,6 +292,12 @@ public class ZhihuItemFragment extends Fragment implements
 
 	private ImageView getImageView() {
 		ImageView image = new ImageView(getActivity());
+		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT
+		);
+		lp.setMargins(0, 10, 0, 10);
+		image.setLayoutParams(lp);
 		image.setAdjustViewBounds(true);
 		image.setOnTouchListener(new View.OnTouchListener() {
 			@Override

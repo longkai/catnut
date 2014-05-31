@@ -18,7 +18,7 @@
 		android:layout_height="match_parent">
 
 		<FrameLayout
-			android:padding="@dimen/medium"
+			android:padding="@dimen/large"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent">
 
