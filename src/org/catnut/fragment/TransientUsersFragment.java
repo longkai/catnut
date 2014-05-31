@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.ListFragment;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,13 +35,11 @@ import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.UserProcessor;
 import org.catnut.support.TransientRequest;
 import org.catnut.support.TransientUser;
+import org.catnut.support.app.SwipeRefreshListFragment;
 import org.catnut.ui.ProfileActivity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -51,7 +50,7 @@ import java.util.List;
  *
  * @author longkai
  */
-public class TransientUsersFragment extends ListFragment implements AbsListView.OnScrollListener, OnRefreshListener {
+public class TransientUsersFragment extends SwipeRefreshListFragment implements AbsListView.OnScrollListener, SwipeRefreshLayout.OnRefreshListener {
 
 	private static final String TAG = "TransientUsersFragment";
 
@@ -59,7 +58,6 @@ public class TransientUsersFragment extends ListFragment implements AbsListView.
 	private int mTotal_number = 0;
 
 	private RequestQueue mRequestQueue;
-	private PullToRefreshLayout mPullToRefreshLayout;
 
 	private String mScreenName;
 	private boolean mFollowing;
@@ -75,7 +73,7 @@ public class TransientUsersFragment extends ListFragment implements AbsListView.
 			mLastTotalCount = mAdapter.getCount();
 			mUsers.addAll(response);
 			mAdapter.notifyDataSetChanged();
-			mPullToRefreshLayout.setRefreshComplete();
+			setRefreshing(false);
 		}
 	};
 
@@ -85,7 +83,7 @@ public class TransientUsersFragment extends ListFragment implements AbsListView.
 			Log.e(TAG, "load friends error!", error);
 			WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
 			Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_LONG).show();
-			mPullToRefreshLayout.setRefreshComplete();
+			setRefreshing(false);
 		}
 	};
 
@@ -118,12 +116,7 @@ public class TransientUsersFragment extends ListFragment implements AbsListView.
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		ViewGroup viewGroup = (ViewGroup) view;
-		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
-		ActionBarPullToRefresh.from(getActivity())
-				.insertLayoutInto(viewGroup)
-				.theseChildrenArePullable(android.R.id.list, android.R.id.empty)
-				.listener(this)
-				.setup(mPullToRefreshLayout);
+		setOnRefreshListener(this);
 		// go！开始加载数据吧！
 		load(true);
 	}
@@ -180,7 +173,7 @@ public class TransientUsersFragment extends ListFragment implements AbsListView.
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		if (SCROLL_STATE_IDLE == scrollState
 				&& getListView().getLastVisiblePosition() == mAdapter.getCount() - 1
-				&& !mPullToRefreshLayout.isRefreshing()) {
+				&& !isRefreshing()) {
 			if (mAdapter.getCount() >= mTotal_number || mLastTotalCount == mAdapter.getCount()) {
 				Toast.makeText(getActivity(), R.string.no_more, Toast.LENGTH_SHORT).show();
 			} else {
@@ -194,13 +187,13 @@ public class TransientUsersFragment extends ListFragment implements AbsListView.
 	}
 
 	@Override
-	public void onRefreshStarted(View view) {
+	public void onRefresh() {
 		load(true);
 	}
 
 	// 加载数据
 	private void load(boolean refresh) {
-		mPullToRefreshLayout.setRefreshing(true);
+		setRefreshing(true);
 		if (refresh) {
 			mUsers.clear(); // 清空现有的列表
 			mNext_cursor = 0;

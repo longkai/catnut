@@ -22,6 +22,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.BaseColumns;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
@@ -73,14 +74,12 @@ import org.catnut.ui.ProfileActivity;
 import org.catnut.ui.SingleFragmentActivity;
 import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
+import org.catnut.util.ColorSwicher;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 /**
  * 微博界面
@@ -89,8 +88,8 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  */
 public class TweetFragment extends Fragment implements
 		TextWatcher, OnFragmentBackPressedListener, PopupMenu.OnMenuItemClickListener,
-		LoaderManager.LoaderCallbacks<Cursor>, OnRefreshListener, AdapterView.OnItemClickListener,
-		AbsListView.OnScrollListener, AdapterView.OnItemLongClickListener {
+		LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener,
+		AbsListView.OnScrollListener, AdapterView.OnItemLongClickListener, SwipeRefreshLayout.OnRefreshListener {
 
 	private static final String TAG = "TweetFragment";
 	private static final String RETWEET_INDICATOR = ">"; // 标记转发
@@ -117,7 +116,7 @@ public class TweetFragment extends Fragment implements
 	private TweetImageSpan mImageSpan;
 	private SharedPreferences mPreferences;
 	private ConnectivityManager mConnectivityManager;
-	private PullToRefreshLayout mPullToRefreshLayout;
+	private SwipeRefreshLayout mSwipeRefreshLayout;
 
 	private String mSelection;
 
@@ -175,7 +174,7 @@ public class TweetFragment extends Fragment implements
 			Log.d(TAG, "error loading data from cloud!", error);
 			WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
 			Toast.makeText(getActivity(), weiboAPIError.error, Toast.LENGTH_LONG).show();
-			mPullToRefreshLayout.setRefreshComplete();
+			mSwipeRefreshLayout.setRefreshing(false);
 		}
 	};
 
@@ -320,11 +319,11 @@ public class TweetFragment extends Fragment implements
 		mLastTotalCount = mAdapter.getCount(); // 暂存一下
 		args.putInt(TAG, mAdapter.getCount() + getFetchSize());
 		getLoaderManager().restartLoader(0, args, this);
-		mPullToRefreshLayout.setRefreshing(true);
+		mSwipeRefreshLayout.setRefreshing(true);
 	}
 
 	private void loadFromCloud(long max_id) {
-		mPullToRefreshLayout.setRefreshing(true);
+		mSwipeRefreshLayout.setRefreshing(true);
 		CatnutAPI api = CommentsAPI.show(mId, 0, max_id, getFetchSize(), 0, 0);
 		mRequestQueue.add(new CatnutRequest(
 				getActivity(),
@@ -418,13 +417,10 @@ public class TweetFragment extends Fragment implements
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
-		ViewGroup viewGroup = (ViewGroup) view;
-		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
-		ActionBarPullToRefresh.from(getActivity())
-				.insertLayoutInto(viewGroup)
-				.theseChildrenArePullable(android.R.id.list, android.R.id.empty)
-				.listener(this)
-				.setup(mPullToRefreshLayout);
+		mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
+		mSwipeRefreshLayout.setOnRefreshListener(this);
+		int[] colors = ColorSwicher.ramdomColors(4);
+		mSwipeRefreshLayout.setColorScheme(colors[0], colors[1], colors[2], colors[3]);
 		mSendText.addTextChangedListener(this);
 		mSendText.setTextColor(getResources().getColor(android.R.color.primary_text_light));
 		mSend.setOnClickListener(new View.OnClickListener() {
@@ -443,7 +439,7 @@ public class TweetFragment extends Fragment implements
 			}
 		});
 		// 载入评论
-		mPullToRefreshLayout.setRefreshing(true);
+		mSwipeRefreshLayout.setRefreshing(true);
 		if (savedInstanceState == null) {
 			if (mPreferences.getBoolean(getString(R.string.pref_keep_latest), true)) {
 				refresh();
@@ -718,8 +714,8 @@ public class TweetFragment extends Fragment implements
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		if (mPullToRefreshLayout.isRefreshing()) {
-			mPullToRefreshLayout.setRefreshComplete();
+		if (mSwipeRefreshLayout.isRefreshing()) {
+			mSwipeRefreshLayout.setRefreshing(false);
 		}
 		mAdapter.swapCursor(data);
 	}
@@ -730,7 +726,7 @@ public class TweetFragment extends Fragment implements
 	}
 
 	@Override
-	public void onRefreshStarted(View view) {
+	public void onRefresh() {
 		refresh();
 	}
 
@@ -738,7 +734,7 @@ public class TweetFragment extends Fragment implements
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		boolean canLoading = SCROLL_STATE_IDLE == scrollState // 停住了，不滑动了
 				&& (mListView.getLastVisiblePosition() - 1) == (mAdapter.getCount() - 1) // 到底了，这里有一个header！
-				&& !mPullToRefreshLayout.isRefreshing(); // 当前没有处在刷新状态
+				&& !mSwipeRefreshLayout.isRefreshing(); // 当前没有处在刷新状态
 //				&& mAdapter.getCount() > 0; // 不是一开始
 		if (canLoading) {
 			// 可以加载更多，但是我们需要判断一下是否加载完了，没有更多了

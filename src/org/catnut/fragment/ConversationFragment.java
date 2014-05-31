@@ -80,7 +80,7 @@ public class ConversationFragment extends TimelineFragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		// load it!
-		mPullToRefreshLayout.setRefreshing(true);
+		mSwipeRefreshLayout.setRefreshing(true);
 		if (savedInstanceState == null) {
 			String key = getString(R.string.pref_first_run);
 			boolean firstRun = mPreferences.getBoolean(key, true);
@@ -220,11 +220,11 @@ public class ConversationFragment extends TimelineFragment {
 		Bundle args = new Bundle();
 		args.putInt(TAG, mAdapter.getCount() + getFetchSize());
 		getLoaderManager().restartLoader(0, args, this);
-		mPullToRefreshLayout.setRefreshing(true);
+		mSwipeRefreshLayout.setRefreshing(true);
 	}
 
 	private void loadFromCloud(long max_id) {
-		mPullToRefreshLayout.setRefreshing(true);
+		mSwipeRefreshLayout.setRefreshing(true);
 		CatnutAPI api = CommentsAPI.to_me(0, max_id, getFetchSize(), 0, 0, 0);
 		mRequestQueue.add(new CatnutRequest(
 				getActivity(),
@@ -285,8 +285,8 @@ public class ConversationFragment extends TimelineFragment {
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-		if (mPullToRefreshLayout.isRefreshing()) {
-			mPullToRefreshLayout.setRefreshComplete();
+		if (mSwipeRefreshLayout.isRefreshing()) {
+			mSwipeRefreshLayout.setRefreshing(false);
 		}
 		mAdapter.swapCursor(data);
 	}
@@ -301,7 +301,7 @@ public class ConversationFragment extends TimelineFragment {
 		super.onScrollStateChanged(view, scrollState);
 		boolean canLoading = SCROLL_STATE_IDLE == scrollState // 停住了，不滑动了
 				&& mListView.getLastVisiblePosition() == mAdapter.getCount() - 1 // 到底了
-				&& !mPullToRefreshLayout.isRefreshing(); // 当前没有处在刷新状态
+				&& !mSwipeRefreshLayout.isRefreshing(); // 当前没有处在刷新状态
 //				&& mAdapter.getCount() > 0; // 不是一开始
 		if (canLoading) {
 			// 可以加载更多，但是我们需要判断一下是否加载完了，没有更多了

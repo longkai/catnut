@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -40,10 +41,8 @@ import org.catnut.fragment.GalleryPagerFragment;
 import org.catnut.support.QuickReturnScrollView;
 import org.catnut.ui.SingleFragmentActivity;
 import org.catnut.util.CatnutUtils;
+import org.catnut.util.ColorSwicher;
 import org.catnut.util.Constants;
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +56,7 @@ import java.util.regex.Pattern;
  * @author longkai
  */
 public class ZhihuItemFragment extends Fragment implements
-		QuickReturnScrollView.Callbacks, OnRefreshListener, View.OnClickListener {
+		QuickReturnScrollView.Callbacks, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 	public static final String TAG = ZhihuItemFragment.class.getSimpleName();
 
 	private static final String[] PROJECTION = new String[]{
@@ -76,6 +75,8 @@ public class ZhihuItemFragment extends Fragment implements
 
 	private ScrollSettleHandler mScrollSettleHandler = new ScrollSettleHandler();
 
+	private SwipeRefreshLayout mSwipeRefreshLayout;
+
 	private View mPlaceholderView;
 	private View mQuickReturnView;
 	private QuickReturnScrollView mQuickReturnLayout;
@@ -84,8 +85,6 @@ public class ZhihuItemFragment extends Fragment implements
 	private int mState = STATE_ON_SCREEN;
 	private int mQuickReturnHeight;
 	private int mMaxScrollY;
-
-	private PullToRefreshLayout mPullToRefreshLayout;
 
 	private long mAnswerId;
 	private long mQuestionId;
@@ -111,12 +110,10 @@ public class ZhihuItemFragment extends Fragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.zhihu_item, container, false);
 
-		mPullToRefreshLayout = (PullToRefreshLayout) view;
-		ActionBarPullToRefresh.from(getActivity())
-				.allChildrenArePullable()
-				.listener(this)
-				.setup(mPullToRefreshLayout);
-		mPullToRefreshLayout.setRefreshing(true);
+		mSwipeRefreshLayout = (SwipeRefreshLayout) view;
+		int[] colors = ColorSwicher.ramdomColors(4);
+		mSwipeRefreshLayout.setColorScheme(colors[0], colors[1], colors[2], colors[3]);
+		mSwipeRefreshLayout.setOnRefreshListener(this);
 
 		mQuickReturnLayout = (QuickReturnScrollView) view.findViewById(R.id.quick_return);
 		mPlaceholderView = mQuickReturnLayout.findViewById(R.id.place_holder);
@@ -268,8 +265,8 @@ public class ZhihuItemFragment extends Fragment implements
 							}
 							author.setText(_nick);
 							lastAlterDate.setText(DateUtils.getRelativeTimeSpanString(_lastAlterDate));
-							if (mPullToRefreshLayout != null) {
-								mPullToRefreshLayout.setRefreshComplete();
+							if (mSwipeRefreshLayout != null) {
+								mSwipeRefreshLayout.setRefreshing(false);
 							}
 							if (savedInstanceState != null) {
 								final int scrollY = savedInstanceState.getInt(TAG);
@@ -435,7 +432,7 @@ public class ZhihuItemFragment extends Fragment implements
 	}
 
 	@Override
-	public void onRefreshStarted(View view) {
+	public void onRefresh() {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -447,8 +444,8 @@ public class ZhihuItemFragment extends Fragment implements
 				mScrollSettleHandler.post(new Runnable() {
 					@Override
 					public void run() {
-						if (mPullToRefreshLayout != null) {
-							mPullToRefreshLayout.setRefreshComplete();
+						if (mSwipeRefreshLayout != null) {
+							mSwipeRefreshLayout.setRefreshing(false);
 						}
 					}
 				});

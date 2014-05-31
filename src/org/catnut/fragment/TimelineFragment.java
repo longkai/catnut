@@ -14,6 +14,7 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,9 +39,7 @@ import org.catnut.support.ConfirmBarController;
 import org.catnut.support.SwipeDismissListViewTouchListener;
 import org.catnut.support.VividSearchView;
 import org.catnut.util.CatnutUtils;
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+import org.catnut.util.ColorSwicher;
 
 /**
  * 时间线
@@ -48,7 +47,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  * @author longkai
  */
 public abstract class TimelineFragment extends Fragment implements ConfirmBarController.Callbacks,
-		ConfirmBarController.ConfirmListener, OnRefreshListener, AbsListView.OnScrollListener,
+		ConfirmBarController.ConfirmListener, SwipeRefreshLayout.OnRefreshListener, AbsListView.OnScrollListener,
 		LoaderManager.LoaderCallbacks<Cursor>, SwipeDismissListViewTouchListener.DismissCallbacks,
 		AdapterView.OnItemClickListener, SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
@@ -59,7 +58,7 @@ public abstract class TimelineFragment extends Fragment implements ConfirmBarCon
 
 	protected CatnutApp mApp;
 	protected SharedPreferences mPreferences;
-	protected PullToRefreshLayout mPullToRefreshLayout;
+	protected SwipeRefreshLayout mSwipeRefreshLayout;
 
 	protected ListView mListView;
 	protected ConfirmBarController mConfirmBarController;
@@ -76,7 +75,7 @@ public abstract class TimelineFragment extends Fragment implements ConfirmBarCon
 			} catch (Exception e) {
 				// 有些时候，比如没有网络连接的时候，超时什么的，fragment会detach...
 			}
-			mPullToRefreshLayout.setRefreshComplete();
+			mSwipeRefreshLayout.setRefreshing(false);
 		}
 	};
 
@@ -119,6 +118,7 @@ public abstract class TimelineFragment extends Fragment implements ConfirmBarCon
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.confirm_bar, container, false);
 		mListView = (ListView) view.findViewById(android.R.id.list);
+		mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
 		mConfirmBarController = new ConfirmBarController(view.findViewById(R.id.confirmbar), this);
 		mEmptyText = (TextView) inflater.inflate(R.layout.empty_list, null);
 		mListView.setEmptyView(mEmptyText); // empty text view
@@ -130,12 +130,9 @@ public abstract class TimelineFragment extends Fragment implements ConfirmBarCon
 		ViewGroup viewGroup = (ViewGroup) view;
 		viewGroup.addView(mEmptyText);
 		mSwipeDismissListViewTouchListener = new SwipeDismissListViewTouchListener(mListView, this);
-		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
-		ActionBarPullToRefresh.from(getActivity())
-				.insertLayoutInto(viewGroup)
-				.theseChildrenArePullable(android.R.id.list, android.R.id.empty)
-				.listener(this)
-				.setup(mPullToRefreshLayout);
+		mSwipeRefreshLayout.setOnRefreshListener(this);
+		int[] colors = ColorSwicher.ramdomColors(4);
+		mSwipeRefreshLayout.setColorScheme(colors[0], colors[1], colors[2], colors[3]);
 	}
 
 	@Override
@@ -173,8 +170,8 @@ public abstract class TimelineFragment extends Fragment implements ConfirmBarCon
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.refresh:
-				if (!mPullToRefreshLayout.isRefreshing()) {
-					mPullToRefreshLayout.setRefreshing(true);
+				if (!mSwipeRefreshLayout.isRefreshing()) {
+					mSwipeRefreshLayout.setRefreshing(true);
 					refresh();
 				}
 				break;
@@ -208,7 +205,7 @@ public abstract class TimelineFragment extends Fragment implements ConfirmBarCon
 	}
 
 	@Override
-	public void onRefreshStarted(View view) {
+	public void onRefresh() {
 		refresh();
 	}
 

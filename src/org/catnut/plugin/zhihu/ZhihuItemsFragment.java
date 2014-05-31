@@ -5,7 +5,6 @@
  */
 package org.catnut.plugin.zhihu;
 
-import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -16,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.BaseColumns;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -37,21 +37,20 @@ import org.catnut.core.CatnutAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutArrayRequest;
 import org.catnut.core.CatnutProvider;
+import org.catnut.support.app.SwipeRefreshListFragment;
 import org.catnut.ui.PluginsActivity;
 import org.catnut.util.CatnutUtils;
+import org.catnut.util.ColorSwicher;
 import org.catnut.util.Constants;
 import org.json.JSONArray;
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 /**
  * 知乎列表界面
  *
  * @author longkai
  */
-public class ZhihuItemsFragment extends ListFragment implements
-		AbsListView.OnScrollListener, LoaderManager.LoaderCallbacks<Cursor>,OnRefreshListener, AdapterView.OnItemLongClickListener, TextWatcher, View.OnClickListener {
+public class ZhihuItemsFragment extends SwipeRefreshListFragment implements
+		AbsListView.OnScrollListener, LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemLongClickListener, TextWatcher, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
 	public static final String TAG = ZhihuItemsFragment.class.getSimpleName();
 	private static final int PAGE_SIZE = 10; // 每次加载10条吧
@@ -64,8 +63,6 @@ public class ZhihuItemsFragment extends ListFragment implements
 			Zhihu.ANSWER_ID,
 			Zhihu.NICK
 	};
-
-	private PullToRefreshLayout mPullToRefreshLayout;
 
 	private View mSearchFrame;
 	private View mClear;
@@ -100,7 +97,7 @@ public class ZhihuItemsFragment extends ListFragment implements
 				new Handler(Looper.getMainLooper()).post(new Runnable() {
 					@Override
 					public void run() {
-						mPullToRefreshLayout.setRefreshing(true);
+						setRefreshing(true);
 						refresh();
 					}
 				});
@@ -134,13 +131,9 @@ public class ZhihuItemsFragment extends ListFragment implements
 		mSearchView.setThreshold(1); // 1 word
 		mClear.setOnClickListener(this);
 		getListView().addHeaderView(mSearchFrame);
-		ViewGroup viewGroup = (ViewGroup) view;
-		mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
-		ActionBarPullToRefresh.from(getActivity())
-				.insertLayoutInto(viewGroup)
-				.theseChildrenArePullable(android.R.id.list, android.R.id.empty)
-				.listener(this)
-				.setup(mPullToRefreshLayout);
+		setOnRefreshListener(this);
+		int[] colors = ColorSwicher.ramdomColors(4);
+		setColorScheme(colors[0], colors[1], colors[2], colors[3]);
 	}
 
 	@Override
@@ -150,7 +143,7 @@ public class ZhihuItemsFragment extends ListFragment implements
 		setEmptyText(getString(R.string.zhihu_refresh_hint));
 		getListView().setOnScrollListener(this);
 		getListView().setOnItemLongClickListener(this);
-		mPullToRefreshLayout.setRefreshing(true);
+		setRefreshing(true);
 		if (CatnutApp.getBoolean(R.string.pref_enable_zhihu_auto_refresh, R.bool.default_plugin_status)) {
 			refresh();
 		} else {
@@ -188,8 +181,8 @@ public class ZhihuItemsFragment extends ListFragment implements
 		if (scrollState == SCROLL_STATE_IDLE
 				&& getListView().getLastVisiblePosition() == mAdapter.getCount() - 1
 				&& mAdapter.getCount() < mTotal
-				&& !mPullToRefreshLayout.isRefreshing()) {
-			mPullToRefreshLayout.setRefreshing(true);
+				&& !isRefreshing()) {
+			setRefreshing(true);
 			mCount += PAGE_SIZE;
 			getLoaderManager().restartLoader(0, null, this);
 		}
@@ -215,8 +208,8 @@ public class ZhihuItemsFragment extends ListFragment implements
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		mAdapter.swapCursor(data);
-		if (mPullToRefreshLayout.isRefreshing()) {
-			mPullToRefreshLayout.setRefreshComplete();
+		if (isRefreshing()) {
+			setRefreshing(false);
 		}
 	}
 
@@ -226,7 +219,7 @@ public class ZhihuItemsFragment extends ListFragment implements
 	}
 
 	@Override
-	public void onRefreshStarted(View view) {
+	public void onRefresh() {
 		refresh();
 	}
 
@@ -248,7 +241,7 @@ public class ZhihuItemsFragment extends ListFragment implements
 					@Override
 					public void onErrorResponse(VolleyError error) {
 						Toast.makeText(getActivity(), error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-						mPullToRefreshLayout.setRefreshComplete();
+						setRefreshing(false);
 					}
 				}
 		));

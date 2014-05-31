@@ -12,6 +12,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,13 +31,9 @@ import org.catnut.core.CatnutProvider;
 import org.catnut.core.CatnutRequest;
 import org.catnut.ui.HelloActivity;
 import org.catnut.util.CatnutUtils;
+import org.catnut.util.ColorSwicher;
 import org.catnut.util.Constants;
 import org.json.JSONObject;
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.Options;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
-import uk.co.senab.actionbarpulltorefresh.library.viewdelegates.AbsListViewDelegate;
 
 /**
  * 500px 瀑布流
@@ -44,7 +41,7 @@ import uk.co.senab.actionbarpulltorefresh.library.viewdelegates.AbsListViewDeleg
  * @author longkai
  */
 public class FantasyFallFragment extends Fragment implements
-		LoaderManager.LoaderCallbacks<Cursor>, AbsListView.OnScrollListener, OnRefreshListener, AdapterView.OnItemSelectedListener {
+		LoaderManager.LoaderCallbacks<Cursor>, AbsListView.OnScrollListener, AdapterView.OnItemSelectedListener, SwipeRefreshLayout.OnRefreshListener {
 
 	public static final String TAG = FantasyFallFragment.class.getSimpleName();
 
@@ -56,7 +53,7 @@ public class FantasyFallFragment extends Fragment implements
 			Photo.height
 	};
 
-	protected PullToRefreshLayout mPullToRefreshLayout;
+	protected SwipeRefreshLayout mSwipeRefreshLayout;
 	private Spinner mSwitcher;
 
 	private StaggeredGridView mFall;
@@ -85,13 +82,10 @@ public class FantasyFallFragment extends Fragment implements
 		mSwitcher.setOnItemSelectedListener(this);
 		mFall = (StaggeredGridView) view.findViewById(R.id.fall);
 		mFall.addHeaderView(mSwitcher);
-		mPullToRefreshLayout = (PullToRefreshLayout) view.findViewById(R.id.pull2refresh);
-		ActionBarPullToRefresh.from(getActivity())
-				.options(Options.create().build())
-				.allChildrenArePullable()
-				.listener(this)
-				.useViewDelegate(GridView.class, new AbsListViewDelegate())
-				.setup(mPullToRefreshLayout);
+		mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
+		int[] colors = ColorSwicher.ramdomColors(4);
+		mSwipeRefreshLayout.setColorScheme(colors[0], colors[1], colors[2], colors[3]);
+		mSwipeRefreshLayout.setOnRefreshListener(this);
 	}
 
 	@Override
@@ -120,10 +114,10 @@ public class FantasyFallFragment extends Fragment implements
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		mAdapter.swapCursor(data);
-		if (!mPullToRefreshLayout.isRefreshing()) {
+		if (!mSwipeRefreshLayout.isRefreshing()) {
 			if (mAdapter.getCount() == 0 || Photo.shouldRefresh()) { // 如果木有的话，那么来一发~
-				mPullToRefreshLayout.setRefreshing(true);
-				onRefreshStarted(null);
+				mSwipeRefreshLayout.setRefreshing(true);
+				onRefresh();
 			}
 		}
 	}
@@ -147,7 +141,7 @@ public class FantasyFallFragment extends Fragment implements
 	}
 
 	@Override
-	public void onRefreshStarted(final View view) {
+	public void onRefresh() {
 		CatnutApp.getTingtingApp().getRequestQueue().add(new CatnutRequest(
 				getActivity(),
 				_500pxAPI.photos(mChoice, (int) (Math.random() * 400)),
@@ -155,13 +149,13 @@ public class FantasyFallFragment extends Fragment implements
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {
-						mPullToRefreshLayout.setRefreshComplete();
+						mSwipeRefreshLayout.setRefreshing(false);
 					}
 				},
 				new Response.ErrorListener() {
 					@Override
 					public void onErrorResponse(VolleyError error) {
-						mPullToRefreshLayout.setRefreshComplete();
+						mSwipeRefreshLayout.setRefreshing(false);
 					}
 				}
 		));
