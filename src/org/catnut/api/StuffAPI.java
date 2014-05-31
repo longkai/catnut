@@ -33,7 +33,7 @@ public class StuffAPI {
 		for (int i = 0; i < url_longs.length; i++) {
 			uri.append("&url_long=").append(url_longs[i]);
 		}
-		return new CatnutAPI(Request.Method.GET, uri.toString(), false, null);
+		return new CatnutAPI(Request.Method.GET, uri, false, null);
 	}
 
 	/**
@@ -49,6 +49,6 @@ public class StuffAPI {
 				.append("?uid=").append(uid)
 				.append("&unread_message=")
 				.append(CatnutUtils.optValue(unread_message, 0));
-		return new CatnutAPI(Request.Method.GET, uri.toString(), true, null);
+		return new CatnutAPI(Request.Method.GET, uri, true, null);
 	}
 }

@@ -27,7 +27,7 @@ public class FavoritesAPI {
 	public static CatnutAPI create(long id) {
 		StringBuilder uri = new StringBuilder(BASE_URI);
 		uri.append("/create.json").append("?id=").append(id);
-		return new CatnutAPI(Request.Method.POST, uri.toString(), true, null);
+		return new CatnutAPI(Request.Method.POST, uri, true, null);
 	}
 
 	/**
@@ -39,7 +39,7 @@ public class FavoritesAPI {
 	public static CatnutAPI destroy(long id) {
 		StringBuilder uri = new StringBuilder(BASE_URI);
 		uri.append("/destroy.json").append("?id=").append(id);
-		return new CatnutAPI(Request.Method.POST, uri.toString(), true, null);
+		return new CatnutAPI(Request.Method.POST, uri, true, null);
 	}
 
 	/**
@@ -53,6 +53,6 @@ public class FavoritesAPI {
 		StringBuilder uri = new StringBuilder(BASE_URI).append(".json");
 		uri.append("?count=").append(CatnutUtils.optValue(count, 50))
 				.append("&page=").append(CatnutUtils.optValue(page, 1));
-		return new CatnutAPI(Request.Method.GET, uri.toString(), true, null);
+		return new CatnutAPI(Request.Method.GET, uri, true, null);
 	}
 }

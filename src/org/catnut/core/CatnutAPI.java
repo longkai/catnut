@@ -28,14 +28,7 @@ public class CatnutAPI {
 	/** 是否需要在map里设置请求参数，通常用于post和put方法，没有赋null即可 */
 	public final Map<String, String> params;
 
-	public CatnutAPI(int method, String uri, boolean authRequired, Map<String, String> params) {
-		this.method = method;
-		this.uri = uri;
-		this.authRequired = authRequired;
-		this.params = params;
-	}
-
-	public CatnutAPI(int method, StringBuilder uri, boolean authRequired, Map<String, String> params) {
+	public CatnutAPI(int method, CharSequence uri, boolean authRequired, Map<String, String> params) {
 		this.method = method;
 		this.uri = uri.toString();
 		this.authRequired = authRequired;

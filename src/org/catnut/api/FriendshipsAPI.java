@@ -37,7 +37,7 @@ public class FriendshipsAPI {
 				.append("&count=").append(CatnutUtils.optValue(count, 50))
 				.append("&cursor=").append(CatnutUtils.optValue(cursor, 0))
 				.append("&trim_status=").append(CatnutUtils.optValue(trim_status, 1));
-		return new CatnutAPI(Request.Method.GET, uri.toString(), true, null);
+		return new CatnutAPI(Request.Method.GET, uri, true, null);
 	}
 
 	/**
@@ -56,7 +56,7 @@ public class FriendshipsAPI {
 				.append("&count=").append(CatnutUtils.optValue(count, 50))
 				.append("&cursor=").append(CatnutUtils.optValue(cursor, 0))
 				.append("&trim_status=").append(CatnutUtils.optValue(trim_status, 1));
-		return new CatnutAPI(Request.Method.GET, uri.toString(), true, null);
+		return new CatnutAPI(Request.Method.GET, uri, true, null);
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class FriendshipsAPI {
 				.append("&count=").append(CatnutUtils.optValue(count, 50))
 				.append("&cursor=").append(CatnutUtils.optValue(cursor, 0))
 				.append("&trim_status=").append(CatnutUtils.optValue(trim_status, 1));
-		return new CatnutAPI(Request.Method.GET, uri.toString(), true, null);
+		return new CatnutAPI(Request.Method.GET, uri, true, null);
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class FriendshipsAPI {
 				.append("&count=").append(CatnutUtils.optValue(count, 50))
 				.append("&cursor=").append(CatnutUtils.optValue(cursor, 0))
 				.append("&trim_status=").append(CatnutUtils.optValue(trim_status, 1));
-		return new CatnutAPI(Request.Method.GET, uri.toString(), true, null);
+		return new CatnutAPI(Request.Method.GET, uri, true, null);
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class FriendshipsAPI {
 		uri.append("create.json")
 				.append("?screen_name=").append(CatnutAPI.encode(screen_name))
 				.append("&rip=").append(rip);
-		return new CatnutAPI(Request.Method.POST, uri.toString(), true, null);
+		return new CatnutAPI(Request.Method.POST, uri, true, null);
 	}
 
 	/**
@@ -122,6 +122,6 @@ public class FriendshipsAPI {
 		StringBuilder uri = new StringBuilder(BASE_URI);
 		uri.append("destroy.json")
 				.append("?screen_name=").append(CatnutAPI.encode(screen_name));
-		return new CatnutAPI(Request.Method.POST, uri.toString(), true, null);
+		return new CatnutAPI(Request.Method.POST, uri, true, null);
 	}
 }

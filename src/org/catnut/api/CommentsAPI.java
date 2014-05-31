@@ -41,7 +41,7 @@ public class CommentsAPI {
 				.append("&count=").append(CatnutUtils.optValue(count, 50))
 				.append("&page=").append(CatnutUtils.optValue(page, 1))
 				.append("&filter_by_author=").append(CatnutUtils.optValue(filter_by_author, 0));
-		return new CatnutAPI(Request.Method.GET, uri.toString(), true, null);
+		return new CatnutAPI(Request.Method.GET, uri, true, null);
 	}
 
 	/**
@@ -56,11 +56,11 @@ public class CommentsAPI {
 	public static CatnutAPI create(String comment, long id, int comment_ori, String rip) {
 		StringBuilder uri = new StringBuilder(BASE_URI).append("create.json");
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("comment", comment);
+		params.put("comment", comment.trim());
 		params.put("id", String.valueOf(id));
 		params.put("comment_ori", String.valueOf(CatnutUtils.optValue(comment_ori, 0)));
 		params.put("rip", String.valueOf(rip));
-		return new CatnutAPI(Request.Method.POST, uri.toString(), true, params);
+		return new CatnutAPI(Request.Method.POST, uri, true, params);
 	}
 
 	/**
@@ -79,11 +79,11 @@ public class CommentsAPI {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("cid", String.valueOf(cid));
 		params.put("id", String.valueOf(id));
-		params.put("comment", comment);
+		params.put("comment", comment.trim());
 		params.put("without_mention", String.valueOf(CatnutUtils.optValue(without_mention, 0)));
 		params.put("comment_ori", String.valueOf(CatnutUtils.optValue(comment_ori, 0)));
 		params.put("rip", String.valueOf(rip));
-		return new CatnutAPI(Request.Method.POST, uri.toString(), true, params);
+		return new CatnutAPI(Request.Method.POST, uri, true, params);
 	}
 
 	/**

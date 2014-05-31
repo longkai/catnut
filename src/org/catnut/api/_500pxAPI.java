@@ -26,6 +26,6 @@ public class _500pxAPI {
 				.append("&image_size=4")
 				.append("&page=").append(CatnutUtils.optValue(page, 1))
 				.append("&consumer_key=").append(KEY);
-		return new CatnutAPI(Request.Method.GET, uri.toString(), false, null);
+		return new CatnutAPI(Request.Method.GET, uri, false, null);
 	}
 }

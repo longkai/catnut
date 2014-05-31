@@ -32,7 +32,7 @@ public class TweetAPI {
 	public static CatnutAPI public_timeline(int count) {
 		StringBuilder uri = new StringBuilder(BASE_URI);
 		uri.append("public_timeline.json?count=").append(CatnutUtils.optValue(count, 20));
-		return new CatnutAPI(Request.Method.GET, uri.toString(), true, null);
+		return new CatnutAPI(Request.Method.GET, uri, true, null);
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class TweetAPI {
 				.append("&base_app=").append(CatnutUtils.optValue(base_app, 0))
 				.append("&feature=").append(CatnutUtils.optValue(feature, 0))
 				.append("&trim_user=").append(CatnutUtils.optValue(trim_user, 0));
-		return new CatnutAPI(Request.Method.GET, uri.toString(), true, null);
+		return new CatnutAPI(Request.Method.GET, uri, true, null);
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class TweetAPI {
 				.append("&trim_user=").append(CatnutUtils.optValue(trim_user, 0));
 		return new CatnutAPI(
 				Request.Method.GET,
-				uri.toString(),
+				uri,
 				true,
 				null
 		);
@@ -118,7 +118,7 @@ public class TweetAPI {
 				.append("&trim_user=").append(CatnutUtils.optValue(trim_user, 0));
 		return new CatnutAPI(
 				Request.Method.GET,
-				uri.toString(),
+				uri,
 				true,
 				null
 		);
@@ -138,7 +138,7 @@ public class TweetAPI {
 	 */
 	public static CatnutAPI update(String status, int visible, String list_id, float lat, float _long, JSONObject annotations, String rip) {
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("status", status);
+		params.put("status", status.trim());
 		params.put("visible", String.valueOf(CatnutUtils.optValue(visible, 0)));
 		if (visible == 3) { // 暂时不碰这个先
 			params.put("list_id", list_id);
@@ -164,7 +164,7 @@ public class TweetAPI {
 	public static CatnutAPI repost(long id, String status, int is_comment, String rip) {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("id", String.valueOf(id));
-		params.put("status", status);
+		params.put("status", status.trim());
 		params.put("is_comment", String.valueOf(CatnutUtils.optValue(is_comment, 0)));
 		params.put("rip", String.valueOf(rip));
 		return new CatnutAPI(Request.Method.POST, BASE_URI + "repost.json", true, params);
@@ -186,8 +186,7 @@ public class TweetAPI {
 	 */
 	public static MultipartAPI upload(String status, int visible, String list_id, List<Uri> pic, float lat, float _long, JSONObject annotations, String rip) {
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("status", status);
-		params.put("status", status);
+		params.put("status", status.trim());
 		params.put("visible", String.valueOf(CatnutUtils.optValue(visible, 0)));
 		if (visible == 3) { // 暂时不碰这个先
 			params.put("list_id", list_id);
