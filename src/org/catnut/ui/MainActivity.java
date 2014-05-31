@@ -96,10 +96,13 @@ public class MainActivity extends Activity implements
 	private TextView mDescription;
 
 	private long mLastFetchMillis;
-	private TextView mFetchNews;
 	private TextView mNewTweet;
 	private TextView mNewMention;
 	private TextView mNewComment;
+
+	private boolean mInitNewsFetcher = false;
+	private MenuItem mCompose;
+	private MenuItem mNews;
 
 	private ConfirmBarController.Callbacks mCallbacks;
 
@@ -252,10 +255,7 @@ public class MainActivity extends Activity implements
 
 	// 更新消息数
 	private void fetchNews() {
-		if (mFetchNews == null) {
-			mFetchNews = (TextView) findViewById(R.id.fetch_news);
-			mFetchNews.setOnClickListener(this);
-
+		if (!mInitNewsFetcher) {
 			View newTweet = findViewById(R.id.new_tweet);
 			CatnutUtils.setText(newTweet, android.R.id.text2, getString(R.string.new_tweet_count));
 			mNewTweet = (TextView) newTweet.findViewById(android.R.id.text1);
@@ -270,9 +270,10 @@ public class MainActivity extends Activity implements
 			mNewMention = (TextView) newMention.findViewById(android.R.id.text1);
 			CatnutUtils.setText(newMention, android.R.id.text2, getString(R.string.new_mention_count));
 			newMention.setOnClickListener(this);
+
+			mLastFetchMillis = System.currentTimeMillis();
+			mInitNewsFetcher = true;
 		}
-		mFetchNews.setText(R.string.loading);
-		mFetchNews.setClickable(false);
 		mApp.getRequestQueue().add(new CatnutRequest(
 				this,
 				StuffAPI.unread_count(mApp.getAccessToken().uid, 0),
@@ -285,8 +286,9 @@ public class MainActivity extends Activity implements
 						CatnutUtils.setText(mNewMention, android.R.id.text1, String.valueOf(response.optInt("mention_status")));
 
 						mLastFetchMillis = System.currentTimeMillis();
-						mFetchNews.setText(getString(R.string.last_check_time, DateUtils.getRelativeTimeSpanString(mLastFetchMillis)));
-						mFetchNews.setClickable(true);
+						if (mDrawerLayout.isDrawerOpen(mQuickReturnDrawer)) {
+							getActionBar().setSubtitle(DateUtils.getRelativeTimeSpanString(mLastFetchMillis));
+						}
 					}
 				},
 				new Response.ErrorListener() {
@@ -294,8 +296,6 @@ public class MainActivity extends Activity implements
 					public void onErrorResponse(VolleyError error) {
 						WeiboAPIError weiboAPIError = WeiboAPIError.fromVolleyError(error);
 						Toast.makeText(MainActivity.this, weiboAPIError.error, Toast.LENGTH_LONG).show();
-						mFetchNews.setText(getString(R.string.error_click_try_again));
-						mFetchNews.setClickable(true);
 					}
 				}
 		));
@@ -315,6 +315,9 @@ public class MainActivity extends Activity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
+		mCompose = menu.findItem(R.id.action_compose);
+		mNews = menu.findItem(R.id.refresh);
+		mNews.setVisible(false);
 		return true;
 	}
 
@@ -367,6 +370,9 @@ public class MainActivity extends Activity implements
 			case R.id.plugins:
 				switch2Plugins(null);
 				break;
+			case R.id.refresh:
+				fetchNews();
+				break;
 			default:
 				break;
 		}
@@ -389,12 +395,17 @@ public class MainActivity extends Activity implements
 	@Override
 	public void onDrawerOpened(View drawerView) {
 		mDrawerToggle.onDrawerOpened(drawerView);
-		mFetchNews.setText(getString(R.string.last_check_time, DateUtils.getRelativeTimeSpanString(mLastFetchMillis)));
+		mCompose.setVisible(false);
+		mNews.setVisible(true);
+		getActionBar().setSubtitle(DateUtils.getRelativeTimeSpanString(mLastFetchMillis));
 	}
 
 	@Override
 	public void onDrawerClosed(View drawerView) {
 		mDrawerToggle.onDrawerClosed(drawerView);
+		mCompose.setVisible(true);
+		mNews.setVisible(false);
+		getActionBar().setSubtitle(null);
 	}
 
 	@Override
@@ -416,11 +427,9 @@ public class MainActivity extends Activity implements
 	@Override
 	public void onClick(View v) {
 		int id = v.getId();
-		if (id != R.id.fetch_news) {
-			mDrawerLayout.closeDrawer(mQuickReturnDrawer);
-		}
 		Fragment fragment = null;
 		String tag = null;
+		mDrawerLayout.closeDrawer(mQuickReturnDrawer);
 		switch (id) {
 			case R.id.tweets_count:
 			case R.id.action_my_tweets:
@@ -456,9 +465,6 @@ public class MainActivity extends Activity implements
 				return;
 			case R.id.action_view_source_code:
 				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.github_link))));
-				return;
-			case R.id.fetch_news:
-				fetchNews();
 				return;
 			case R.id.new_tweet:
 				// 回掉主页时间线

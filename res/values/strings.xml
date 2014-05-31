@@ -226,8 +226,6 @@
 	<string name="new_tweet_count">新微博</string>
 	<string name="new_comment_count">新评论</string>
 	<string name="new_mention_count">\@</string>
-	<string name="last_check_time">%1$s，点击刷新</string>
-	<string name="error_click_try_again">出错了...点击重试</string>
 	<string name="mention_me_timeline">艾特时间线</string>
 	<string name="received_reply">收到的评论</string>
 	<string name="swipe_right_hint">向右滑动试试！</string>
@@ -261,6 +259,7 @@
 	<string name="weibo_app">新浪微博客户端</string>
 	<string name="zhihu_item_search_hint">搜索感兴趣的条目？</string>
 	<string name="back_to_top">回到顶部</string>
+	<string name="news_count">新消息数</string>
 	<string-array name="fantasy_features">
 		<item>最受欢迎</item>
 		<item>即将到来</item>

@@ -173,8 +173,6 @@
 	<string name="malformed_json">malformed json data!</string>
 	<string name="new_tweet_count">New weibo</string>
 	<string name="new_comment_count">New reply</string>
-	<string name="last_check_time">%1$s, click to refresh</string>
-	<string name="error_click_try_again">error...click to try again</string>
 	<string name="mention_me_timeline">Mention Timeline</string>
 	<string name="received_reply">Reply Timeline</string>
 	<string name="swipe_right_hint">Swipe to right to see something!</string>
@@ -208,6 +206,7 @@
 	<string name="weibo_app">Sina Weibo Client</string>
 	<string name="zhihu_item_search_hint">Search interested items?</string>
 	<string name="back_to_top">Back to top</string>
+	<string name="news_count">News count</string>
 	<string-array name="fantasy_features">
 		<item>popular</item>
 		<item>upcoming</item>

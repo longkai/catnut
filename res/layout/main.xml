@@ -93,7 +93,7 @@
 				<View
 					android:id="@id/place_holder"
 					android:layout_width="match_parent"
-					android:layout_height="100dp" />
+					android:layout_height="60dp" />
 
 				<LinearLayout
 					android:id="@id/statics"
@@ -242,24 +242,7 @@
 				android:layout_marginTop="@dimen/small"
 				android:orientation="vertical"
 				android:layout_width="match_parent"
-				android:layout_height="100dp">
-
-				<TextView
-					android:id="@+id/fetch_news"
-					android:text="@string/last_check_time"
-					android:padding="@dimen/medium"
-					android:gravity="center"
-					android:clickable="true"
-					android:background="?android:attr/selectableItemBackground"
-					android:textColor="@android:color/holo_blue_bright"
-					android:textAppearance="?android:attr/textAppearanceMedium"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content" />
-
-				<View
-					android:background="@android:color/holo_blue_bright"
-					android:layout_width="match_parent"
-					android:layout_height="1px" />
+				android:layout_height="60dp">
 
 				<LinearLayout
 					android:id="@+id/news"
