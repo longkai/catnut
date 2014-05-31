@@ -29,8 +29,8 @@
 			android:layout_marginTop="@dimen/medium"
 			android:layout_marginBottom="@dimen/medium"
 			android:background="?android:attr/selectableItemBackground"
-			android:layout_width="@dimen/avatar_bound"
-			android:layout_height="@dimen/avatar_bound" />
+			android:layout_width="36dp"
+			android:layout_height="36dp" />
 
 		<TextView
 			android:id="@+id/create_at"
