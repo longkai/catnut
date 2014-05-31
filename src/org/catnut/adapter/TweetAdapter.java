@@ -250,7 +250,7 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 		if (mScreenName == null) {
 			holder.nickIndex = cursor.getColumnIndex(User.screen_name);
 			holder.avatar = (ImageView) view.findViewById(R.id.avatar);
-			holder.avatarIndex = cursor.getColumnIndex(User.profile_image_url);
+			holder.avatarIndex = cursor.getColumnIndex(User.avatar_large);
 		}
 		// 微博相关
 		holder.text = (TweetTextView) view.findViewById(R.id.text);

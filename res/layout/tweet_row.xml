@@ -39,7 +39,8 @@
 		<TextView
 			android:id="@+id/time"
 			android:textColor="#ff9fa9b0"
-			android:layout_gravity="center"
+			android:layout_gravity="bottom"
+			android:paddingBottom="@dimen/medium"
 			android:gravity="center"
 			android:layout_width="@dimen/avatar_bound"
 			android:layout_height="wrap_content" />
