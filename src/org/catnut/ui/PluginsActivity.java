@@ -58,7 +58,6 @@ public class PluginsActivity extends Activity implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		ActionBar bar = getActionBar();
-		bar.setDisplayShowHomeEnabled(false);
 		bar.setTitle(R.string.plugins);
 		getFragmentManager().addOnBackStackChangedListener(this);
 		int which = getIntent().getIntExtra(Constants.ACTION, -1);
