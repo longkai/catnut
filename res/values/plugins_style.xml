@@ -8,6 +8,7 @@
 
 	<style name="Theme.Plugins" parent="AppTheme.Light">
 		<item name="android:actionBarStyle">@style/ActionBar_Plug_Light</item>
+		<item name="android:actionBarItemBackground">@drawable/plugins_actionbar_item_background_light</item>
 	</style>
 
 	<style name="ActionBar_Plug_Light" parent="ActionBar_Light">

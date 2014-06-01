@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<item android:state_pressed="true" android:drawable="@color/cardTableColorPressed" />
+	<item android:state_pressed="false" android:drawable="@android:color/transparent" />
+	<item android:drawable="@android:color/transparent" />
+</selector>

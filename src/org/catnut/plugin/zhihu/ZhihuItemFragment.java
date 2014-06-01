@@ -16,7 +16,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Html;
 import android.text.TextUtils;
@@ -30,7 +29,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -39,7 +37,6 @@ import org.catnut.R;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutProvider;
 import org.catnut.fragment.GalleryPagerFragment;
-import org.catnut.support.QuickReturnScrollView;
 import org.catnut.ui.SingleFragmentActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.ColorSwicher;
@@ -57,7 +54,7 @@ import java.util.regex.Pattern;
  * @author longkai
  */
 public class ZhihuItemFragment extends Fragment implements
-		QuickReturnScrollView.Callbacks, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+		View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 	public static final String TAG = ZhihuItemFragment.class.getSimpleName();
 
 	private static final String[] PROJECTION = new String[]{
@@ -74,18 +71,9 @@ public class ZhihuItemFragment extends Fragment implements
 	private static final int ACTION_VIEW_ON_WEB = 1;
 	private static final int ACTION_VIEW_ALL_ON_WEB = 2;
 
-	private ScrollSettleHandler mScrollSettleHandler = new ScrollSettleHandler();
+	private Handler mHandler = new Handler();
 
 	private SwipeRefreshLayout mSwipeRefreshLayout;
-
-	private View mPlaceholderView;
-	private View mQuickReturnView;
-	private QuickReturnScrollView mQuickReturnLayout;
-
-	private int mMinRawY = 0;
-	private int mState = STATE_ON_SCREEN;
-	private int mQuickReturnHeight;
-	private int mMaxScrollY;
 
 	private long mAnswerId;
 	private long mQuestionId;
@@ -114,22 +102,6 @@ public class ZhihuItemFragment extends Fragment implements
 		mSwipeRefreshLayout = (SwipeRefreshLayout) view;
 		ColorSwicher.injectColor(mSwipeRefreshLayout);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
-
-		mQuickReturnLayout = (QuickReturnScrollView) view.findViewById(R.id.quick_return);
-		mPlaceholderView = mQuickReturnLayout.findViewById(R.id.place_holder);
-		mQuickReturnView = mQuickReturnLayout.findViewById(android.R.id.title);
-		mQuickReturnLayout.setCallbacks(this);
-		mQuickReturnLayout.getViewTreeObserver().addOnGlobalLayoutListener(
-				new ViewTreeObserver.OnGlobalLayoutListener() {
-					@Override
-					public void onGlobalLayout() {
-						onScrollChanged(mQuickReturnLayout.getScrollY());
-						mMaxScrollY = mQuickReturnLayout.computeVerticalScrollRange()
-								- mQuickReturnLayout.getHeight();
-						mQuickReturnHeight = mQuickReturnView.getHeight();
-					}
-				}
-		);
 		return view;
 	}
 
@@ -179,9 +151,7 @@ public class ZhihuItemFragment extends Fragment implements
 						@Override
 						public void run() {
 							title.setText(_title);
-							if (_title.length() > 30) {
-								title.setTextSize(18);
-							}
+							getActivity().getActionBar().setSubtitle(_title);
 
 							// 假设第一个是文本，即偶数文本，奇数图片
 							int l = contentSegment.size() > 1 ? contentSegment.size() >> 1 : 0;
@@ -270,16 +240,6 @@ public class ZhihuItemFragment extends Fragment implements
 							lastAlterDate.setText(DateUtils.getRelativeTimeSpanString(_lastAlterDate));
 							if (mSwipeRefreshLayout != null) {
 								mSwipeRefreshLayout.setRefreshing(false);
-							}
-							if (savedInstanceState != null) {
-								final int scrollY = savedInstanceState.getInt(TAG);
-								mQuickReturnLayout.scrollTo(0, scrollY);
-								mQuickReturnLayout.postDelayed(new Runnable() {
-									@Override
-									public void run() {
-										mQuickReturnLayout.scrollTo(0, scrollY);
-									}
-								}, 500);
 							}
 						}
 					});
@@ -381,66 +341,6 @@ public class ZhihuItemFragment extends Fragment implements
 	}
 
 	@Override
-	public void onScrollChanged(int scrollY) {
-		scrollY = Math.min(mMaxScrollY, scrollY);
-
-		mScrollSettleHandler.onScroll(scrollY);
-
-		int rawY = mPlaceholderView.getTop() - scrollY;
-		int translationY = 0;
-
-		switch (mState) {
-			case STATE_OFF_SCREEN:
-				if (rawY <= mMinRawY) {
-					mMinRawY = rawY;
-				} else {
-					mState = STATE_RETURNING;
-				}
-				translationY = rawY;
-				break;
-
-			case STATE_ON_SCREEN:
-				if (rawY < -mQuickReturnHeight) {
-					mState = STATE_OFF_SCREEN;
-					mMinRawY = rawY;
-				}
-				translationY = rawY;
-				break;
-
-			case STATE_RETURNING:
-				translationY = (rawY - mMinRawY) - mQuickReturnHeight;
-				if (translationY > 0) {
-					translationY = 0;
-					mMinRawY = rawY - mQuickReturnHeight;
-				}
-
-				if (rawY > 0) {
-					mState = STATE_ON_SCREEN;
-					translationY = rawY;
-				}
-
-				if (translationY < -mQuickReturnHeight) {
-					mState = STATE_OFF_SCREEN;
-					mMinRawY = rawY;
-				}
-				break;
-		}
-		mQuickReturnView.animate().cancel();
-		mQuickReturnView.setTranslationY(translationY + scrollY);
-	}
-
-	@Override
-	public void onDownMotionEvent() {
-		mScrollSettleHandler.setSettleEnabled(false);
-	}
-
-	@Override
-	public void onUpOrCancelMotionEvent() {
-		mScrollSettleHandler.setSettleEnabled(true);
-		mScrollSettleHandler.onScroll(mQuickReturnLayout.getScrollY());
-	}
-
-	@Override
 	public void onRefresh() {
 		new Thread(new Runnable() {
 			@Override
@@ -450,7 +350,7 @@ public class ZhihuItemFragment extends Fragment implements
 					TimeUnit.MILLISECONDS.sleep(1500);
 				} catch (InterruptedException e) {
 				}
-				mScrollSettleHandler.post(new Runnable() {
+				mHandler.post(new Runnable() {
 					@Override
 					public void run() {
 						if (mSwipeRefreshLayout != null) {
@@ -460,12 +360,6 @@ public class ZhihuItemFragment extends Fragment implements
 				});
 			}
 		}).start();
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		outState.putInt(TAG, mQuickReturnLayout.getScrollY());
-		super.onSaveInstanceState(outState);
 	}
 
 	@Override
@@ -479,47 +373,6 @@ public class ZhihuItemFragment extends Fragment implements
 		intent.putExtra(GalleryPagerFragment.URLS, mImageUrls);
 		intent.putExtra(GalleryPagerFragment.TITLE, getString(R.string.view_photos));
 		startActivity(intent);
-	}
-
-	// quick return animation
-	private class ScrollSettleHandler extends Handler {
-		private static final int SETTLE_DELAY_MILLIS = 100;
-
-		private int mSettledScrollY = Integer.MIN_VALUE;
-		private boolean mSettleEnabled;
-
-		public void onScroll(int scrollY) {
-			if (mSettledScrollY != scrollY) {
-				// Clear any pending messages and post delayed
-				removeMessages(0);
-				sendEmptyMessageDelayed(0, SETTLE_DELAY_MILLIS);
-				mSettledScrollY = scrollY;
-			}
-		}
-
-		public void setSettleEnabled(boolean settleEnabled) {
-			mSettleEnabled = settleEnabled;
-		}
-
-		@Override
-		public void handleMessage(Message msg) {
-			// Handle the scroll settling.
-			if (STATE_RETURNING == mState && mSettleEnabled) {
-				int mDestTranslationY;
-				if (mSettledScrollY - mQuickReturnView.getTranslationY() > mQuickReturnHeight / 2) {
-					mState = STATE_OFF_SCREEN;
-					mDestTranslationY = Math.max(
-							mSettledScrollY - mQuickReturnHeight,
-							mPlaceholderView.getTop());
-				} else {
-					mDestTranslationY = mSettledScrollY;
-				}
-
-				mMinRawY = mPlaceholderView.getTop() - mQuickReturnHeight - mDestTranslationY;
-				mQuickReturnView.animate().translationY(mDestTranslationY);
-			}
-			mSettledScrollY = Integer.MIN_VALUE; // reset
-		}
 	}
 
 	/**
