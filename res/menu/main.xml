@@ -12,7 +12,7 @@
 		android:icon="@drawable/ic_title_compose"
 		android:showAsAction="always" />
 	<item
-		android:id="@id/refresh"
+		android:id="@+id/action_refresh_news_count"
 		android:title="@string/news_count"
 		android:icon="@drawable/ic_action_retry"
 		android:showAsAction="always"/>

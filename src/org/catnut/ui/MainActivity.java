@@ -148,7 +148,6 @@ public class MainActivity extends Activity implements
 
 		prepareDrawer();
 		injectListeners();
-		fetchNews();
 
 		if (savedInstanceState == null) {
 			HomeTimelineFragment fragment = HomeTimelineFragment.getFragment();
@@ -255,25 +254,6 @@ public class MainActivity extends Activity implements
 
 	// 更新消息数
 	private void fetchNews() {
-		if (!mInitNewsFetcher) {
-			View newTweet = findViewById(R.id.new_tweet);
-			CatnutUtils.setText(newTweet, android.R.id.text2, getString(R.string.new_tweet_count));
-			mNewTweet = (TextView) newTweet.findViewById(android.R.id.text1);
-			newTweet.setOnClickListener(this);
-
-			View newComment = findViewById(R.id.new_comment);
-			mNewComment = (TextView) newComment.findViewById(android.R.id.text1);
-			CatnutUtils.setText(newComment, android.R.id.text2, getString(R.string.new_comment_count));
-			newComment.setOnClickListener(this);
-
-			View newMention = findViewById(R.id.new_mention);
-			mNewMention = (TextView) newMention.findViewById(android.R.id.text1);
-			CatnutUtils.setText(newMention, android.R.id.text2, getString(R.string.new_mention_count));
-			newMention.setOnClickListener(this);
-
-			mLastFetchMillis = System.currentTimeMillis();
-			mInitNewsFetcher = true;
-		}
 		mApp.getRequestQueue().add(new CatnutRequest(
 				this,
 				StuffAPI.unread_count(mApp.getAccessToken().uid, 0),
@@ -286,9 +266,7 @@ public class MainActivity extends Activity implements
 						CatnutUtils.setText(mNewMention, android.R.id.text1, String.valueOf(response.optInt("mention_status")));
 
 						mLastFetchMillis = System.currentTimeMillis();
-						if (mDrawerLayout.isDrawerOpen(mQuickReturnDrawer)) {
-							getActionBar().setSubtitle(DateUtils.getRelativeTimeSpanString(mLastFetchMillis));
-						}
+						setNewsHint();
 					}
 				},
 				new Response.ErrorListener() {
@@ -301,10 +279,18 @@ public class MainActivity extends Activity implements
 		));
 	}
 
+	private void setNewsHint() {
+		if (mDrawerLayout.isDrawerOpen(mQuickReturnDrawer)) {
+			getActionBar().setSubtitle(
+					mLastFetchMillis == 0L
+							? getString(R.string.refresh_see_news_count)
+							: DateUtils.getRelativeTimeSpanString(mLastFetchMillis)
+			);
+		}
+	}
+
 	private void injectListeners() {
 		findViewById(R.id.action_my_tweets).setOnClickListener(this);
-		findViewById(R.id.action_my_followings).setOnClickListener(this);
-		findViewById(R.id.action_my_followers).setOnClickListener(this);
 		findViewById(R.id.action_my_list).setOnClickListener(this);
 		findViewById(R.id.action_my_favorites).setOnClickListener(this);
 		findViewById(R.id.action_my_drafts).setOnClickListener(this);
@@ -316,7 +302,7 @@ public class MainActivity extends Activity implements
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 		mCompose = menu.findItem(R.id.action_compose);
-		mNews = menu.findItem(R.id.refresh);
+		mNews = menu.findItem(R.id.action_refresh_news_count);
 		mNews.setVisible(false);
 		return true;
 	}
@@ -370,7 +356,7 @@ public class MainActivity extends Activity implements
 			case R.id.plugins:
 				switch2Plugins(null);
 				break;
-			case R.id.refresh:
+			case R.id.action_refresh_news_count:
 				fetchNews();
 				break;
 			default:
@@ -397,7 +383,28 @@ public class MainActivity extends Activity implements
 		mDrawerToggle.onDrawerOpened(drawerView);
 		mCompose.setVisible(false);
 		mNews.setVisible(true);
-		getActionBar().setSubtitle(DateUtils.getRelativeTimeSpanString(mLastFetchMillis));
+		setNewsHint();
+		if (!mInitNewsFetcher) {
+			View newTweet = findViewById(R.id.new_tweet);
+			CatnutUtils.setText(newTweet, android.R.id.text1, "?");
+			CatnutUtils.setText(newTweet, android.R.id.text2, getString(R.string.new_tweet_count));
+			mNewTweet = (TextView) newTweet.findViewById(android.R.id.text1);
+			newTweet.setOnClickListener(this);
+
+			View newComment = findViewById(R.id.new_comment);
+			mNewComment = (TextView) newComment.findViewById(android.R.id.text1);
+			CatnutUtils.setText(newComment, android.R.id.text1, "?");
+			CatnutUtils.setText(newComment, android.R.id.text2, getString(R.string.new_comment_count));
+			newComment.setOnClickListener(this);
+
+			View newMention = findViewById(R.id.new_mention);
+			mNewMention = (TextView) newMention.findViewById(android.R.id.text1);
+			CatnutUtils.setText(newMention, android.R.id.text1, "?");
+			CatnutUtils.setText(newMention, android.R.id.text2, getString(R.string.new_mention_count));
+			newMention.setOnClickListener(this);
+
+			mInitNewsFetcher = true;
+		}
 	}
 
 	@Override
@@ -437,12 +444,10 @@ public class MainActivity extends Activity implements
 				tag = UserTimelineFragment.TAG;
 				break;
 			case R.id.following_count:
-			case R.id.action_my_followings:
 				fragment = MyRelationshipFragment.getFragment(true);
 				tag = "true";
 				break;
 			case R.id.followers_count:
-			case R.id.action_my_followers:
 				fragment = MyRelationshipFragment.getFragment(false);
 				tag = "false";
 				break;

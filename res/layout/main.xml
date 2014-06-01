@@ -154,16 +154,6 @@
 						style="@style/Profile_Action" />
 
 					<TextView
-						android:id="@+id/action_my_followings"
-						android:text="@string/followings"
-						style="@style/Profile_Action" />
-
-					<TextView
-						android:id="@+id/action_my_followers"
-						android:text="@string/followers"
-						style="@style/Profile_Action" />
-
-					<TextView
 						android:id="@+id/action_my_list"
 						android:text="@string/list"
 						style="@style/Profile_Action" />

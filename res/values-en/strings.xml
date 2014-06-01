@@ -207,6 +207,7 @@
 	<string name="zhihu_item_search_hint">Search interested items?</string>
 	<string name="back_to_top">Back to top</string>
 	<string name="news_count">News count</string>
+	<string name="refresh_see_news_count">refresh news count</string>
 	<string-array name="fantasy_features">
 		<item>popular</item>
 		<item>upcoming</item>

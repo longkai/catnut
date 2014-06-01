@@ -260,6 +260,7 @@
 	<string name="zhihu_item_search_hint">搜索感兴趣的条目？</string>
 	<string name="back_to_top">回到顶部</string>
 	<string name="news_count">新消息数</string>
+	<string name="refresh_see_news_count">刷新查看新消息数</string>
 	<string-array name="fantasy_features">
 		<item>最受欢迎</item>
 		<item>即将到来</item>
