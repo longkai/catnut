@@ -100,7 +100,7 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 		Resources resources = context.getResources();
 
 		int maxThumbsWidth = resources.getDimensionPixelSize(R.dimen.max_thumb_width);
-		if (mScreenWidth > maxThumbsWidth) {
+		if (mScreenWidth < maxThumbsWidth) {
 			mScreenWidth = maxThumbsWidth;
 		}
 
