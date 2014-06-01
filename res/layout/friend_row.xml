@@ -13,8 +13,8 @@
 	<ImageView
 		android:id="@+id/avatar"
 		android:layout_marginRight="@dimen/medium"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content" />
+		android:layout_width="@dimen/avatar_bound"
+		android:layout_height="@dimen/avatar_bound" />
 
 	<TextView
 		android:id="@id/nick"

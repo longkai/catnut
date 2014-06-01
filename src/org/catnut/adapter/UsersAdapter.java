@@ -56,7 +56,7 @@ public class UsersAdapter extends CursorAdapter {
 		ViewHolder holder = new ViewHolder();
 		View view = mInflater.inflate(R.layout.friend_row , parent, false);
 		holder.avatar = (ImageView) view.findViewById(R.id.avatar);
-		holder.avatarIndex = cursor.getColumnIndex(User.profile_image_url);
+		holder.avatarIndex = cursor.getColumnIndex(User.avatar_large);
 		holder.screenName = (TextView) view.findViewById(R.id.nick);
 		holder.screenNameIndex = cursor.getColumnIndex(User.screen_name);
 		holder.remarkIndex = cursor.getColumnIndex(User.remark);
