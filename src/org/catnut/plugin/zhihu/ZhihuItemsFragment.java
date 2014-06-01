@@ -178,7 +178,7 @@ public class ZhihuItemsFragment extends SwipeRefreshListFragment implements
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		if (scrollState == SCROLL_STATE_IDLE
-				&& getListView().getLastVisiblePosition() == mAdapter.getCount() - 1
+				&& getListView().getLastVisiblePosition() == mAdapter.getCount()
 				&& mAdapter.getCount() < mTotal
 				&& !isRefreshing()) {
 			setRefreshing(true);
