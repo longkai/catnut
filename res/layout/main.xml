@@ -151,21 +151,25 @@
 					<TextView
 						android:id="@+id/action_my_tweets"
 						android:text="@string/tweets"
+						android:drawableLeft="@drawable/ic_menu_forums_holo_light"
 						style="@style/Profile_Action" />
 
 					<TextView
 						android:id="@+id/action_my_list"
 						android:text="@string/list"
+						android:drawableLeft="@drawable/ic_menu_social_holo_light"
 						style="@style/Profile_Action" />
 
 					<TextView
 						android:id="@+id/action_my_favorites"
 						android:text="@string/favorite"
+						android:drawableLeft="@drawable/ic_rating_favorite_light"
 						style="@style/Profile_Action" />
 
 					<TextView
 						android:id="@+id/action_my_drafts"
 						android:text="@string/draft"
+						android:drawableLeft="@drawable/ic_content_edit_light"
 						style="@style/Profile_Action" />
 
 					<TextView
