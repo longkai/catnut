@@ -54,7 +54,7 @@ public class FantasyFragment extends Fragment {
 	private Intent mIntent;
 	private ShareActionProvider mShareActionProvider;
 	private File mImage;
-	private boolean mSaved;
+	private boolean mSaved = false;
 
 	private Target target = new Target() {
 		@Override
@@ -72,16 +72,14 @@ public class FantasyFragment extends Fragment {
 						return;
 					}
 					try {
-						if (mImage.length() > 10) { // 10是随机取的，>0就ok了
+						if (mImage.exists()) {
 							// 文件已经存在，没有必要再来一次了
 							mIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(mImage));
-							mSaved = true;
 							return;
 						}
 						os = new FileOutputStream(mImage);
 						bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
 						mIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(mImage));
-						mSaved = true;
 					} catch (FileNotFoundException e) {
 						Log.e(TAG, "io error!", e);
 					} finally {
@@ -168,10 +166,10 @@ public class FantasyFragment extends Fragment {
 				.into(target);
 	}
 
-	@Override
-	public void onPrepareOptionsMenu(Menu menu) {
-		mShare.setEnabled(mSaved);
-	}
+//	@Override
+//	public void onPrepareOptionsMenu(Menu menu) {
+//		mShare.setEnabled(mSaved);
+//	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
