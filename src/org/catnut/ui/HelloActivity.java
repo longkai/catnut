@@ -148,21 +148,13 @@ public class HelloActivity extends Activity {
 		if (CatnutApp.getBoolean(R.string.pref_fantasy_say_salutation, R.bool.default_fantasy_say_salutation)) {
 			version.setText(getString(R.string.about_version_template, getString(R.string.version_name)));
 			int n = (int) (Math.random() * 101);
-			if (0 < n && n < 15) {
+			if (0 < n && n < 35) {
 				bar.setTitle(R.string.fantasy);
 				about.setText(Html.fromHtml(getString(R.string.about_body)));
 				about.setMovementMethod(LinkMovementMethod.getInstance());
-			} else if (n <= 30) {
+			} else {
 				bar.setTitle(R.string.fantasy);
 				about.setText(Html.fromHtml(getString(R.string.salutation)));
-				about.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-			} else if (n > 30 && n < 60) {
-				bar.setTitle("Salutation");
-				about.setText(Html.fromHtml(getString(R.string.bonus_1)));
-				about.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-			} else {
-				bar.setTitle("Salutation");
-				about.setText(Html.fromHtml(getString(R.string.bonus_2)));
 				about.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
 			}
 		} else {

@@ -153,9 +153,6 @@
         <b><a href="http://square.github.io/picasso/">Picasso</a>&nbsp;</b><br>
         <i>by Square</i><br><br>
 
-        <b><a href="https://github.com/chrisbanes/ActionBar-PullToRefresh">ActionBar-PullToRefresh</a>&nbsp;</b><br>
-        <i>by Chris Banes</i><br><br>
-
         <b><a href="http://viewpagerindicator.com/">ViewPagerIndicator</a>&nbsp;</b><br>
         <i>by Jake Wharton, Patrik Åkerfeldt, and Francisco Figueiredo Jr.</i><br><br>
 
@@ -169,33 +166,22 @@
         <i>from Twitter for Android and my friends:-)</i><br><br>
     ]]></string>
 	<string name="salutation"><![CDATA[
-		<b>蒹葭苍苍，白露为霜</b><br><br>
-		<b>所谓伊人，在水一方<b><br><br>
-		<b>溯洄从之，道阻且长</b><br><br>
-		<b>溯游从之，宛在水中央</b><br><br><br>
-		<b>蒹葭萋萋，白露未晞</b><br><br>
-		<b>所谓伊人，在水之湄</b><br><br>
-		<b>所谓伊人，在水之湄</b><br><br>
-		<b>溯洄从之，道阻且跻</b><br><br>
-		<b>溯游从之，宛在水中坻</b><br><br><br>
-		<b>蒹葭采采，白露未已</b><br><br>
-		<b>所谓伊人，在水之涘</b><br><br>
-		<b>所谓伊人，在水之涘</b><br><br>
-		<b>溯洄从之，道阻且右</b><br><br>
-		<b>溯游从之，宛在水中沚</b><br><br>
-		<b>『诗经』</b><br><br>
+		<b>Let me write a app for you,</b><br><br>
+		<b>all the world accompany you play.<b><br><br>
+		<b>This is the love you will understand,</b><br><br>
+		<b>you are the only irreplaceable.</b><br><br>
 	]]></string>
 	<string name="about_version_template">v%1$s</string>
 	<string name="hide_fantasy_words">隐藏文字</string>
 	<string name="show_fantasy_words">显示文字</string>
-	<string name="app_desc">追求 <b>简洁&amp;流畅&amp;高速</b></string>
+	<string name="app_desc"><b>简洁&amp;流畅&amp;高速</b></string>
 	<string name="default_art">默认</string>
 	<string name="enable_fantasy">启用fantasy</string>
 	<string name="enable_fantasy_summary">启用后，每天你都可以发现和分享各种精彩照片:-) 版权归原作者或「500px」所有，建议在wifi下开启</string>
 	<string name="enter_home_directly">直接进入主页</string>
 	<string name="enter_home_directly_on_summary">启动应用后进入Fantasy</string>
 	<string name="enter_home_directly_off_summary">启动应用后进入主页时间线</string>
-	<string name="fantasy">fantasy</string>
+	<string name="fantasy">Fantasy</string>
 	<string name="unknown_user">\@微博用户</string>
 	<string name="find_new_version">发现新版本！（%1$s）</string>
 	<string name="down_load_and_upgrade">下载并更新</string>
