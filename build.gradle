@@ -29,7 +29,7 @@ ext {
 
 android {
 	compileSdkVersion 19
-	buildToolsVersion = '19.0.3'
+	buildToolsVersion = '19.1'
 
 	sourceSets {
 		defaultConfig {
@@ -64,14 +64,13 @@ dependencies {
 	compile "com.android.support:support-v4:$supportLibVersion"
 	compile "com.android.support:support-v13:$supportLibVersion"
 	compile 'com.mcxiaoke.volley:library:1.0.+'
-	compile 'com.github.chrisbanes.actionbarpulltorefresh:library:+'
 	compile 'com.viewpagerindicator:library:2.4.1' // no test, you should be aware...
 	compile 'com.squareup.picasso:picasso:2.2.0'
 	compile 'com.etsy.android.grid:library:1.0.4' // 源码有修改注释掉了com.etsy.android.grid.ExtendableListView 557-561
-    compile 'com.squareup.okhttp:okhttp:1.5.4' // 事实上，不用也可以，用自身的httpurlconnection
+	compile 'com.squareup.okhttp:okhttp:1.6.0' // 事实上，不用也可以，用自身的httpurlconnection
 }
 
 task wrapper(type: Wrapper) {
-	// 1.9+ is not supported for now!
-	gradleVersion = 1.8
+	// be sure which version is suitable!
+	gradleVersion = 1.10
 }

@@ -1,5 +1,7 @@
-新浪微博Android REST Client
+ 新浪微博Android REST Client
 =====================
+![logo](https://farm3.staticflickr.com/2915/14145326087_9fb76b1ed5_m.jpg)
+---
 ## 说明
 简洁，流畅，快速的微博app，并且附带500px和知乎每日精选的照片和问答插件 :-)
 
@@ -7,7 +9,7 @@
 
 个人学习时作品，目前有空或者有新的想法就写写，持续构建中:-)，欢迎感兴趣的朋友交流，fork，clone，bug issue啥的!
 
-项目主页请见[这里][project-host], app安装包[下载][download]，目前需要Android 4.1+
+项目主页请见[这里][project-host], 豌豆荚地址[下载][download]，目前需要Android 4.1+
 
 > ![about][]
 
@@ -21,40 +23,40 @@
  2. Eclipse（包含ADT插件，建议直接下载打包好的[ADT Bundle][]）
  3. Android Studio（好是挺好，就是龟速，现阶段不太推荐）
 4. 以下为**可选**
- 1. Gradle == 1.9 （本项目自带了Gradle Wrapper，所以本地没有也没有关系，不用Android Studio的话更不需要这个）
+ 1. Gradle >= x(版本号在变化，请自行检查) （本项目自带了Gradle Wrapper，所以本地没有也没有关系，不用Android Studio的话更不需要这个）
 
 ## 依赖（在``build.gradle``里``dependencies {}``申明）
 1. support-v4，注意版本号，为什么我们的项目要求那么高的API却还需要兼容库呢？因为兼容库不仅仅提供兼容类，还有其它的功能。并且没有用到的类可以在编译期间被删除掉[?][ProGuard]
 2. support-v13，for native fragment api
-3. android-volley，异步http请求框架，需要自行[下载][volley]或者通过Android Studio引引入
-4. ActionBar-PullToRefresh，刷新控件，需自行[下载][pull2refresh]或者通过Android Studio引入
-5. Google Analytics，匿名统计使用信息，需自行[下载][Google Analytics]并引入
-6. Picasso，图片缓存框架，需自行[下载][Picasso]或者通过Android Studio引入
-7. ViewPagerIndicator, 页面切换指示器，需自行[下载][ViewPagerIndicator]或者通过Android Studio引入
-8. AndroidStaggeredGrid, grid view，需自行[下载][AndroidStaggeredGrid]或者通过Android Studio引入
-9. OkHttp, spdy http client, 需自行[下载][OkHttp]或者通过Android Studio引入
+3. android-volley，异步http请求框架，需要自行[下载][volley]或者通过Android Studio引入
+4. Google Analytics，匿名统计使用信息，需自行[下载][Google Analytics]并引入
+5. Picasso，(注意版本暂为2.2.0)图片缓存框架，需自行[下载][Picasso]或者通过Android Studio引入
+6. ViewPagerIndicator, 页面切换指示器，需自行[下载][ViewPagerIndicator]或者通过Android Studio引入
+7. AndroidStaggeredGrid, grid view，需自行[下载][AndroidStaggeredGrid]**并自行将目录结构设置为Eclipse项目结构**或者通过Android Studio引入
+8. OkHttp, spdy http client, 需自行[下载][OkHttp]或者通过Android Studio引入
 
 ## 如何构建
 1. 通过IDE
- 1. Intellij IDEA，直接导入（需自行引入``build.gradle``里``dependencies {}``的依赖），后面你懂的
- 2. Eclipse，直接导入（需自行引入``build.gradle``里``dependencies {}``的依赖），后面你懂的
+ 1. Intellij IDEA，直接导入（需自行引入``build.gradle``里``dependencies {}``的依赖），后面你懂的，一定要注意所有的support lib保持版本一致！
+ 2. Eclipse，直接导入（需自行引入``build.gradle``里``dependencies {}``的依赖），后面你懂的，一定要注意所有的support lib保持版本一致！
  3. Android Studio，直接导入（最好选中build.gradle文件），后面你懂的
-2. 通过命令行（gradle构建，**目前版本必须是1.9**，并且要**设置好ANDROID_HOME环境变量**）
+2. 通过命令行（gradle构建，**目前当前适用的版本**，并且要**设置好ANDROID_HOME环境变量**）
  1. 如果本地有配置有gradle，那么shell或者cmd进入到项目根目录，敲``gradle clean build``，一切正常的话在``build/apk/``下会生成相应的apk文件（**注意安装文件名有debug的那个apk文件**）
  2. 如果本地没有安装gradle，那么shell或者cmd进入项目根目录，mac或者linux敲``./gradlew clean build``，windows敲``gradlew clean build``，接下来同1
 
 ## License
-code license
-> ```
-> The MIT License (MIT)
-> Copyright (c) 2014 longkai
-> The software shall be used for good, not evil.
-> ```
+### code license
+The MIT License (MIT)
 
-document license
-> 本作品采用[知识共享署名-非商业性使用 4.0 国际许可协议][creative commons license]进行许可。
+Copyright (c) 2014 longkai
 
->![][creative commons icon]
+The software shall be used for good, not evil.
+
+
+### document license
+本作品采用[知识共享署名-非商业性使用 4.0 国际许可协议][creative commons license]进行许可。
+
+![][creative commons icon]
 
 ## 联系作者
 1. 邮箱：im.longkai@gmail.com
@@ -62,8 +64,8 @@ document license
 3. Twitter: [@longkai_1991][]
 4. 新浪微博：[@米粉撸油条][]
 
----
-last updated: 2014-04-16
+===
+last updated: 2014-06-03
 
 [developing-RESTful-android-apps]: http://www.google.com/events/io/2010/sessions/developing-RESTful-android-apps.html "developing-RESTful-android-apps"
 [Twitter for Android]: https://about.twitter.com/zh-hans/products/android "twitter for android"
@@ -71,7 +73,6 @@ last updated: 2014-04-16
 [ADT Bundle]: http://developer.android.com/sdk/index.html "ADT Bundle"
 [ProGuard]: http://proguard.sourceforge.net/index.html "ProGuard"
 [volley]: https://android.googlesource.com/platform/frameworks/volley "android-volley"
-[pull2refresh]: https://github.com/chrisbanes/ActionBar-PullToRefresh "ActionBar-PullToRefresh"
 [Google Analytics]: https://developers.google.com/analytics/devguides/collection/android/v3/ "Google Analytics v3"
 [Picasso]: http://square.github.io/picasso/ "Picasso"
 [ViewPagerIndicator]: http://viewpagerindicator.com/ "ViewPagerIndicator"
@@ -82,7 +83,7 @@ last updated: 2014-04-16
 [creative commons icon]: http://i.creativecommons.org/l/by-nc/4.0/88x31.png "creative commons icon"
 [creative commons license]: http://creativecommons.org/licenses/by-nc/4.0/deed.zh "creative commons license"
 
-[about]: https://farm3.staticflickr.com/2841/13335333864_b3c25109a6_o.png "about"
-[timeline]: https://farm3.staticflickr.com/2881/13335091823_7e7d82f215_o.png "timeline"
+[about]: https://farm4.staticflickr.com/3925/14308701166_9bc0348a0c_o.png "about"
+[timeline]: https://farm4.staticflickr.com/3865/14331112414_929a71514c_o.png "timeline"
 [project-host]: http://longkai.github.io/catnut/ "project-host"
-[download]: https://dl.dropboxusercontent.com/u/96034496/apps/catnut-latest.apk "下载apk文件"
+[download]: http://www.wandoujia.com/apps/org.catnut "豌豆荚下载"
