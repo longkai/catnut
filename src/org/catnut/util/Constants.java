@@ -20,6 +20,7 @@ public class Constants {
 	public static final String ACTION = "action";
 	public static final String ID = "id";
 	public static final String PIC = "pic";
+	public static final String THUMBNAIL = "thumbnail";
 	public static final String IMAGE_DIR = "images/"; // 保持在用户外部存储上的，并非cache的
 	public static final String FANTASY_DIR = "fantasy";
 	public static final String NULL = "null";

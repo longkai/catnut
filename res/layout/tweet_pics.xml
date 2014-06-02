@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ The MIT License (MIT)
+  ~ Copyright (c) 2014 longkai
+  ~ The software shall be used for good, not evil.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+	<com.viewpagerindicator.LinePageIndicator
+			android:id="@+id/indicator"
+			android:paddingTop="@dimen/medium"
+			android:layout_marginBottom="@dimen/medium"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
+	<include layout="@layout/pager" />
+</LinearLayout>

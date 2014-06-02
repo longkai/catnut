@@ -5,16 +5,22 @@
  */
 package org.catnut.adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.provider.BaseColumns;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,14 +37,18 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
+import com.viewpagerindicator.LinePageIndicator;
 import org.catnut.R;
 import org.catnut.api.FavoritesAPI;
 import org.catnut.core.CatnutApp;
 import org.catnut.core.CatnutRequest;
+import org.catnut.fragment.GalleryPagerFragment;
 import org.catnut.metadata.Status;
 import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.StatusProcessor;
+import org.catnut.support.PageTransformer;
+import org.catnut.support.TouchImageView;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.support.annotation.NotNull;
@@ -49,8 +59,11 @@ import org.catnut.ui.TweetActivity;
 import org.catnut.util.CatnutUtils;
 import org.catnut.util.Constants;
 import org.catnut.util.DateTime;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * 微博列表适配器
@@ -269,6 +282,8 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 		holder.originalPicIndex = cursor.getColumnIndex(Status.original_pic);
 		holder.thumbs = (ImageView) view.findViewById(R.id.thumbs);
 		holder.thumbs.setAdjustViewBounds(true);
+		holder.picsOverflow = (ImageView) view.findViewById(R.id.pics_overflow);
+		holder.picsIndex = cursor.getColumnIndex(Status.pic_urls);
 		holder.remarkIndex = cursor.getColumnIndex(User.remark);
 		holder.reply = (ImageView) view.findViewById(R.id.action_reply);
 		holder.retweet = (ImageView) view.findViewById(R.id.action_reteet);
@@ -374,6 +389,21 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 		bean.text = cursor.getString(holder.textIndex);
 		holder.popup.setTag(bean); // inject data
 		holder.popup.setOnClickListener(this);
+
+		// got more pics ie. > 1
+		String picsJson = cursor.getString(holder.picsIndex);
+		JSONArray jsonArray = CatnutUtils.optPics(picsJson);
+		injectPicsOverflow(holder.picsOverflow, jsonArray);
+	}
+
+	private void injectPicsOverflow(View overflow, JSONArray jsonArray) {
+		if (jsonArray != null) {
+			overflow.setVisibility(View.VISIBLE);
+			overflow.setTag(jsonArray);
+			overflow.setOnClickListener(mOverflowOnclickListener);
+		} else {
+			overflow.setVisibility(View.GONE);
+		}
 	}
 
 	private void injectThumbs(final Context context, final String originUri, String mediumThumbUrl, String smallThumbUrl, final ImageView thumbs) {
@@ -469,6 +499,8 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 			text.setLineSpacing(0, mCustomizedLineSpacing);
 			injectThumbs(mContext, json.optString(Status.original_pic), json.optString(Status.bmiddle_pic),
 					json.optString(Status.thumbnail_pic), (ImageView) holder.retweetView.findViewById(R.id.thumbs));
+			JSONArray jsonArray = CatnutUtils.optPics(json.optJSONArray(Status.pic_urls));
+			injectPicsOverflow(holder.retweetView.findViewById(R.id.pics_overflow), jsonArray);
 		} else {
 			holder.retweetView.setVisibility(View.GONE);
 		}
@@ -497,6 +529,9 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 		int originalPicIndex;
 		int remarkIndex;
 
+		ImageView picsOverflow;
+		int picsIndex;
+
 		ImageView reply;
 		ImageView retweet;
 
@@ -514,6 +549,69 @@ public class TweetAdapter extends CursorAdapter implements View.OnClickListener,
 		boolean favorited;
 		String text;
 	}
+
+	private View.OnClickListener mOverflowOnclickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			final JSONArray pics = (JSONArray) v.getTag();
+			View view = mInflater.inflate(R.layout.tweet_pics, null, false);
+			LinePageIndicator indicator = (LinePageIndicator) view.findViewById(R.id.indicator);
+			final ViewPager pager = (ViewPager) view.findViewById(R.id.pager);
+			pager.setPageMargin(10);
+			pager.setPageTransformer(true, new PageTransformer.DepthPageTransformer());
+			pager.setAdapter(new PagerAdapter() {
+				@Override
+				public int getCount() {
+					return pics.length();
+				}
+
+				@Override
+				public boolean isViewFromObject(View view, Object object) {
+					return view == object;
+				}
+
+				@Override
+				public void destroyItem(ViewGroup container, int position, Object object) {
+					container.removeView((View) object);
+				}
+
+				@Override
+				public Object instantiateItem(ViewGroup container, int position) {
+					View v = mInflater.inflate(R.layout.photo, null);
+					TouchImageView iv = (TouchImageView) v.findViewById(R.id.image);
+					String url = pics.optJSONObject(position)
+							.optString(Status.thumbnail_pic);
+					String replace = url.replace(Constants.THUMBNAIL, Status.MEDIUM_THUMBNAIL);
+					Picasso.with(mContext)
+							.load(replace)
+							.into(iv);
+					container.addView(v);
+					return v;
+				}
+			});
+			indicator.setViewPager(pager);
+			new AlertDialog.Builder(new ContextThemeWrapper(mContext, android.R.style.Theme_Holo_Dialog))
+					.setView(view)
+					.setPositiveButton(mContext.getString(R.string.original_pics), new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							ArrayList<Uri> urls = new ArrayList<Uri>(pics.length());
+							for (int i = 0; i < pics.length(); i++) {
+								String s = pics.optJSONObject(i).optString(Status.thumbnail_pic)
+										.replace(Constants.THUMBNAIL, Status.LARGE_THUMBNAIL);
+								urls.add(Uri.parse(s));
+							}
+							Intent intent = SingleFragmentActivity.getIntent(mContext, SingleFragmentActivity.GALLERY);
+							intent.putExtra(GalleryPagerFragment.CUR_INDEX, pager.getCurrentItem());
+							intent.putExtra(GalleryPagerFragment.URLS, urls);
+							intent.putExtra(GalleryPagerFragment.TITLE, mContext.getString(R.string.tweet_pics));
+							mContext.startActivity(intent);
+						}
+					})
+					.setNegativeButton(mContext.getString(R.string.close), null)
+					.show();
+		}
+	};
 
 	/**
 	 * enum facility for thumbs options

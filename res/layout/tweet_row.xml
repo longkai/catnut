@@ -127,6 +127,16 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" />
 
+		<ImageView
+			android:id="@+id/pics_overflow"
+			android:clickable="true"
+			android:focusable="true"
+			android:visibility="gone"
+			android:src="@drawable/ic_title_down"
+			android:background="?android:selectableItemBackground"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
 		<!--retweet-->
 		<include layout="@layout/retweet" />
 

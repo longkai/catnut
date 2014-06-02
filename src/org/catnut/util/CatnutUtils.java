@@ -40,6 +40,8 @@ import org.catnut.service.UpgradeService;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.support.TweetURLSpan;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -607,5 +609,32 @@ public class CatnutUtils {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * if pics.len > 1, return the json, or null
+	 * @param json
+	 * @return
+	 */
+	public static JSONArray optPics(String json) {
+		if (!TextUtils.isEmpty(json)) {
+			try {
+				JSONArray jsonArray = new JSONArray(json);
+				return optPics(jsonArray);
+			} catch (JSONException e) {
+				Log.wtf(TAG, "cannot serialize pics json array!", e);
+				return null;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * if pics.len > 1, return the json, or null
+	 * @param jsonArray
+	 * @return
+	 */
+	public static JSONArray optPics(JSONArray jsonArray) {
+		return jsonArray == null ? null : jsonArray.length() > 1 ? jsonArray : null;
 	}
 }

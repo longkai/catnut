@@ -64,7 +64,8 @@ public class HomeTimelineFragment extends TimelineFragment implements FragmentCa
 			User.remark,
 			User.verified,
 			Status.favorited,
-			Status.retweeted_status
+			Status.retweeted_status,
+			Status.pic_urls
 	};
 
 	private Handler mHandler = new Handler();

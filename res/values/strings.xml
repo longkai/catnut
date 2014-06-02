@@ -248,6 +248,9 @@
 	<string name="back_to_top">回到顶部</string>
 	<string name="news_count">新消息数</string>
 	<string name="refresh_see_news_count">刷新查看新消息数</string>
+	<string name="original_pics">原图</string>
+	<string name="tweet_pics">微博配图</string>
+	<string name="close">关闭</string>
 	<string-array name="fantasy_features">
 		<item>最受欢迎</item>
 		<item>即将到来</item>
