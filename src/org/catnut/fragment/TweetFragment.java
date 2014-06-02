@@ -11,6 +11,7 @@ import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
@@ -19,9 +20,13 @@ import android.database.Cursor;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.BaseColumns;
+import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.Html;
@@ -29,6 +34,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,6 +57,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.squareup.picasso.Picasso;
+import com.viewpagerindicator.LinePageIndicator;
 import org.catnut.R;
 import org.catnut.adapter.CommentsAdapter;
 import org.catnut.adapter.EmotionsAdapter;
@@ -66,6 +73,8 @@ import org.catnut.metadata.User;
 import org.catnut.metadata.WeiboAPIError;
 import org.catnut.processor.StatusProcessor;
 import org.catnut.support.OnFragmentBackPressedListener;
+import org.catnut.support.PageTransformer;
+import org.catnut.support.TouchImageView;
 import org.catnut.support.TweetImageSpan;
 import org.catnut.support.TweetTextView;
 import org.catnut.ui.ComposeTweetActivity;
@@ -80,6 +89,8 @@ import org.catnut.util.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * 微博界面
@@ -157,6 +168,7 @@ public class TweetFragment extends Fragment implements
 	private TextView mSource;
 	private TextView mCreateAt;
 	private ImageView mThumbs;
+	private View mPicsOverflow;
 //	private View mRetweetLayout;
 	private ViewStub mRetweetLayout;
 
@@ -410,6 +422,7 @@ public class TweetFragment extends Fragment implements
 		mSource = (TextView) mTweetLayout.findViewById(R.id.source);
 		mCreateAt = (TextView) mTweetLayout.findViewById(R.id.create_at);
 		mThumbs = (ImageView) mTweetLayout.findViewById(R.id.thumbs);
+		mPicsOverflow = mTweetLayout.findViewById(R.id.pics_overflow);
 		mRetweetLayout = (ViewStub) mTweetLayout.findViewById(R.id.view_stub);
 		// just return the list
 		return view;
@@ -471,6 +484,7 @@ public class TweetFragment extends Fragment implements
 						Status.source,
 						Status.favorited,
 						Status.retweeted_status,
+						Status.pic_urls,
 						"s." + Status.created_at,
 						User.screen_name,
 						User.avatar_large,
@@ -526,7 +540,8 @@ public class TweetFragment extends Fragment implements
 					}
 					String thumb = cursor.getString(cursor.getColumnIndex(Status.bmiddle_pic));
 					String url = cursor.getString(cursor.getColumnIndex(Status.original_pic));
-					loadThumbs(thumb, url, mThumbs);
+					loadThumbs(thumb, url, mThumbs,
+							CatnutUtils.optPics(cursor.getString(cursor.getColumnIndex(Status.pic_urls))), mPicsOverflow);
 					// retweet
 					final String jsonString = cursor.getString(cursor.getColumnIndex(Status.retweeted_status));
 					if (!TextUtils.isEmpty(jsonString)) {
@@ -557,7 +572,8 @@ public class TweetFragment extends Fragment implements
 									.setVisibility(user.optBoolean(User.verified) ? View.VISIBLE : View.GONE);
 							if (json.has(Status.thumbnail_pic)) {
 								loadThumbs(json.optString(Status.bmiddle_pic), json.optString(Status.bmiddle_pic),
-										(ImageView) retweet.findViewById(R.id.thumbs));
+										(ImageView) retweet.findViewById(R.id.thumbs), json.optJSONArray(Status.pic_urls),
+										retweet.findViewById(R.id.pics_overflow));
 							}
 						} catch (JSONException e) {
 							Log.e(TAG, "convert text to string error!", e);
@@ -613,7 +629,8 @@ public class TweetFragment extends Fragment implements
 			mTweetLayout.findViewById(R.id.verified).setVisibility(View.VISIBLE);
 		}
 
-		loadThumbs(mJson.optString(Status.bmiddle_pic), mJson.optString(Status.original_pic), mThumbs);
+		loadThumbs(mJson.optString(Status.bmiddle_pic), mJson.optString(Status.original_pic), mThumbs,
+				mJson.optJSONArray(Status.pic_urls), mPicsOverflow);
 		shareAndFavorite(mJson.optBoolean(Status.favorited), mJson.optString(Status.text));
 
 		if (!mJson.has(Status.retweeted_status)) {
@@ -627,7 +644,7 @@ public class TweetFragment extends Fragment implements
 	 * @param thumb 缩略图url
 	 * @param originalUrl 原图url
 	 */
-	private void loadThumbs(String thumb, final String originalUrl, final ImageView thumbs) {
+	private void loadThumbs(String thumb, final String originalUrl, final ImageView thumbs, final JSONArray jsonArray, View overflow) {
 		if (!TextUtils.isEmpty(thumb)) {
 			if (mStayInLatest) {
 				Picasso.with(getActivity()).load(thumb).into(thumbs);
@@ -654,6 +671,72 @@ public class TweetFragment extends Fragment implements
 			thumbs.setVisibility(View.VISIBLE);
 		} else {
 			thumbs.setVisibility(View.GONE);
+			overflow.setVisibility(View.GONE);
+		}
+		if (jsonArray != null && jsonArray.length() > 1) {
+			overflow.setVisibility(View.VISIBLE);
+			overflow.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					View view = LayoutInflater.from(getActivity()).inflate(R.layout.tweet_pics, null);
+					LinePageIndicator indicator = (LinePageIndicator) view.findViewById(R.id.indicator);
+					final ViewPager pager = (ViewPager) view.findViewById(R.id.pager);
+					pager.setPageTransformer(true, new PageTransformer.DepthPageTransformer());
+					pager.setAdapter(new PagerAdapter() {
+						@Override
+						public int getCount() {
+							return jsonArray.length();
+						}
+
+						@Override
+						public boolean isViewFromObject(View view, Object object) {
+							return view == object;
+						}
+
+						@Override
+						public void destroyItem(ViewGroup container, int position, Object object) {
+							container.removeView((View) object);
+						}
+
+						@Override
+						public Object instantiateItem(ViewGroup container, int position) {
+							View v = LayoutInflater.from(getActivity()).inflate(R.layout.photo, null);
+							TouchImageView iv = (TouchImageView) v.findViewById(R.id.image);
+							String url = jsonArray.optJSONObject(position)
+									.optString(Status.thumbnail_pic);
+							String replace = url.replace(Constants.THUMBNAIL, Status.MEDIUM_THUMBNAIL);
+							Picasso.with(getActivity())
+									.load(replace)
+									.into(iv);
+							container.addView(v);
+							return v;
+						}
+					});
+					indicator.setViewPager(pager);
+					new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), android.R.style.Theme_Holo_Dialog))
+						.setView(view)
+						.setPositiveButton(getString(R.string.original_pics), new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								ArrayList<Uri> urls = new ArrayList<Uri>(jsonArray.length());
+								for (int i = 0; i < jsonArray.length(); i++) {
+									String s = jsonArray.optJSONObject(i).optString(Status.thumbnail_pic)
+											.replace(Constants.THUMBNAIL, Status.LARGE_THUMBNAIL);
+									urls.add(Uri.parse(s));
+								}
+								Intent intent = SingleFragmentActivity.getIntent(getActivity(), SingleFragmentActivity.GALLERY);
+								intent.putExtra(GalleryPagerFragment.CUR_INDEX, pager.getCurrentItem());
+								intent.putExtra(GalleryPagerFragment.URLS, urls);
+								intent.putExtra(GalleryPagerFragment.TITLE, getString(R.string.tweet_pics));
+								startActivity(intent);
+							}
+						})
+						.setNegativeButton(getString(R.string.close), null)
+						.show();
+				}
+			});
+		} else {
+			overflow.setVisibility(View.GONE);
 		}
 	}
 
