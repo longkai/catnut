@@ -33,7 +33,7 @@
 
 	<integer name="default_fetch_size">20</integer>
 	<string name="default_typeface">null</string>
-	<string name="default_thumbs_option">@string/thumb_small</string>
+	<string name="default_thumbs_option">@string/thumb_medium</string>
 	<integer name="default_tweet_font_size">16</integer>
 	<string name="default_line_spacing">1.0</string>
 

@@ -79,7 +79,7 @@
 		android:layout_marginTop="@dimen/small"
 		android:adjustViewBounds="true"
 		android:layout_below="@id/text"
-		android:layout_width="match_parent"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" />
 
 	<ImageView
@@ -88,7 +88,7 @@
 		android:focusable="true"
 		android:visibility="gone"
 		android:layout_below="@id/thumbs"
-		android:src="@drawable/ic_title_down"
+		android:src="@drawable/ic_navigation_expand"
 		android:background="?android:selectableItemBackground"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content" />

@@ -647,6 +647,7 @@ public class TweetFragment extends Fragment implements
 	private void loadThumbs(String thumb, final String originalUrl, final ImageView thumbs, final JSONArray jsonArray, View overflow) {
 		if (!TextUtils.isEmpty(thumb)) {
 			if (mStayInLatest) {
+				int screenWidth = CatnutUtils.getScreenWidth(getActivity());
 				Picasso.with(getActivity()).load(thumb).into(thumbs);
 				thumbs.setOnTouchListener(new View.OnTouchListener() {
 					@Override

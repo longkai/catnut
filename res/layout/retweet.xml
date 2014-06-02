@@ -72,7 +72,7 @@
 		android:clickable="true"
 		android:focusable="true"
 		android:visibility="gone"
-		android:src="@drawable/ic_title_down"
+		android:src="@drawable/ic_navigation_expand"
 		android:background="?android:selectableItemBackground"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content" />
