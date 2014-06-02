@@ -58,10 +58,11 @@ public class FavoriteFragment extends TimelineFragment {
 			Status.source,
 			Status.retweeted_status,
 			Status.favorited,
+			Status.pic_urls,
 			"s." + Status.created_at,
 			User.screen_name,
 			User.verified,
-			User.profile_image_url,
+//			User.profile_image_url,
 			User.avatar_large,
 			User.remark
 	};

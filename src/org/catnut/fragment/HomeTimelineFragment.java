@@ -59,7 +59,7 @@ public class HomeTimelineFragment extends TimelineFragment implements FragmentCa
 			Status.source,
 			"s." + Status.created_at,
 			User.screen_name,
-			User.profile_image_url,
+//			User.profile_image_url,
 			User.avatar_large,
 			User.remark,
 			User.verified,

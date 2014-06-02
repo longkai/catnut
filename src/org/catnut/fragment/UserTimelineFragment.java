@@ -62,7 +62,8 @@ public class UserTimelineFragment extends TimelineFragment {
 			Status.source,
 			Status.created_at,
 			Status.favorited,
-			Status.retweeted_status
+			Status.retweeted_status,
+			Status.pic_urls
 	};
 
 	private Handler mHandler = new Handler();
