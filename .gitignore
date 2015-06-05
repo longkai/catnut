@@ -20,9 +20,6 @@ build/
 # Local configuration file (sdk path, etc)
 local.properties
 
-# libs(for now, it seems no use, use gradle or IDE-specific dependency strategy instead)
-libs/
-
 # Intellij IDEA(Android Studio)
 out/
 .idea/

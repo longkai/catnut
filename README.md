@@ -15,17 +15,14 @@
 
 > ![timeline][]
 
-## 环境需求
+## 环境需求(可直接导入到Android Studio)
 1. Android SDK >= 4.1.x（API Level >= 16），*建议设置ANDROID_HOME环境变量*
 2. JDK >= 1.6（现在只有4.4才支持JDK7的语法），**必须设置好JAVA_HOME环境变量**
 3. IDE（选择一个自己熟悉的就可以了）
- 1. Intellij IDEA（推荐使用免费开源的社区版[Intellij IDEA Community][]）
+ 1. Android Studio（推荐）
  2. Eclipse（包含ADT插件，建议直接下载打包好的[ADT Bundle][]）
- 3. Android Studio（好是挺好，就是龟速，现阶段不太推荐）
-4. 以下为**可选**
- 1. Gradle >= x(版本号在变化，请自行检查) （本项目自带了Gradle Wrapper，所以本地没有也没有关系，不用Android Studio的话更不需要这个）
 
-## 依赖（在``build.gradle``里``dependencies {}``申明）
+## 依赖（在``build.gradle``里``dependencies {}``申明，使用Eclipse请自行导入，推荐直接导入到Android Studio中，啥事都没有直接run）
 1. support-v4，注意版本号，为什么我们的项目要求那么高的API却还需要兼容库呢？因为兼容库不仅仅提供兼容类，还有其它的功能。并且没有用到的类可以在编译期间被删除掉[?][ProGuard]
 2. support-v13，for native fragment api
 3. android-volley，异步http请求框架，需要自行[下载][volley]或者通过Android Studio引入
@@ -35,14 +32,12 @@
 7. AndroidStaggeredGrid, grid view，需自行[下载][AndroidStaggeredGrid]**并自行将目录结构设置为Eclipse项目结构**或者通过Android Studio引入
 8. OkHttp, spdy http client, 需自行[下载][OkHttp]或者通过Android Studio引入
 
-## 如何构建
+## 如何构建(推荐直接导入Android Studio或者在terminal构建)
 1. 通过IDE
- 1. Intellij IDEA，直接导入（需自行引入``build.gradle``里``dependencies {}``的依赖），后面你懂的，一定要注意所有的support lib保持版本一致！
- 2. Eclipse，直接导入（需自行引入``build.gradle``里``dependencies {}``的依赖），后面你懂的，一定要注意所有的support lib保持版本一致！
- 3. Android Studio，直接导入（最好选中build.gradle文件），后面你懂的
+ 1. Eclipse，直接导入（需自行引入``build.gradle``里``dependencies {}``的依赖），后面你懂的，一定要注意所有的support lib保持版本一致！
+ 2. Android Studio，直接导入（最好选中build.gradle文件），后面你懂的
 2. 通过命令行（gradle构建，**目前当前适用的版本**，并且要**设置好ANDROID_HOME环境变量**）
- 1. 如果本地有配置有gradle，那么shell或者cmd进入到项目根目录，敲``gradle clean build``，一切正常的话在``build/apk/``下会生成相应的apk文件（**注意安装文件名有debug的那个apk文件**）
- 2. 如果本地没有安装gradle，那么shell或者cmd进入项目根目录，mac或者linux敲``./gradlew clean build``，windows敲``gradlew clean build``，接下来同1
+ 1. 如果本地没有安装gradle，那么shell或者cmd进入项目根目录，mac或者linux敲``./gradlew clean build``，windows敲``gradlew clean build``，接下来同1
 
 ## License
 ### code license
@@ -65,7 +60,7 @@ The software shall be used for good, not evil.
 4. 新浪微博：[@米粉撸油条][]
 
 ===
-last updated: 2014-06-03
+last updated: 2015-06-06
 
 [developing-RESTful-android-apps]: http://www.google.com/events/io/2010/sessions/developing-RESTful-android-apps.html "developing-RESTful-android-apps"
 [Twitter for Android]: https://about.twitter.com/zh-hans/products/android "twitter for android"
