@@ -22,6 +22,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -117,7 +118,7 @@ public class MainActivity extends Activity implements
 		setContentView(R.layout.main);
 		// drawer specific
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, Gravity.START);
+//		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 		mDrawerLayout.setDrawerListener(this);
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,

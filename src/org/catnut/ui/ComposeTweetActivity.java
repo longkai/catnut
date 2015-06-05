@@ -634,7 +634,7 @@ public class ComposeTweetActivity extends Activity implements TextWatcher,
 			mApp.getRequestQueue().add(new JsonObjectRequest(
 					api.method,
 					api.uri,
-					null,
+					"",
 					new Response.Listener<JSONObject>() {
 						@Override
 						public void onResponse(JSONObject response) {

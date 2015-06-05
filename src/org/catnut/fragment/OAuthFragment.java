@@ -90,7 +90,7 @@ public class OAuthFragment extends Fragment {
 				mRequestQueue.add(new JsonObjectRequest(
 					Request.Method.POST,
 					accessTokenUri,
-					null,
+					"",
 					new Response.Listener<JSONObject>() {
 						@Override
 						public void onResponse(JSONObject response) {

@@ -8,6 +8,7 @@ package org.catnut.support;
 
 import com.android.volley.toolbox.HurlStack;
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.OkUrlFactory;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -21,20 +22,22 @@ import java.net.URL;
 public class OkHttpStack extends HurlStack {
 	/** singleton */
 	private final OkHttpClient client;
-
 	public OkHttpStack(OkHttpClient client) {
 		if (client == null) {
 			throw new NullPointerException("client cannot be null!");
 		}
 		okHttpClient = client;
 		this.client = client;
+		this.urlFactory = new OkUrlFactory(this.client);
 	}
 
 	public OkHttpStack() {
 		this(getOkHttpClient());
 	}
 
+	private static OkUrlFactory urlFactory;
 	private static OkHttpClient okHttpClient;
+
 
 	public static OkHttpClient getOkHttpClient() {
 		if (okHttpClient == null) {
@@ -43,8 +46,12 @@ public class OkHttpStack extends HurlStack {
 		return okHttpClient;
 	}
 
+	public static OkUrlFactory getOkUrlFactory() {
+		return urlFactory;
+	}
+
 	@Override
 	protected HttpURLConnection createConnection(URL url) throws IOException {
-		return client.open(url);
+		return urlFactory.open(url);
 	}
 }

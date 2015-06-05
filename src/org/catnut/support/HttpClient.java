@@ -41,7 +41,7 @@ public class HttpClient {
 	}
 
 	public void connectForMultipart(Map<String, String> headers) throws Exception {
-		httpURLConnection = OkHttpStack.getOkHttpClient().open(new URL(url));
+		httpURLConnection = OkHttpStack.getOkUrlFactory().open(new URL(url));
 		httpURLConnection.setRequestMethod("POST");
 		httpURLConnection.setDoInput(true);
 		httpURLConnection.setDoOutput(true);

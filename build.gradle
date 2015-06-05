@@ -1,5 +1,3 @@
-import java.sql.Wrapper
-
 /*
  * The MIT License (MIT)
  * Copyright (c) 2014 longkai
@@ -10,7 +8,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath 'com.android.tools.build:gradle:0.8.+'
+		classpath 'com.android.tools.build:gradle:1.2.3'
 	}
 }
 
@@ -24,16 +22,16 @@ repositories {
 apply plugin: 'android'
 
 ext {
-	supportLibVersion = '19.1.0'
+	supportLibVersion = '22.2.0'
 }
 
 android {
-	compileSdkVersion 19
-	buildToolsVersion = '19.1'
+	compileSdkVersion 22
+	buildToolsVersion = '22.0.1'
 
 	sourceSets {
 		defaultConfig {
-			testPackageName 'org.catnut.tests'
+			// testPackageName 'org.catnut.tests'
 		}
 
 		main {
@@ -60,17 +58,14 @@ dependencies {
 	// and that lib is not available in remote maven repo,
 	// you need to use gradle' s multi-project build facility.
 	// if you don' t know how it works, please refer Gradle' s docs or google.
-	compile files("libs/*.jar")
+  compile fileTree(dir: 'libs', include: ['*.jar'])
 	compile "com.android.support:support-v4:$supportLibVersion"
 	compile "com.android.support:support-v13:$supportLibVersion"
 	compile 'com.mcxiaoke.volley:library:1.0.+'
-	compile 'com.viewpagerindicator:library:2.4.1' // no test, you should be aware...
-	compile 'com.squareup.picasso:picasso:2.2.0'
+  compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
+	compile 'com.squareup.picasso:picasso:2.5.2'
 	compile 'com.etsy.android.grid:library:1.0.4' // 源码有修改注释掉了com.etsy.android.grid.ExtendableListView 557-561
-	compile 'com.squareup.okhttp:okhttp:1.6.0' // 事实上，不用也可以，用自身的httpurlconnection
+	compile 'com.squareup.okhttp:okhttp-urlconnection:2.4.0'
+	compile 'com.squareup.okhttp:okhttp:2.4.0' // 事实上，不用也可以，用自身的httpurlconnection
 }
 
-task wrapper(type: Wrapper) {
-	// be sure which version is suitable!
-	gradleVersion = 1.10
-}
