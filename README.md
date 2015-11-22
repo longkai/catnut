@@ -1,6 +1,9 @@
  新浪微博Android REST Client
 =====================
 ![logo](https://farm3.staticflickr.com/2915/14145326087_9fb76b1ed5_m.jpg)
+
+[<img width=240 alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png' />][Google Play]
+
 ---
 ## 说明
 简洁，流畅，快速的微博app，并且附带500px和知乎每日精选的照片和问答插件 :-)
@@ -59,6 +62,9 @@ The software shall be used for good, not evil.
 3. Twitter: [@longkai_1991][]
 4. 新浪微博：[@米粉撸油条][]
 
+### Legal attribution
+* Android, Google Play and the Google Play logo are trademarks of Google Inc.
+
 ===
 last updated: 2015-06-06
 
@@ -82,3 +88,5 @@ last updated: 2015-06-06
 [timeline]: https://farm4.staticflickr.com/3865/14331112414_929a71514c_o.png "timeline"
 [project-host]: http://longkai.github.io/catnut/ "project-host"
 [download]: http://www.wandoujia.com/apps/org.catnut "豌豆荚下载"
+
+[Google Play]: https://play.google.com/store/apps/details?id=org.catnut&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1 'Get it on Google Play'
